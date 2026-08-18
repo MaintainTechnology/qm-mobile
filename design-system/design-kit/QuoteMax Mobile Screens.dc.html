@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><meta name="design_doc_mode" content="canvas"><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+body{margin:0;background:#0B0907;font-family:Manrope,ui-sans-serif,system-ui,sans-serif;font-feature-settings:'ss01','cv11'}
+*{box-sizing:border-box}
+a{color:#FFC400;text-decoration:none}a:hover{color:#E6AC00}
+</style></helmet>
+
+<section style="padding:56px 60px 80px;display:flex;flex-direction:column;gap:52px">
+
+<div style="display:flex;flex-direction:column;gap:14px;max-width:96ch">
+<div style="display:flex;align-items:center;gap:11px">
+<span style="font:800 11px/1 'JetBrains Mono',monospace;letter-spacing:.12em;padding:6px 9px;background:#FFC400;color:#1C1812;border-radius:5px">1a</span>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.18em;text-transform:uppercase;color:#A2968A">QuoteMax mobile · React Native + Expo</span>
+</div>
+<h1 style="margin:0;font:800 46px/.93 Manrope,sans-serif;letter-spacing:-.045em;text-transform:uppercase;color:#F6F1EA">Every web tab, one-handed</h1>
+<p style="margin:0;font:400 15.5px/1.6 Manrope,sans-serif;color:#A2968A;max-width:78ch">Trade-first bottom bar — Home · Roof · Quotes · Chats · Menu — over the same tokens as the web app: warm charcoal <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#C3B8AC">#16120F</span>, cards <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#C3B8AC">#2B2422</span>, signal yellow <span style="font-family:'JetBrains Mono',monospace;font-size:13.5px;color:#FFC400">#FFC400</span>, Manrope + JetBrains Mono, all-caps display. Every screen below is live — tap through it. Bare screens are <a href="#1b">1b</a>.</p>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:44px">
+
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:baseline;gap:11px">
+<span style="font:700 11px/1 'JetBrains Mono',monospace;color:#FFC400">01</span>
+<h2 style="margin:0;font:700 12px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#F6F1EA">First run · welcome, sign in, onboarding</h2>
+<span style="font:400 12px/1 Manrope,sans-serif;color:#6E645C">Four onboarding steps, same as web</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:34px">
+<div data-screen-label="Welcome" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="welcome" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Welcome · Face ID unlock</span>
+</div>
+<div data-screen-label="Sign in" style="display:flex;flex-direction:column;gap:11px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="signin" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Sign in</span>
+</div>
+<div data-screen-label="Onboarding" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="onboard" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Onboard 01–04 · tap Continue</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:baseline;gap:11px">
+<span style="font:700 11px/1 'JetBrains Mono',monospace;color:#FFC400">02</span>
+<h2 style="margin:0;font:700 12px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#F6F1EA">Daily · today first, then the quote that needs you</h2>
+<span style="font:400 12px/1 Manrope,sans-serif;color:#6E645C">Push lands with Review · Release · Resend</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:34px">
+<div data-screen-label="Home" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="home" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Home · site visits, review card, KPIs</span>
+</div>
+<div data-screen-label="Quote review" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="quote" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Quote review · tiers, lines, camera, send sheet</span>
+</div>
+<div data-screen-label="SMS thread" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="chat" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">SMS thread · AI drafting live</span>
+</div>
+</div>
+</div>
+
+<div style="display:flex;flex-direction:column;gap:16px">
+<div style="display:flex;align-items:baseline;gap:11px">
+<span style="font:700 11px/1 'JetBrains Mono',monospace;color:#FFC400">03</span>
+<h2 style="margin:0;font:700 12px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#F6F1EA">Roof hub · measure on site, gloves on</h2>
+<span style="font:400 12px/1 Manrope,sans-serif;color:#6E645C">Fixed map over a fixed results panel — no sheet dragging</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:34px">
+<div data-screen-label="Roof measure" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="measure" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Measure · toggle structures, fix, re-price, save</span>
+</div>
+<div data-screen-label="Roof hub" style="display:flex;flex-direction:column;gap:11px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="hub" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Roof hub · Switch cycles trades</span>
+</div>
+<div data-screen-label="Customer quote" style="display:flex;flex-direction:column;gap:11px">
+<div style="padding:11px;border-radius:56px;background:#0A0908;box-shadow:0 0 0 1.5px #3A322C,0 34px 64px -24px rgba(0,0,0,.8);position:relative">
+<div style="position:absolute;top:23px;left:50%;transform:translateX(-50%);width:108px;height:30px;border-radius:18px;background:#000;z-index:5"></div>
+<div style="width:390px;height:844px;border-radius:46px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="customer" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">What Priya sees · Good/Better/Best + deposit</span>
+</div>
+</div>
+</div>
+
+</div>
+
+<div id="1b" style="display:flex;flex-direction:column;gap:16px;padding-top:26px;border-top:1px solid rgba(255,255,255,.08)">
+<div style="display:flex;align-items:center;gap:11px">
+<span style="font:800 11px/1 'JetBrains Mono',monospace;letter-spacing:.12em;padding:6px 9px;background:rgba(255,255,255,.1);color:#F6F1EA;border-radius:5px">1b</span>
+<h2 style="margin:0;font:700 12px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:#F6F1EA">Bare screens · every remaining tab</h2>
+<span style="font:400 12px/1 Manrope,sans-serif;color:#6E645C">Menu bands mirror the web sidebar</span>
+</div>
+<div style="display:flex;flex-wrap:wrap;gap:26px">
+<div data-screen-label="Quotes" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="quotes" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Quotes · filters + sort</span>
+</div>
+<div data-screen-label="Chats" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="chats" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Chats · AI handled vs needs you</span>
+</div>
+<div data-screen-label="Calendar" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="calendar" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Calendar · visits + follow-ups</span>
+</div>
+<div data-screen-label="Menu" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="menu" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Menu · Price book / Marketing / Records / Account</span>
+</div>
+<div data-screen-label="Pricing" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="pricing" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Price book · 49/65 coverage</span>
+</div>
+<div data-screen-label="Marketing" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="marketing" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Marketing · QR, flyer, videos</span>
+</div>
+<div data-screen-label="Files" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="files" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Files · toggle to History</span>
+</div>
+<div data-screen-label="Account" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="account" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Account · AI line, notifications, device</span>
+</div>
+<div data-screen-label="Billing" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #3A322C;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="billing" theme="dark" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Billing · plan, usage, invoices</span>
+</div>
+<div data-screen-label="Home light" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #CFC2B0;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="home" theme="light" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Home · warm-paper light</span>
+</div>
+<div data-screen-label="Quote light" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #CFC2B0;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="quote" theme="light" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Quote review · light</span>
+</div>
+<div data-screen-label="Measure light" style="display:flex;flex-direction:column;gap:10px">
+<div style="width:390px;height:844px;border:1px solid #CFC2B0;border-radius:26px;overflow:hidden;position:relative">
+<dc-import name="QuoteMax Mobile App" screen="measure" theme="light" hint-size="390px,844px"></dc-import>
+</div>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:#A2968A">Measure · light</span>
+</div>
+</div>
+</div>
+
+</section>
+
+</x-dc>
+</body>
+</html>

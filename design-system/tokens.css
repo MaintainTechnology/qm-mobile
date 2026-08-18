@@ -1,0 +1,163 @@
+/* ════════════════════════════════════════════════════════════════════
+   QuoteMax Mobile design tokens (web/docs form).
+   Source of truth: DESIGN.md at the repo root, tailored from the
+   quotemax.com.au website system. The app consumes src/lib/theme.ts;
+   this file exists for the brand kit (index.html) and any web embeds.
+   Sizes are the mobile dp values expressed as px.
+   ════════════════════════════════════════════════════════════════════ */
+
+:root {
+  color-scheme: dark;
+
+  /* ─── Ink / surface (dark canvas, warm Caterpillar charcoal) ─── */
+  --ink-deep: #16120f; /* screen canvas */
+  --ink: #1e1813; /* sunken: inputs, insets */
+  --ink-card: #2b2422; /* cards, sheets, tab bar */
+  --ink-line: #3a322c; /* the 1px warm hairline */
+  --ctl-line: #7a6e5e; /* input/control boundary; stronger so a field edge holds ~3:1 in sun */
+
+  /* ─── Accent (Caterpillar yellow, the one signal) ─── */
+  --accent: #ffc400;
+  --accent-press: #e6ac00;
+  --accent-soft: #ffd23d; /* focus rings, ticks */
+  --accent-ink: #1c1812; /* text/icons ON yellow, never white */
+
+  /* ─── Text on dark ─── */
+  --text-pri: #f6f1ea; /* bone */
+  --text-sec: #c3b8ac; /* warm grey */
+  --text-dim: #a2968a; /* mono labels; ≥4.5:1 on ink-card */
+
+  /* ─── Ridge neutrals (topographic texture only) ─── */
+  --edge-glow: #6e6354;
+  --edge-deep: #4a4136;
+
+  /* ─── State (quote lifecycle; chips and rules, never large fills) ─── */
+  --success: #15803d;
+  --success-bright: #34d27b;
+  --warning: #b45309;
+  --warning-bright: #f59e0b;
+  --danger: #b91c1c;
+  --danger-bright: #f0816b;
+
+  /* ─── Brand mark (source-art values; gold is NOT --accent) ─── */
+  --logo-body: #ffffff;
+  --logo-notch: #e3c13c;
+
+  /* ─── Type ─── */
+  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --text-display: 34px; /* lh 36, tracking -0.04em, caps  */
+  --text-headline: 26px; /* lh 28, tracking -0.04em, caps  */
+  --text-title: 18px; /* lh 24, tracking -0.02em        */
+  --text-body: 16px; /* lh 24                          */
+  --text-body-sm: 14px; /* lh 20                          */
+  --text-label: 12px; /* lh 16, tracking .18em, caps    */
+  --text-price: 28px; /* lh 32, mono, tabular-nums      */
+
+  /* ─── Shape ─── */
+  --radius-card: 14px;
+  --radius-ctl: 9px;
+  --radius-chip: 6px;
+  --radius-sheet: 16px;
+  --radius-pill: 9999px; /* status dots and avatar discs only, never buttons */
+
+  /* ─── Space (4dp base) ─── */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-12: 48px;
+  --space-16: 64px;
+
+  /* ─── Touch floors ─── */
+  --touch-min: 48px;
+  --touch-row: 56px;
+  --touch-cta: 56px;
+
+  /* ─── Motion ─── */
+  --dur-fast: 120ms;
+  --dur-base: 180ms;
+  --dur-slow: 240ms;
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+
+  /* ─── Depth (borders not shadows) ─── */
+  --lift: inset 0 1px 0 0 rgba(255, 255, 255, 0.06); /* lit panel edge */
+  --shadow-menu: 0 16px 40px -12px rgba(11, 9, 7, 0.55); /* true overlays only */
+  --shadow-overlay: 0 24px 60px -12px rgba(11, 9, 7, 0.7);
+  --noise-opacity: 0.045; /* hero surfaces only */
+  /* Hero canvas yellow ember, inherited from the website's globals.css
+     --glow-warm. Hero surfaces only; it is a declared material, not a wash. */
+  --glow-warm: rgba(255, 196, 0, 0.07);
+}
+
+/* ── Light theme, "warm paper" (device preference or [data-theme] pin).
+      The sunlight theme: same accent, ink text, taupe hairlines. ── */
+@media (prefers-color-scheme: light) {
+  :root:not([data-theme="dark"]) {
+    color-scheme: light;
+    --ink-deep: #faf8f4;
+    --ink: #f3eee7;
+    --ink-card: #ffffff;
+    --ink-line: #cfc2b0;
+    --ctl-line: #8a7d6a;
+    --accent-soft: #2b2422; /* focus ring is ink on paper; soft yellow vanishes on cream */
+    --accent-ink: #2b2422;
+    --text-pri: #241e1b;
+    --text-sec: #5e544e;
+    --text-dim: #6e645c;
+    --edge-glow: #8a7d6a;
+    --edge-deep: #6e6354;
+    --success-bright: #15803d;
+    --warning-bright: #b45309;
+    --danger-bright: #b91c1c;
+    --logo-body: #16120f;
+    --lift: 0 1px 2px rgba(43, 36, 34, 0.06);
+    --noise-opacity: 0.03;
+  }
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --ink-deep: #faf8f4;
+  --ink: #f3eee7;
+  --ink-card: #ffffff;
+  --ink-line: #cfc2b0;
+  --accent-ink: #2b2422;
+  --text-pri: #241e1b;
+  --text-sec: #5e544e;
+  --text-dim: #6e645c;
+  --edge-glow: #8a7d6a;
+  --edge-deep: #6e6354;
+  --success-bright: #15803d;
+  --warning-bright: #b45309;
+  --danger-bright: #b91c1c;
+  --logo-body: #16120f;
+  --lift: 0 1px 2px rgba(43, 36, 34, 0.06);
+  --noise-opacity: 0.03;
+}
+
+/* ── Utilities the brand kit leans on ── */
+
+/* Film grain: fixed fractal noise over dark hero surfaces. */
+.qm-grain {
+  position: relative;
+  isolation: isolate;
+}
+.qm-grain::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  opacity: var(--noise-opacity);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+/* Lifted plate: hairline + lit edge, the resting-surface treatment. */
+.qm-lift {
+  border: 1px solid var(--ink-line);
+  box-shadow: var(--lift);
+}

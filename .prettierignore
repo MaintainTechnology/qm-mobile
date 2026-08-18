@@ -1,0 +1,10 @@
+# Generated, vendored, or not ours to reformat
+node_modules/
+.expo/
+dist/
+example/
+android/
+ios/
+assets/
+.vscode/
+package-lock.json

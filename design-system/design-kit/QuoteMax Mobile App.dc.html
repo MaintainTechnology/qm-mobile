@@ -1,0 +1,1915 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics><link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet"><style>
+html,body{margin:0;padding:0;background:#0B0907}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+a{color:#FFC400;text-decoration:none}a:hover{color:#E6AC00}
+button{font-family:inherit;cursor:pointer}
+@keyframes qmPulse{0%,100%{opacity:1}50%{opacity:.4}}
+@keyframes qmHeart{0%,40%,100%{transform:scale(1)}10%{transform:scale(1.07)}20%{transform:scale(1)}30%{transform:scale(1.05)}}
+@keyframes qmBreathe{0%,100%{opacity:.35}50%{opacity:1}}
+@keyframes qmPop{from{opacity:0;transform:translateY(10px) scale(.97)}to{opacity:1;transform:none}}
+@keyframes qmUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+@keyframes qmDrop{from{opacity:0;transform:translateY(-120%)}to{opacity:1;transform:none}}
+@keyframes qmDot{0%,60%,100%{transform:translateY(0);opacity:.45}30%{transform:translateY(-4px);opacity:1}}
+@keyframes qmSweep{0%{transform:translateX(-100%)}100%{transform:translateX(300%)}}
+@keyframes qmMarquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+image-slot{display:block}
+.qm-scroll{overflow-y:auto;scrollbar-width:none}.qm-scroll>*{flex-shrink:0}.qm-scroll::-webkit-scrollbar{display:none}
+.qm-x{overflow-x:auto;scrollbar-width:none}.qm-x::-webkit-scrollbar{display:none}
+</style><script src="./image-slot.js"></script></helmet>
+
+<div ref="{{ rootRef }}" style="--bg:#16120F;--card:#2B2422;--sunk:#1E1813;--line:#3A322C;--pri:#F6F1EA;--sec:#C3B8AC;--dim:#A2968A;--acc:#FFC400;--accTx:#FFC400;--accUnder:transparent;--accPress:#E6AC00;--accInk:#1C1812;--ok:#34D27B;--warn:#F59E0B;--bad:#F0816B;--logo:#FFFFFF;--lift:inset 0 1px 0 0 rgba(255,255,255,.06);--grain:.045;width:390px;height:844px;position:relative;overflow:hidden;background:var(--bg);color:var(--pri);font-family:Manrope,ui-sans-serif,system-ui,sans-serif;font-feature-settings:'ss01','cv11'">
+
+<div aria-hidden="true" style="position:absolute;inset:0;z-index:60;pointer-events:none;opacity:var(--grain);background-image:url(&quot;data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3'/%3E%3C/filter%3E%3Crect width='120' height='120' filter='url(%23n)'/%3E%3C/svg%3E&quot;)"></div>
+
+<div style="position:absolute;inset:0;display:flex;flex-direction:column">
+
+<div style="flex:none;height:44px;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 8px;font:600 13.5px/1 Manrope,sans-serif;color:var(--pri)">
+<span style="font-variant-numeric:tabular-nums">9:41</span>
+<div style="display:flex;align-items:center;gap:5px">
+<svg width="17" height="11" viewBox="0 0 17 11" fill="currentColor"><rect x="0" y="7.5" width="3" height="3.5" rx="1"></rect><rect x="4.6" y="5.4" width="3" height="5.6" rx="1"></rect><rect x="9.2" y="3" width="3" height="8" rx="1"></rect><rect x="13.8" y="0" width="3" height="11" rx="1"></rect></svg>
+<svg width="16" height="11" viewBox="0 0 16 11" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M1 3.6a10 10 0 0 1 14 0M3.6 6.3a6.4 6.4 0 0 1 8.8 0M6.2 9a2.8 2.8 0 0 1 3.6 0"></path></svg>
+<svg width="25" height="12" viewBox="0 0 25 12" fill="none"><rect x=".7" y=".7" width="21" height="10.6" rx="2.8" stroke="currentColor" stroke-opacity=".4"></rect><rect x="2.4" y="2.4" width="15" height="7.2" rx="1.6" fill="currentColor"></rect><path d="M23.2 4.2v3.6a2 2 0 0 0 0-3.6z" fill="currentColor" fill-opacity=".5"></path></svg>
+</div>
+</div>
+
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;position:relative">
+
+<sc-if value="{{ atWelcome }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column;padding:0 26px 30px;position:relative">
+<div aria-hidden="true" style="position:absolute;left:-120px;right:-120px;top:120px;height:340px;opacity:.5;background:radial-gradient(closest-side,rgba(255,196,0,.10),transparent 70%)"></div>
+<div style="flex:none;padding-top:26px;display:flex;align-items:center;gap:11px;animation:qmHeart 2.6s ease-in-out infinite">
+<svg viewBox="151 214 397 270" style="height:34px;width:auto;display:block"><path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="var(--logo)"></path><path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#E3C13C"></path></svg>
+<span style="display:flex;flex-direction:column;font:800 21px/.82 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--logo);animation:qmBreathe 2.6s ease-in-out infinite"><span>Quote</span><span>Max</span></span>
+</div>
+<div style="flex:1"></div>
+<span style="align-self:flex-start;display:inline-flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:8px;padding:8px 12px;font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--sec)">
+<span style="width:5px;height:5px;border-radius:50%;background:var(--ok)"></span>Built for Australian tradies</span>
+<h1 style="margin:20px 0 0;font:800 40px/.93 Manrope,sans-serif;letter-spacing:-.04em;text-transform:uppercase;color:var(--pri)">Never quote on a <span style="color:var(--accTx);text-decoration-line:underline;text-decoration-color:var(--accUnder);text-decoration-thickness:.09em;text-underline-offset:.12em">Sunday night</span> again.</h1>
+<p style="margin:16px 0 0;font:400 15.5px/1.55 Manrope,sans-serif;color:var(--sec)">Your AI receptionist answers the call, asks the right questions and drafts the quote off your own pricing book. You review it in the ute and send.</p>
+<div style="margin-top:26px;display:flex;flex-direction:column;gap:11px">
+<button onClick="{{ goSignup }}" style="height:58px;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--acc);color:var(--accInk);border:0;border-radius:8px;font:700 14px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Get my QuoteMax
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"></path></svg></button>
+<button onClick="{{ goSignin }}" style="height:52px;display:inline-flex;align-items:center;justify-content:center;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:8px;font:700 13px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">I already have an account</button>
+</div>
+<button onClick="{{ goHome }}" style="margin-top:20px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:transparent;border:0;padding:6px;font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.6"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 10v1M15 10v1M9.5 15a3.5 3.5 0 0 0 5 0"></path></svg>Face ID enabled · tap to unlock</button>
+</div>
+</sc-if>
+
+<sc-if value="{{ atSignin }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:12px;height:52px;padding:0 18px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goWelcome }}" style="width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Sign in</span>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:30px 26px 34px">
+<h2 style="margin:0;font:800 30px/1 Manrope,sans-serif;letter-spacing:-.035em;text-transform:uppercase;color:var(--pri)">Welcome back</h2>
+<p style="margin:11px 0 0;font:400 14.5px/1.55 Manrope,sans-serif;color:var(--sec)">Your AI line has been answering while you were on the tools.</p>
+<div style="margin-top:26px;display:flex;flex-direction:column;gap:18px">
+<label style="display:block">
+<span style="display:block;margin-bottom:8px;font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pri)">Email</span>
+<div style="height:52px;display:flex;align-items:center;padding:0 16px;background:var(--sunk);border:1px solid var(--line);border-radius:8px;font:400 16px/1 Manrope,sans-serif;color:var(--pri)">jeph@hartleyelectrical.com.au</div>
+</label>
+<label style="display:block">
+<span style="display:block;margin-bottom:8px;font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pri)">Password</span>
+<div style="height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--sunk);border:1px solid var(--acc);border-radius:8px;box-shadow:0 0 0 2px rgba(255,210,61,.35)">
+<span style="font:400 18px/1 'JetBrains Mono',monospace;letter-spacing:.2em;color:var(--pri)">••••••••••</span>
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.75"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+</div>
+</label>
+</div>
+<button onClick="{{ goHome }}" style="margin-top:26px;width:100%;height:58px;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--acc);color:var(--accInk);border:0;border-radius:8px;font:700 14px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Sign in
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"></path></svg></button>
+<div style="margin:22px 0;display:flex;align-items:center;gap:14px">
+<span style="flex:1;height:1px;background:var(--line)"></span>
+<span style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">or</span>
+<span style="flex:1;height:1px;background:var(--line)"></span>
+</div>
+<button onClick="{{ goHome }}" style="width:100%;height:58px;display:inline-flex;align-items:center;justify-content:center;gap:11px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:8px;font:700 13px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.6"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M9 10v1M15 10v1M9.5 15a3.5 3.5 0 0 0 5 0"></path></svg>Unlock with Face ID</button>
+<div style="margin-top:24px;display:flex;flex-direction:column;gap:12px;align-items:flex-start">
+<a href="#" style="font:600 12.5px/1 Manrope,sans-serif;color:var(--accTx)">Forgot your password?</a>
+<span style="font:400 12.5px/1 Manrope,sans-serif;color:var(--dim)">No account yet? <a href="#" onClick="{{ goSignup }}" style="color:var(--accTx)">Get your QuoteMax</a></span>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atOnboard }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;justify-content:space-between;height:52px;padding:0 18px;border-bottom:1px solid var(--line)">
+<div style="display:flex;align-items:center;gap:10px">
+<button onClick="{{ obBack }}" style="width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<svg viewBox="151 214 397 270" style="height:22px;width:auto;display:block"><path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="var(--logo)"></path><path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#E3C13C"></path></svg>
+</div>
+<span style="font:500 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Step {{ obNum }} <span style="color:var(--line)">/</span> 04</span>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:22px 26px 30px">
+<div style="display:flex;gap:7px">
+<sc-for list="{{ obBars }}" as="b" hint-placeholder-count="4">
+<span style="height:4px;flex:1;border-radius:2px;background:{{ b.bg }}"></span>
+</sc-for>
+</div>
+<div style="margin-top:12px;display:flex;align-items:baseline;justify-content:space-between;gap:12px">
+<span style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Step {{ obNum }} / 04</span>
+<span style="font:600 13.5px/1 Manrope,sans-serif;color:var(--pri)">{{ obLabel }}</span>
+</div>
+<h2 style="margin:28px 0 0;font:800 27px/1.03 Manrope,sans-serif;letter-spacing:-.03em;text-transform:uppercase;color:var(--pri)">{{ obLabel }}</h2>
+<p style="margin:10px 0 0;font:400 14.5px/1.55 Manrope,sans-serif;color:var(--sec)">{{ obSub }}</p>
+<div style="margin-top:22px;display:flex;flex-direction:column;gap:20px">
+<sc-for list="{{ obFields }}" as="f" hint-placeholder-count="3">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;margin-bottom:8px">
+<span style="font:600 10.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pri)">{{ f.label }}<span style="color:#F43F5E;margin-left:4px">{{ f.req }}</span></span>
+<span style="font:400 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ f.hint }}</span>
+</div>
+<sc-if value="{{ f.isGrid }}" hint-placeholder-val="{{ false }}">
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+<sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="4">
+<button onClick="{{ o.onPick }}" style="display:flex;align-items:center;gap:10px;min-height:56px;padding:0 14px;text-align:left;background:{{ o.bg }};border:1px solid {{ o.border }};border-radius:8px">
+<span style="flex:none;width:18px;height:18px;border-radius:5px;border:1px solid {{ o.border }};background:{{ o.tick }};display:grid;place-items:center;color:var(--accInk)">{{ o.mark }}</span>
+<span style="font:600 14px/1.2 Manrope,sans-serif;color:var(--pri)">{{ o.label }}</span>
+</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ f.isChips }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-wrap:wrap;gap:8px">
+<sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="8">
+<button onClick="{{ o.onPick }}" style="min-height:44px;padding:0 15px;background:{{ o.bg }};border:1px solid {{ o.border }};border-radius:8px;font:700 12.5px/1 'JetBrains Mono',monospace;letter-spacing:.08em;color:{{ o.fg }}">{{ o.label }}</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ f.isInput }}" hint-placeholder-val="{{ false }}">
+<div style="height:54px;display:flex;align-items:center;justify-content:space-between;padding:0 16px;background:var(--sunk);border:1px solid var(--line);border-radius:8px">
+<span style="font:400 16px/1 Manrope,sans-serif;color:{{ f.valueColor }}">{{ f.value }}</span>
+<span style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ f.suffix }}</span>
+</div>
+</sc-if>
+<sc-if value="{{ f.isReview }}" hint-placeholder-val="{{ false }}">
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ f.opts }}" as="o" hint-placeholder-count="5">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:14px;padding:13px 16px;border-bottom:1px solid var(--line)">
+<span style="font:500 10px/1.3 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">{{ o.label }}</span>
+<span style="text-align:right;font:700 13.5px/1.3 Manrope,sans-serif;color:var(--pri)">{{ o.value }}</span>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ obNext }}" style="margin-top:26px;width:100%;height:58px;display:inline-flex;align-items:center;justify-content:center;gap:10px;background:var(--acc);color:var(--accInk);border:0;border-radius:8px;font:700 14px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">{{ obCta }}
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M13 5l7 7-7 7"></path></svg></button>
+<p style="margin:16px 0 0;font:500 10px/1.5 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">No card needed · about 3 minutes</p>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atHome }}" hint-placeholder-val="{{ true }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;height:54px;display:flex;align-items:center;gap:10px;padding:0 16px;border-bottom:1px solid var(--line)">
+<svg viewBox="151 214 397 270" style="height:24px;width:auto;display:block"><path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="var(--logo)"></path><path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#E3C13C"></path></svg>
+<div style="flex:1;min-width:0">
+<div style="font:800 12.5px/1 Manrope,sans-serif;letter-spacing:-.01em;text-transform:uppercase;color:var(--logo)">QuoteMax</div>
+<div style="margin-top:3px;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">Hartley Electrical</div>
+</div>
+<button onClick="{{ firePush }}" style="width:38px;height:38px;position:relative;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.75"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"></path><path d="M13.7 21a2 2 0 0 1-3.4 0"></path></svg>
+<span style="position:absolute;top:-3px;right:-3px;min-width:16px;height:16px;padding:0 4px;border-radius:8px;background:var(--acc);color:var(--accInk);font:700 9.5px/16px 'JetBrains Mono',monospace;text-align:center">3</span></button>
+<button onClick="{{ toggleTheme }}" style="width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.75"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2M12 20v2M2 12h2M20 12h2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"></path></svg></button>
+<div style="width:32px;height:32px;border-radius:50%;background:var(--acc);display:grid;place-items:center;font:800 13.5px/1 Manrope,sans-serif;color:var(--accInk)">J</div>
+</div>
+
+<div class="qm-scroll" style="flex:1;min-height:0">
+<div style="display:flex;align-items:center;gap:9px;padding:9px 16px;border-bottom:1px solid var(--line);background:var(--sunk)">
+<span style="width:6px;height:6px;border-radius:50%;background:var(--ok);animation:qmPulse 2.4s ease-in-out infinite"></span>
+<span style="flex:1;font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--ok)">AI line live · answering</span>
+<span style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">+61 468 048 422</span>
+</div>
+
+<div style="padding:20px 16px 0;animation:qmUp .32s cubic-bezier(.22,1,.36,1) both">
+<h1 style="margin:0;font:800 28px/.95 Manrope,sans-serif;letter-spacing:-.04em;text-transform:uppercase;color:var(--pri)">Good morning, <span style="color:var(--accTx);text-decoration-line:underline;text-decoration-color:var(--accUnder);text-decoration-thickness:.09em;text-underline-offset:.12em">Jeph</span></h1>
+<p style="margin:9px 0 0;font:400 13.5px/1.5 Manrope,sans-serif;color:var(--sec)">Two visits booked today. One quote needs your review.</p>
+</div>
+
+<section style="margin-top:20px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:12px;padding:0 16px 10px">
+<div style="display:flex;align-items:baseline;gap:9px">
+<span style="font:700 12px/1 'JetBrains Mono',monospace;color:var(--accTx)">01</span>
+<h2 style="margin:0;font:700 11.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--pri)">Today · 2 site visits</h2>
+</div>
+<button onClick="{{ goCalendar }}" style="background:transparent;border:0;padding:0;font:700 10px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accTx)">Calendar →</button>
+</div>
+<div class="qm-x" style="display:flex;gap:12px;padding:2px 16px 2px">
+<sc-for list="{{ todayVisits }}" as="v" hint-placeholder-count="2">
+<div style="flex:none;width:274px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:16px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:800 26px/1 'JetBrains Mono',monospace;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--pri)">{{ v.time }}</span>
+<span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">{{ v.dur }}</span>
+</div>
+<div style="margin-top:12px;font:700 15px/1.2 Manrope,sans-serif;color:var(--pri)">{{ v.name }}</div>
+<div style="margin-top:5px;font:400 12.5px/1.4 Manrope,sans-serif;color:var(--sec)">{{ v.addr }}</div>
+<div style="margin-top:11px;display:inline-flex;align-items:center;gap:6px;border:1px solid {{ v.tone }};border-radius:6px;padding:5px 8px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ v.tone }}"><span style="width:5px;height:5px;border-radius:50%;background:{{ v.tone }}"></span>{{ v.kind }}</div>
+<div style="margin-top:13px;display:flex;gap:8px">
+<button style="flex:1;height:48px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>Call</button>
+<button style="flex:1;height:48px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 11 21 3l-8 18-2-7z"></path></svg>Drive</button>
+</div>
+<div style="margin-top:9px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ v.drive }} from here</div>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="margin:20px 16px 0;position:relative;border:1px solid rgba(245,158,11,.42);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:18px">
+<div style="display:flex;align-items:center;gap:8px;font:700 9.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)">
+<span style="width:6px;height:6px;border-radius:50%;background:var(--warn);animation:qmPulse 2.4s ease-in-out infinite"></span>Needs your attention</div>
+<div style="margin-top:12px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font:700 15px/1.2 Manrope,sans-serif;color:var(--pri)">Jon · Chandler</span>
+<span style="flex:none;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">SMS · 4 min</span>
+</div>
+<p style="margin:7px 0 0;font:400 12.5px/1.45 Manrope,sans-serif;color:var(--dim)">QuoteMax drafted this one. It needs a couple of details before you can send.</p>
+<button onClick="{{ goQuote }}" style="margin-top:14px;width:100%;height:52px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 12.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Review quote →</button>
+</section>
+
+<section style="margin:16px 16px 0;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:18px">
+<div style="font:600 10.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Quoted · This month</div>
+<div style="margin-top:9px;font:800 38px/1 'JetBrains Mono',monospace;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--pri)">$178,411</div>
+<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:5px 18px;font:400 12.5px/1.4 Manrope,sans-serif;color:var(--sec)">
+<span><span style="font:700 12.5px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">20</span> drafts</span>
+<span><span style="font:700 12.5px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--ok)">$0</span> converted</span>
+<span><span style="font:700 12.5px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">0%</span> rate</span>
+</div>
+</section>
+
+<div style="margin:12px 16px 0;display:grid;grid-template-columns:repeat(3,1fr);gap:1px;overflow:hidden;border:1px solid var(--line);border-radius:14px;background:var(--line);box-shadow:var(--lift)">
+<sc-for list="{{ miniKpis }}" as="k" hint-placeholder-count="3">
+<div style="background:var(--card);padding:14px 12px">
+<div style="font:600 9.5px/1.2 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">{{ k.label }}</div>
+<div style="margin-top:7px;font:800 17px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:{{ k.color }}">{{ k.value }}</div>
+<div style="margin-top:6px;font:500 9.5px/1.2 Manrope,sans-serif;color:var(--sec)">{{ k.sub }}</div>
+</div>
+</sc-for>
+</div>
+
+<section style="margin:16px 16px 0;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:18px">
+<div style="font:600 9.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Your QuoteMax number</div>
+<div style="margin-top:10px;display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font:700 20px/1 'JetBrains Mono',monospace;letter-spacing:-.01em;color:var(--pri)">+61 468 048 422</span>
+<button style="width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.75"><rect x="9" y="9" width="12" height="12" rx="2"></rect><path d="M5 15V5a2 2 0 0 1 2-2h10"></path></svg></button>
+</div>
+<div style="margin-top:13px;display:flex;gap:8px">
+<sc-for list="{{ chips }}" as="c" hint-placeholder-count="3">
+<span style="flex:1;display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid rgba(52,210,123,.45);border-radius:6px;padding:8px 0;font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)"><span style="width:5px;height:5px;border-radius:50%;background:var(--ok)"></span>{{ c }}</span>
+</sc-for>
+</div>
+</section>
+
+<section style="margin:16px 16px 0;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<header style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:13px 16px">
+<div style="display:flex;align-items:baseline;gap:9px">
+<span style="font:700 11.5px/1 'JetBrains Mono',monospace;color:var(--accTx)">02</span>
+<h2 style="margin:0;font:700 11px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--pri)">Recent quotes</h2>
+</div>
+<button onClick="{{ goQuotes }}" style="background:transparent;border:0;padding:0;font:700 10px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accTx)">All 20 →</button>
+</header>
+<sc-for list="{{ recentQuotes }}" as="q" hint-placeholder-count="3">
+<button onClick="{{ goQuote }}" style="display:flex;width:100%;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:13px 16px">
+<div style="flex:1;min-width:0">
+<div style="font:700 13.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ q.name }}</div>
+<div style="margin-top:4px;font:400 12px/1.35 Manrope,sans-serif;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ q.job }}</div>
+<div style="margin-top:5px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">{{ q.suburb }} · {{ q.ch }}</div>
+</div>
+<div style="flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:7px">
+<span style="font:700 14px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ q.value }}</span>
+<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid {{ q.tone }};border-radius:6px;padding:4px 7px;font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ q.tone }}"><span style="width:4px;height:4px;border-radius:50%;background:{{ q.tone }}"></span>{{ q.status }}</span>
+</div>
+</button>
+</sc-for>
+<div style="display:flex;align-items:center;gap:8px;padding:11px 16px">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.75"><path d="M21 12a9 9 0 0 1-9 9M3 12a9 9 0 0 1 9-9M12 8v4l3 2"></path></svg>
+<span style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">2 drafts saved offline · sync on signal</span>
+</div>
+</section>
+
+<section style="margin:16px 16px 24px;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<header style="display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid var(--line);padding:13px 16px">
+<h2 style="margin:0;font:700 11px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--pri)">Recent chats</h2>
+<button onClick="{{ goChats }}" style="background:transparent;border:0;padding:0;font:700 10px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accTx)">Open →</button>
+</header>
+<sc-for list="{{ recentChats }}" as="c" hint-placeholder-count="2">
+<button onClick="{{ goChats }}" style="display:flex;width:100%;gap:11px;align-items:flex-start;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:13px 16px">
+<div style="flex:none;width:30px;height:30px;border-radius:50%;background:var(--line);display:grid;place-items:center;font:700 12px/1 Manrope,sans-serif;color:var(--sec)">{{ c.initial }}</div>
+<div style="min-width:0;flex:1">
+<div style="display:flex;justify-content:space-between;gap:8px"><span style="font:700 13px/1 Manrope,sans-serif;color:var(--pri)">{{ c.name }}</span><span style="flex:none;font:500 9.5px/1 'JetBrains Mono',monospace;color:var(--dim)">{{ c.time }}</span></div>
+<p style="margin:5px 0 0;font:400 12px/1.4 Manrope,sans-serif;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.msg }}</p>
+</div>
+</button>
+</sc-for>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atQuotes }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goHome }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Daily</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Quotes</div>
+</div>
+<button style="flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"></path></svg>New</button>
+</div>
+<div style="flex:none;padding:12px 14px 0">
+<div style="height:44px;display:flex;align-items:center;gap:9px;padding:0 13px;background:var(--sunk);border:1px solid var(--line);border-radius:10px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg>
+<span style="flex:1;font:400 14.5px/1 Manrope,sans-serif;color:var(--dim)">Customer, suburb or job</span>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM5 11a7 7 0 0 0 14 0M12 18v3"></path></svg>
+</div>
+</div>
+<div class="qm-x" style="flex:none;display:flex;gap:8px;padding:12px 14px 12px">
+<sc-for list="{{ quoteFilters }}" as="f" hint-placeholder-count="5">
+<button onClick="{{ f.onPick }}" style="flex:none;min-height:38px;display:inline-flex;align-items:center;gap:7px;padding:0 13px;background:{{ f.bg }};border:1px solid {{ f.border }};border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ f.fg }}">{{ f.label }}
+<span style="font:700 10px/1 'JetBrains Mono',monospace;color:{{ f.countFg }}">{{ f.count }}</span></button>
+</sc-for>
+</div>
+<div style="flex:none;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 16px 10px">
+<span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">{{ quoteCountLabel }}</span>
+<button onClick="{{ cycleSort }}" style="height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 11px;background:transparent;border:1px solid var(--line);border-radius:8px;font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)">
+<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 7h16M7 12h10M10 17h4"></path></svg>{{ sortLabel }}</button>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:0 14px 20px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ quoteList }}" as="q" hint-placeholder-count="6">
+<button onClick="{{ goQuote }}" style="display:flex;flex-direction:column;width:100%;text-align:left;border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:var(--lift);padding:14px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+<div style="flex:1;min-width:0">
+<div style="font:700 15px/1.2 Manrope,sans-serif;color:var(--pri)">{{ q.name }}</div>
+<div style="margin-top:5px;font:400 12.5px/1.4 Manrope,sans-serif;color:var(--sec)">{{ q.job }}</div>
+</div>
+<span style="flex:none;font:800 16px/1 'JetBrains Mono',monospace;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--pri)">{{ q.value }}</span>
+</div>
+<div style="margin-top:11px;display:flex;align-items:center;gap:8px">
+<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid {{ q.tone }};border-radius:6px;padding:5px 8px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ q.tone }}"><span style="width:4px;height:4px;border-radius:50%;background:{{ q.tone }}"></span>{{ q.status }}</span>
+<span style="font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ q.suburb }} · {{ q.ch }} · {{ q.age }}</span>
+</div>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atQuote }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goQuotes }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--warn)">Awaiting you · draft</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Q-1043</div>
+</div>
+<button style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.9"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"></path></svg></button>
+<button style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><circle cx="12" cy="5" r="1.4"></circle><circle cx="12" cy="12" r="1.4"></circle><circle cx="12" cy="19" r="1.4"></circle></svg></button>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 20px;display:flex;flex-direction:column;gap:14px">
+
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:16px">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+<div style="flex:1;min-width:0">
+<div style="font:700 17px/1.15 Manrope,sans-serif;color:var(--pri)">Priya Naidu</div>
+<div style="margin-top:5px;font:400 12.5px/1.45 Manrope,sans-serif;color:var(--sec)">14 Wynnum Rd, Norman Park QLD 4170</div>
+<div style="margin-top:8px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">Full re-roof · Colorbond corrugated · 270 m²</div>
+</div>
+<span style="flex:none;display:inline-flex;align-items:center;gap:5px;border:1px solid rgba(52,210,123,.45);border-radius:6px;padding:5px 8px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)"><span style="width:4px;height:4px;border-radius:50%;background:var(--ok)"></span>$99 paid</span>
+</div>
+<div style="margin-top:13px;display:flex;gap:7px">
+<button style="flex:1;height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>Call</button>
+<button onClick="{{ goChat }}" style="flex:1;height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path></svg>SMS</button>
+<button onClick="{{ goMeasure }}" style="flex:1;height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 17 6-6 4 4 8-8M14 7h7v7"></path></svg>Measure</button>
+</div>
+</section>
+
+<section>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:9px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Option presented</h2>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">From the measure</span>
+</div>
+<div style="display:flex;gap:8px">
+<sc-for list="{{ tiers }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.onPick }}" style="display:flex;flex-direction:column;flex:1;text-align:left;padding:13px 12px;background:{{ t.bg }};border:1px solid {{ t.border }};border-radius:12px">
+<div style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ t.labelFg }}">{{ t.label }}</div>
+<div style="margin-top:9px;font:800 15px/1 'JetBrains Mono',monospace;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--pri)">{{ t.price }}</div>
+<div style="margin-top:6px;font:500 9.5px/1.3 Manrope,sans-serif;color:var(--dim)">{{ t.sub }}</div>
+</button>
+</sc-for>
+</div>
+</section>
+
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;padding:13px 15px;border-bottom:1px solid var(--line)">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Line items</h2>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Tap to edit</span>
+</div>
+<sc-for list="{{ lineItems }}" as="li" hint-placeholder-count="5">
+<div style="display:flex;align-items:flex-start;gap:12px;padding:13px 15px;border-bottom:1px solid var(--line)">
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:center;gap:7px">
+<span style="font:600 13.5px/1.3 Manrope,sans-serif;color:var(--pri)">{{ li.label }}</span>
+<sc-if value="{{ li.flag }}" hint-placeholder-val="{{ false }}"><span style="flex:none;border:1px solid rgba(245,158,11,.5);border-radius:5px;padding:3px 5px;font:700 8px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--warn)">Check</span></sc-if>
+</div>
+<div style="margin-top:5px;font:500 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:.06em;color:var(--dim)">{{ li.qty }}</div>
+</div>
+<span style="flex:none;font:700 13.5px/1.3 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ li.amount }}</span>
+</div>
+</sc-for>
+<div style="padding:13px 15px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ totals }}" as="t" hint-placeholder-count="3">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:{{ t.font }};letter-spacing:.1em;text-transform:uppercase;color:{{ t.fg }}">{{ t.label }}</span>
+<span style="font:{{ t.vFont }};font-variant-numeric:tabular-nums;color:{{ t.vFg }}">{{ t.value }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:15px">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Job photos</h2>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">4 attached</span>
+</div>
+<div class="qm-x" style="margin-top:12px;display:flex;gap:9px">
+<button style="flex:none;width:78px;height:78px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;background:var(--sunk);border:1px dashed var(--line);border-radius:11px;color:var(--accTx)">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>
+<span style="font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase">Camera</span></button>
+<sc-for list="{{ photoTiles }}" as="p" hint-placeholder-count="4">
+<div style="flex:none;width:78px;height:78px;border-radius:11px;border:1px solid var(--line);background:{{ p.bg }};position:relative;overflow:hidden">
+<span style="position:absolute;left:7px;bottom:6px;font:600 8px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#F6F1EA;text-shadow:0 1px 3px rgba(0,0,0,.7)">{{ p.label }}</span>
+</div>
+</sc-for>
+</div>
+</section>
+
+<div style="display:flex;flex-direction:column;gap:9px">
+<button onClick="{{ openSend }}" style="width:100%;height:56px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 13.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="m3 11 19-8-8 19-2.5-8.5z"></path></svg>Release &amp; send to Priya</button>
+<div style="display:flex;gap:9px">
+<button style="flex:1;height:48px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"></path></svg>Share link</button>
+<button onClick="{{ goCustomer }}" style="flex:1;height:48px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"></path><circle cx="12" cy="12" r="3"></circle></svg>Preview</button>
+</div>
+</div>
+</div>
+
+<sc-if value="{{ sendOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:40;background:rgba(11,9,7,.6);display:flex;flex-direction:column;justify-content:flex-end">
+<div style="border-radius:20px 20px 0 0;border-top:1px solid var(--line);background:var(--card);padding:14px 18px 24px;animation:qmPop .3s cubic-bezier(.22,1,.36,1) both">
+<div style="width:42px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px"></div>
+<h3 style="margin:0;font:800 19px/1.1 Manrope,sans-serif;letter-spacing:-.025em;text-transform:uppercase;color:var(--pri)">Send this quote</h3>
+<p style="margin:8px 0 0;font:400 13px/1.5 Manrope,sans-serif;color:var(--sec)">Priya gets an SMS with a link to all three options and can pay the deposit on the spot.</p>
+<div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ sendChannels }}" as="s" hint-placeholder-count="3">
+<button style="display:flex;align-items:center;gap:12px;padding:14px;background:{{ s.bg }};border:1px solid {{ s.border }};border-radius:11px;text-align:left">
+<span style="flex:none;width:20px;color:{{ s.fg }}">{{ s.icon }}</span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font:700 13.5px/1 Manrope,sans-serif;color:var(--pri)">{{ s.label }}</span>
+<span style="display:block;margin-top:4px;font:400 11.5px/1.3 Manrope,sans-serif;color:var(--dim)">{{ s.sub }}</span>
+</span>
+<sc-if value="{{ s.on }}" hint-placeholder-val="{{ false }}"><span style="flex:none;font:800 13px/1 Manrope,sans-serif;color:var(--accTx)">✓</span></sc-if>
+</button>
+</sc-for>
+</div>
+<div style="margin-top:16px;display:flex;gap:9px">
+<button onClick="{{ closeSend }}" style="flex:none;width:96px;height:52px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 12px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Cancel</button>
+<button onClick="{{ closeSend }}" style="flex:1;height:52px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 12.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Send now</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ atChats }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goHome }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Daily</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Chats</div>
+</div>
+<span style="flex:none;display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(52,210,123,.45);border-radius:8px;padding:8px 10px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)"><span style="width:5px;height:5px;border-radius:50%;background:var(--ok);animation:qmPulse 2.4s ease-in-out infinite"></span>AI on</span>
+</div>
+<div class="qm-x" style="flex:none;display:flex;gap:8px;padding:12px 14px">
+<sc-for list="{{ chatFilters }}" as="f" hint-placeholder-count="4">
+<button onClick="{{ f.onPick }}" style="flex:none;min-height:38px;padding:0 13px;background:{{ f.bg }};border:1px solid {{ f.border }};border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ f.fg }}">{{ f.label }}</button>
+</sc-for>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:0 0 20px">
+<sc-for list="{{ chatList }}" as="c" hint-placeholder-count="6">
+<button onClick="{{ goChat }}" style="width:100%;display:flex;gap:12px;align-items:flex-start;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:14px 16px">
+<div style="flex:none;width:38px;height:38px;border-radius:50%;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center;font:700 14px/1 Manrope,sans-serif;color:var(--sec)">{{ c.initial }}</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+<span style="font:700 14.5px/1.2 Manrope,sans-serif;color:var(--pri);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.name }}</span>
+<span style="flex:none;font:500 9.5px/1 'JetBrains Mono',monospace;color:var(--dim)">{{ c.time }}</span>
+</div>
+<p style="margin:5px 0 0;font:400 12.5px/1.4 Manrope,sans-serif;color:var(--dim);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ c.msg }}</p>
+<div style="margin-top:8px;display:flex;align-items:center;gap:7px">
+<span style="display:inline-flex;align-items:center;gap:5px;border:1px solid {{ c.tone }};border-radius:5px;padding:4px 6px;font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ c.tone }}"><span style="width:4px;height:4px;border-radius:50%;background:{{ c.tone }}"></span>{{ c.state }}</span>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ c.ch }}</span>
+</div>
+</div>
+<sc-if value="{{ c.unread }}" hint-placeholder-val="{{ false }}"><span style="flex:none;min-width:20px;height:20px;padding:0 6px;border-radius:10px;background:var(--acc);color:var(--accInk);font:800 10px/20px 'JetBrains Mono',monospace;text-align:center">{{ c.unread }}</span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atChat }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:11px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goChats }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:none;width:34px;height:34px;border-radius:50%;background:var(--sunk);border:1px solid var(--line);display:grid;place-items:center;font:700 13px/1 Manrope,sans-serif;color:var(--sec)">P</div>
+<div style="flex:1;min-width:0">
+<div style="font:700 14.5px/1 Manrope,sans-serif;color:var(--pri)">Priya Naidu</div>
+<div style="margin-top:4px;display:flex;align-items:center;gap:6px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)"><span style="width:5px;height:5px;border-radius:50%;background:var(--ok)"></span>AI handling · 0468 048 422</div>
+</div>
+<button style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:var(--acc);border:0;border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accInk)" stroke-width="2.2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg></button>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 10px;display:flex;flex-direction:column;gap:11px">
+<div style="align-self:center;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Today · 2:41 pm</div>
+<sc-for list="{{ thread }}" as="m" hint-placeholder-count="5">
+<div style="align-self:{{ m.align }};max-width:83%;border:1px solid {{ m.border }};border-radius:{{ m.radius }};background:{{ m.bg }};padding:11px 13px">
+<sc-if value="{{ m.tag }}" hint-placeholder-val="{{ false }}"><div style="margin-bottom:6px;font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ m.tagFg }}">{{ m.tag }}</div></sc-if>
+<p style="margin:0;font:400 13.5px/1.45 Manrope,sans-serif;color:{{ m.fg }}">{{ m.text }}</p>
+<div style="margin-top:6px;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ m.metaFg }}">{{ m.meta }}</div>
+</div>
+</sc-for>
+<div style="align-self:flex-start;display:flex;align-items:center;gap:7px;border:1px solid var(--line);border-radius:14px 14px 14px 4px;background:var(--card);padding:13px 15px">
+<span style="width:6px;height:6px;border-radius:50%;background:var(--acc);animation:qmDot 1.1s ease-in-out infinite"></span>
+<span style="width:6px;height:6px;border-radius:50%;background:var(--acc);animation:qmDot 1.1s ease-in-out .16s infinite"></span>
+<span style="width:6px;height:6px;border-radius:50%;background:var(--acc);animation:qmDot 1.1s ease-in-out .32s infinite"></span>
+<span style="margin-left:4px;font:600 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">QuoteMax drafting</span>
+</div>
+<button onClick="{{ goQuote }}" style="align-self:stretch;margin-top:2px;display:flex;align-items:center;gap:11px;border:1px solid rgba(255,196,0,.42);border-radius:13px;background:var(--card);padding:13px 14px;text-align:left;animation:qmPop .4s cubic-bezier(.22,1,.36,1) both">
+<div style="flex:none;width:34px;height:34px;border-radius:9px;background:rgba(255,196,0,.14);display:grid;place-items:center">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.9"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6"></path></svg></div>
+<div style="flex:1;min-width:0">
+<div style="font:700 13px/1.2 Manrope,sans-serif;color:var(--pri)">Draft quote ready · $73,522</div>
+<div style="margin-top:4px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Q-1043 · tap to review</div>
+</div>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="2.2"><path d="m10 6 6 6-6 6"></path></svg>
+</button>
+</div>
+<div style="flex:none;border-top:1px solid var(--line);padding:10px 12px 14px;display:flex;align-items:center;gap:9px">
+<button style="flex:none;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:11px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.9"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="3.4"></circle></svg></button>
+<div style="flex:1;min-height:44px;display:flex;align-items:center;padding:0 14px;background:var(--sunk);border:1px solid var(--line);border-radius:11px;font:400 14.5px/1 Manrope,sans-serif;color:var(--dim)">Take over from the AI…</div>
+<button style="flex:none;width:44px;height:44px;display:grid;place-items:center;background:var(--acc);border:0;border-radius:11px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--accInk)" stroke-width="2.2"><path d="M12 15a3 3 0 0 0 3-3V6a3 3 0 0 0-6 0v6a3 3 0 0 0 3 3zM5 11a7 7 0 0 0 14 0M12 18v3"></path></svg></button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atCalendar }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goHome }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Daily · March</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Calendar</div>
+</div>
+<button style="flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"></path></svg>Book</button>
+</div>
+<div style="flex:none;display:grid;grid-template-columns:repeat(7,1fr);gap:5px;padding:13px 12px;border-bottom:1px solid var(--line)">
+<sc-for list="{{ weekDays }}" as="d" hint-placeholder-count="7">
+<button onClick="{{ d.onPick }}" style="display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 0 8px;background:{{ d.bg }};border:1px solid {{ d.border }};border-radius:10px">
+<span style="font:600 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ d.dowFg }}">{{ d.dow }}</span>
+<span style="font:800 15px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:{{ d.numFg }}">{{ d.num }}</span>
+<span style="width:5px;height:5px;border-radius:50%;background:{{ d.dot }}"></span>
+</button>
+</sc-for>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 20px;display:flex;flex-direction:column;gap:16px">
+<section>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Thursday 19 · 2 visits</h2>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">17.6 km driving</span>
+</div>
+<div style="display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ agenda }}" as="a" hint-placeholder-count="3">
+<div style="display:flex;gap:12px">
+<div style="flex:none;width:46px;display:flex;flex-direction:column;align-items:flex-end;gap:4px;padding-top:14px">
+<span style="font:700 13px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ a.time }}</span>
+<span style="font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ a.dur }}</span>
+</div>
+<div style="flex:1;min-width:0;border:1px solid {{ a.border }};border-left:3px solid {{ a.tone }};border-radius:12px;background:var(--card);box-shadow:var(--lift);padding:13px 14px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:700 14.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ a.name }}</span>
+<span style="flex:none;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ a.tone }}">{{ a.kind }}</span>
+</div>
+<div style="margin-top:6px;font:400 12.5px/1.4 Manrope,sans-serif;color:var(--sec)">{{ a.job }}</div>
+<div style="margin-top:7px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ a.addr }}</div>
+<div style="margin-top:12px;display:flex;gap:7px">
+<button style="flex:1;height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z"></path></svg>Call</button>
+<button style="flex:1;height:44px;display:inline-flex;align-items:center;justify-content:center;gap:6px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:9px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m3 11 19-8-8 19-2.5-8.5z"></path></svg>Drive</button>
+<button onClick="{{ goMeasure }}" style="flex:none;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m3 17 6-6 4 4 8-8M14 7h7v7"></path></svg></button>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+<section>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Follow-ups</h2>
+<span style="font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--warn)">3 due</span>
+</div>
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ followUps }}" as="f" hint-placeholder-count="3">
+<div style="display:flex;align-items:center;gap:11px;padding:13px 14px;border-bottom:1px solid var(--line)">
+<div style="flex:1;min-width:0">
+<div style="font:700 13.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ f.name }}</div>
+<div style="margin-top:5px;font:400 11.5px/1.35 Manrope,sans-serif;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.note }}</div>
+<div style="margin-top:6px;font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:{{ f.tone }}">{{ f.due }}</div>
+</div>
+<button style="flex:none;height:40px;padding:0 13px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 10px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase">Nudge</button>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atHub }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<div style="flex:none;width:34px;height:34px;border-radius:9px;background:rgba(255,196,0,.14);display:grid;place-items:center">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.9"><path d="M2 12 12 4l10 8M6 11v9h12v-9M10 20v-5h4v5"></path></svg></div>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Trade hub</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">{{ hubTrade }}</div>
+</div>
+<button onClick="{{ cycleTrade }}" style="flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;background:transparent;border:1px solid var(--line);border-radius:9px;font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)">Measures
+<svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="m10 6 6 6-6 6"></path></svg></button>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 20px;display:flex;flex-direction:column;gap:16px">
+<button onClick="{{ goMeasure }}" style="display:flex;flex-direction:column;text-align:left;border:1px solid rgba(255,196,0,.4);border-radius:16px;background:var(--card);box-shadow:var(--lift);padding:18px;position:relative;overflow:hidden">
+<div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(320px 160px at 88% 0,rgba(255,196,0,.14),transparent 70%)"></div>
+<div style="position:relative">
+<div style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accTx)">Roof tools</div>
+<h2 style="margin:12px 0 0;font:800 24px/1.02 Manrope,sans-serif;letter-spacing:-.03em;text-transform:uppercase;color:var(--pri)">Roof <span style="color:var(--accTx);text-decoration-line:underline;text-decoration-color:var(--accUnder);text-decoration-thickness:.09em;text-underline-offset:.12em">measure</span></h2>
+<p style="margin:9px 0 0;font:400 13px/1.5 Manrope,sans-serif;color:var(--sec)">Type an address and we measure every structure on the property — the house plus any sheds or garages. Price each one its own way, include or drop structures, and get a combined total.</p>
+<div style="margin-top:15px;display:flex;align-items:center;gap:9px">
+<span style="flex:1;height:48px;display:flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--accInk);border-radius:10px;font:700 12px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0z"></path><circle cx="12" cy="10" r="2.6"></circle></svg>Measure all structures →</span>
+<span style="flex:none;width:48px;height:48px;display:grid;place-items:center;border:1px solid var(--line);border-radius:10px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.9"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="3.4"></circle></svg></span>
+</div>
+</div>
+</button>
+<section>
+<h2 style="margin:0 0 10px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">{{ hubToolsHeading }}</h2>
+<div style="display:grid;grid-template-columns:1fr 1fr;gap:9px">
+<sc-for list="{{ hubTools }}" as="t" hint-placeholder-count="6">
+<button onClick="{{ t.onTap }}" style="text-align:left;min-height:112px;display:flex;flex-direction:column;justify-content:space-between;gap:12px;border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:var(--lift);padding:14px">
+<span style="width:34px;height:34px;border-radius:9px;background:var(--sunk);display:grid;place-items:center;color:var(--accTx)">{{ t.icon }}</span>
+<span>
+<span style="display:block;font:700 13.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ t.label }}</span>
+<span style="display:block;margin-top:5px;font:400 11px/1.35 Manrope,sans-serif;color:var(--dim)">{{ t.sub }}</span>
+</span>
+</button>
+</sc-for>
+</div>
+</section>
+<section>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Recent measures</h2>
+<span style="font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Synced</span>
+</div>
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ recentMeasures }}" as="m" hint-placeholder-count="3">
+<button onClick="{{ goMeasure }}" style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:13px 14px">
+<div style="flex:1;min-width:0">
+<div style="font:700 13.5px/1.2 Manrope,sans-serif;color:var(--pri);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ m.addr }}</div>
+<div style="margin-top:5px;font:500 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ m.meta }}</div>
+</div>
+<span style="flex:none;font:700 13px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--accTx)">{{ m.area }}</span>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><path d="m10 6 6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atMeasure }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goHub }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Roof measure</div>
+<div style="margin-top:4px;font:700 14px/1 Manrope,sans-serif;letter-spacing:-.01em;color:var(--pri);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">14 Wynnum Rd, Norman Park</div>
+</div>
+<button style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.9"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg></button>
+</div>
+
+<div style="flex:none;height:274px;position:relative;background:#1B2420;border-bottom:1px solid var(--line);overflow:hidden">
+<image-slot id="qm-aerial" shape="rect" fit="cover" placeholder="Drop the Google static-map aerial for 14 Wynnum Rd" style="position:absolute;inset:0;width:100%;height:100%"></image-slot>
+<svg viewBox="0 0 390 274" style="position:absolute;inset:0;width:100%;height:100%;pointer-events:none">
+<sc-for list="{{ facetShapes }}" as="f" hint-placeholder-count="3">
+<g>
+<polygon points="{{ f.points }}" fill="{{ f.fill }}" stroke="#2B2422" stroke-width="4" stroke-dasharray="{{ f.dash }}" stroke-linejoin="round"></polygon>
+<polygon points="{{ f.points }}" fill="none" stroke="{{ f.stroke }}" stroke-width="2" stroke-dasharray="{{ f.dash }}" stroke-linejoin="round"></polygon>
+<text x="{{ f.lx }}" y="{{ f.ly }}" fill="#2B2422" stroke="#2B2422" stroke-width="3.5" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700" text-anchor="middle">{{ f.tag }}</text>
+<text x="{{ f.lx }}" y="{{ f.ly }}" fill="{{ f.textFill }}" font-family="JetBrains Mono, monospace" font-size="10.5" font-weight="700" text-anchor="middle">{{ f.tag }}</text>
+</g>
+</sc-for>
+</svg>
+<div style="position:absolute;left:12px;top:12px;display:flex;gap:7px;flex-wrap:wrap;max-width:230px">
+<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(52,210,123,.5);border-radius:8px;background:rgba(11,9,7,.78);backdrop-filter:blur(8px);padding:8px 10px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#34D27B"><span style="width:5px;height:5px;border-radius:50%;background:#34D27B"></span>Geoscape</span>
+<span style="display:inline-flex;align-items:center;border:1px solid rgba(255,255,255,.16);border-radius:8px;background:rgba(11,9,7,.78);backdrop-filter:blur(8px);padding:8px 10px;font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#C3B8AC">Layout map</span>
+</div>
+<div style="position:absolute;right:12px;top:12px;display:flex;flex-direction:column;gap:7px">
+<button style="width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(11,9,7,.72);backdrop-filter:blur(8px)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F6F1EA" stroke-width="2.2"><path d="M12 5v14M5 12h14"></path></svg></button>
+<button style="width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(11,9,7,.72);backdrop-filter:blur(8px)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F6F1EA" stroke-width="2.2"><path d="M5 12h14"></path></svg></button>
+<button style="width:40px;height:40px;display:grid;place-items:center;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(11,9,7,.72);backdrop-filter:blur(8px)">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#F6F1EA" stroke-width="1.9"><path d="M12 2v3M12 19v3M2 12h3M19 12h3"></path><circle cx="12" cy="12" r="6"></circle></svg></button>
+</div>
+<div style="position:absolute;left:12px;right:12px;bottom:12px;display:flex;align-items:center;gap:9px;border:1px solid rgba(255,255,255,.14);border-radius:10px;background:rgba(11,9,7,.78);backdrop-filter:blur(8px);padding:9px 11px">
+<span style="font:800 15px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:#FFC400">{{ totalArea }}</span>
+<span style="width:1px;height:16px;background:rgba(255,255,255,.16)"></span>
+<span style="flex:1;font:600 8.5px/1.35 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:#C3B8AC">{{ structureSummary }}<br>Drag to rotate · compass resets north</span>
+</div>
+</div>
+
+<div class="qm-scroll" style="flex:1;min-height:0;padding:14px 14px 12px;display:flex;flex-direction:column;gap:13px">
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--line)">
+<sc-for list="{{ measureStats }}" as="s" hint-placeholder-count="3">
+<div style="background:var(--card);padding:12px 11px">
+<div style="font:600 8.5px/1.2 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ s.label }}</div>
+<div style="margin-top:7px;font:800 16px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:{{ s.color }}">{{ s.value }}</div>
+</div>
+</sc-for>
+</div>
+<div style="border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px 13px 13px 4px;background:var(--card);padding:12px 14px">
+<p style="margin:0;font:400 12.5px/1.5 Manrope,sans-serif;color:var(--sec)">{{ selectionNotice }}</p>
+</div>
+<sc-for list="{{ structures }}" as="s" hint-placeholder-count="3">
+<section style="border:1px solid {{ s.cardBorder }};border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:14px;opacity:{{ s.opacity }}">
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:11px">
+<div style="flex:1;min-width:0">
+<div style="display:flex;flex-wrap:wrap;align-items:center;gap:7px">
+<span style="font:700 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accTx)">{{ s.role }}</span>
+<span style="border:1px solid {{ s.badgeBorder }};border-radius:5px;padding:3px 6px;font:700 8px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:{{ s.badgeFg }}">{{ s.badge }}</span>
+</div>
+<h3 style="margin:7px 0 0;font:800 16px/1.15 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">{{ s.label }}</h3>
+</div>
+<button onClick="{{ s.onToggle }}" style="flex:none;width:50px;height:30px;border-radius:15px;border:1px solid {{ s.trackBorder }};background:{{ s.track }};padding:2px;display:flex;justify-content:{{ s.knobJustify }}">
+<span style="width:24px;height:24px;border-radius:50%;background:{{ s.knob }}"></span></button>
+</div>
+<div style="margin-top:13px;display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--line);border:1px solid var(--line);border-radius:11px;overflow:hidden">
+<sc-for list="{{ s.stats }}" as="m" hint-placeholder-count="6">
+<div style="background:var(--card);padding:10px 11px">
+<div style="font:600 8.5px/1.2 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ m.label }}</div>
+<div style="margin-top:6px;font:700 14px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ m.value }}</div>
+<div style="margin-top:5px;font:500 8.5px/1.2 'JetBrains Mono',monospace;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)">{{ m.hint }}</div>
+</div>
+</sc-for>
+</div>
+<button onClick="{{ openFix }}" style="margin-top:12px;width:100%;min-height:46px;display:flex;align-items:center;gap:10px;padding:0 13px;background:var(--sunk);border:1px solid var(--line);border-radius:10px;text-align:left">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.9"><path d="M12 20h9M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"></path></svg>
+<span style="flex:1;font:700 11.5px/1.3 Manrope,sans-serif;letter-spacing:.04em;color:var(--accTx)">Confirm counts &amp; measurements</span>
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="2"><path d="m10 6 6 6-6 6"></path></svg></button>
+</section>
+</sc-for>
+<section style="border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px 14px 14px 4px;background:var(--card);box-shadow:var(--lift);padding:15px">
+<div style="font:700 10px/1.4 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accTx)">{{ combinedLabel }}</div>
+<div style="margin-top:13px;display:flex;flex-direction:column;gap:9px">
+<sc-for list="{{ combinedTiers }}" as="t" hint-placeholder-count="3">
+<div style="border:1px solid var(--line);border-radius:11px;background:var(--sunk);padding:12px 13px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:700 9.5px/1.3 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">{{ t.label }}</span>
+<span style="flex:none;font:800 21px/1 'JetBrains Mono',monospace;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--accTx)">{{ t.inc }}</span>
+</div>
+<div style="margin-top:6px;text-align:right;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">inc GST · {{ t.ex }} ex GST</div>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px 14px 14px 4px;background:var(--card);box-shadow:var(--lift);padding:15px">
+<div style="font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accTx)">Existing solar &amp; skylights</div>
+<p style="margin:9px 0 0;font:400 13px/1.5 Manrope,sans-serif;color:var(--sec)">No panels detected on the aerial. 1 skylight flagged — add a re-flash line if the re-roof disturbs it (not auto-priced).</p>
+<div style="margin-top:13px;border-top:1px solid var(--line);padding-top:12px">
+<div style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Attach roof photos &amp; re-scan</div>
+<p style="margin:7px 0 0;font:400 11.5px/1.45 Manrope,sans-serif;color:var(--sec)">Close-up photos sharpen the read. We merge them with the aerial scan and update the quote.</p>
+<div style="margin-top:11px;display:flex;gap:8px">
+<button style="flex:1;height:46px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--sunk);color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="3.4"></circle></svg>Add photos</button>
+<button style="flex:none;width:118px;height:46px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Re-scan (4)</button>
+</div>
+</div>
+</section>
+</div>
+<div style="flex:none;border-top:1px solid var(--line);padding:11px 14px 14px;display:flex;gap:9px">
+<button onClick="{{ reprice }}" style="flex:none;width:126px;height:52px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12a9 9 0 0 1-9 9 9 9 0 0 1-8-5M3 12a9 9 0 0 1 9-9 9 9 0 0 1 8 5M3 4v5h5M21 20v-5h-5"></path></svg>Update prices</button>
+<button onClick="{{ goQuote }}" style="flex:1;height:52px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 12.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Edit &amp; send quote →</button>
+</div>
+
+<sc-if value="{{ fixOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:40;background:rgba(11,9,7,.6);display:flex;flex-direction:column;justify-content:flex-end">
+<div style="border-radius:20px 20px 0 0;border-top:1px solid var(--line);background:var(--card);padding:14px 18px 24px;animation:qmPop .3s cubic-bezier(.22,1,.36,1) both">
+<div style="width:42px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px"></div>
+<h3 style="margin:0;font:800 19px/1.1 Manrope,sans-serif;letter-spacing:-.025em;text-transform:uppercase;color:var(--pri)">Confirm counts</h3>
+<p style="margin:8px 0 0;font:400 13px/1.5 Manrope,sans-serif;color:var(--sec)">Box gutter and accessories aren't visible in the 2D footprint, so they start blank. Edit to correct, then update prices.</p>
+<div style="margin-top:16px;display:flex;flex-direction:column;gap:12px">
+<sc-for list="{{ fixRows }}" as="r" hint-placeholder-count="2">
+<div>
+<div style="margin-bottom:8px;font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--pri)">{{ r.label }}</div>
+<div style="display:flex;align-items:center;gap:9px">
+<button onClick="{{ r.onMinus }}" style="flex:none;width:52px;height:52px;display:grid;place-items:center;background:var(--sunk);border:1px solid var(--line);border-radius:10px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2.4"><path d="M5 12h14"></path></svg></button>
+<div style="flex:1;height:52px;display:flex;align-items:center;justify-content:center;gap:7px;background:var(--sunk);border:1px solid var(--acc);border-radius:10px">
+<span style="font:800 20px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ r.value }}</span>
+<span style="font:600 10px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ r.unit }}</span>
+</div>
+<button onClick="{{ r.onPlus }}" style="flex:none;width:52px;height:52px;display:grid;place-items:center;background:var(--sunk);border:1px solid var(--line);border-radius:10px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--pri)" stroke-width="2.4"><path d="M12 5v14M5 12h14"></path></svg></button>
+</div>
+</div>
+</sc-for>
+</div>
+<div style="margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--acc);border-radius:4px 10px 10px 4px;background:var(--sunk);padding:11px 12px">
+<p style="margin:0;font:500 11px/1.5 'JetBrains Mono',monospace;letter-spacing:.04em;color:var(--sec)">{{ fixPreview }}</p>
+</div>
+<div style="margin-top:16px;display:flex;gap:9px">
+<button onClick="{{ closeFix }}" style="flex:none;width:96px;height:52px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 12px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Cancel</button>
+<button onClick="{{ closeFix }}" style="flex:1;height:52px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 12.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Update prices</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ atMenu }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:11px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<div style="flex:none;width:34px;height:34px;border-radius:50%;background:var(--acc);display:grid;place-items:center;font:800 14px/1 Manrope,sans-serif;color:var(--accInk)">J</div>
+<div style="flex:1;min-width:0">
+<div style="font:700 14.5px/1 Manrope,sans-serif;color:var(--pri)">Jeph Daligdig</div>
+<div style="margin-top:4px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">Hartley Electrical · Pro plan</div>
+</div>
+<button onClick="{{ toggleTheme }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.75"><path d="M12 3a9 9 0 1 0 9 9 7 7 0 0 1-9-9z"></path></svg></button>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:14px 14px 22px;display:flex;flex-direction:column;gap:18px">
+<sc-for list="{{ menuBands }}" as="b" hint-placeholder-count="4">
+<section>
+<h2 style="margin:0 0 9px;font:700 10px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">{{ b.label }}</h2>
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="4">
+<button onClick="{{ r.onTap }}" style="width:100%;min-height:56px;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:11px 14px">
+<span style="flex:none;width:32px;height:32px;border-radius:9px;background:var(--sunk);display:grid;place-items:center;color:var(--accTx)">{{ r.icon }}</span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font:700 14px/1.2 Manrope,sans-serif;color:var(--pri)">{{ r.label }}</span>
+<span style="display:block;margin-top:4px;font:400 11.5px/1.3 Manrope,sans-serif;color:var(--dim)">{{ r.sub }}</span>
+</span>
+<sc-if value="{{ r.badge }}" hint-placeholder-val="{{ false }}"><span style="flex:none;border:1px solid {{ r.badgeTone }};border-radius:6px;padding:4px 7px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:{{ r.badgeTone }}">{{ r.badge }}</span></sc-if>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><path d="m10 6 6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</section>
+</sc-for>
+<button style="width:100%;height:52px;display:inline-flex;align-items:center;justify-content:center;gap:8px;background:transparent;color:var(--bad);border:1px solid var(--line);border-radius:10px;font:700 12px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9"></path></svg>Sign out</button>
+<div style="text-align:center;font:500 9px/1.6 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">QuoteMax mobile 1.0 · Expo<br>quotemax.com.au</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atPricing }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goMenu }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Price book</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">{{ priceTitle }}</div></div>
+<button style="flex:none;height:38px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6"><path d="M12 5v14M5 12h14"></path></svg>Rate</button>
+</div>
+<sc-if value="{{ showGauge }}" hint-placeholder-val="{{ false }}">
+<div style="flex:none;padding:13px 14px 0">
+<div style="border:1px solid var(--line);border-radius:13px;background:var(--card);box-shadow:var(--lift);padding:14px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:600 9.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Auto-quoted by your AI</span>
+<span style="font:700 12.5px/1 'JetBrains Mono',monospace;color:var(--accTx)">49 / 65</span>
+</div>
+<div style="margin-top:11px;height:7px;border-radius:4px;background:var(--sunk);overflow:hidden">
+<div style="width:75%;height:100%;border-radius:4px;background:var(--acc)"></div>
+</div>
+</div>
+</div>
+</sc-if>
+<div class="qm-x" style="flex:none;display:flex;gap:8px;padding:13px 14px">
+<sc-for list="{{ priceCats }}" as="c" hint-placeholder-count="4">
+<button onClick="{{ c.onPick }}" style="flex:none;min-height:38px;padding:0 13px;background:{{ c.bg }};border:1px solid {{ c.border }};border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ c.fg }}">{{ c.label }}</button>
+</sc-for>
+</div>
+<p style="flex:none;margin:0;padding:0 16px 12px;font:400 12px/1.5 Manrope,sans-serif;color:var(--sec)">{{ priceBlurb }}</p>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:0 14px 20px">
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ priceRows }}" as="p" hint-placeholder-count="7">
+<div style="display:flex;align-items:center;gap:12px;padding:13px 14px;border-bottom:1px solid var(--line)">
+<div style="flex:1;min-width:0">
+<div style="font:600 13.5px/1.25 Manrope,sans-serif;color:var(--pri)">{{ p.label }}</div>
+<div style="margin-top:5px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ p.meta }}</div>
+</div>
+<div style="flex:none;text-align:right">
+<div style="font:700 14px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:{{ p.valueFg }}">{{ p.value }}</div>
+<div style="margin-top:5px;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">{{ p.unit }}</div>
+</div>
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><path d="m10 6 6 6-6 6"></path></svg>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atMarketing }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goMenu }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Business</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Marketing</div>
+</div>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 20px;display:flex;flex-direction:column;gap:14px">
+<section style="border:1px solid var(--line);border-radius:16px;background:var(--card);box-shadow:var(--lift);padding:18px;display:flex;gap:16px;align-items:center">
+<div style="flex:none;width:104px;height:104px;border-radius:12px;background:#F6F1EA;padding:9px;display:grid;place-items:center">
+<svg viewBox="0 0 21 21" style="width:100%;height:100%;display:block" shape-rendering="crispEdges">
+<rect width="21" height="21" fill="#F6F1EA"></rect>
+<g fill="#16120F">
+<path d="M0 0h7v1H0zM0 1h1v5H0zM6 1h1v5H6zM0 6h7v1H0zM2 2h3v3H2z"></path>
+<path d="M14 0h7v1h-7zM14 1h1v5h-1zM20 1h1v5h-1zM14 6h7v1h-7zM16 2h3v3h-3z"></path>
+<path d="M0 14h7v1H0zM0 15h1v5H0zM6 15h1v5H6zM0 20h7v1H0zM2 16h3v3H2z"></path>
+<path d="M9 0h1v3H9zM11 1h1v2h-1zM8 4h2v1H8zM11 4h2v1h-2zM9 6h3v1H9zM8 8h1v2H8zM10 8h2v1h-2zM13 8h1v3h-1zM15 9h2v1h-2zM18 8h1v2h-1zM8 11h3v1H8zM12 11h2v1h-2zM16 11h1v2h-1zM19 11h1v1h-1zM9 13h1v1H9zM11 13h2v1h-2zM14 13h1v2h-1zM17 13h1v1h-1zM19 14h2v1h-2zM8 15h1v3H8zM10 16h2v1h-2zM13 15h1v2h-1zM16 16h2v1h-2zM19 16h1v2h-1zM9 18h3v1H9zM13 18h1v2h-1zM15 18h2v1h-2zM18 19h3v1h-3zM11 19h1v2h-1zM9 20h1v1H9z"></path>
+</g>
+</svg>
+</div>
+<div style="flex:1;min-width:0">
+<div style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">Your invite code</div>
+<div style="margin-top:9px;font:800 21px/1 'JetBrains Mono',monospace;letter-spacing:-.01em;color:var(--pri)">HARTLEY10</div>
+<p style="margin:9px 0 0;font:400 11.5px/1.4 Manrope,sans-serif;color:var(--sec)">Stick it on the ute. Scans go straight to your AI line.</p>
+<button style="margin-top:12px;width:100%;height:44px;display:inline-flex;align-items:center;justify-content:center;gap:7px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13"></path></svg>Share</button>
+</div>
+</section>
+<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:1px;overflow:hidden;border:1px solid var(--line);border-radius:13px;background:var(--line)">
+<sc-for list="{{ marketingStats }}" as="s" hint-placeholder-count="3">
+<div style="background:var(--card);padding:13px 11px">
+<div style="font:600 8.5px/1.2 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ s.label }}</div>
+<div style="margin-top:7px;font:800 17px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:{{ s.color }}">{{ s.value }}</div>
+</div>
+</sc-for>
+</div>
+<sc-for list="{{ marketingTools }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.onTap }}" style="display:flex;align-items:center;gap:13px;text-align:left;border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:15px">
+<span style="flex:none;width:40px;height:40px;border-radius:10px;background:var(--sunk);display:grid;place-items:center;color:var(--accTx)">{{ t.icon }}</span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font:700 14.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ t.label }}</span>
+<span style="display:block;margin-top:5px;font:400 12px/1.4 Manrope,sans-serif;color:var(--dim)">{{ t.sub }}</span>
+</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="2"><path d="m10 6 6 6-6 6"></path></svg>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atFiles }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goMenu }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Records</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">{{ filesTitle }}</div>
+</div>
+</div>
+<div style="flex:none;display:flex;gap:4px;padding:13px 14px;border-bottom:1px solid var(--line)">
+<sc-for list="{{ filesTabs }}" as="t" hint-placeholder-count="2">
+<button onClick="{{ t.onPick }}" style="flex:1;height:40px;background:{{ t.bg }};border:1px solid {{ t.border }};border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase;color:{{ t.fg }}">{{ t.label }}</button>
+</sc-for>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:14px 14px 20px">
+<sc-if value="{{ filesMode }}" hint-placeholder-val="{{ true }}">
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ fileRows }}" as="f" hint-placeholder-count="6">
+<button style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:13px 14px">
+<span style="flex:none;width:34px;height:34px;border-radius:9px;background:var(--sunk);display:grid;place-items:center;font:700 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.06em;color:{{ f.kindFg }}">{{ f.kind }}</span>
+<span style="flex:1;min-width:0">
+<span style="display:block;font:600 13.5px/1.25 Manrope,sans-serif;color:var(--pri);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">{{ f.name }}</span>
+<span style="display:block;margin-top:5px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ f.meta }}</span>
+</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.9"><path d="M12 3v13M7 11l5 5 5-5M4 21h16"></path></svg>
+</button>
+</sc-for>
+</div>
+</sc-if>
+<sc-if value="{{ historyMode }}" hint-placeholder-val="{{ false }}">
+<div style="display:flex;flex-direction:column;gap:2px">
+<sc-for list="{{ historyRows }}" as="h" hint-placeholder-count="6">
+<div style="display:flex;gap:13px">
+<div style="flex:none;width:56px;text-align:right;padding-top:13px;font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">{{ h.time }}</div>
+<div style="flex:none;width:11px;display:flex;flex-direction:column;align-items:center;padding-top:14px">
+<span style="width:9px;height:9px;border-radius:50%;background:{{ h.tone }}"></span>
+<span style="flex:1;width:1px;background:var(--line)"></span>
+</div>
+<div style="flex:1;min-width:0;padding:9px 0 14px">
+<div style="font:700 13px/1.3 Manrope,sans-serif;color:var(--pri)">{{ h.title }}</div>
+<div style="margin-top:5px;font:400 11.5px/1.4 Manrope,sans-serif;color:var(--dim)">{{ h.detail }}</div>
+</div>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atAccount }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goMenu }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Account</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Settings</div>
+</div>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:14px 14px 22px;display:flex;flex-direction:column;gap:16px">
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:16px">
+<div style="display:flex;align-items:center;gap:13px">
+<div style="flex:none;width:52px;height:52px;border-radius:50%;background:var(--acc);display:grid;place-items:center;font:800 21px/1 Manrope,sans-serif;color:var(--accInk)">J</div>
+<div style="flex:1;min-width:0">
+<div style="font:700 16px/1.2 Manrope,sans-serif;color:var(--pri)">Jeph Daligdig</div>
+<div style="margin-top:5px;font:400 12px/1.35 Manrope,sans-serif;color:var(--sec);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">jeph@hartleyelectrical.com.au</div>
+<div style="margin-top:6px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">QBCC 15 284 991 · QLD</div>
+</div>
+<button style="flex:none;height:40px;padding:0 13px;background:transparent;border:1px solid var(--line);border-radius:9px;font:700 10px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--pri)">Edit</button>
+</div>
+</section>
+<sc-for list="{{ accountBands }}" as="b" hint-placeholder-count="3">
+<section>
+<h2 style="margin:0 0 9px;font:700 10px/1 Manrope,sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)">{{ b.label }}</h2>
+<div style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<sc-for list="{{ b.rows }}" as="r" hint-placeholder-count="4">
+<div style="min-height:58px;display:flex;align-items:center;gap:12px;padding:12px 14px;border-bottom:1px solid var(--line)">
+<div style="flex:1;min-width:0">
+<div style="font:600 13.5px/1.25 Manrope,sans-serif;color:var(--pri)">{{ r.label }}</div>
+<div style="margin-top:4px;font:400 11px/1.35 Manrope,sans-serif;color:var(--dim)">{{ r.sub }}</div>
+</div>
+<sc-if value="{{ r.isToggle }}" hint-placeholder-val="{{ false }}">
+<button onClick="{{ r.onToggle }}" style="flex:none;width:50px;height:30px;border-radius:15px;border:1px solid {{ r.trackBorder }};background:{{ r.track }};padding:2px;display:flex;justify-content:{{ r.knobJustify }}">
+<span style="width:24px;height:24px;border-radius:50%;background:{{ r.knob }}"></span></button>
+</sc-if>
+<sc-if value="{{ r.isValue }}" hint-placeholder-val="{{ false }}">
+<span style="flex:none;font:700 12.5px/1 'JetBrains Mono',monospace;color:var(--accTx)">{{ r.value }}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</sc-for>
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:16px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:600 9.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">Payouts · next Tuesday</span>
+<button onClick="{{ goBilling }}" style="background:transparent;border:0;padding:0;font:700 9.5px/1 Manrope,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--accTx)">Billing →</button>
+</div>
+<div style="margin-top:10px;font:800 28px/1 'JetBrains Mono',monospace;letter-spacing:-.03em;font-variant-numeric:tabular-nums;color:var(--pri)">$1,485.00</div>
+<div style="margin-top:9px;font:400 12px/1.45 Manrope,sans-serif;color:var(--sec)">15 × $99 site-visit deposits, less fees. Paid to NAB •••• 4417.</div>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atBilling }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goMenu }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="m14 6-6 6 6 6"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Account</div>
+<div style="margin-top:4px;font:800 16px/1 Manrope,sans-serif;letter-spacing:-.02em;text-transform:uppercase;color:var(--pri)">Billing</div>
+</div>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0;padding:16px 14px 22px;display:flex;flex-direction:column;gap:14px">
+<section style="position:relative;overflow:hidden;border:1px solid rgba(255,196,0,.4);border-radius:16px;background:var(--card);box-shadow:var(--lift);padding:18px">
+<div aria-hidden="true" style="position:absolute;inset:0;background:radial-gradient(300px 150px at 90% 0,rgba(255,196,0,.15),transparent 70%)"></div>
+<div style="position:relative">
+<div style="display:flex;align-items:center;justify-content:space-between;gap:10px">
+<span style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:var(--accTx)">Current plan</span>
+<span style="border:1px solid rgba(52,210,123,.45);border-radius:6px;padding:5px 8px;font:700 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)">Active</span>
+</div>
+<h2 style="margin:13px 0 0;font:800 27px/1 Manrope,sans-serif;letter-spacing:-.03em;text-transform:uppercase;color:var(--pri)">Pro</h2>
+<div style="margin-top:9px;display:flex;align-items:baseline;gap:8px">
+<span style="font:800 21px/1 'JetBrains Mono',monospace;color:var(--pri)">$349</span>
+<span style="font:500 10px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">/ month + GST</span>
+</div>
+<p style="margin:11px 0 0;font:400 12.5px/1.5 Manrope,sans-serif;color:var(--sec)">Unlimited quotes, AI voice + SMS line, roof measure, 3 trade hubs. Renews 14 April.</p>
+<button style="margin-top:15px;width:100%;height:48px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 11.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Change plan</button>
+</div>
+</section>
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);padding:16px">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">This cycle</h2>
+<div style="margin-top:13px;display:flex;flex-direction:column;gap:13px">
+<sc-for list="{{ usageRows }}" as="u" hint-placeholder-count="3">
+<div>
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px">
+<span style="font:600 12px/1 Manrope,sans-serif;color:var(--sec)">{{ u.label }}</span>
+<span style="font:700 12px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ u.value }}</span>
+</div>
+<div style="margin-top:8px;height:6px;border-radius:3px;background:var(--sunk);overflow:hidden">
+<div style="width:{{ u.pct }};height:100%;border-radius:3px;background:{{ u.tone }}"></div>
+</div>
+</div>
+</sc-for>
+</div>
+</section>
+<section style="border:1px solid var(--line);border-radius:14px;background:var(--card);box-shadow:var(--lift);overflow:hidden">
+<div style="padding:13px 14px;border-bottom:1px solid var(--line)">
+<h2 style="margin:0;font:700 10.5px/1 Manrope,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--pri)">Invoices</h2>
+</div>
+<sc-for list="{{ invoiceRows }}" as="i" hint-placeholder-count="3">
+<button style="width:100%;display:flex;align-items:center;gap:12px;text-align:left;border:0;border-bottom:1px solid var(--line);background:transparent;padding:13px 14px">
+<div style="flex:1;min-width:0">
+<div style="font:600 13.5px/1.2 Manrope,sans-serif;color:var(--pri)">{{ i.date }}</div>
+<div style="margin-top:5px;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">{{ i.id }}</div>
+</div>
+<span style="flex:none;font:700 13px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ i.amount }}</span>
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="var(--dim)" stroke-width="1.9"><path d="M12 3v13M7 11l5 5 5-5M4 21h16"></path></svg>
+</button>
+</sc-for>
+</section>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{ atCustomer }}" hint-placeholder-val="{{ false }}">
+<div style="flex:1;min-height:0;display:flex;flex-direction:column">
+<div style="flex:none;display:flex;align-items:center;gap:10px;height:54px;padding:0 14px;border-bottom:1px solid var(--line)">
+<button onClick="{{ goQuote }}" style="flex:none;width:38px;height:38px;display:grid;place-items:center;background:transparent;border:1px solid var(--line);border-radius:9px">
+<svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+<div style="flex:1;min-width:0">
+<div style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.16em;text-transform:uppercase;color:var(--dim)">Customer preview</div>
+<div style="margin-top:4px;font:700 14px/1 Manrope,sans-serif;color:var(--pri)">quotemax.com.au/q/8fk2</div>
+</div>
+</div>
+<div class="qm-scroll" style="flex:1;min-height:0">
+<div style="padding:22px 18px 18px;border-bottom:1px solid var(--line)">
+<div style="display:flex;align-items:center;gap:10px">
+<svg viewBox="151 214 397 270" style="height:26px;width:auto;display:block"><path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="var(--logo)"></path><path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#E3C13C"></path></svg>
+<div style="flex:1;min-width:0">
+<div style="font:800 14px/1 Manrope,sans-serif;letter-spacing:-.01em;text-transform:uppercase;color:var(--pri)">Hartley Electrical</div>
+<div style="margin-top:4px;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">QBCC 15 284 991 · Brisbane</div>
+</div>
+</div>
+<h1 style="margin:20px 0 0;font:800 26px/1.02 Manrope,sans-serif;letter-spacing:-.035em;text-transform:uppercase;color:var(--pri)">Your reroof quote</h1>
+<p style="margin:10px 0 0;font:400 14px/1.55 Manrope,sans-serif;color:var(--sec)">Hi Priya — three ways to do the job at 14 Wynnum Rd, priced off the measure. Pick the one that suits and we'll lock in a start date.</p>
+<div style="margin-top:14px;display:flex;flex-wrap:wrap;gap:7px">
+<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:7px;padding:7px 10px;font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)">Valid 30 days</span>
+<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line);border-radius:7px;padding:7px 10px;font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--sec)">Licensed &amp; insured</span>
+<span style="display:inline-flex;align-items:center;gap:6px;border:1px solid rgba(52,210,123,.45);border-radius:7px;padding:7px 10px;font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--ok)">$99 visit credited</span>
+</div>
+</div>
+<div style="padding:16px 18px 20px;display:flex;flex-direction:column;gap:11px">
+<sc-for list="{{ custTiers }}" as="t" hint-placeholder-count="3">
+<button onClick="{{ t.onPick }}" style="display:flex;flex-direction:column;text-align:left;border:1px solid {{ t.border }};border-radius:16px;background:{{ t.bg }};box-shadow:var(--lift);padding:17px;position:relative">
+<sc-if value="{{ t.flag }}" hint-placeholder-val="{{ false }}"><span style="position:absolute;top:-9px;left:17px;background:var(--acc);color:var(--accInk);border-radius:6px;padding:4px 8px;font:800 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase">{{ t.flag }}</span></sc-if>
+<div style="display:flex;align-items:flex-start;justify-content:space-between;gap:12px">
+<div style="flex:1;min-width:0">
+<div style="font:700 10px/1 'JetBrains Mono',monospace;letter-spacing:.14em;text-transform:uppercase;color:{{ t.labelFg }}">{{ t.label }}</div>
+<div style="margin-top:9px;font:700 16px/1.2 Manrope,sans-serif;color:var(--pri)">{{ t.title }}</div>
+</div>
+<div style="flex:none;text-align:right">
+<div style="font:800 20px/1 'JetBrains Mono',monospace;letter-spacing:-.02em;font-variant-numeric:tabular-nums;color:var(--pri)">{{ t.price }}</div>
+<div style="margin-top:5px;font:500 8.5px/1 'JetBrains Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)">inc GST</div>
+</div>
+</div>
+<div style="margin-top:12px;display:flex;flex-direction:column;gap:7px">
+<sc-for list="{{ t.bullets }}" as="b" hint-placeholder-count="3">
+<div style="display:flex;align-items:flex-start;gap:8px">
+<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="2.6" style="flex:none;margin-top:2px"><path d="m5 13 4 4L19 7"></path></svg>
+<span style="font:400 12.5px/1.45 Manrope,sans-serif;color:var(--sec)">{{ b }}</span>
+</div>
+</sc-for>
+</div>
+</button>
+</sc-for>
+</div>
+</div>
+<div style="flex:none;border-top:1px solid var(--line);background:var(--bg);padding:12px 16px 16px">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin-bottom:10px">
+<span style="font:600 9.5px/1 'JetBrains Mono',monospace;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)">{{ custSelLabel }} · deposit 10%</span>
+<span style="font:800 17px/1 'JetBrains Mono',monospace;font-variant-numeric:tabular-nums;color:var(--pri)">{{ custDeposit }}</span>
+</div>
+<button onClick="{{ openDeposit }}" style="width:100%;height:56px;display:inline-flex;align-items:center;justify-content:center;gap:9px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 13.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg>Accept &amp; pay deposit</button>
+</div>
+<sc-if value="{{ depositOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;inset:0;z-index:40;background:rgba(11,9,7,.6);display:flex;flex-direction:column;justify-content:flex-end">
+<div style="border-radius:20px 20px 0 0;border-top:1px solid var(--line);background:var(--card);padding:14px 18px 24px;animation:qmPop .3s cubic-bezier(.22,1,.36,1) both">
+<div style="width:42px;height:4px;border-radius:2px;background:var(--line);margin:0 auto 16px"></div>
+<h3 style="margin:0;font:800 19px/1.1 Manrope,sans-serif;letter-spacing:-.025em;text-transform:uppercase;color:var(--pri)">Pay deposit</h3>
+<p style="margin:8px 0 0;font:400 13px/1.5 Manrope,sans-serif;color:var(--sec)">{{ custSelLabel }} option · {{ custDeposit }} now, balance on completion.</p>
+<div style="margin-top:16px;display:flex;flex-direction:column;gap:9px">
+<div style="height:54px;display:flex;align-items:center;gap:11px;padding:0 15px;background:var(--sunk);border:1px solid var(--acc);border-radius:11px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--accTx)" stroke-width="1.9"><rect x="2" y="5" width="20" height="14" rx="2"></rect><path d="M2 10h20"></path></svg>
+<span style="flex:1;font:600 14.5px/1 'JetBrains Mono',monospace;color:var(--pri)">•••• •••• •••• 4417</span>
+<span style="font:600 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)">Visa</span>
+</div>
+<div style="height:54px;display:flex;align-items:center;gap:11px;padding:0 15px;background:var(--sunk);border:1px solid var(--line);border-radius:11px">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--sec)" stroke-width="1.9"><rect x="5" y="2" width="14" height="20" rx="3"></rect><path d="M11 18h2"></path></svg>
+<span style="flex:1;font:600 13.5px/1 Manrope,sans-serif;color:var(--pri)">Apple Pay</span>
+</div>
+</div>
+<div style="margin-top:16px;display:flex;gap:9px">
+<button onClick="{{ closeDeposit }}" style="flex:none;width:96px;height:52px;background:transparent;color:var(--pri);border:1px solid var(--line);border-radius:10px;font:700 12px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Back</button>
+<button onClick="{{ closeDeposit }}" style="flex:1;height:52px;background:var(--acc);color:var(--accInk);border:0;border-radius:10px;font:700 12.5px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Pay {{ custDeposit }}</button>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{ pushOpen }}" hint-placeholder-val="{{ false }}">
+<div style="position:absolute;top:8px;left:10px;right:10px;z-index:50;border:1px solid var(--line);border-radius:16px;background:rgba(43,36,34,.94);backdrop-filter:blur(18px);box-shadow:0 24px 60px -12px rgba(11,9,7,.7);padding:14px;animation:qmDrop .4s cubic-bezier(.22,1,.36,1) both">
+<div style="display:flex;gap:11px;align-items:flex-start">
+<div style="flex:none;width:34px;height:34px;border-radius:9px;background:var(--acc);display:grid;place-items:center">
+<svg viewBox="151 214 397 270" style="height:17px;width:auto;display:block"><path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="#16120F"></path><path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#2B2422"></path></svg>
+</div>
+<div style="flex:1;min-width:0">
+<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px">
+<span style="font:700 12.5px/1 Manrope,sans-serif;color:#F6F1EA">QuoteMax</span>
+<span style="flex:none;font:500 9px/1 'JetBrains Mono',monospace;letter-spacing:.1em;text-transform:uppercase;color:#A2968A">now</span>
+</div>
+<p style="margin:5px 0 0;font:600 13px/1.35 Manrope,sans-serif;color:#F6F1EA">Quote drafted · Priya Naidu paid the $99 site visit</p>
+<p style="margin:3px 0 0;font:400 12px/1.35 Manrope,sans-serif;color:#C3B8AC">Full reroof — Colorbond · <span style="font-family:'JetBrains Mono',monospace;font-weight:700;color:#F6F1EA">$73,522</span> ready to release</p>
+</div>
+</div>
+<div style="margin-top:12px;display:flex;gap:8px">
+<button onClick="{{ goQuote }}" style="flex:1;height:44px;background:var(--acc);color:var(--accInk);border:0;border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Review</button>
+<button onClick="{{ dismissPush }}" style="flex:1;height:44px;background:transparent;color:#F6F1EA;border:1px solid #3A322C;border-radius:9px;font:700 11px/1 Manrope,sans-serif;letter-spacing:.06em;text-transform:uppercase">Release</button>
+<button onClick="{{ dismissPush }}" style="flex:none;width:44px;height:44px;display:grid;place-items:center;background:transparent;border:1px solid #3A322C;border-radius:9px">
+<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#C3B8AC" stroke-width="2"><path d="M18 6 6 18M6 6l12 12"></path></svg></button>
+</div>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{ showTabs }}" hint-placeholder-val="{{ true }}">
+<nav style="flex:none;display:flex;border-top:1px solid var(--line);background:var(--bg);padding-bottom:22px">
+<sc-for list="{{ tabs }}" as="t" hint-placeholder-count="5">
+<button onClick="{{ t.onPick }}" style="position:relative;flex:1;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;background:transparent;border:0;color:{{ t.fg }}">
+<span style="position:absolute;top:0;left:22%;right:22%;height:2px;background:{{ t.bar }}"></span>
+{{ t.icon }}
+<span style="font:700 9.5px/1 Manrope,sans-serif;letter-spacing:.08em;text-transform:uppercase">{{ t.label }}</span>
+</button>
+</sc-for>
+</nav>
+</sc-if>
+
+</div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:390,&quot;height&quot;:844},&quot;screen&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;welcome&quot;,&quot;signin&quot;,&quot;onboard&quot;,&quot;home&quot;,&quot;quotes&quot;,&quot;quote&quot;,&quot;chats&quot;,&quot;chat&quot;,&quot;calendar&quot;,&quot;hub&quot;,&quot;measure&quot;,&quot;menu&quot;,&quot;pricing&quot;,&quot;marketing&quot;,&quot;files&quot;,&quot;account&quot;,&quot;billing&quot;,&quot;customer&quot;],&quot;default&quot;:&quot;home&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;},&quot;theme&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;options&quot;:[&quot;dark&quot;,&quot;light&quot;],&quot;default&quot;:&quot;dark&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;section&quot;:&quot;State&quot;}}">
+const OB = [
+  { num: '01', label: 'Account', sub: 'Your business and how customers reach you.', cta: 'Continue' },
+  { num: '02', label: 'Trade & licence', sub: 'What you do, where, optional regulatory bits.', cta: 'Continue' },
+  { num: '03', label: 'Your pricing', sub: 'Rates for the trades you picked. Anything optional has a sensible default.', cta: 'Continue' },
+  { num: '04', label: 'Review & activate', sub: 'One last look, then we provision your AI line.', cta: 'Activate my AI line' },
+];
+
+const fmt = (n) => '$' + Math.round(n).toLocaleString('en-AU');
+const chip = (on) => ({
+  bg: on ? 'rgba(255,196,0,0.12)' : 'var(--sunk)',
+  border: on ? '#FFC400' : 'var(--line)',
+  fg: on ? 'var(--accTx)' : 'var(--sec)',
+});
+const SORTS = ['Newest', 'Value', 'Oldest'];
+const QF = [
+  { label: 'All', count: 20 }, { label: 'Awaiting you', count: 1 }, { label: 'Sent', count: 6 },
+  { label: 'Viewed', count: 9 }, { label: 'Accepted', count: 3 }, { label: 'Declined', count: 1 },
+];
+const QUOTES = [
+  { name: 'Priya Naidu', job: 'Full re-roof — Colorbond corrugated', value: '$73,522', status: 'Awaiting you', tone: 'var(--warn)', suburb: 'Norman Park', ch: 'Voice', age: '12 min' },
+  { name: 'Dean Whitlam', job: 'Reroof + gutters — 2 storey', value: '$41,880', status: 'Viewed', tone: 'var(--dim)', suburb: 'Wynnum', ch: 'SMS', age: '2 h' },
+  { name: 'Jeph Daligdig', job: 'Solar install — 6.6kW', value: '$20,922', status: 'Sent', tone: '#C3B8AC', suburb: 'Chandler', ch: 'SMS', age: 'Yesterday' },
+  { name: 'Sam Okafor', job: 'Hot water — replace 250L', value: '$3,180', status: 'Accepted', tone: 'var(--ok)', suburb: 'Coogee', ch: 'SMS', age: 'Mon' },
+  { name: 'Marika Toll', job: 'Ridge capping repoint — 38 lm', value: '$4,640', status: 'Viewed', tone: 'var(--dim)', suburb: 'Bulimba', ch: 'Voice', age: 'Mon' },
+  { name: 'Ben Ashcroft', job: 'Skylight replace ×2', value: '$6,310', status: 'Sent', tone: '#C3B8AC', suburb: 'Hawthorne', ch: 'SMS', age: 'Sun' },
+  { name: 'Trish Vella', job: 'Gutter guard — whole house', value: '$2,940', status: 'Declined', tone: 'var(--bad)', suburb: 'Cannon Hill', ch: 'SMS', age: 'Fri' },
+  { name: 'Nick Faraj', job: 'Tile to metal conversion', value: '$58,410', status: 'Accepted', tone: 'var(--ok)', suburb: 'Camp Hill', ch: 'Voice', age: 'Thu' },
+];
+const TIERS = [
+  { key: 'good', label: 'Patch', price: '$12,479', sub: 'Spot repair' },
+  { key: 'better', label: 'Full replace', price: '$73,522', sub: 'Re-roof' },
+  { key: 'best', label: 'Upgraded', price: '$84,910', sub: '+ sarking' },
+];
+const LINES = [
+  { label: 'Colorbond corrugated · supply & install', qty: '270 m² @ $145.00', amount: '$39,150', flag: false },
+  { label: 'Ridge, hip cap & flashings', qty: '62 lm @ $103.55', amount: '$6,420', flag: false },
+  { label: 'Gutter + downpipe replacement', qty: '48 lm @ $101.67', amount: '$4,880', flag: true },
+  { label: 'Scaffold & edge protection', qty: '2 storey · 3 days', amount: '$11,437', flag: true },
+  { label: 'Waste + tip fees', qty: '8% of works', amount: '$4,951', flag: false },
+];
+const CHATS = [
+  { initial: 'P', name: 'Priya Naidu', time: '2:54 pm', msg: 'QuoteMax: Perfect — Jeph will confirm the reroof quote shortly.', state: 'Needs you', tone: 'var(--warn)', ch: 'Voice → SMS', unread: '2' },
+  { initial: 'D', name: 'Dean Whitlam', time: '1:12 pm', msg: 'Can you do the gutters at the same time?', state: 'Needs you', tone: 'var(--warn)', ch: 'SMS', unread: '1' },
+  { initial: 'S', name: 'Sam Okafor', time: '11:40 am', msg: 'QuoteMax: A 250L will suit that household. Drafting it now.', state: 'AI handled', tone: 'var(--ok)', ch: 'SMS', unread: false },
+  { initial: 'M', name: 'Marika Toll', time: 'Yesterday', msg: 'QuoteMax: Sent through — have a look when you get a minute.', state: 'AI handled', tone: 'var(--ok)', ch: 'SMS', unread: false },
+  { initial: 'B', name: 'Ben Ashcroft', time: 'Mon', msg: 'QuoteMax: Two skylights, same size. Noted for the quote.', state: 'AI handled', tone: 'var(--ok)', ch: 'SMS', unread: false },
+  { initial: 'T', name: 'Trish Vella', time: 'Fri', msg: 'Going with someone else this time, thanks Jeph.', state: 'AI handled', tone: 'var(--ok)', ch: 'SMS', unread: false },
+];
+const THREAD = [
+  { me: false, text: 'Hi, I got your number off the ute at Wynnum. Roof is leaking in two spots after the storm.', meta: 'Priya · 2:41 pm', tag: false },
+  { me: false, text: 'QuoteMax: No worries Priya. Is it a tile or metal roof, and roughly how old?', meta: 'AI · 2:41 pm', tag: 'QuoteMax AI' },
+  { me: false, text: 'Tile, original — house is 1968. Single storey, about 200 square metres.', meta: 'Priya · 2:43 pm', tag: false },
+  { me: false, text: 'QuoteMax: Thanks. Given the age, a full reroof usually beats patching. I can book Jeph for a $99 site visit that comes off the job if you go ahead — Thursday 10:30?', meta: 'AI · 2:44 pm', tag: 'QuoteMax AI' },
+  { me: false, text: 'Thursday works. Paid the $99 just now.', meta: 'Priya · 2:52 pm', tag: false },
+  { me: true, text: 'See you Thursday Priya — I\u2019ll bring the Colorbond samples.', meta: 'You · 2:54 pm · delivered', tag: 'You' },
+];
+const WEEK = [
+  { dow: 'Mon', num: 16, busy: true }, { dow: 'Tue', num: 17, busy: true }, { dow: 'Wed', num: 18, busy: false },
+  { dow: 'Thu', num: 19, busy: true }, { dow: 'Fri', num: 20, busy: true }, { dow: 'Sat', num: 21, busy: false }, { dow: 'Sun', num: 22, busy: false },
+];
+const AGENDA = [
+  { time: '10:30', dur: '90 min', name: 'Priya Naidu', kind: '$99 paid', tone: 'var(--ok)', border: 'var(--line)', job: 'Reroof site visit · tile to Colorbond', addr: '14 Wynnum Rd, Norman Park' },
+  { time: '14:00', dur: '60 min', name: 'Dean Whitlam', kind: 'Inspection', tone: 'var(--warn)', border: 'var(--line)', job: 'Reroof + gutter inspection · 2 storey', addr: '3/22 Kianawah Rd, Wynnum' },
+];
+const FOLLOWUPS = [
+  { name: 'Marika Toll', note: 'Ridge repoint quote · viewed twice, no reply', due: 'Overdue 2 days', tone: 'var(--bad)' },
+  { name: 'Ben Ashcroft', note: 'Skylight replace · sent Sunday', due: 'Due today', tone: 'var(--warn)' },
+  { name: 'Nick Faraj', note: 'Accepted — needs a start date', due: 'Due Friday', tone: 'var(--dim)' },
+];
+const HUBS = [
+  { name: 'Roof tools', heading: 'Roof tools', tools: [
+    ['Measurements', 'Every saved measure', 'M9 3H5a2 2 0 0 0-2 2v4M15 3h4a2 2 0 0 1 2 2v4M9 21H5a2 2 0 0 1-2-2v-4M15 21h4a2 2 0 0 0 2-2v-4M8 12h8', 'measure'],
+    ['Street view', 'Kerbside check before you drive', 'M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10zM9 11h6M12 8v6'],
+    ['Photo verify', 'Match photos to the measurement', 'M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2zm-11-8a3.4 3.4 0 1 0 0 6.8 3.4 3.4 0 0 0 0-6.8z'],
+    ['Solar check', 'Panels + skylights on the aerial', 'M12 4v2M12 18v2M4 12h2M18 12h2M6 6l1.5 1.5M16.5 16.5 18 18M6 18l1.5-1.5M16.5 7.5 18 6M12 8a4 4 0 1 1 0 8 4 4 0 0 1 0-8z'],
+    ['Roof tiles viewer', 'Profiles and colours to show', 'm3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM3 14h18M9 10v10M15 10v10'],
+    ['Topology evidence', 'Facet assignment review', 'm3 18 9-12 9 12M3 18h18M12 6v12'],
+  ], recent: [
+    { addr: '14 Wynnum Rd, Norman Park', meta: 'Today · 3 structures · Geoscape', area: '270 m²' },
+    { addr: '3/22 Kianawah Rd, Wynnum', meta: 'Yesterday · 2 storeys · steep', area: '162 m²' },
+    { addr: '88 Bennetts Rd, Camp Hill', meta: 'Mon · tile → Colorbond', area: '341 m²' },
+  ]},
+];
+const FACETS = [
+  { key: 'dwelling', role: 'Main dwelling · 01', label: 'Dwelling — 14 Wynnum Rd',
+    sloped: 212, footprint: 196, form: 'Hip', storeys: 1, hips: 4, valleys: 2, pitch: 24, pitchSrc: 'measured',
+    points: '112,74 254,68 268,144 124,156', lx: 190, ly: 116, tag: 'HIP · 212 m²' },
+  { key: 'garage', role: 'Secondary structure · 02', label: 'Garage — detached',
+    sloped: 58, footprint: 54, form: 'Gable', storeys: 1, hips: 0, valleys: 0, pitch: 18, pitchSrc: 'declared',
+    points: '272,152 352,146 358,192 278,198', lx: 315, ly: 174, tag: 'GABLE · 58 m²' },
+  { key: 'patio', role: 'Secondary structure · 03', label: 'Patio — skillion',
+    sloped: 34, footprint: 34, form: 'Skillion', storeys: 1, hips: 0, valleys: 0, pitch: 8, pitchSrc: 'declared',
+    points: '106,166 176,162 182,204 112,208', lx: 144, ly: 188, tag: 'SKILLION · 34 m²' },
+];
+const TIER_RATE = [
+  { label: 'Patch', rate: 46.22 },
+  { label: 'Full roof replacement', rate: 272.304 },
+  { label: 'Upgraded roof replacement', rate: 314.48 },
+];
+const PITCH_BUCKET = (d) => (d < 20 ? 'shallow' : d <= 25 ? 'standard' : d <= 35 ? 'steep' : 'very steep');
+const MENU = [
+  { label: 'Price book', rows: [
+    ['Pricing', 'Settings shared across your trades', 'M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6', 'pricing'],
+    ['Services', 'Which jobs your AI auto-quotes', 'm14.7 6.3a4 4 0 1 0 5 5L21 21H3z', 'pricing', '49/65', 'var(--accTx)'],
+    ['Catalogue', 'Supplier materials your estimator uses', 'm7.5 4.3 9 5.2M21 16V8a2 2 0 0 0-1-1.7l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.7l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z', 'pricing'],
+    ['Estimating', 'Run a job and see how it prices', 'M8 2h8a2 2 0 0 1 2 2v16a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2zM9 7h6M9 11h2M13 11h2M9 15h2M13 15h2', 'pricing'],
+  ]},
+  { label: 'Marketing', rows: [
+    ['Marketing', 'QR invites, scans, leads', 'm3 11 18-5v12L3 13zM11.6 16.8a3 3 0 1 1-5.8-1.6', 'marketing'],
+    ['Flyer designer', 'A5 letterbox drop', 'M3 3h18v6H3zM3 13h8v8H3zM15 13h6v8h-6z', 'marketing'],
+    ['Videos', '4 clips ready to send', 'M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM7 4v16M17 4v16M2 10h20', 'marketing'],
+  ]},
+  { label: 'Records', rows: [
+    ['Files', 'Plans, photos, PDFs', 'M20 20a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.9a2 2 0 0 1-1.7-.9L9.6 3.9A2 2 0 0 0 7.9 3H4a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2z', 'files'],
+    ['History', 'Every AI call and change', 'M3 12a9 9 0 1 0 9-9 9.7 9.7 0 0 0-6.7 2.7L3 8M3 3v5h5M12 7v5l4 2', 'files'],
+    ['Follow-ups', '3 due today', 'M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3 19.5 19.5 0 0 1-6-6 19.8 19.8 0 0 1-3-8.7A2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1 1 .4 1.9.7 2.8a2 2 0 0 1-.5 2.1L8.1 9.9a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.8.7a2 2 0 0 1 1.7 2z', 'calendar', '3', 'var(--warn)'],
+  ]},
+  { label: 'Account', rows: [
+    ['Account settings', 'AI line, notifications, device', 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-2.9 1.2v.2a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-2.9-1.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0-1.2-2.9H3a2 2 0 1 1 0-4h.2a1.7 1.7 0 0 0 1.2-2.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 2.9-1.2V3a2 2 0 1 1 4 0v.2a1.7 1.7 0 0 0 2.9 1.2l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0 1.2 2.9H21a2 2 0 1 1 0 4h-.2a1.7 1.7 0 0 0-1.4.9z', 'account'],
+    ['Payouts', '$1,485.00 next Tuesday', 'M2 7h20v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2zM2 11h20M6 3h12l2 4H4z', 'account'],
+    ['Billing & plan', 'Pro · renews 14 April', 'M2 5h20v14H2zM2 10h20M6 15h4', 'billing'],
+  ]},
+];
+const PRICE_TABS = ['General pricing', 'Services', 'Catalogue', 'Roof rates'];
+const PRICE_BLURB = {
+  'General pricing': 'Settings shared across all your trades. Per-trade rates live in each trade\u2019s tab.',
+  Services: 'Decide which jobs your AI auto-quotes — and which always book a paid site visit instead.',
+  Catalogue: 'The supplier materials and prices your estimator draws on when it builds a quote.',
+  'Roof rates': 'Your $/m² rates. The measure applies these to every included structure.',
+};
+const PRICES = {
+  'General pricing': [
+    ['Early-booking discount', 'Applied when they accept inside 7 days', '5%', 'off total'],
+    ['Quote layout', 'What the customer page shows', 'Good/Better/Best', 'three tiers'],
+    ['Review policy', 'Drafts wait for you before sending', 'Always review', 'default'],
+    ['Follow-ups', 'Auto-nudge on unanswered quotes', 'Day 2, 5, 10', 'schedule'],
+    ['Invoice calibration', 'Learns from your uploaded invoices', '18 invoices', 'calibrated'],
+  ],
+  Services: [
+    ['Full re-roof', 'Roofing · measured from aerial', 'Auto-quote', 'no visit'],
+    ['Gutter + downpipe replace', 'Roofing · lm from perimeter', 'Auto-quote', 'no visit'],
+    ['Ridge / hip cap rebed', 'Roofing · lm', 'Auto-quote', 'no visit'],
+    ['Flashing repair', 'Roofing · per flashing', 'Auto-quote', 'no visit'],
+    ['Patch / spot repair', 'Roofing · needs eyes on it', 'Site visit', '$99 paid'],
+    ['Leak trace + minor repair', 'Roofing · cause unknown', 'Site visit', '$99 paid'],
+    ['Cement sheet (asbestos-suspect)', 'Roofing · forces inspection', 'Site visit', '$99 paid'],
+  ],
+  Catalogue: [
+    ['Colorbond Corrugated', 'Supply + install', '$145.00', 'per m²'],
+    ['Colorbond Trimdek', 'Supply + install', '$152.00', 'per m²'],
+    ['Colorbond Spandek', 'Supply + install', '$149.00', 'per m²'],
+    ['Colorbond Klip-Lok 700', 'Concealed fix', '$178.00', 'per m²'],
+    ['Concrete tile', 'Supply + install', '$132.00', 'per m²'],
+    ['Terracotta tile', 'Supply + install', '$186.00', 'per m²'],
+    ['Cement sheet (asbestos-suspect)', 'Removal quoted on site', 'Not set', 'inspect'],
+  ],
+  'Roof rates': [
+    ['Shallow (under 20°)', 'Pitch bucket loading', '$138.00', 'per m²'],
+    ['Standard (20–25°, the AU norm)', 'Pitch bucket loading', '$145.00', 'per m²'],
+    ['Steep (26–35°)', 'Pitch bucket loading', '$168.00', 'per m²'],
+    ['Very steep (over 35°)', 'Forces inspection', 'Inspect', 'no auto'],
+    ['Box gutter', 'Entered per structure', '$214.00', 'per lm'],
+    ['Gutter', 'Blank unless selected', '$101.67', 'per lm'],
+    ['Downpipe', 'Suggested 1 per 12 m perimeter', '$88.00', 'each'],
+    ['Fascia', 'Blank unless selected', '$96.00', 'per lm'],
+    ['Soffit', 'Blank unless selected', '$104.00', 'per lm'],
+  ],
+};
+const FILES = [
+  { kind: 'PDF', kindFg: 'var(--bad)', name: 'Q-1043 Priya Naidu reroof.pdf', meta: 'Today · 412 kB' },
+  { kind: 'JPG', kindFg: 'var(--accTx)', name: 'Wynnum Rd ridge damage 01.jpg', meta: 'Today · 2.8 MB' },
+  { kind: 'JPG', kindFg: 'var(--accTx)', name: 'Wynnum Rd valley flashing.jpg', meta: 'Today · 3.1 MB' },
+  { kind: 'PNG', kindFg: 'var(--ok)', name: 'Wynnum Rd aerial trace.png', meta: 'Today · 640 kB' },
+  { kind: 'PDF', kindFg: 'var(--bad)', name: 'Hartley Electrical CoC 2026.pdf', meta: 'Feb · 188 kB' },
+  { kind: 'CSV', kindFg: '#C3B8AC', name: 'Price book export March.csv', meta: 'Mar 2 · 24 kB' },
+];
+const HISTORY = [
+  { time: '2:54 pm', tone: '#FFC400', title: 'You replied to Priya Naidu', detail: 'Took over the thread from the AI · SMS delivered' },
+  { time: '2:52 pm', tone: 'var(--ok)', title: 'Deposit paid · $99 site visit', detail: 'Priya Naidu · Visa •••• 4417 · credited to Q-1043' },
+  { time: '2:47 pm', tone: '#FFC400', title: 'Quote drafted · Q-1043', detail: '$73,522 from roof measure 270 m² · awaiting your review' },
+  { time: '2:44 pm', tone: 'var(--ok)', title: 'AI booked a site visit', detail: 'Thursday 19 March, 10:30 · added to calendar' },
+  { time: '2:41 pm', tone: 'var(--dim)', title: 'Inbound call answered by AI', detail: '3 min 12 s · Norman Park · transcript saved' },
+  { time: '11:40 am', tone: 'var(--dim)', title: 'Quote sent · Q-1039', detail: 'Sam Okafor · $3,180 · accepted 12 min later' },
+];
+const CUST = [
+  { key: 'good', label: 'Patch', title: 'Patch / spot repair', price: '$12,479', raw: 12479, bullets: ['Re-bed and re-point the failed ridge caps', 'Re-flash the two leaking penetrations', 'Buys time — does not renew the roof'] },
+  { key: 'better', label: 'Full roof replacement', title: 'Full re-roof', price: '$73,522', raw: 73522, flag: 'Recommended for a 1968 roof', bullets: ['Colorbond corrugated over 270 m², two structures', 'New ridge caps, hip caps and flashings', 'New gutters and downpipes, scaffold included'] },
+  { key: 'best', label: 'Upgraded roof replacement', title: 'Upgraded re-roof', price: '$84,910', raw: 84910, bullets: ['Everything in the full re-roof', 'Anticon 55mm sarking under the sheet', 'Gutter guard on every run'] },
+];
+
+class Component extends DCLogic {
+  tog(key) {
+    const on = !!this.state.notif[key];
+    return {
+      isToggle: true,
+      track: on ? '#FFC400' : 'var(--sunk)',
+      trackBorder: on ? '#FFC400' : 'var(--line)',
+      knob: on ? 'var(--accInk)' : 'var(--dim)',
+      knobJustify: on ? 'flex-end' : 'flex-start',
+      onToggle: () => this.setState((s) => ({ notif: { ...s.notif, [key]: !s.notif[key] } })),
+    };
+  }
+
+  state = {
+    nav: null, obStep: 1, trades: ['roofing'], stateCode: 'QLD', theme: null,
+    qf: 'All', sort: 0, cf: 'All', period: 'This month', day: 19,
+    tier: 'better', cust: 'better', priceCat: 'Roofing', filesTab: 'files',
+    structOff: ['patio'], fixArea: 212, fixPitch: 24, fixHips: 4, fixValleys: 2, fixBox: '', hubTrade: 0,
+    priceTab: 'General pricing',
+    sendOpen: false, fixOpen: false, depositOpen: false,
+    notif: { quote: true, paid: true, quiet: false, face: true, offline: true },
+  };
+  rootRef = React.createRef();
+
+  get nav() { return this.state.nav ?? (this.props.screen || 'home'); }
+  go = (n) => () => this.setState({ nav: n });
+
+  applyTheme() {
+    const el = this.rootRef.current;
+    if (!el) return;
+    const light = (this.state.theme ?? this.props.theme ?? 'dark') === 'light';
+    const L = { bg:'#FAF8F4', card:'#FFFFFF', sunk:'#F3EEE7', line:'#CFC2B0', pri:'#241E1B', sec:'#5E544E', dim:'#6E645C', acc:'#FFC400', accTx:'#2B2422', accUnder:'#FFC400', accInk:'#2B2422', ok:'#15803D', warn:'#B45309', bad:'#B91C1C', logo:'#16120F', lift:'0 1px 2px rgba(43,36,34,.06)', grain:'.03' };
+    const D = { bg:'#16120F', card:'#2B2422', sunk:'#1E1813', line:'#3A322C', pri:'#F6F1EA', sec:'#C3B8AC', dim:'#A2968A', acc:'#FFC400', accTx:'#FFC400', accUnder:'transparent', accInk:'#1C1812', ok:'#34D27B', warn:'#F59E0B', bad:'#F0816B', logo:'#FFFFFF', lift:'inset 0 1px 0 0 rgba(255,255,255,.06)', grain:'.045' };
+    const src = light ? L : D;
+    Object.keys(src).forEach((k) => el.style.setProperty('--' + k, src[k]));
+  }
+  componentDidMount() { this.applyTheme(); }
+  componentDidUpdate() { this.applyTheme(); }
+
+  toggleTrade = (t) => () => this.setState((s) => ({
+    trades: s.trades.includes(t) ? s.trades.filter((x) => x !== t) : [...s.trades, t],
+  }));
+
+  obFieldsFor(step) {
+    const acc = { bg: 'rgba(255,196,0,0.10)', border: '#FFC400', tick: '#FFC400', mark: '✓', fg: 'var(--accTx)' };
+    const off = { bg: 'var(--sunk)', border: 'var(--line)', tick: 'transparent', mark: '', fg: 'var(--sec)' };
+    const flag = (on) => (on ? acc : off);
+    if (step === 1) return [
+      { label: 'Business name', req: '*', hint: '', isInput: true, value: 'Hartley Electrical', valueColor: 'var(--pri)', suffix: '' },
+      { label: 'Your first name', req: '*', hint: '', isInput: true, value: 'Jeph', valueColor: 'var(--pri)', suffix: '' },
+      { label: 'Email', req: '*', hint: 'We send the quote copies here', isInput: true, value: 'jeph@hartleyelectrical.com.au', valueColor: 'var(--pri)', suffix: '' },
+      { label: 'Password', req: '*', hint: 'Min 8 characters', isInput: true, value: '••••••••••', valueColor: 'var(--pri)', suffix: 'Show' },
+    ];
+    if (step === 2) return [
+      { label: 'Your trade', req: '*', hint: 'Pick one or more', isGrid: true, opts: [
+        { label: 'Electrical', ...flag(this.state.trades.includes('electrical')), onPick: this.toggleTrade('electrical') },
+        { label: 'Plumbing', ...flag(this.state.trades.includes('plumbing')), onPick: this.toggleTrade('plumbing') },
+        { label: 'Painting', ...flag(this.state.trades.includes('painting')), onPick: this.toggleTrade('painting') },
+        { label: 'Roofing', ...flag(this.state.trades.includes('roofing')), onPick: this.toggleTrade('roofing') },
+      ]},
+      { label: 'State', req: '*', hint: '', isChips: true, opts: ['NSW','VIC','QLD','WA','SA','TAS','ACT','NT'].map((s) => ({
+        label: s, ...flag(this.state.stateCode === s), onPick: () => this.setState({ stateCode: s }),
+      }))},
+      { label: 'Mobile', req: '*', hint: 'Australian mobile', isInput: true, value: '0468 048 422', valueColor: 'var(--pri)', suffix: 'AU' },
+      { label: 'Licence number', req: '', hint: 'Optional', isInput: true, value: 'QBCC 15 284 991', valueColor: 'var(--pri)', suffix: 'QBCC' },
+    ];
+    if (step === 3) return [
+      { label: 'Hourly rate', req: '*', hint: 'Ex-GST', isInput: true, value: '$ 110.00', valueColor: 'var(--pri)', suffix: '/ hr' },
+      { label: 'Call-out minimum', req: '*', hint: '', isInput: true, value: '$ 180.00', valueColor: 'var(--pri)', suffix: 'Min' },
+      { label: 'Default markup', req: '', hint: 'On materials', isInput: true, value: '25', valueColor: 'var(--pri)', suffix: '%' },
+      { label: 'Reroof rate — Colorbond corrugated', req: '', hint: 'Roofing', isInput: true, value: '$ 145.00', valueColor: 'var(--pri)', suffix: '/ m²' },
+      { label: 'Risk buffer', req: '', hint: 'Optional', isInput: true, value: '8', valueColor: 'var(--dim)', suffix: '%' },
+    ];
+    return [
+      { label: 'Check these over', req: '', hint: 'Editable later', isReview: true, opts: [
+        { label: 'Business', value: 'Hartley Electrical' },
+        { label: 'Trades', value: 'Electrical · Roofing' },
+        { label: 'State', value: this.state.stateCode },
+        { label: 'Mobile', value: '0468 048 422' },
+        { label: 'Hourly rate', value: '$110.00 ex-GST' },
+        { label: 'Reroof · corrugated', value: '$145.00 / m²' },
+        { label: 'AI line', value: 'Provisioning on activate' },
+      ]},
+    ];
+  }
+
+  ico = (d) => React.createElement('svg', { width: 21, height: 21, viewBox: '0 0 24 24', fill: 'none', stroke: 'currentColor', strokeWidth: 1.75, strokeLinecap: 'round', strokeLinejoin: 'round' }, React.createElement('path', { d }));
+
+  renderVals() {
+    const nav = this.nav;
+    const step = this.state.obStep;
+    const meta = OB[step - 1];
+    const tabOf = { home: 'home', hub: 'hub', measure: 'hub', quotes: 'quotes', quote: 'quotes', chats: 'chats', chat: 'chats', menu: 'menu', pricing: 'menu', marketing: 'menu', files: 'menu', account: 'menu', billing: 'menu', calendar: 'home' };
+    const at = tabOf[nav] || 'home';
+    const off = this.state.structOff;
+    const onFacets = FACETS.filter((f) => !off.includes(f.key));
+    const onCount = onFacets.length;
+    const area = onFacets.reduce((n, f) => n + (f.key === 'dwelling' ? this.state.fixArea : f.sloped), 0);
+    const secondaryIn = onFacets.filter((f) => f.key !== 'dwelling').length;
+    const bucket = PITCH_BUCKET(this.state.fixPitch);
+    const sel = CUST.find((t) => t.key === this.state.cust) || CUST[1];
+    const T = [
+      { key: 'home', label: 'Home', d: 'm3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z', nav: 'home' },
+      { key: 'hub', label: 'Roof', d: 'M2 12 12 4l10 8M6 11v9h12v-9M10 20v-5h4v5', nav: 'hub' },
+      { key: 'quotes', label: 'Quotes', d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h4', nav: 'quotes' },
+      { key: 'chats', label: 'Chats', d: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z', nav: 'chats' },
+      { key: 'menu', label: 'Menu', d: 'M4 7h16M4 12h16M4 17h16', nav: 'menu' },
+    ];
+    return {
+      rootRef: this.rootRef,
+      showTabs: ['home', 'hub', 'quotes', 'quote', 'chats', 'menu', 'pricing', 'marketing', 'files', 'account', 'billing', 'calendar'].includes(nav),
+      inApp: !['welcome', 'signin', 'onboard'].includes(nav),
+      atHome: nav === 'home',
+      atQuotes: nav === 'quotes',
+      atQuote: nav === 'quote',
+      atChats: nav === 'chats',
+      atChat: nav === 'chat',
+      atCalendar: nav === 'calendar',
+      atHub: nav === 'hub',
+      atMeasure: nav === 'measure',
+      atMenu: nav === 'menu',
+      atPricing: nav === 'pricing',
+      atMarketing: nav === 'marketing',
+      atFiles: nav === 'files',
+      atAccount: nav === 'account',
+      atBilling: nav === 'billing',
+      atCustomer: nav === 'customer',
+      goChat: this.go('chat'),
+      goMenu: this.go('menu'),
+      goHub: this.go('hub'),
+      goMeasure: this.go('measure'),
+      goBilling: this.go('billing'),
+      goAccount: this.go('account'),
+      goCustomer: this.go('customer'),
+      tabs: T.map((t) => ({
+        label: t.label, icon: this.ico(t.d),
+        fg: at === t.key ? 'var(--accTx)' : 'var(--dim)',
+        bar: at === t.key ? '#FFC400' : 'transparent',
+        onPick: this.go(t.nav),
+      })),
+      pushOpen: nav === 'home' && this.state.push === true,
+      firePush: () => this.setState({ push: true }),
+      dismissPush: () => this.setState({ push: false }),
+      toggleTheme: () => this.setState((s) => ({ theme: (s.theme ?? this.props.theme ?? 'dark') === 'dark' ? 'light' : 'dark' })),
+      period: this.state.period,
+      cyclePeriod: () => this.setState((s) => ({ period: s.period === 'This month' ? 'This quarter' : s.period === 'This quarter' ? 'This year' : 'This month' })),
+
+      quoteFilters: QF.map((f) => ({
+        label: f.label, count: f.count,
+        ...chip(this.state.qf === f.label),
+        countFg: this.state.qf === f.label ? 'var(--accTx)' : 'var(--dim)',
+        onPick: () => this.setState({ qf: f.label }),
+      })),
+      quoteCountLabel: (() => { const n = this.state.qf === 'All' ? 20 : (QF.find((x) => x.label === this.state.qf) || { count: 0 }).count; return n + (n === 1 ? ' quote · ' : ' quotes · ') + this.state.qf.toLowerCase(); })(),
+      sortLabel: SORTS[this.state.sort],
+      cycleSort: () => this.setState((s) => ({ sort: (s.sort + 1) % SORTS.length })),
+      quoteList: QUOTES.filter((q) => this.state.qf === 'All' || q.status === this.state.qf),
+
+      tiers: TIERS.map((t) => ({
+        label: t.label, price: t.price, sub: t.sub,
+        bg: this.state.tier === t.key ? 'rgba(255,196,0,0.10)' : 'var(--card)',
+        border: this.state.tier === t.key ? '#FFC400' : 'var(--line)',
+        labelFg: this.state.tier === t.key ? 'var(--accTx)' : 'var(--dim)',
+        onPick: () => this.setState({ tier: t.key }),
+      })),
+      lineItems: LINES,
+      totals: [
+        { label: 'Subtotal ex-GST', value: '$66,838', font: "600 11px/1 'JetBrains Mono',monospace", fg: 'var(--dim)', vFont: "700 13px/1 'JetBrains Mono',monospace", vFg: 'var(--sec)' },
+        { label: 'GST 10%', value: '$6,684', font: "600 11px/1 'JetBrains Mono',monospace", fg: 'var(--dim)', vFont: "700 13px/1 'JetBrains Mono',monospace", vFg: 'var(--sec)' },
+        { label: 'Total inc GST', value: '$73,522', font: "700 11.5px/1 Manrope,sans-serif", fg: 'var(--pri)', vFont: "800 21px/1 'JetBrains Mono',monospace", vFg: 'var(--pri)' },
+        { label: 'Deposit on accept · 10%', value: '$7,352', font: "600 10.5px/1 'JetBrains Mono',monospace", fg: 'var(--accTx)', vFont: "700 13px/1 'JetBrains Mono',monospace", vFg: 'var(--accTx)' },
+      ],
+      photoTiles: [
+        { label: 'Ridge', bg: 'linear-gradient(150deg,#3E332B,#241E1B)' },
+        { label: 'Gutter', bg: 'linear-gradient(150deg,#33403B,#1E2724)' },
+        { label: 'Valley', bg: 'linear-gradient(150deg,#463A2C,#26201A)' },
+        { label: 'Access', bg: 'linear-gradient(150deg,#2E3948,#1B222B)' },
+      ],
+      sendOpen: this.state.sendOpen,
+      openSend: () => this.setState({ sendOpen: true }),
+      closeSend: () => this.setState({ sendOpen: false }),
+      sendChannels: [
+        { label: 'SMS to 0468 048 422', sub: 'Link to all three options + deposit', on: true, icon: this.ico('M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z'), bg: 'rgba(255,196,0,0.10)', border: '#FFC400', fg: 'var(--accTx)' },
+        { label: 'Email a PDF copy', sub: 'priya.naidu@gmail.com', on: true, icon: this.ico('M4 4h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2zm0 2 8 6 8-6'), bg: 'rgba(255,196,0,0.10)', border: '#FFC400', fg: 'var(--accTx)' },
+        { label: 'Share sheet', sub: 'WhatsApp, Messenger, anything else', on: false, icon: this.ico('M4 12v7a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7M16 6l-4-4-4 4M12 2v13'), bg: 'var(--sunk)', border: 'var(--line)', fg: 'var(--sec)' },
+      ],
+
+      chatFilters: ['All', 'Needs you', 'AI handled', 'Unread'].map((l) => ({
+        label: l, ...chip(this.state.cf === l), onPick: () => this.setState({ cf: l }),
+      })),
+      chatList: CHATS.filter((c) => this.state.cf === 'All' || (this.state.cf === 'Unread' ? !!c.unread : c.state === this.state.cf)),
+      thread: THREAD.map((m) => (m.me
+        ? { ...m, align: 'flex-end', bg: 'rgba(255,196,0,0.12)', border: 'rgba(255,196,0,0.4)', radius: '14px 14px 4px 14px', fg: 'var(--pri)', metaFg: 'var(--dim)', tagFg: 'var(--accTx)' }
+        : { ...m, align: 'flex-start', bg: 'var(--card)', border: 'var(--line)', radius: '14px 14px 14px 4px', fg: 'var(--pri)', metaFg: 'var(--dim)', tagFg: 'var(--ok)' })),
+
+      weekDays: WEEK.map((d) => {
+        const on = this.state.day === d.num;
+        return { dow: d.dow, num: d.num, onPick: () => this.setState({ day: d.num }),
+          bg: on ? 'rgba(255,196,0,0.12)' : 'transparent', border: on ? '#FFC400' : 'var(--line)',
+          dowFg: on ? 'var(--accTx)' : 'var(--dim)', numFg: on ? 'var(--accTx)' : 'var(--pri)',
+          dot: d.busy ? (on ? '#FFC400' : 'var(--sec)') : 'transparent' };
+      }),
+      agenda: AGENDA,
+      followUps: FOLLOWUPS,
+
+      hubTrade: HUBS[this.state.hubTrade].name,
+      hubToolsHeading: HUBS[this.state.hubTrade].heading,
+      cycleTrade: () => this.setState({ nav: 'measure' }),
+      hubTools: HUBS[this.state.hubTrade].tools.map((t) => ({ label: t[0], sub: t[1], icon: this.ico(t[2]), onTap: this.go(t[3] || 'measure') })),
+      recentMeasures: HUBS[this.state.hubTrade].recent,
+
+      facetShapes: FACETS.map((f) => {
+        const on = !off.includes(f.key);
+        return { points: f.points, lx: f.lx, ly: f.ly, tag: on ? f.tag : 'NOT IN JOB',
+          dash: on ? 'none' : '7 6',
+          fill: on ? 'rgba(253,243,211,0.30)' : 'rgba(122,134,153,0.12)',
+          stroke: on ? '#FFD23D' : '#7A8699',
+          textFill: on ? '#FFF6D6' : '#C3B8AC' };
+      }),
+      totalArea: area + ' m²',
+      structureSummary: onCount + ' of 3 structures in job',
+      selectionNotice: secondaryIn > 0
+        ? 'Including ' + secondaryIn + ' secondary structure' + (secondaryIn === 1 ? '' : 's') + ' — untick any you don\u2019t want in the quote.'
+        : 'Main dwelling only. Secondary structures are measured but not in the job — tick one to add it.',
+      combinedLabel: 'Combined total · ' + onCount + ' structure' + (onCount === 1 ? '' : 's') + ' included · ' + area + ' m²',
+      combinedTiers: TIER_RATE.map((t) => ({
+        label: t.label, inc: fmt(area * t.rate), ex: fmt((area * t.rate) / 1.1),
+      })),
+      structures: FACETS.map((f) => {
+        const on = !off.includes(f.key);
+        const sloped = f.key === 'dwelling' ? this.state.fixArea : f.sloped;
+        const hips = f.key === 'dwelling' ? this.state.fixHips : f.hips;
+        const valleys = f.key === 'dwelling' ? this.state.fixValleys : f.valleys;
+        const pitch = f.key === 'dwelling' ? this.state.fixPitch : f.pitch;
+        return {
+          role: f.role, label: f.label,
+          badge: on ? 'In job' : 'Not in job',
+          badgeBorder: on ? 'var(--acc)' : 'var(--line)',
+          badgeFg: on ? 'var(--accTx)' : 'var(--dim)',
+          cardBorder: on ? 'var(--line)' : 'var(--line)',
+          opacity: on ? '1' : '0.55',
+          track: on ? '#FFC400' : 'var(--sunk)', trackBorder: on ? '#FFC400' : 'var(--line)',
+          knob: on ? 'var(--accInk)' : 'var(--dim)', knobJustify: on ? 'flex-end' : 'flex-start',
+          stats: [
+            { label: 'Sloped area', value: sloped + ' m²', hint: 'Footprint ' + f.footprint + ' m²' },
+            { label: 'Roof form', value: f.form, hint: 'from aerial' },
+            { label: 'Storeys', value: String(f.storeys), hint: 'declared' },
+            { label: 'Hips · valleys', value: hips + ' · ' + valleys, hint: 'confirm on site' },
+            { label: 'Pitch', value: pitch + '°', hint: f.pitchSrc },
+            { label: 'Box gutter', value: this.state.fixBox === '' ? '—' : this.state.fixBox + ' lm', hint: 'not auto-detected' },
+          ],
+          onToggle: () => this.setState((s) => ({ structOff: s.structOff.includes(f.key) ? s.structOff.filter((x) => x !== f.key) : [...s.structOff, f.key] })),
+        };
+      }),
+      measureStats: [
+        { label: 'Included area', value: area + ' m²', color: 'var(--accTx)' },
+        { label: 'Structures', value: onCount + ' / 3', color: 'var(--pri)' },
+        { label: 'Provider', value: 'Geoscape', color: 'var(--pri)' },
+      ],
+      reprice: () => this.forceUpdate(),
+      fixOpen: this.state.fixOpen,
+      openFix: () => this.setState({ fixOpen: true }),
+      closeFix: () => this.setState({ fixOpen: false }),
+      fixPreview: 'Pitch ' + this.state.fixPitch + '\u00b0 = ' + bucket + ' · sloped area uses your entered value · hip/valley basis ' + (Math.round(Math.sqrt(this.state.fixArea) * 0.52 * 10) / 10) + ' m per edge',
+      fixRows: [
+        { label: 'Hips', value: this.state.fixHips, unit: 'count', onMinus: () => this.setState((s) => ({ fixHips: Math.max(0, s.fixHips - 1) })), onPlus: () => this.setState((s) => ({ fixHips: s.fixHips + 1 })) },
+        { label: 'Valleys', value: this.state.fixValleys, unit: 'count', onMinus: () => this.setState((s) => ({ fixValleys: Math.max(0, s.fixValleys - 1) })), onPlus: () => this.setState((s) => ({ fixValleys: s.fixValleys + 1 })) },
+        { label: 'Box gutter', value: this.state.fixBox === '' ? '—' : this.state.fixBox, unit: 'lm', onMinus: () => this.setState((s) => ({ fixBox: s.fixBox === '' ? '' : Math.max(0, s.fixBox - 1) || '' })), onPlus: () => this.setState((s) => ({ fixBox: (s.fixBox === '' ? 0 : s.fixBox) + 1 })) },
+        { label: 'Pitch', value: this.state.fixPitch, unit: 'deg', onMinus: () => this.setState((s) => ({ fixPitch: Math.max(5, s.fixPitch - 1) })), onPlus: () => this.setState((s) => ({ fixPitch: Math.min(45, s.fixPitch + 1) })) },
+        { label: 'Sloped area', value: this.state.fixArea, unit: 'm²', onMinus: () => this.setState((s) => ({ fixArea: Math.max(20, s.fixArea - 2) })), onPlus: () => this.setState((s) => ({ fixArea: s.fixArea + 2 })) },
+      ],
+
+      menuBands: MENU.map((b) => ({
+        label: b.label,
+        rows: b.rows.map((r) => ({ label: r[0], sub: r[1], icon: this.ico(r[2]), onTap: this.go(r[3]), badge: r[4] || false, badgeTone: r[5] || 'var(--dim)' })),
+      })),
+
+      priceTitle: this.state.priceTab,
+      showGauge: this.state.priceTab === 'Services',
+      priceBlurb: PRICE_BLURB[this.state.priceTab],
+      priceCats: PRICE_TABS.map((l) => ({
+        label: l, ...chip(this.state.priceTab === l), onPick: () => this.setState({ priceTab: l }),
+      })),
+      priceRows: (PRICES[this.state.priceTab] || []).map((p) => ({
+        label: p[0], meta: p[1], value: p[2], unit: p[3],
+        valueFg: p[2] === 'Not set' || p[2] === 'Inspect' || p[2] === 'Site visit' ? 'var(--warn)' : 'var(--pri)',
+      })),
+
+      marketingStats: [
+        { label: 'QR scans', value: '184', color: 'var(--accTx)' },
+        { label: 'Leads', value: '31', color: 'var(--pri)' },
+        { label: 'Won', value: '9', color: 'var(--ok)' },
+      ],
+      marketingTools: [
+        { label: 'Flyer designer', sub: 'A5 letterbox drop with your QR and rates', icon: this.ico('M3 3h18v6H3zM3 13h8v8H3zM15 13h6v8h-6z'), onTap: this.go('marketing') },
+        { label: 'Videos', sub: '4 explainer clips to send with a quote', icon: this.ico('M20 4H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2zM7 4v16M17 4v16M2 10h20'), onTap: this.go('marketing') },
+        { label: 'Review requests', sub: 'Auto-ask after a job is marked done', icon: this.ico('m12 3 2.9 5.9 6.5.9-4.7 4.6 1.1 6.5L12 17.8 6.2 20.9l1.1-6.5L2.6 9.8l6.5-.9z'), onTap: this.go('marketing') },
+      ],
+
+      filesTitle: this.state.filesTab === 'files' ? 'Files' : 'History',
+      filesMode: this.state.filesTab === 'files',
+      historyMode: this.state.filesTab === 'history',
+      filesTabs: [['files', 'Files'], ['history', 'History']].map(([k, l]) => ({
+        label: l, ...chip(this.state.filesTab === k), onPick: () => this.setState({ filesTab: k }),
+      })),
+      fileRows: FILES,
+      historyRows: HISTORY,
+
+      accountBands: [
+        { label: 'AI line', rows: [
+          { label: 'Your QuoteMax number', sub: '+61 468 048 422 · voice + SMS', isValue: true, value: 'Live' },
+          { label: 'Greeting & voice', sub: 'Australian male · warm', isValue: true, value: 'Edit' },
+          { label: 'Quiet hours', sub: 'AI takes messages 8pm–6am', ...this.tog('quiet') },
+        ]},
+        { label: 'Notifications', rows: [
+          { label: 'Quote needs review', sub: 'Push the moment a draft lands', ...this.tog('quote') },
+          { label: 'Deposit paid', sub: '$99 site visits and quote deposits', ...this.tog('paid') },
+        ]},
+        { label: 'Device', rows: [
+          { label: 'Face ID unlock', sub: 'Skip the password on this phone', ...this.tog('face') },
+          { label: 'Offline drafts', sub: 'Keep quotes editable with no signal', ...this.tog('offline') },
+          { label: 'Trades & licence', sub: 'Electrical · Roofing · QBCC 15 284 991', isValue: true, value: 'Edit' },
+        ]},
+      ],
+
+      usageRows: [
+        { label: 'Quotes drafted', value: '20 / unlimited', pct: '34%', tone: '#FFC400' },
+        { label: 'AI minutes', value: '148 / 300', pct: '49%', tone: '#FFC400' },
+        { label: 'Roof measures', value: '11 / 25', pct: '44%', tone: 'var(--ok)' },
+      ],
+      invoiceRows: [
+        { date: '14 March 2026', id: 'INV-2026-0314 · Pro', amount: '$383.90' },
+        { date: '14 February 2026', id: 'INV-2026-0214 · Pro', amount: '$383.90' },
+        { date: '14 January 2026', id: 'INV-2026-0114 · Pro', amount: '$383.90' },
+      ],
+
+      custTiers: CUST.map((t) => ({
+        label: t.label, title: t.title, price: t.price, bullets: t.bullets, flag: t.flag || false,
+        bg: this.state.cust === t.key ? 'rgba(255,196,0,0.10)' : 'var(--card)',
+        border: this.state.cust === t.key ? '#FFC400' : 'var(--line)',
+        labelFg: this.state.cust === t.key ? 'var(--accTx)' : 'var(--dim)',
+        onPick: () => this.setState({ cust: t.key }),
+      })),
+      custSelLabel: sel.label,
+      custDeposit: fmt(Math.round(sel.raw * 0.1)),
+      depositOpen: this.state.depositOpen,
+      openDeposit: () => this.setState({ depositOpen: true }),
+      closeDeposit: () => this.setState({ depositOpen: false }),
+      todayVisits: [
+        { time: '10:30', dur: '90 min', name: 'Priya Naidu', addr: '14 Wynnum Rd, Norman Park', kind: 'Paid site visit · $99 paid', tone: 'var(--ok)', drive: '12 min · 6.4 km' },
+        { time: '14:00', dur: '60 min', name: 'Dean Whitlam', addr: '3/22 Kianawah Rd, Wynnum', kind: 'Reroof inspection', tone: 'var(--warn)', drive: '19 min · 11.2 km' },
+      ],
+      miniKpis: [
+        { label: 'Avg quote', value: '$8,921', sub: 'Per draft', color: 'var(--accTx)' },
+        { label: 'In review', value: '1', sub: 'Awaiting send', color: 'var(--pri)' },
+        { label: 'Services', value: '49/65', sub: 'Auto-quote', color: 'var(--accTx)' },
+      ],
+      chips: ['SMS', 'Voice', 'AI'],
+      recentQuotes: [
+        { name: 'Jon', suburb: 'Chandler', job: 'Other — general enquiry', value: '—', status: 'Awaiting you', tone: 'var(--warn)', ch: 'SMS' },
+        { name: 'New lead', suburb: 'Chandler 4155', job: 'Full reroof — Colorbond', value: '$73,522', status: 'Viewed', tone: 'var(--dim)', ch: 'Voice' },
+        { name: 'Sam', suburb: 'Coogee', job: 'Hot water — replace 250L', value: '$3,180', status: 'Accepted', tone: 'var(--ok)', ch: 'SMS' },
+      ],
+      recentChats: [
+        { initial: 'J', name: 'Jon', time: '2:54 pm', msg: 'QuoteMax: No worries, ask away whenever you\u2019re ready.' },
+        { initial: 'S', name: 'Sam', time: '3:02 pm', msg: 'QuoteMax: A 250L will suit. Drafting it now.' },
+      ],
+      goQuote: this.go('quote'),
+      goQuotes: this.go('quotes'),
+      goChats: this.go('chats'),
+      goCalendar: this.go('calendar'),
+      atWelcome: nav === 'welcome',
+      atSignin: nav === 'signin',
+      atOnboard: nav === 'onboard',
+      goWelcome: this.go('welcome'),
+      goSignin: this.go('signin'),
+      goSignup: () => this.setState({ nav: 'onboard', obStep: 1 }),
+      goHome: this.go('home'),
+      obNum: meta.num,
+      obLabel: meta.label,
+      obSub: meta.sub,
+      obCta: meta.cta,
+      obBars: OB.map((o, i) => ({ bg: i < step ? '#FFC400' : 'var(--line)' })),
+      obFields: this.obFieldsFor(step),
+      obNext: () => (step >= 4 ? this.setState({ nav: 'home' }) : this.setState({ obStep: step + 1 })),
+      obBack: () => (step <= 1 ? this.setState({ nav: 'welcome' }) : this.setState({ obStep: step - 1 })),
+    };
+  }
+}
+
+</script>
+</body>
+</html>
