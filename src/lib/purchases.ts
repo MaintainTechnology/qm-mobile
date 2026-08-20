@@ -4,7 +4,7 @@
  * react-native-purchases is NATIVE-ONLY: importing it in the web bundle (or in
  * Expo Go, or in a dev client that has not been rebuilt since install) throws
  * "`new NativeEventEmitter()` requires a non-null argument". Everything here
- * loads the SDK lazily behind a platform guard so web dev keeps working, and
+ * loads the SDK lazily behind a platform / Expo Go guard so web dev keeps working, and
  * degrades to "purchases unavailable" when the API keys are not set yet.
  *
  * Keys are the PUBLIC per-platform SDK keys from the RevenueCat dashboard
@@ -12,6 +12,7 @@
  * secrets, so EXPO_PUBLIC_ is correct for them.
  */
 import { useAuth } from '@clerk/clerk-expo';
+import Constants from 'expo-constants';
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
 
@@ -23,6 +24,12 @@ const API_KEY = Platform.select({
   default: undefined,
 });
 
+// Expo Go ships no RevenueCat native module. appOwnership is deprecated but it
+// is the only field that tells Expo Go apart from a dev client —
+// executionEnvironment reports 'storeClient' for both. Swap it if expo-constants
+// ever ships a replacement.
+const IN_EXPO_GO = Constants.appOwnership === 'expo';
+
 let configured: Promise<Purchases | null> | null = null;
 
 /**
@@ -31,6 +38,15 @@ let configured: Promise<Purchases | null> | null = null;
  */
 export function configurePurchases(): Promise<Purchases | null> {
   configured ??= (async () => {
+    if (IN_EXPO_GO) {
+      if (__DEV__) {
+        console.warn(
+          'RevenueCat: purchases are disabled in Expo Go — it has no native module ' +
+            'for them. Run a development build to test purchases.',
+        );
+      }
+      return null;
+    }
     if (!API_KEY) {
       if (__DEV__ && Platform.OS !== 'web') {
         console.warn(

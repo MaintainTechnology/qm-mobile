@@ -40,7 +40,8 @@
           "image": "./assets/images/splash-icon.png",
           "imageWidth": 76
         }
-      ]
+      ],
+      "expo-image"
     ],
     "experiments": {
       "typedRoutes": true,
@@ -48,6 +49,15 @@
     },
     "runtimeVersion": {
       "policy": "appVersion"
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "1ff37186-cb0b-4c61-88a8-d4ddb6d756ce"
+      }
+    },
+    "updates": {
+      "url": "https://u.expo.dev/1ff37186-cb0b-4c61-88a8-d4ddb6d756ce"
     }
   }
 }
