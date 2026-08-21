@@ -3,7 +3,7 @@
 The tradie-facing mobile app for [QuoteMax](https://quotemax.com.au) — review and approve drafted
 quotes, watch leads arrive, edit the pricing book, and track deposits and booked jobs.
 
-Built with Expo SDK 57 and React Native 0.86.
+Built with Expo SDK 54 and React Native 0.81.
 
 ## Getting started
 

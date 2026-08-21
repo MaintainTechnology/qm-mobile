@@ -39,7 +39,7 @@ QuoteMax quotes from the tradie's own pricing book, never from a model's guess. 
 - The pricing book is the only source of a price. Nothing in the app may invent, estimate, or interpolate a price the tradie did not set.
 - Every API response is zod-parsed before use; shape mismatches throw rather than render a wrong number.
 - Offline tolerance is mandatory: any on-site screen must survive a dropped connection (react-query offline-tolerant defaults in `src/lib/query.ts`).
-- Stack is decided and recorded in CLAUDE.md (Expo SDK 57, RN 0.86.2, React 19.2, TypeScript strict, expo-router, FlashList for anything longer than a screen).
+- Stack is decided and recorded in CLAUDE.md (Expo SDK 54, RN 0.81.5, React 19.1.2, TypeScript strict, expo-router, FlashList for anything longer than a screen).
 - en-AU spelling in all user-facing copy (organise, licence, colour).
 
 ## Brand Commitments

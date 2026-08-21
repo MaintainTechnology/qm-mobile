@@ -31,25 +31,26 @@ It is **not** the customer-facing quote page — that stays on web. The customer
 
 ## Status
 
-Scaffolded and verified: typecheck, lint, tests and `expo-doctor` (20/20) all pass, and the app
+Scaffolded and verified: typecheck, lint, tests and `expo-doctor` (18/18) all pass, and the app
 bundles for both iOS and Android. No product screens yet — `src/app/index.tsx` is a placeholder
 that exists to prove the wiring and is meant to be deleted when the design system arrives.
 
 ## Stack
 
-| Layer        | Choice                                              | Notes                                           |
-| ------------ | --------------------------------------------------- | ----------------------------------------------- |
-| Runtime      | Expo SDK 57 · React Native 0.86.2 · React 19.2      | new architecture, Hermes                        |
-| Routing      | `expo-router` 57, file-based                        | routes in `src/app/`, typed routes on           |
-| Language     | TypeScript 6, `strict` + `noUncheckedIndexedAccess` | `any` is an ESLint error                        |
-| Server state | `@tanstack/react-query`                             | offline-tolerant defaults in `src/lib/query.ts` |
-| Validation   | `zod`                                               | every API response is parsed before use         |
-| LLM          | `ai` + `@ai-sdk/react`, streaming over `expo/fetch` | model runs on the backend, never here           |
-| Lists        | `@shopify/flash-list`                               | for anything longer than a screen               |
-| Secrets      | `expo-secure-store`                                 | session token only                              |
-| IAP          | `react-native-purchases` (+`-ui`) — RevenueCat      | native-only; wired in `src/lib/purchases.ts`    |
-| Tests        | `jest-expo` + `@testing-library/react-native`       |                                                 |
-| Builds       | EAS Build + EAS Update (`eas.json`)                 | native dirs are generated, not committed        |
+| Layer        | Choice                                                | Notes                                                                                                                                                                                                                                                     |
+| ------------ | ----------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Runtime      | Expo SDK 54 · React Native 0.81.5 · React 19.1.0      | new architecture, Hermes. React must exactly match RN's bundled renderer (19.1.0); the `@ai-sdk/react` peer range that excludes it is bypassed via npm `overrides` — the exclusion targets a React SSR advisory that does not apply to this native client |
+| Routing      | `expo-router` 6, file-based                           | routes in `src/app/`, typed routes on                                                                                                                                                                                                                     |
+| Language     | TypeScript 5.9, `strict` + `noUncheckedIndexedAccess` | `any` is an ESLint error                                                                                                                                                                                                                                  |
+| Server state | `@tanstack/react-query`                               | offline-tolerant defaults in `src/lib/query.ts`                                                                                                                                                                                                           |
+| Validation   | `zod`                                                 | every API response is parsed before use                                                                                                                                                                                                                   |
+| LLM          | `ai` + `@ai-sdk/react`, streaming over `expo/fetch`   | model runs on the backend, never here                                                                                                                                                                                                                     |
+| Lists        | `@shopify/flash-list`                                 | for anything longer than a screen                                                                                                                                                                                                                         |
+| Auth         | `@clerk/clerk-expo`                                   | same Clerk instance as the web app; sessions restored from the keychain token cache; every `/api/tenant/*` call carries a per-request `getToken()` Bearer                                                                                                 |
+| Secrets      | `expo-secure-store`                                   | Clerk token cache + legacy session token only                                                                                                                                                                                                             |
+| IAP          | `react-native-purchases` (+`-ui`) — RevenueCat        | native-only; wired in `src/lib/purchases.ts`                                                                                                                                                                                                              |
+| Tests        | `jest-expo` + `@testing-library/react-native`         |                                                                                                                                                                                                                                                           |
+| Builds       | EAS Build + EAS Update (`eas.json`)                   | native dirs are generated, not committed                                                                                                                                                                                                                  |
 
 Change this table first, then the code — it is the source of truth for stack decisions.
 
@@ -77,6 +78,10 @@ every LLM provider credential. This app renders and acts on what that API return
 - `src/lib/ai.ts` — `useQuoteAssistant()` streams from the backend. There is deliberately no
   provider package (`@ai-sdk/anthropic` etc.) in `package.json`; those belong server-side.
 - `src/lib/money.ts` — the only place money rounding is allowed. Fully unit-tested.
+- `src/lib/purchases.ts` — the whole RevenueCat integration: plan entitlements, the paywall,
+  restore, and Clerk identity sync. This is the tradie's **subscription** only; it never touches
+  a job price. The `PLANS` tuple must match the entitlement identifiers in the RevenueCat
+  dashboard. Expo Go needs a `test_…` Test Store key — real purchases need a development build.
 
 ## Conventions
 
@@ -124,8 +129,8 @@ every LLM provider credential. This app renders and acts on what that API return
 - `.claude/settings.json` — shared permissions and hooks, and enables the official Expo Claude
   plugin. Personal overrides go in `settings.local.json`, which is gitignored.
 - `AGENTS.md` — Expo's own note that the SDK has changed and that the versioned docs at
-  https://docs.expo.dev/versions/v57.0.0/ are the authority. Read it before writing Expo code;
-  training data for SDK 57 is thin and confidently wrong.
+  https://docs.expo.dev/versions/v54.0.0/ are the authority. Read it before writing Expo code;
+  training data for newer Expo SDKs is thin and confidently wrong.
 
 For generic React Native and Expo work, use the globally installed `expo-react-native-expert`
 agent rather than adding a duplicate here.

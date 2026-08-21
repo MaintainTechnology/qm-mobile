@@ -13,7 +13,7 @@ import { useTheme } from '@/lib/useTheme';
 /** Kit icon paths (24×24 viewBox, stroke 1.75, round caps and joins). */
 const TAB_META: Record<string, { label: string; d: string }> = {
   index: { label: 'Home', d: 'm3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
-  roof: { label: 'Roof', d: 'M2 12 12 4l10 8M6 11v9h12v-9M10 20v-5h4v5' },
+  roof: { label: 'Tools', d: 'M2 12 12 4l10 8M6 11v9h12v-9M10 20v-5h4v5' },
   quotes: {
     label: 'Quotes',
     d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h4',
@@ -22,7 +22,7 @@ const TAB_META: Record<string, { label: string; d: string }> = {
   menu: { label: 'Menu', d: 'M4 7h16M4 12h16M4 17h16' },
 };
 
-// Structural slice of the navigator's tab-bar props — expo-router SDK 57
+// Structural slice of the navigator's tab-bar props — expo-router (SDK 54)
 // vendors its own @react-navigation/bottom-tabs types, so naming the packaged
 // type would pin us to whichever copy wins the resolution race.
 type TabBarProps = {
@@ -115,8 +115,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fonts.sans.bold,
-    fontSize: 9.5,
-    letterSpacing: 0.76, // .08em @ 9.5
+    fontSize: 12,
+    letterSpacing: 0.96, // .08em @ 12
     textTransform: 'uppercase',
   },
 });

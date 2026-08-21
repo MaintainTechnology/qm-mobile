@@ -60,5 +60,26 @@ export function parseAud(input: string): number | null {
   return roundHalfAwayFromZero(value * 100);
 }
 
+/**
+ * Converts a dollar amount from the QuoteMax API (e.g. `quotes.total_inc_gst`) into cents at the
+ * parse boundary. The API speaks dollars; nothing past this function may.
+ */
+export function centsFromApiDollars(dollars: number): number {
+  return roundHalfAwayFromZero(dollars * 100);
+}
+
+/**
+ * The outbound mirror: cents → the dollar number the QuoteMax API expects in write payloads.
+ * Exact division, no rounding — cents are already whole.
+ */
+export function apiDollarsFromCents(cents: number): number {
+  return cents / 100;
+}
+
+/** Mean of a cents total over a count, rounded here — the only module allowed to round money. */
+export function averageCents(totalCents: number, count: number): number {
+  return count === 0 ? 0 : roundHalfAwayFromZero(totalCents / count);
+}
+
 /** The fixed site-visit fee a complex job routes to instead of being auto-quoted. Ex-GST. */
 export const SITE_VISIT_FEE_CENTS = 9900;

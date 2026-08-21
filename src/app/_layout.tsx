@@ -16,8 +16,9 @@ import {
   Manrope_800ExtraBold,
   useFonts,
 } from '@expo-google-fonts/manrope';
+import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { QueryClientProvider } from '@tanstack/react-query';
-import { DarkTheme, DefaultTheme, Stack, ThemeProvider } from 'expo-router';
+import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
@@ -59,7 +60,8 @@ const navLight = {
 /** Inside ThemeControlProvider so the in-app toggle restyles navigation too. */
 function ThemedApp() {
   const { isDark } = useTheme();
-  // RevenueCat: configure at launch, keep the customer tied to the Clerk session.
+  // RevenueCat: configure at launch, keep the customer tied to the Clerk session,
+  // and keep cached entitlements live as renewals and purchases land.
   usePurchases();
   return (
     <ThemeProvider value={isDark ? navDark : navLight}>

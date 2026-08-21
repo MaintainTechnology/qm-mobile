@@ -4,8 +4,9 @@
  * Same Clerk instance as the quotemax web app, so an account created on either
  * surface signs in on both, and the session token authorises the web /api routes.
  */
-import { isClerkAPIResponseError, useSignIn } from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useAuth, useSignIn } from '@clerk/clerk-expo';
 import { useRouter } from 'expo-router';
+import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -18,15 +19,7 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import {
-  AuthHeader,
-  BackButton,
-  FaceIdIcon,
-  Field,
-  GhostButton,
-  OrDivider,
-  PrimaryCta,
-} from '@/features/auth/ui';
+import { AuthHeader, BackButton, Field, PrimaryCta } from '@/features/auth/ui';
 import { fonts } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -48,6 +41,7 @@ export function SignInScreen() {
   const insets = useSafeAreaInsets();
   const router = useRouter();
   const { signIn, setActive, isLoaded } = useSignIn();
+  const { signOut } = useAuth();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -63,7 +57,20 @@ export function SignInScreen() {
     setError(null);
     setSubmitting(true);
     try {
-      const attempt = await signIn.create({ identifier: email.trim(), password });
+      let attempt;
+      try {
+        attempt = await signIn.create({ identifier: email.trim(), password });
+      } catch (err) {
+        // A session can survive on the server while the app's local state says
+        // signed out (e.g. after onboarding activated it in another launch).
+        // Clerk then rejects sign-in with session_exists and the screen would
+        // dead-end. The tradie just typed valid credentials, so replace the
+        // stale session: sign it out and retry once.
+        const stale = isClerkAPIResponseError(err) && err.errors[0]?.code === 'session_exists';
+        if (!stale) throw err;
+        await signOut();
+        attempt = await signIn.create({ identifier: email.trim(), password });
+      }
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
         router.replace('/');
@@ -121,20 +128,13 @@ export function SignInScreen() {
             <PrimaryCta label="Sign in" onPress={submit} loading={submitting} />
           </View>
 
-          <OrDivider />
-
-          {/* ponytail: Face ID unlock needs expo-local-authentication plus a resumable
-              session; display-only until that lands, per the kit layout. */}
-          <GhostButton
-            label="Unlock with Face ID"
-            onPress={() => {}}
-            height={58}
-            icon={<FaceIdIcon color={colors.accentText} size={19} />}
-          />
-
           <View style={styles.links}>
-            {/* The kit ships this as a dead link; password reset has no designed screen yet. */}
-            <Pressable accessibilityRole="link" onPress={() => {}}>
+            <Pressable
+              accessibilityRole="link"
+              onPress={() =>
+                WebBrowser.openBrowserAsync('https://www.quotemax.com.au/forgot-password')
+              }
+            >
               <Text style={[styles.forgot, { color: colors.accentText }]}>
                 Forgot your password?
               </Text>

@@ -7,7 +7,22 @@
  * backend, which is what this app talks to.
  */
 
+import Constants from 'expo-constants';
+
 const apiBase = process.env.EXPO_PUBLIC_API_URL;
+
+/**
+ * On a device, `localhost` is the phone, not the machine running the QuoteMax
+ * web app. In dev, rewrite it to the host Metro is serving from (the dev
+ * machine's LAN IP) so .env.local can stay `http://localhost:3000` for
+ * everyone. Release builds pass through untouched.
+ */
+function withDevHost(url: string): string {
+  if (!__DEV__) return url;
+  const host = Constants.expoConfig?.hostUri?.split(':')[0];
+  if (!host) return url;
+  return url.replace(/\/\/(localhost|127\.0\.0\.1)/, `//${host}`);
+}
 
 /**
  * Builds an absolute URL against the QuoteMax API.
@@ -20,7 +35,7 @@ export function apiUrl(path: string): string {
       'EXPO_PUBLIC_API_URL is not set. Copy .env.example to .env.local and point it at the QuoteMax API.',
     );
   }
-  const base = apiBase.replace(/\/+$/, '');
+  const base = withDevHost(apiBase.replace(/\/+$/, ''));
   const suffix = path.startsWith('/') ? path : `/${path}`;
   return `${base}${suffix}`;
 }
