@@ -44,15 +44,15 @@ the project requires explicit control over extracted frames.
 
 ## Pipeline at a glance
 
-| # | Stage | Tool | Output |
-|---|---|---|---|
-| 1 | Source image | manifest / user / `stylization.md` pipeline | character or object image |
-| 2 | Key-pose image | `higgsfield generate create` → `flux_2` | full-body pose at the action's mid/peak phase |
-| 3 | Animation video | `higgsfield generate create` → **`seedance1_5`** | 4 s, 720p, AR = key-pose ratio (explicit); loop: start = end frame |
-| 4 | Raw frames | ffmpeg | every frame of the video as PNG |
-| 5 | Frame selection | local script | `frame_count` frames (2–64, default 25), evenly spaced, first + last always kept |
-| 6 | Alpha | `image_background_remover`, per frame | transparent-background PNGs |
-| 7 | Spritesheet | local assembly | grid PNG, metadata encoded in the filename |
+| #   | Stage           | Tool                                             | Output                                                                           |
+| --- | --------------- | ------------------------------------------------ | -------------------------------------------------------------------------------- |
+| 1   | Source image    | manifest / user / `stylization.md` pipeline      | character or object image                                                        |
+| 2   | Key-pose image  | `higgsfield generate create` → `flux_2`          | full-body pose at the action's mid/peak phase                                    |
+| 3   | Animation video | `higgsfield generate create` → **`seedance1_5`** | 4 s, 720p, AR = key-pose ratio (explicit); loop: start = end frame               |
+| 4   | Raw frames      | ffmpeg                                           | every frame of the video as PNG                                                  |
+| 5   | Frame selection | local script                                     | `frame_count` frames (2–64, default 25), evenly spaced, first + last always kept |
+| 6   | Alpha           | `image_background_remover`, per frame            | transparent-background PNGs                                                      |
+| 7   | Spritesheet     | local assembly                                   | grid PNG, metadata encoded in the filename                                       |
 
 Hard rules (each one is a known failure when violated):
 
@@ -86,8 +86,8 @@ first. A cropped input guarantees a cropped animation.
 
 ## Stage 2 — Key-pose generation (`flux_2`)
 
-**What:** produce the subject in the *mid/peak phase* of the requested action.
-The video model animates *around* the image it is given; starting from the
+**What:** produce the subject in the _mid/peak phase_ of the requested action.
+The video model animates _around_ the image it is given; starting from the
 action's characteristic phase is what makes 4 seconds of video read as that
 action.
 
@@ -102,11 +102,11 @@ action.
 reference, the STYLE FORMULA verbatim in the prompt, plus the pose
 instruction. The prompt MUST demand:
 
-- *full body / full object in frame* — head to feet visible;
-- *empty margin above and below the subject* — the motion needs headroom and
+- _full body / full object in frame_ — head to feet visible;
+- _empty margin above and below the subject_ — the motion needs headroom and
   footroom (a jump goes up, a stride extends down; without reserve space the
   video model crops);
-- a *clean, uniform, uncluttered background* — it is removed per-frame later,
+- a _clean, uniform, uncluttered background_ — it is removed per-frame later,
   and a busy background degrades the matte. **The background color must NOT
   appear anywhere on the subject** — pick it by looking at the subject's
   palette first (green character → magenta background, red/pink character →
@@ -136,14 +136,14 @@ higgsfield generate create flux_2 \
 
 **Fixed parameters:**
 
-| Param | Value |
-|---|---|
-| model | `seedance1_5` |
-| duration | 4 s |
-| resolution | 720p |
+| Param        | Value                                                                             |
+| ------------ | --------------------------------------------------------------------------------- |
+| model        | `seedance1_5`                                                                     |
+| duration     | 4 s                                                                               |
+| resolution   | 720p                                                                              |
 | aspect_ratio | **= the key-pose image's ratio, passed EXPLICITLY on every call** — never omitted |
-| start frame | the stage-2 key pose — always |
-| end frame | the SAME image — **looping actions only** |
+| start frame  | the stage-2 key pose — always                                                     |
+| end frame    | the SAME image — **looping actions only**                                         |
 
 **Aspect ratio is read off the key-pose file and passed explicitly** (a 1:1
 pose → `aspect_ratio: "1:1"`, and so on). "Auto" does not exist as a real
@@ -172,29 +172,29 @@ prompt**, because the model fills the fixed 4 seconds with improvisation
 wherever the prompt leaves freedom — a positive instruction alone only says
 what to do and stays silent about everything else. Two parts:
 
-1. *Camera lock (always):* `camera locked, no camera movement, no zoom,
-   subject stays fully in frame, plain static background` — camera drift and
+1. _Camera lock (always):_ `camera locked, no camera movement, no zoom,
+subject stays fully in frame, plain static background` — camera drift and
    zoom are the top causes of unusable frames.
-2. *Prop & action inertia (always; expand when the subject holds anything):*
+2. _Prop & action inertia (always; expand when the subject holds anything):_
    `the character performs ONLY this action, nothing else happens`. If the
    subject carries a prop with an obvious action of its own (weapon, tool,
    instrument), name the prop and freeze it explicitly: `the <prop> stays
-   inert and is never used — no firing, no muzzle flash, no swinging, no
-   raising it`. Props carry their own learned scenarios (a raised pistol
+inert and is never used — no firing, no muzzle flash, no swinging, no
+raising it`. Props carry their own learned scenarios (a raised pistol
    "wants" to fire, a bat "wants" to swing); an unfilled cycle duration plus
    an unconstrained prop is exactly how a run cycle gains a gunshot
    mid-video. Shipped failure: a 4 s "run cycle in place" where the model
    fired the held pistol twice — the negative block above is what prevents
    it.
-3. *Facing lock (always):* `the subject keeps facing the SAME direction for
-   the entire video — never turns around, never rotates toward or away from
-   the camera, no head turns past the shoulder`. Game sprites are generated
+3. _Facing lock (always):_ `the subject keeps facing the SAME direction for
+the entire video — never turns around, never rotates toward or away from
+the camera, no head turns past the shoulder`. Game sprites are generated
    facing ONE direction (the engine mirrors them for the other side); a
    mid-video turn poisons every frame after it — half the selected frames
    face the wrong way and the sheet is garbage. Turning is the model's
    favorite filler for loopable actions (idle "look around", walk "glance
    back"), so the lock is mandatory even when the action seems
-direction-neutral. The ONLY exception: the requested action IS a turn —
+   direction-neutral. The ONLY exception: the requested action IS a turn —
    then it is a one-shot (start frame only, `once`), never a loop.
 
 Loop example (omit `--end-image` for a one-shot):
@@ -247,14 +247,14 @@ idx = np.unique(np.round(np.linspace(1, total, frame_count)).astype(int))
 **Choosing by context** — the question is "how much does the silhouette
 change per beat of this action":
 
-| Action / context | frame_count |
-|---|---|
-| idle, breathing, hover, flame flicker | 8–16 |
-| walk / run cycle — pixel art | 8–12 |
-| walk / run cycle — HD sprites | 16–24 |
-| attack, hit, jump, one-shot actions | 10–20 |
-| fluid motion: cape, water, fire burst, magic FX (HD) | 24–48 |
-| unclear / no signal | 25 |
+| Action / context                                     | frame_count |
+| ---------------------------------------------------- | ----------- |
+| idle, breathing, hover, flame flicker                | 8–16        |
+| walk / run cycle — pixel art                         | 8–12        |
+| walk / run cycle — HD sprites                        | 16–24       |
+| attack, hit, jump, one-shot actions                  | 10–20       |
+| fluid motion: cape, water, fire burst, magic FX (HD) | 24–48       |
+| unclear / no signal                                  | 25          |
 
 **Why fewer is often better:** every frame is a sheet cell — memory, texture
 size, and background-removal calls all scale linearly with it. A walk cycle
@@ -353,17 +353,17 @@ action to fit the envelope — that is a planning fix, not a generation fix.
 
 ## Failure recovery
 
-| Symptom | Cause | Fix |
-|---|---|---|
-| Subject clipped in the video | key pose lacked top/bottom margin, or camera drifted | back to stage 2: more margin; add "camera locked" to the video prompt |
-| Loop visibly jumps at wrap | end frame not passed, or model ignored it | re-check start=end were both set; regenerate video |
-| One-shot looks rubber-banded | end frame was passed on a non-loop action | drop the end frame, regenerate |
-| Sprite jitters in-game | per-frame cropping instead of union bbox | reassemble the sheet with the union box |
-| Flickering halo around edges | busy key-pose background | back to stage 2: flat uniform background |
-| Holes in the subject / background patches stuck to it | background color also present on the subject | back to stage 2: pick a key color absent from the subject's palette |
-| Subject turns around / changes facing mid-video | facing lock missing from the negative block, or the action invites turning | regenerate with the facing lock; rephrase the action to be direction-neutral ("walk in place" not "walk around") |
-| Pixel sprite shimmers | too many frames / AA downscale | cut frame_count to 8–12; nearest-neighbor only |
-| Loop stalls one beat at wrap | duplicated last frame left in the sheet | drop the final frame (loops only) |
+| Symptom                                               | Cause                                                                      | Fix                                                                                                              |
+| ----------------------------------------------------- | -------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------- |
+| Subject clipped in the video                          | key pose lacked top/bottom margin, or camera drifted                       | back to stage 2: more margin; add "camera locked" to the video prompt                                            |
+| Loop visibly jumps at wrap                            | end frame not passed, or model ignored it                                  | re-check start=end were both set; regenerate video                                                               |
+| One-shot looks rubber-banded                          | end frame was passed on a non-loop action                                  | drop the end frame, regenerate                                                                                   |
+| Sprite jitters in-game                                | per-frame cropping instead of union bbox                                   | reassemble the sheet with the union box                                                                          |
+| Flickering halo around edges                          | busy key-pose background                                                   | back to stage 2: flat uniform background                                                                         |
+| Holes in the subject / background patches stuck to it | background color also present on the subject                               | back to stage 2: pick a key color absent from the subject's palette                                              |
+| Subject turns around / changes facing mid-video       | facing lock missing from the negative block, or the action invites turning | regenerate with the facing lock; rephrase the action to be direction-neutral ("walk in place" not "walk around") |
+| Pixel sprite shimmers                                 | too many frames / AA downscale                                             | cut frame_count to 8–12; nearest-neighbor only                                                                   |
+| Loop stalls one beat at wrap                          | duplicated last frame left in the sheet                                    | drop the final frame (loops only)                                                                                |
 
 Regeneration budget per SKILL.md: 2 attempts per stage, then take the best
 and compensate downstream.

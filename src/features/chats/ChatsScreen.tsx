@@ -16,7 +16,13 @@ import { useTheme } from '@/lib/useTheme';
 
 import { ChatThread } from './ChatThread';
 import { useChats, type ChatRow } from './chats-api';
-import { chatDisplayName, chatInitial, channelLabel, lastMessagePreview, relativeTime } from './format';
+import {
+  chatDisplayName,
+  chatInitial,
+  channelLabel,
+  lastMessagePreview,
+  relativeTime,
+} from './format';
 
 export function ChatsScreen({
   selectedId,
@@ -79,12 +85,19 @@ export function ChatsScreen({
       ) : (
         <>
           {isError ? (
-            <View style={[styles.refreshBanner, { borderColor: colors.danger, backgroundColor: colors.ink }]}>
+            <View
+              style={[
+                styles.refreshBanner,
+                { borderColor: colors.danger, backgroundColor: colors.ink },
+              ]}
+            >
               <Text style={[styles.refreshBannerText, { color: colors.textPri }]}>
                 Couldn&rsquo;t refresh — showing the last loaded list.
               </Text>
               <Pressable accessibilityRole="button" onPress={() => void refetch()} hitSlop={8}>
-                <Text style={[styles.refreshBannerAction, { color: colors.accentText }]}>RETRY</Text>
+                <Text style={[styles.refreshBannerAction, { color: colors.accentText }]}>
+                  RETRY
+                </Text>
               </Pressable>
             </View>
           ) : null}
@@ -97,9 +110,7 @@ export function ChatsScreen({
             ItemSeparatorComponent={() => (
               <View style={{ height: 1, backgroundColor: colors.inkLine }} />
             )}
-            renderItem={({ item }) => (
-              <ChatListRow chat={item} onPress={() => onSelect(item.id)} />
-            )}
+            renderItem={({ item }) => <ChatListRow chat={item} onPress={() => onSelect(item.id)} />}
           />
         </>
       )}
@@ -110,7 +121,11 @@ export function ChatsScreen({
 function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) {
   const { colors } = useTheme();
   const who = chatDisplayName(chat);
-  const meta = [channelLabel(chat), chat.suburb, chat.job_type ? chat.job_type.replace(/_/g, ' ') : null]
+  const meta = [
+    channelLabel(chat),
+    chat.suburb,
+    chat.job_type ? chat.job_type.replace(/_/g, ' ') : null,
+  ]
     .filter(Boolean)
     .join(' · ');
 
@@ -137,7 +152,11 @@ function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) 
             {meta.toUpperCase()}
           </Text>
         ) : null}
-        <Text style={[styles.rowPreview, { color: colors.textSec }]} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={[styles.rowPreview, { color: colors.textSec }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {lastMessagePreview(chat)}
         </Text>
       </View>

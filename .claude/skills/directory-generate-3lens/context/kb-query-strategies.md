@@ -7,12 +7,12 @@ This document details strategies for reading and extracting knowledge from the l
 **Location:** `kb-v2-all/`
 **Total Files:** 1,165 curated markdown documents
 
-| Category | Count | File Pattern | Content |
-|----------|-------|-------------|---------|
-| `pathways/` | 152 | `pathway_{descriptive_name}.md` | Signaling cascades, metabolic axes, pathway crosstalk |
-| `interventions/` | 413 | `intervention-{slug}.md` or bare names | Supplements, drugs, diets, therapies with dosing & evidence |
-| `biomarkers/` | 297 | `BIOMARKER_{NAME}_001.md` | Clinical markers with interpretation patterns & reference ranges |
-| `conflicts/` | 303 | `{descriptive_slug}.md` | Unresolved debates, assay limitations, evidence gaps |
+| Category         | Count | File Pattern                           | Content                                                          |
+| ---------------- | ----- | -------------------------------------- | ---------------------------------------------------------------- |
+| `pathways/`      | 152   | `pathway_{descriptive_name}.md`        | Signaling cascades, metabolic axes, pathway crosstalk            |
+| `interventions/` | 413   | `intervention-{slug}.md` or bare names | Supplements, drugs, diets, therapies with dosing & evidence      |
+| `biomarkers/`    | 297   | `BIOMARKER_{NAME}_001.md`              | Clinical markers with interpretation patterns & reference ranges |
+| `conflicts/`     | 303   | `{descriptive_slug}.md`                | Unresolved debates, assay limitations, evidence gaps             |
 
 Each file follows a consistent structure with Summary, Mechanistic Context, Clinical/Practical Use Patterns, Dosing and Implementation Patterns, Evidence and Uncertainty, Verifiable Citations, and a Lossless Structured Appendix.
 
@@ -27,6 +27,7 @@ ls kb-v2-all/pathways/
 ```
 
 **Key microbiome-related pathways:**
+
 - `pathway_microbiome_ecology_colonization.md` — Microbiome ecology, SCFA production, dysbiosis framework
 - `pathway_gut_incretin_scfa_signaling.md` — SCFA → FFAR2/FFAR3 → GLP-1, colonocyte metabolism, HDAC inhibition
 - `pathway_gut_brain_axis_psychobiotic.md` — Gut-brain communication, SCFAs, LPS, vagus nerve
@@ -50,6 +51,7 @@ ls kb-v2-all/interventions/
 ```
 
 **Key microbiome interventions:**
+
 - `intervention-butyrate.md` — HDAC inhibitor, colonocyte fuel, barrier support
 - `intervention-propionate.md` — FFAR2/FFAR3, hepatic DNL inhibition
 - `intervention-acetate.md` — Cross-feeding, GLP-1 secretion
@@ -74,6 +76,7 @@ ls kb-v2-all/biomarkers/
 ```
 
 **Key microbiome biomarkers:**
+
 - `BIOMARKER_STOOL_SCFAS_001.md` — Fecal SCFA panel (butyrate, propionate, acetate)
 - `BIOMARKER_BUTYRATE_001.md` — Colonocyte fuel, HDAC inhibitor
 - `BIOMARKER_MICROBIOME_DIVERSITY_001.md` — Alpha diversity index
@@ -98,6 +101,7 @@ ls kb-v2-all/conflicts/
 ```
 
 **Key microbiome conflicts:**
+
 - `zonulin_tight_junction_permeability_assay_gap.md` — Commercial ELISAs detect properdin, not zonulin
 - `sibo_breath_test_threshold_outcome_gap.md` — No validated thresholds or decision trees
 - `probiotics_microbiome_gut_brain_axis.md` — Transient colonization, no validated selection framework
@@ -112,11 +116,11 @@ ls kb-v2-all/conflicts/
 
 ### Tiered Approach
 
-| Tier | When | What to Read | What to Extract |
-|------|------|-------------|-----------------|
-| **Tier 1** (Core) | File directly about product/primary mechanism | Full document | Everything: mechanisms, targets, dosing, citations, cross-refs |
-| **Tier 2** (Adjacent) | Related pathway, intervention, or biomarker | Summary + Structured Appendix | Relationship, key PMIDs, clinical insight, crosstalk nodes |
-| **Tier 3** (Contextual) | Indirectly connected via shared targets | Summary only | Connection type, surprising relationships |
+| Tier                    | When                                          | What to Read                  | What to Extract                                                |
+| ----------------------- | --------------------------------------------- | ----------------------------- | -------------------------------------------------------------- |
+| **Tier 1** (Core)       | File directly about product/primary mechanism | Full document                 | Everything: mechanisms, targets, dosing, citations, cross-refs |
+| **Tier 2** (Adjacent)   | Related pathway, intervention, or biomarker   | Summary + Structured Appendix | Relationship, key PMIDs, clinical insight, crosstalk nodes     |
+| **Tier 3** (Contextual) | Indirectly connected via shared targets       | Summary only                  | Connection type, surprising relationships                      |
 
 ### Structured Appendix Extraction
 
@@ -124,13 +128,13 @@ Every KBV2 file ends with a "Lossless Structured Appendix" in YAML-like format. 
 
 ```yaml
 # From intervention-butyrate.md:
-- intervention_id: "intervention-butyrate"
-- primary_pathways: ["HDAC inhibition", "SCFA signaling", "colonocyte beta-oxidation"]
+- intervention_id: 'intervention-butyrate'
+- primary_pathways: ['HDAC inhibition', 'SCFA signaling', 'colonocyte beta-oxidation']
 - mechanism_claims:
-  - target: "HDAC1/HDAC2"
-    effect: "Inhibits class I/II HDACs"
-    confidence: "high"
-    citations: [{"pmid": "14676263"}, {"pmid": "12840228"}]
+    - target: 'HDAC1/HDAC2'
+      effect: 'Inhibits class I/II HDACs'
+      confidence: 'high'
+      citations: [{ 'pmid': '14676263' }, { 'pmid': '12840228' }]
 - dosing_protocols: [...]
 - contraindications: [...]
 ```
@@ -138,6 +142,7 @@ Every KBV2 file ends with a "Lossless Structured Appendix" in YAML-like format. 
 ### Cross-Document Connection Patterns
 
 When reading multiple files, look for:
+
 1. **Shared molecular targets** — Same gene symbol in multiple documents
 2. **Pathway crosstalk tables** — Explicit cross-references in pathway files
 3. **Intervention-biomarker links** — Intervention files reference biomarkers they modulate
@@ -148,12 +153,12 @@ When reading multiple files, look for:
 
 When mapping related interventions from KB files, classify the relationship:
 
-| Relationship | Criteria | Example |
-|--------------|----------|---------|
-| `synergistic` | Different targets, complementary effects | Rapamycin (mTOR) + Metformin (AMPK) |
-| `complementary` | Same goal, different mechanism | Butyrate supplementation + Resistant starch |
-| `overlapping` | Same target, consider redundancy | Tributyrin + Sodium butyrate (both deliver butyrate) |
-| `potentially_antagonistic` | May interfere with each other | Prebiotics in active SIBO |
+| Relationship               | Criteria                                 | Example                                              |
+| -------------------------- | ---------------------------------------- | ---------------------------------------------------- |
+| `synergistic`              | Different targets, complementary effects | Rapamycin (mTOR) + Metformin (AMPK)                  |
+| `complementary`            | Same goal, different mechanism           | Butyrate supplementation + Resistant starch          |
+| `overlapping`              | Same target, consider redundancy         | Tributyrin + Sodium butyrate (both deliver butyrate) |
+| `potentially_antagonistic` | May interfere with each other            | Prebiotics in active SIBO                            |
 
 ## Handling Products NOT in KB
 

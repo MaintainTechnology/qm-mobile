@@ -1,4 +1,4 @@
-"use client";
+'use client';
 // Pre-loads images as base64 data URIs so html-to-image exports without
 // non-deterministic image fetch races. Always use img(path) in render.
 
@@ -28,8 +28,8 @@ export async function preloadImages(
   await Promise.all(
     paths
       .filter(Boolean)
-      .filter((p) => !cache.has(p) && (options.retryFailed || !failed.has(p)))
-      .map(async (p) => {
+      .filter(p => !cache.has(p) && (options.retryFailed || !failed.has(p)))
+      .map(async p => {
         const data = await fetchAsDataUrl(p);
         if (data) {
           cache.set(p, data);
@@ -42,9 +42,9 @@ export async function preloadImages(
 }
 
 export function img(path: string | undefined): string {
-  if (!path) return "";
-  if (path.startsWith("data:")) return path;
-  if (failed.has(path)) return "";
+  if (!path) return '';
+  if (path.startsWith('data:')) return path;
+  if (failed.has(path)) return '';
   return cache.get(path) || path;
 }
 
@@ -55,6 +55,6 @@ export function setImage(path: string, dataUrl: string) {
 
 export function didFail(path: string | undefined): boolean {
   if (!path) return false;
-  if (path.startsWith("data:")) return false;
+  if (path.startsWith('data:')) return false;
   return failed.has(path);
 }

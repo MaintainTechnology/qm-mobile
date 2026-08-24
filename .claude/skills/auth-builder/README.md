@@ -35,6 +35,7 @@ This skill manages the Stripe → Clerk authentication flow for the NGM platform
 ### Update Tier Metadata
 
 Edit `src/app/api/verify-and-enroll/route.ts`:
+
 - Line ~70: `mentorshipAccess` and `mentorshipTier` defaults
 - Lines ~115, ~157, ~225, ~262, ~303: All `publicMetadata` objects
 

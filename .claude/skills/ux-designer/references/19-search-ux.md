@@ -24,6 +24,7 @@ Centered hero (landing pages / search-first apps):
 ```
 
 **Guidelines:**
+
 - Minimum width: 300px (desktop), full-width on mobile
 - Visible by default (not hidden behind an icon on desktop)
 - Magnifying glass icon on the left (universal affordance)
@@ -97,6 +98,7 @@ Centered hero (landing pages / search-first apps):
 ```
 
 **Suggestion categories:**
+
 - **Recent searches**: User's own history (with clear history option)
 - **Popular/trending**: Common searches from all users
 - **Predictive**: Completions based on typing so far
@@ -182,15 +184,15 @@ Desktop — Side panel:                Mobile — Bottom sheet:
 
 ### Filter UX Patterns
 
-| Filter Type | UI Pattern | Best For |
-|-------------|-----------|----------|
-| **Single select** | Radio buttons / dropdown | Category, sort order |
-| **Multi select** | Checkboxes | Tags, sizes, colors |
-| **Range** | Slider or min/max inputs | Price, date range |
-| **Boolean** | Toggle switch | "In stock", "Free shipping" |
-| **Text** | Search within filter | Long category lists |
-| **Color** | Color swatches | Product colors |
-| **Rating** | Star row (clickable) | Minimum rating |
+| Filter Type       | UI Pattern               | Best For                    |
+| ----------------- | ------------------------ | --------------------------- |
+| **Single select** | Radio buttons / dropdown | Category, sort order        |
+| **Multi select**  | Checkboxes               | Tags, sizes, colors         |
+| **Range**         | Slider or min/max inputs | Price, date range           |
+| **Boolean**       | Toggle switch            | "In stock", "Free shipping" |
+| **Text**          | Search within filter     | Long category lists         |
+| **Color**         | Color swatches           | Product colors              |
+| **Rating**        | Star row (clickable)     | Minimum rating              |
 
 ### Filter Counts
 
@@ -236,6 +238,7 @@ Category
 ```
 
 **Result item components:**
+
 - Title (linked, keyword-highlighted)
 - URL/breadcrumb path
 - Snippet with highlighted matching terms
@@ -305,6 +308,7 @@ All (23) | Articles (12) | Products (8) | People (3)
 ```
 
 **Zero results checklist:**
+
 - [ ] Spelling suggestion ("Did you mean...?")
 - [ ] Actionable tips (fewer keywords, check spelling)
 - [ ] Alternative queries or popular searches
@@ -425,16 +429,16 @@ AI-powered search:       "How many days do I have to return an item?"
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Search success rate | > 70% | Users who find what they need |
-| Zero results rate | < 10% | Queries returning nothing |
-| Click-through rate | > 40% | Clicks on search results |
-| Time to first click | < 10s | Speed of finding relevant result |
-| Search exit rate | < 30% | Users who leave after searching |
-| Refinement rate | < 30% | Users who modify their query |
-| Autocomplete usage | > 30% | Suggestions selected |
-| Queries per session | < 2 | Finding it on first try |
+| Metric              | Target | Context                          |
+| ------------------- | ------ | -------------------------------- |
+| Search success rate | > 70%  | Users who find what they need    |
+| Zero results rate   | < 10%  | Queries returning nothing        |
+| Click-through rate  | > 40%  | Clicks on search results         |
+| Time to first click | < 10s  | Speed of finding relevant result |
+| Search exit rate    | < 30%  | Users who leave after searching  |
+| Refinement rate     | < 30%  | Users who modify their query     |
+| Autocomplete usage  | > 30%  | Suggestions selected             |
+| Queries per session | < 2    | Finding it on first try          |
 
 ---
 

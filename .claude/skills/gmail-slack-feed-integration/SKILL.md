@@ -57,7 +57,7 @@ async function refreshAccessToken(): Promise<string> {
     throw new Error(`Token refresh failed (${res.status}): ${text.slice(0, 300)}`);
   }
 
-  const json = await res.json() as { access_token: string; scope?: string };
+  const json = (await res.json()) as { access_token: string; scope?: string };
 
   // Detect granted scope to know if body access is available
   if (json.scope) {
@@ -81,7 +81,7 @@ const BASE = 'https://gmail.googleapis.com/gmail/v1/users/me';
 async function listMessages(
   token: string,
   maxResults = 30,
-  pageToken?: string
+  pageToken?: string,
 ): Promise<{ messages: { id: string; threadId: string }[]; nextPageToken?: string }> {
   const params = new URLSearchParams({ maxResults: String(maxResults) });
   if (pageToken) params.set('pageToken', pageToken);
@@ -117,7 +117,10 @@ async function getMessageDetail(token: string, messageId: string) {
 
   // Strategy 2: Parallel metadata + minimal (scope-limited fallback)
   const [metaRes, minRes] = await Promise.all([
-    fetch(`${url}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Subject&metadataHeaders=Date`, { headers }),
+    fetch(
+      `${url}?format=metadata&metadataHeaders=From&metadataHeaders=To&metadataHeaders=Cc&metadataHeaders=Subject&metadataHeaders=Date`,
+      { headers },
+    ),
     fetch(`${url}?format=minimal`, { headers }),
   ]);
 
@@ -220,9 +223,9 @@ type GmailDisplayMessage = {
 };
 
 function getHeader(msg: any, name: string): string {
-  return msg.payload?.headers?.find(
-    (h: any) => h.name.toLowerCase() === name.toLowerCase()
-  )?.value || '';
+  return (
+    msg.payload?.headers?.find((h: any) => h.name.toLowerCase() === name.toLowerCase())?.value || ''
+  );
 }
 
 function buildDisplayMessage(detail: any): GmailDisplayMessage {
@@ -245,10 +248,13 @@ function buildDisplayMessage(detail: any): GmailDisplayMessage {
     body_preview: body ? body.slice(0, 500) : snippet,
     body_full: body || snippet,
     gmail_link: `https://mail.google.com/mail/u/0/#inbox/${detail.id}`,
-    has_attachments: !!(detail.payload?.parts?.some(
-      (p: any) => p.mimeType && !p.mimeType.startsWith('text/') &&
-        !p.mimeType.startsWith('multipart/') && (p.body?.size || 0) > 0
-    )),
+    has_attachments: !!detail.payload?.parts?.some(
+      (p: any) =>
+        p.mimeType &&
+        !p.mimeType.startsWith('text/') &&
+        !p.mimeType.startsWith('multipart/') &&
+        (p.body?.size || 0) > 0,
+    ),
     scope_limited: _hasBodyAccess === false,
   };
 }
@@ -271,7 +277,7 @@ async function fetchGmailFeed(maxResults = 100, pageToken?: string) {
   for (let i = 0; i < list.messages.length; i += BATCH) {
     const batch = list.messages.slice(i, i + BATCH);
     const details = await Promise.all(
-      batch.map((m) => getMessageDetail(token, m.id).catch(() => null))
+      batch.map(m => getMessageDetail(token, m.id).catch(() => null)),
     );
     for (const d of details) {
       if (d) results.push(buildDisplayMessage(d));
@@ -297,10 +303,7 @@ async function fetchGmailFeed(maxResults = 100, pageToken?: string) {
 Slack uses simple Bearer tokens (no refresh needed) and a consistent `ok` field in responses.
 
 ```typescript
-async function slackApi<T>(
-  endpoint: string,
-  params: Record<string, string> = {}
-): Promise<T> {
+async function slackApi<T>(endpoint: string, params: Record<string, string> = {}): Promise<T> {
   const token = process.env.CC_SLACK_USER_TOKEN || process.env.CC_SLACK_BOT_TOKEN;
   if (!token) throw new Error('No Slack token configured');
 
@@ -370,16 +373,15 @@ type SlackMessage = {
 
 async function fetchChannelMessages(
   channelId: string,
-  oldestTimestamp: string
+  oldestTimestamp: string,
 ): Promise<SlackMessage[]> {
-  const res = await slackApi<{ messages: SlackMessage[] }>(
-    'conversations.history',
-    { channel: channelId, oldest: oldestTimestamp, limit: '100' }
-  );
+  const res = await slackApi<{ messages: SlackMessage[] }>('conversations.history', {
+    channel: channelId,
+    oldest: oldestTimestamp,
+    limit: '100',
+  });
 
-  return res.messages.filter(
-    (m) => !m.subtype && !m.bot_id && m.text && m.text.length > 5
-  );
+  return res.messages.filter(m => !m.subtype && !m.bot_id && m.text && m.text.length > 5);
 }
 ```
 
@@ -394,10 +396,9 @@ async function resolveUserName(userId: string): Promise<string> {
   if (userNameCache.has(userId)) return userNameCache.get(userId)!;
 
   try {
-    const res = await slackApi<{ user: { real_name?: string; name?: string } }>(
-      'users.info',
-      { user: userId }
-    );
+    const res = await slackApi<{ user: { real_name?: string; name?: string } }>('users.info', {
+      user: userId,
+    });
     const name = res.user.real_name || res.user.name || userId;
     userNameCache.set(userId, name);
     return name;
@@ -428,7 +429,7 @@ type SlackChannelFeed = {
 
 async function fetchSlackFeed(
   windowMinutes = 10080, // 7 days
-  limitPerChannel = 200
+  limitPerChannel = 200,
 ): Promise<{ ok: boolean; channels: SlackChannelFeed[]; total_messages: number }> {
   const oldest = String((Date.now() - windowMinutes * 60_000) / 1000);
   const channels = await fetchAllChannels();
@@ -436,7 +437,7 @@ async function fetchSlackFeed(
 
   for (const ch of channels) {
     // Rate limit for large workspaces
-    if (channels.length > 20) await new Promise((r) => setTimeout(r, 250));
+    if (channels.length > 20) await new Promise(r => setTimeout(r, 250));
 
     const messages = await fetchChannelMessages(ch.id, oldest);
     if (!messages.length) continue;
@@ -498,7 +499,7 @@ export async function POST(req: Request) {
   if (action === 'fetch_gmail_messages') {
     const result = await fetchGmailFeed(
       Number(body.maxResults) || 100,
-      body.pageToken || undefined
+      body.pageToken || undefined,
     );
     return Response.json(result);
   }
@@ -514,7 +515,7 @@ export async function POST(req: Request) {
   if (action === 'fetch_slack_messages') {
     const result = await fetchSlackFeed(
       Number(body.windowMinutes) || 10080,
-      Number(body.limitPerChannel) || 200
+      Number(body.limitPerChannel) || 200,
     );
     return Response.json(result);
   }
@@ -538,7 +539,10 @@ export const fetchGmailMessages = (maxResults = 100, pageToken?: string) =>
   postApi<GmailFeedResult>({ action: 'fetch_gmail_messages', maxResults, pageToken });
 
 export const fetchEmailDetail = (messageId: string) =>
-  postApi<{ ok: boolean; message: GmailDisplayMessage }>({ action: 'fetch_email_detail', messageId });
+  postApi<{ ok: boolean; message: GmailDisplayMessage }>({
+    action: 'fetch_email_detail',
+    messageId,
+  });
 
 export const fetchSlackMessages = (windowMinutes = 10080, limitPerChannel = 200) =>
   postApi<SlackFeedResult>({ action: 'fetch_slack_messages', windowMinutes, limitPerChannel });
@@ -546,34 +550,34 @@ export const fetchSlackMessages = (windowMinutes = 10080, limitPerChannel = 200)
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| Assuming Gmail always returns body | Check `scope` in token response; fall back to metadata+minimal |
-| Only extracting `text/plain` | Many emails are HTML-only; strip tags from `text/html` as fallback |
-| No rate limiting for Slack | Add 250ms delay between channel fetches for workspaces with 20+ channels |
-| Not caching Slack user lookups | Cache `users.info` results; same user appears across many messages |
-| Ignoring `format=full` 403 | Mark `_hasBodyAccess = false` and switch strategy permanently |
-| Fetching all message details serially | Use `Promise.all()` in batches of 10 for parallel fetching |
-| Not filtering Slack bot messages | Filter `subtype` and `bot_id` to get human messages only |
+| Mistake                               | Fix                                                                      |
+| ------------------------------------- | ------------------------------------------------------------------------ |
+| Assuming Gmail always returns body    | Check `scope` in token response; fall back to metadata+minimal           |
+| Only extracting `text/plain`          | Many emails are HTML-only; strip tags from `text/html` as fallback       |
+| No rate limiting for Slack            | Add 250ms delay between channel fetches for workspaces with 20+ channels |
+| Not caching Slack user lookups        | Cache `users.info` results; same user appears across many messages       |
+| Ignoring `format=full` 403            | Mark `_hasBodyAccess = false` and switch strategy permanently            |
+| Fetching all message details serially | Use `Promise.all()` in batches of 10 for parallel fetching               |
+| Not filtering Slack bot messages      | Filter `subtype` and `bot_id` to get human messages only                 |
 
 ## Required Google OAuth Scopes
 
-| Scope | Access Level |
-|-------|-------------|
+| Scope            | Access Level                                          |
+| ---------------- | ----------------------------------------------------- |
 | `gmail.metadata` | Headers only, no body, no snippet via metadata format |
-| `gmail.readonly` | Full read access including body content |
-| `gmail.modify` | Read + write (labels, send) |
+| `gmail.readonly` | Full read access including body content               |
+| `gmail.modify`   | Read + write (labels, send)                           |
 
 ## Required Slack Token Scopes
 
-| Scope | Purpose |
-|-------|---------|
-| `channels:history` | Read public channel messages |
-| `channels:read` | List public channels |
-| `groups:history` | Read private channel messages |
-| `groups:read` | List private channels |
-| `im:history` | Read DM messages |
-| `im:read` | List DMs |
-| `mpim:history` | Read group DM messages |
-| `mpim:read` | List group DMs |
-| `users:read` | Resolve user IDs to names |
+| Scope              | Purpose                       |
+| ------------------ | ----------------------------- |
+| `channels:history` | Read public channel messages  |
+| `channels:read`    | List public channels          |
+| `groups:history`   | Read private channel messages |
+| `groups:read`      | List private channels         |
+| `im:history`       | Read DM messages              |
+| `im:read`          | List DMs                      |
+| `mpim:history`     | Read group DM messages        |
+| `mpim:read`        | List group DMs                |
+| `users:read`       | Resolve user IDs to names     |

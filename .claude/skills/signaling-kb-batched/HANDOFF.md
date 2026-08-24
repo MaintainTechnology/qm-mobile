@@ -4,22 +4,22 @@
 
 ## Current State (2026-01-29)
 
-| Metric | Value |
-|--------|-------|
-| **Transcripts synced** | 224 |
-| **Processed** | 158 (71%) |
-| **Pending** | 66 |
-| **Failed** | 0 |
-| **Total cost** | $248.00 |
+| Metric                 | Value     |
+| ---------------------- | --------- |
+| **Transcripts synced** | 224       |
+| **Processed**          | 158 (71%) |
+| **Pending**            | 66        |
+| **Failed**             | 0         |
+| **Total cost**         | $248.00   |
 
 ### Entity Counts
 
-| Entity Type | Files Created |
-|-------------|---------------|
-| Interventions | 580 |
-| Pathways | 207 |
-| Biomarkers | 239 |
-| Conflicts | 576 |
+| Entity Type   | Files Created |
+| ------------- | ------------- |
+| Interventions | 580           |
+| Pathways      | 207           |
+| Biomarkers    | 239           |
+| Conflicts     | 576           |
 
 ## What's Been Done
 
@@ -71,43 +71,49 @@ nohup bash scripts/monitor_extraction.sh > monitor.log 2>&1 &
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `scripts/extract_kb_openrouter.py` | Main extraction script (3-stage LLM pipeline) |
-| `scripts/sync_gdrive_transcripts.py` | Google Drive sync with tracking |
-| `scripts/monitor_extraction.sh` | Auto-restart monitor for long runs |
-| `.signaling-kb/state/processing-tracker.json` | Tracks processed vs pending |
-| `.signaling-kb/interventions/*.json` | Intervention entity nodes (580) |
-| `.signaling-kb/pathways/*.json` | Pathway entity nodes (207) |
-| `.signaling-kb/biomarkers/*.json` | Biomarker entity nodes (239) |
-| `.signaling-kb/conflicts/*.json` | Conflict entity nodes (576) |
-| `.env` | Environment variables |
+| File                                          | Purpose                                       |
+| --------------------------------------------- | --------------------------------------------- |
+| `scripts/extract_kb_openrouter.py`            | Main extraction script (3-stage LLM pipeline) |
+| `scripts/sync_gdrive_transcripts.py`          | Google Drive sync with tracking               |
+| `scripts/monitor_extraction.sh`               | Auto-restart monitor for long runs            |
+| `.signaling-kb/state/processing-tracker.json` | Tracks processed vs pending                   |
+| `.signaling-kb/interventions/*.json`          | Intervention entity nodes (580)               |
+| `.signaling-kb/pathways/*.json`               | Pathway entity nodes (207)                    |
+| `.signaling-kb/biomarkers/*.json`             | Biomarker entity nodes (239)                  |
+| `.signaling-kb/conflicts/*.json`              | Conflict entity nodes (576)                   |
+| `.env`                                        | Environment variables                         |
 
 ## Output Examples
 
 ### Intervention
+
 ```json
 {
   "intervention_id": "rapamycin",
   "aliases": ["sirolimus"],
   "category": "small_molecule",
-  "dosing_protocols": [{
-    "indication": "longevity",
-    "dose": "5-6mg",
-    "frequency": "weekly",
-    "source_type": "expert_lecture",
-    "peer_reviewed_citations": [{"pmid": "24566879", "title": "..."}],
-    "confidence": "moderate"
-  }],
-  "mechanism_claims": [{
-    "target": "MTORC1",
-    "effect": "inhibit",
-    "confidence": "high"
-  }]
+  "dosing_protocols": [
+    {
+      "indication": "longevity",
+      "dose": "5-6mg",
+      "frequency": "weekly",
+      "source_type": "expert_lecture",
+      "peer_reviewed_citations": [{ "pmid": "24566879", "title": "..." }],
+      "confidence": "moderate"
+    }
+  ],
+  "mechanism_claims": [
+    {
+      "target": "MTORC1",
+      "effect": "inhibit",
+      "confidence": "high"
+    }
+  ]
 }
 ```
 
 ### Pathway
+
 ```json
 {
   "pathway_id": "mtor-signaling",
@@ -116,31 +122,35 @@ nohup bash scripts/monitor_extraction.sh > monitor.log 2>&1 &
   "core_nodes": ["MTOR", "RPTOR", "RICTOR"],
   "upstream_triggers": ["amino acids", "insulin"],
   "downstream_effects": ["protein synthesis"],
-  "interventions_targeting": [
-    {"intervention_name": "rapamycin", "effect": "inhibit"}
-  ]
+  "interventions_targeting": [{ "intervention_name": "rapamycin", "effect": "inhibit" }]
 }
 ```
 
 ### Biomarker
+
 ```json
 {
   "biomarker_id": "igf-1",
-  "interpretation_patterns": [{
-    "biomarker_state": {"igf1": "low"},
-    "interpretation": "May suggest GH deficiency",
-    "clinical_implications": "Consider GH evaluation"
-  }],
-  "optimal_ranges_by_context": [{
-    "context": "longevity",
-    "optimal": {"low": 150, "high": 250}
-  }]
+  "interpretation_patterns": [
+    {
+      "biomarker_state": { "igf1": "low" },
+      "interpretation": "May suggest GH deficiency",
+      "clinical_implications": "Consider GH evaluation"
+    }
+  ],
+  "optimal_ranges_by_context": [
+    {
+      "context": "longevity",
+      "optimal": { "low": 150, "high": 250 }
+    }
+  ]
 }
 ```
 
 ## After Extraction Completes
 
 1. **Commit the KB data**:
+
    ```bash
    git add .signaling-kb/
    git commit -m "feat: complete signaling KB extraction - 224 transcripts, 4 entity types"

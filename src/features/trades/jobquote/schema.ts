@@ -82,7 +82,8 @@ export function explainJobQuoteFailure(err: unknown): string {
   const body = (err.body ?? {}) as JobQuoteFailureBody;
   if (body.issues?.length) return body.issues.join(', ');
 
-  const checkFirst = ' The quote may still have been drafted — check the Quotes tab before retrying.';
+  const checkFirst =
+    ' The quote may still have been drafted — check the Quotes tab before retrying.';
 
   switch (body.error) {
     case 'unauthorized':

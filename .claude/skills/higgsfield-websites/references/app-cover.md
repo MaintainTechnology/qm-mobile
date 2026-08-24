@@ -118,18 +118,18 @@ References are hosted at
 `https://static.higgsfield.ai/website-builder/og-image-references/ref_01.jpg`
 … `ref_11.jpg` (same pattern for every file below):
 
-| File | Layout | Vibe |
-|---|---|---|
-| ref_01 | landscape | lime frame, neon subway, anime character — dark/cinematic |
-| ref_02 | landscape | lime frame, stadium goalkeeper — sporty, dramatic |
-| ref_03 | landscape | peach frame, light studio, glass cards — clean/technical |
-| ref_04 | landscape | olive frame, office slapstick photo — comedic |
-| ref_05, ref_06 | vertical | full-bleed 9:16 versions (no capsule) — style only |
-| ref_07 | landscape | green frame, butterflies, light — fresh/friendly |
-| ref_08 | landscape | sage frame, claymation shark — playful/craft |
-| ref_09 | landscape | yellow frame, office banana slapstick — comedic |
-| ref_10 | landscape | gray frame, app cards fan — product UI focus |
-| ref_11 | vertical | orange gradient, K-pop portrait — style only |
+| File           | Layout    | Vibe                                                      |
+| -------------- | --------- | --------------------------------------------------------- |
+| ref_01         | landscape | lime frame, neon subway, anime character — dark/cinematic |
+| ref_02         | landscape | lime frame, stadium goalkeeper — sporty, dramatic         |
+| ref_03         | landscape | peach frame, light studio, glass cards — clean/technical  |
+| ref_04         | landscape | olive frame, office slapstick photo — comedic             |
+| ref_05, ref_06 | vertical  | full-bleed 9:16 versions (no capsule) — style only        |
+| ref_07         | landscape | green frame, butterflies, light — fresh/friendly          |
+| ref_08         | landscape | sage frame, claymation shark — playful/craft              |
+| ref_09         | landscape | yellow frame, office banana slapstick — comedic           |
+| ref_10         | landscape | gray frame, app cards fan — product UI focus              |
+| ref_11         | vertical  | orange gradient, K-pop portrait — style only              |
 
 Default choice: 2–3 landscape refs whose vibe matches the requested cover
 (e.g., comedic request → ref_04 + ref_09 + one lime ref for the frame). Always

@@ -17,6 +17,7 @@ This skill emphasizes **bold creative commitment**, breaking away from generic p
 Before coding, **ASK to understand context**, then **COMMIT BOLDLY** to a distinctive direction:
 
 ### Questions to Ask First
+
 1. **Purpose**: What problem does this interface solve? Who uses it?
 2. **Tone**: What aesthetic extreme fits? (see Tone Options below) Use these for inspiration but design one that is true to the aesthetic direction.
 3. **Constraints**: Technical requirements (framework, performance, accessibility)?
@@ -25,13 +26,16 @@ Before coding, **ASK to understand context**, then **COMMIT BOLDLY** to a distin
 **CRITICAL**: Choose a clear conceptual direction and execute it with precision. Bold maximalism and refined minimalism both work - the key is intentionality, not intensity.
 
 Then implement working code (HTML/CSS/JS, React, TypeScript, etc.) that is:
+
 - Production-grade and functional
 - Visually striking and memorable
 - Cohesive with a clear aesthetic point-of-view
 - Meticulously refined in every detail
 
 ### Tone Options (Pick an Extreme)
+
 Choose a clear aesthetic direction and execute with precision:
+
 - **Brutally minimal** - stripped to essence, bold typography, vast whitespace
 - **Retro-futuristic** - vintage meets sci-fi, nostalgic tech aesthetics
 - **Organic/natural** - soft edges, earthy colors, nature-inspired textures
@@ -40,8 +44,8 @@ Choose a clear aesthetic direction and execute with precision:
 - **Art deco/geometric** - bold patterns, metallic accents, symmetric elegance
 - **Soft/pastel** - gentle gradients, muted tones, calming atmosphere
 - **Industrial/utilitarian** - functional, no-nonsense, mechanical precision
-• - Neo-Swiss Grid - rigorous grid, restrained palette, razor-sharp alignment,
-    typographic clarity
+  • - Neo-Swiss Grid - rigorous grid, restrained palette, razor-sharp alignment,
+  typographic clarity
   - Anti-Grid Experimental - intentional misalignment, broken columns, playful
     tension, art-school energy
   - Monochrome High-Contrast - black/white only, stark hierarchy, dramatic scale
@@ -70,7 +74,7 @@ Choose a clear aesthetic direction and execute with precision:
     a design principle
   - Cinematic Noir - moody shadows, tight spotlighting, grain, suspenseful
     minimal palette
-  
+
   - Whimsical Storybook - soft illustration cues, charming type, warm palette,
     gentle narrative layout
   - Modern Skeuomorphic - tactile UI cues, soft shadows, realistic materials,
@@ -108,11 +112,13 @@ Choose a clear aesthetic direction and execute with precision:
     in restraint
 
 ### After Getting Context
+
 - **Commit fully** to the chosen direction - no half measures
 - Present 2-3 alternative approaches with trade-offs
 - Then implement with precision: production-grade, visually striking, memorable
 
 ## Foundational Design Principles
+
 - **Typography**: Choose fonts that are beautiful, unique, and interesting. Avoid generic fonts like Arial and Inter; opt instead for distinctive choices that elevate the frontend's aesthetics; unexpected, characterful font choices. Pair a distinctive display font with a refined body font.
 - **Color & Theme**: Commit to a cohesive aesthetic. Use CSS variables for consistency. Dominant colors with sharp accents outperform timid, evenly-distributed palettes.
 - **Motion**: Use animations for effects and micro-interactions. Prioritize CSS-only solutions for HTML. Use Motion library for React when available. Focus on high-impact moments: one well-orchestrated page load with staggered reveals (animation-delay) creates more delight than scattered micro-interactions. Use scroll-triggering and hover states that surprise.
@@ -120,9 +126,11 @@ Choose a clear aesthetic direction and execute with precision:
 - **Backgrounds & Visual Details**: Create atmosphere and depth rather than defaulting to solid colors. Add contextual effects and textures that match the overall aesthetic. Apply creative forms like gradient meshes, noise textures, geometric patterns, layered transparencies, dramatic shadows, decorative borders, custom cursors, and grain overlays.
 
 ### Stand Out From Generic Patterns
+
 Interpret creatively and make unexpected choices that feel genuinely designed for the context. No design should be the same. Vary between light and dark themes, different fonts, different aesthetics. NEVER converge on common choices (Space Grotesk, for example) across generations.
 
 **NEVER Use These AI-Generated Aesthetics:**
+
 - **Fonts**: Inter, Roboto, Arial, system fonts as primary choice, Space Grotesk (overused by AI)
 - **Colors**: Generic SaaS blue (#3B82F6), purple gradients on white backgrounds
 - **Patterns**: Cookie-cutter layouts, predictable component arrangements
@@ -130,6 +138,7 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 - **Overall**: Anything that looks "Claude-generated" or machine-made
 
 **Instead, Create Atmosphere:**
+
 - Suggest photography, patterns, textures over flat solid colors
 - Think beyond typical patterns - you can step off the written path
 - See **Visual Effects (Implementation Checklist)** in Interaction Design section for specific techniques: gradient meshes, grain overlays, dramatic shadows, layered transparencies, custom cursors
@@ -137,12 +146,14 @@ Interpret creatively and make unexpected choices that feel genuinely designed fo
 **Draw Inspiration From:**
 
 Award-winning digital work:
+
 - [Awwwards](https://awwwards.com) - Site of the Day winners
 - [FWA](https://thefwa.com) - Cutting-edge web experiences
 - [CSS Design Awards](https://cssdesignawards.com)
 - [Dribbble Playoffs](https://dribbble.com/shots/popular) - Top shots for component ideas
 
 Independent studios known for distinctive work:
+
 - **Dutch**: Studio Dumbar, Lava Design, Thonik
 - **Swiss**: Büro Destruct, NORM, Elektrosmog
 - **British**: Studio Output, Made Thought, NB Studio
@@ -151,17 +162,20 @@ Independent studios known for distinctive work:
 - **Japanese**: 6D-K, Rhizomatiks, TeamLab (digital)
 
 Historical movements (study, don't copy):
+
 - Bauhaus, Swiss International, Otl Aicher's Munich Olympics
 - Emigre magazine, David Carson's Ray Gun
 - Neville Brody's Face magazine, Sagmeister's rule-breaking
 
 Technical inspiration:
+
 - [Codrops](https://tympanus.net/codrops/) - CSS/JS experiments
 - [CodePen Spark](https://codepen.io/spark) - Creative code
 - [Hoverstat.es](https://hoverstat.es) - Hover state inspiration
 - Beautiful background animations (CSS, SVG) - slow, looping, subtle
 
 **Visual Interest Strategies:**
+
 - Unique color pairs that aren't typical
 - Animation effects that feel fresh
 - Background patterns that add depth without distraction
@@ -173,6 +187,7 @@ Technical inspiration:
 When stuck in safe patterns, ask yourself:
 
 **Designer lens:**
+
 - "What would Sagmeister do?" → Provocation, hand-drawn, conceptual depth
 - "What would Neville Brody do?" → Typography as art, rule-breaking hierarchy
 - "What would Studio Dumbar do?" → Bold color, geometric play, Dutch directness
@@ -180,6 +195,7 @@ When stuck in safe patterns, ask yourself:
 - "What would David Carson do?" → Destroy the grid, prioritize feeling over reading
 
 **Context shift:**
+
 - "What if this was a magazine spread?" → Editorial hierarchy, pull quotes, art direction
 - "What if this was a museum exhibit?" → Generous space, quiet typography, specimen presentation
 - "What if this was street signage?" → Maximum legibility, bold simplicity
@@ -187,6 +203,7 @@ When stuck in safe patterns, ask yourself:
 - "What if this was a protest poster?" → Urgency, stark contrast, immediate impact
 
 **Era lens:**
+
 - "1960s Swiss International?" → Grid perfection, Helvetica, rational clarity
 - "1990s Emigre/Ray Gun?" → Chaos, layering, deliberately challenging
 - "1920s Bauhaus?" → Primary colors, geometric forms, functional art
@@ -198,16 +215,19 @@ When stuck in safe patterns, ask yourself:
 Before implementing, roll the dice on these dimensions:
 
 **Color temperature:** Flip a coin
+
 - Heads → Warm palette (terracotta, ochre, cream, rust)
 - Tails → Cool palette (slate, ice blue, mint, charcoal)
 
 **Layout direction:** Roll 1-4
+
 1. Left-heavy asymmetry
 2. Right-heavy asymmetry
 3. Center-dominant with edge tension
 4. Diagonal/rotated flow
 
 **Type personality:** Roll 1-6
+
 1. Geometric sans (sharp, modern)
 2. Humanist sans (warm, approachable)
 3. Serif (editorial, trustworthy)
@@ -216,15 +236,18 @@ Before implementing, roll the dice on these dimensions:
 6. Monospace (technical, systematic)
 
 **Motion philosophy:** Roll 1-3
+
 1. Minimal (only essential feedback)
 2. Choreographed (orchestrated reveals, scroll-triggered)
 3. Playful (bouncy, overshoots, personality)
 
 **Density:** Roll 1-2
+
 1. Generous whitespace (luxury, breathing room)
 2. Controlled density (editorial, information-rich)
 
 **Use these when:**
+
 - Starting a new project with no brand constraints
 - Feeling stuck in repetitive patterns
 - The brief is open-ended
@@ -234,7 +257,7 @@ Before implementing, roll the dice on these dimensions:
 
 1. **Simplicity**
    - Identify the essential purpose and eliminate distractions
-   - Begin with complexity, 
+   - Begin with complexity,
    - Every element must justify its existence
 
 2. **Material Honesty**
@@ -249,10 +272,11 @@ Before implementing, roll the dice on these dimensions:
 
 Remember: Claude is capable of extraordinary creative work. Don't hold back, show what can truly be created when thinking outside the box and committing fully to a distinctive vision.
 
-   **Examples:**
-   - Clickable: Use distinct colors, hover state changes, cursor feedback, subtle lift effects
-   - Containers: Use borders, background shifts, generous padding, OR shadow depth
-   - Hierarchy: Use scale, weight, spacing, AND elevation when it serves the aesthetic
+**Examples:**
+
+- Clickable: Use distinct colors, hover state changes, cursor feedback, subtle lift effects
+- Containers: Use borders, background shifts, generous padding, OR shadow depth
+- Hierarchy: Use scale, weight, spacing, AND elevation when it serves the aesthetic
 
 3. **Functional Layering**
    - Create hierarchy through typography scale, color contrast, and spatial relationships
@@ -279,12 +303,14 @@ Remember: Claude is capable of extraordinary creative work. Don't hold back, sho
 ### What This Means in Practice
 
 **Color Usage:**
+
 - Base palette: 4-5 neutral shades (backgrounds, borders, text)
 - Accent palette: 1-3 bold colors (CTAs, status, emphasis)
 - Neutrals are slightly desaturated, warm or cool based on brand intent
 - Accents are saturated enough to create clear contrast
 
 **Typography:**
+
 - Headlines: Emotional, attention-grabbing, UNEXPECTED (personality over pure legibility)
 - Body/UI: Functional, highly legible (clarity over expression)
 - 2-3 typefaces maximum, but make them CHARACTERFUL and distinctive
@@ -292,10 +318,12 @@ Remember: Claude is capable of extraordinary creative work. Don't hold back, sho
 - NEVER default to Inter, Roboto, or Space Grotesk - find unique fonts
 
 **Animation:**
+
 - Purposeful: Guides attention, establishes relationships, provides feedback
 - Physics-informed: Natural easing, appropriate mass/momentum
 
 **Spacing:**
+
 - Generous negative space creates clarity and breathing room
 - Mathematical relationships (e.g., 4px base, 8/16/24/32/48px scale)
 - Consistent application creates visual rhythm
@@ -338,6 +366,7 @@ Every interface needs two color roles:
    - Use saturated colors for clear contrast against neutrals
 
 **Palette Structure Example:**
+
 ```
 Neutrals: slate-50, slate-100, slate-300, slate-700, slate-900
 Accents: teal-500 (primary), amber-500 (warning), red-500 (error)
@@ -358,19 +387,23 @@ Accents: teal-500 (primary), amber-500 (warning), red-500 (error)
 **Color Relationships:**
 
 Choose warm or cool intentionally based on brand:
+
 - **Warm greys** (beige/brown undertones): Organic, approachable, trustworthy
 - **Cool greys** (blue undertones): Modern, tech-forward, professional
 
 Accent colors should have clear contrast with both:
+
 - Light backgrounds (for buttons on white)
 - Dark text (if used as backgrounds for white text)
 
 **Intentional Color Usage:**
+
 - Every color must serve a purpose (hierarchy, function, status, or action)
 - Avoid decorative colors that don't communicate meaning
 - Maintain consistency: same color = same meaning throughout
 
 **Accessibility:**
+
 - Ensure sufficient contrast for color-blind users
 - Follow WCAG 2.1 AA: minimum 4.5:1 for normal text, 3:1 for large text
 - Don't rely on color alone to convey information (add icons or labels)
@@ -378,6 +411,7 @@ Accent colors should have clear contrast with both:
 **Unique Color Strategy:**
 
 To stand out from generic patterns:
+
 - NEVER use default SaaS blue (#3B82F6) or purple gradients on white
 - Use unexpected neutrals: warm greys, soft off-whites, deep charcoals, rich blacks
 - Pair neutrals with distinctive accents: terracotta + charcoal, sage + navy, coral + slate
@@ -395,16 +429,19 @@ See **Visual Effects (Implementation Checklist)** for implementation details on 
 Typography is a primary design element that conveys personality and hierarchy.
 
 **Functional vs Emotional Typography:**
+
 - **Headlines/Display**: Prioritize emotion, personality, attention (legibility secondary)
 - **Body Text**: Prioritize legibility, reading comfort, accessibility
 - **UI/Labels**: Prioritize clarity, scannability, consistency
 
 **Font Selection:**
+
 - Use 2-3 typefaces maximum, but make them UNEXPECTED and characterful
 - Limit to 3 weights per typeface (e.g., Regular 400, Medium 500, Bold 700)
 - Prefer variable fonts for fine-tuned control and performance
 
 **NEVER Use These Fonts as Primary:**
+
 - Inter (overused by AI and generic SaaS)
 - Roboto (too generic)
 - Arial/Helvetica (default fallback vibes)
@@ -412,11 +449,13 @@ Typography is a primary design element that conveys personality and hierarchy.
 - System fonts as primary choice (only as fallback)
 
 **Font Version Usage:**
+
 - **Display version**: Headlines and hero text only - BE BOLD
 - **Text version**: Paragraphs and long-form content - legibility matters
 - **Caption/Micro**: Small UI labels (1-2 lines, non-critical info)
 
 **Find Distinctive Fonts:**
+
 - Google Fonts for web - but dig deeper than page 1
 - Type foundries for unique options
 - Choose fonts that serve your CHOSEN AESTHETIC DIRECTION
@@ -425,6 +464,7 @@ Typography is a primary design element that conveys personality and hierarchy.
 **Typographic Scale:**
 
 Use mathematical relationships for size hierarchy:
+
 - **Ratio**: Major third (1.25x) for moderate contrast, Perfect fourth (1.333x) for dramatic
 - **Base size**: 16px (1rem) for body text
 - **Example scale (1.25x)**:
@@ -441,11 +481,13 @@ Use mathematical relationships for size hierarchy:
   ```
 
 **Typographic Hierarchy:**
+
 - Create clear visual distinction between levels
 - Headlines, subheadings, body, captions should each have distinct size/weight
 - Use combination of size, weight, and color for hierarchy
 
 **Spacing & Readability:**
+
 - **Line height**: 1.5x font size for body text (e.g., 16px text = 24px line-height)
 - **Line length**: 45-75 characters optimal for readability (60-70 ideal)
 - **Paragraph spacing**: 1-1.5em between paragraphs
@@ -458,11 +500,13 @@ Use mathematical relationships for size hierarchy:
 **Font Pairing Logic:**
 
 When using multiple typefaces, create contrast through:
+
 - **Category contrast**: Serif + Sans-serif (classic, clear distinction)
 - **Weight contrast**: Light + Bold (dynamic, energetic)
 - **Personality contrast**: Geometric + Humanist (modern + warm)
 
 Examples:
+
 - Serif headlines + Sans body (editorial, trustworthy)
 - Display headlines + System body (distinctive + efficient)
 - Bold sans headlines + Light sans body (modern, clean)
@@ -470,6 +514,7 @@ Examples:
 **UI Typography:**
 
 Specific guidance for interface elements:
+
 - **Button text**: Semi-Bold (600), 14-16px, consistent casing (all-caps OR title case)
 - **Form labels**: Regular (400), 14px, positioned above input
 - **Form input text**: Regular (400), 16px minimum (prevents iOS zoom on focus)
@@ -479,6 +524,7 @@ Specific guidance for interface elements:
 **Responsive Typography:**
 
 Scale type sizes across breakpoints:
+
 ```tsx
 // Example with Tailwind
 <h1 className="text-3xl md:text-4xl lg:text-5xl">
@@ -497,29 +543,32 @@ Reduce hierarchy levels on small screens (fewer distinct sizes)
 ### Layout & Spatial Design
 
 **Compositional Balance:**
+
 - Every screen should feel balanced
 - Pay attention to visual weight and negative space
 - Use generous negative space to focus attention
 - Add sufficient margins and paddings for professional, spacious look
 
 **Grid Discipline:**
+
 - Maintain consistent underlying grid system
 - Create sense of order while allowing meaningful exceptions
 - Use grid/flex wrappers with `gap` for spacing
 - Prioritize wrappers over direct margins/padding on children
 
 **Spatial Relationships:**
+
 - Group related elements through proximity, alignment, and shared attributes
 - Use size, color, and spacing to highlight important elements
 - Guide user focus through visual hierarchy
 
 **Attention Guidance:**
+
 - Design interfaces that guide user attention effectively
 - Avoid cluttered interfaces where elements compete
 - Create clear paths through the content
 
 ## Interaction Design
-
 
 **Motion Specification:**
 
@@ -530,25 +579,30 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 These are specific, high-impact motion patterns to implement for memorable interfaces:
 
 **Scroll-Triggered Animations:**
+
 - Use Intersection Observer API for performant scroll detection
 - Trigger animations when elements enter viewport (not on page load)
 - Example: `data-animate="fade-up"` with `.is-visible` class toggle
 
 **Staggered Reveal Animations:**
+
 - Use `animation-delay` for sequential element reveals
 - Apply to lists, grids, and grouped content
 
-*Timing principles (not rules):*
+_Timing principles (not rules):_
+
 - **Base delay**: 50-150ms between elements (faster = energetic, slower = elegant)
 - **Total sequence**: Keep under 1s or users lose patience
 - **Pattern choices**: Linear (predictable), eased (accelerating/decelerating), or random (chaotic)
 - **Direction**: Left-to-right, top-to-bottom, diagonal, center-out, or edge-in
 
 **Background Atmosphere:**
+
 - Add grain/noise texture overlay via `body::before` pseudo-element
 - Create floating/pulsing background orbs with `@keyframes`
 
-*Ambient motion principles:*
+_Ambient motion principles:_
+
 - **Duration**: 8-20s for background elements (slow = calming, faster = energetic)
 - **Transform types**: translateY (floating), scale (breathing), rotate (orbiting)
 - **Easing**: Use `ease-in-out` for organic, breathing feel
@@ -556,16 +610,19 @@ These are specific, high-impact motion patterns to implement for memorable inter
 - **Layering**: Multiple elements at different speeds create depth (parallax effect)
 
 **Layout Animation:**
+
 - Use asymmetric bento grid layouts with varied reveal timing
 - Animate grid items individually, not the container
 - Consider diagonal or wave-pattern reveal sequences
 
 **Data Visualization Motion:**
+
 - Include animated progress bars that fill on scroll-trigger
 - Implement stat counters that count up when visible
 - Use easing that slows at the end (ease-out) for natural feel
 
 **Hover State Transformations:**
+
 - `translateY(-4px)` for subtle lift effect
 - `scale(1.02-1.05)` for emphasis
 - Glow effects via `box-shadow` with accent color
@@ -573,11 +630,13 @@ These are specific, high-impact motion patterns to implement for memorable inter
 - Always include `transition` for smooth state changes
 
 **Social Proof Motion:**
+
 - Implement infinite marquee/ticker for testimonials, logos, or stats
 - Use CSS-only approach with `@keyframes` for seamless loop
 - Pause on hover for accessibility (`animation-play-state: paused`)
 
-*Marquee principles:*
+_Marquee principles:_
+
 - **Speed**: 20-60s for full cycle (slower = premium, faster = urgency)
 - **Direction**: Horizontal (traditional), vertical (unique), or diagonal (bold)
 - **Content duplication**: Duplicate content 2x for seamless loop
@@ -589,11 +648,13 @@ These are specific, high-impact motion patterns to implement for memorable inter
 Consolidated checklist for atmospheric visual effects (complements Color & Typography sections):
 
 **Gradient Mesh Backgrounds:**
+
 - Use multiple radial gradients with offset positions
 - Blend with `background-blend-mode: multiply` or `overlay`
 - Animate gradient positions subtly for living backgrounds
 
-*Gradient mesh principles:*
+_Gradient mesh principles:_
+
 - **Layer count**: 2-4 radial gradients (more = richer, fewer = cleaner)
 - **Position strategy**: Offset from corners/edges (20-30% from edge creates tension)
 - **Opacity range**: 0.1-0.4 for overlays (subtle), 0.5-0.8 for dominant
@@ -601,23 +662,27 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 - **Animation**: Shift positions 10-30% over 15-30s for subtle movement
 
 **Dramatic Shadows (Not Subtle):**
+
 - Use layered shadows for depth: `box-shadow: 0 4px 6px rgba(), 0 10px 20px rgba();`
 - Add color to shadows from accent palette
 - Consider `drop-shadow` filter for non-rectangular elements
 - Shadows should be visible and intentional, not barely perceptible
 
 **Layered Transparencies:**
+
 - Stack elements with `rgba()` or `hsla()` backgrounds
 - Use `backdrop-filter: blur()` sparingly (performance cost)
 - Create depth through overlapping translucent layers
 
 **Grain/Noise Texture:**
+
 - Apply via `::before` or `::after` pseudo-element
 - Use SVG noise filter or tiny repeating PNG
 - Set `opacity: 0.03-0.08` for subtle texture
 - Use `pointer-events: none` to not interfere with interactions
 
 **Custom Cursors:**
+
 - Change cursor for interactive regions: `cursor: pointer`
 - Consider custom cursor images for brand differentiation
 - Use `cursor: grab` / `cursor: grabbing` for draggable elements
@@ -724,6 +789,7 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
    - Create atmosphere: gradient meshes, noise textures, grain overlays, dramatic lighting
 
 **Navigation:**
+
 - Clear structure with intuitive navigation menus
 - Implement breadcrumbs for deep hierarchies (more than 2 levels)
 - Use standard UI patterns to reduce learning curve (hamburger menu, tab bars)
@@ -735,59 +801,70 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 ### Component Library & Tools
 
 **Component Library:**
+
 - Strongly prefer shadcn components (v4, pre-installed in `@/components/ui`)
 - Import individually: `import { Button } from "@/components/ui/button";`
 - Use over plain HTML elements (`<Button>` over `<button>`)
 - Avoid creating custom components with names that clash with shadcn
 
 **Styling Engine:**
+
 - Use Tailwind utility classes exclusively
 - Adhere to theme variables in `index.css` via CSS custom properties
 - Map variables in `@theme` (see `tailwind.config.js`)
 - Use inline styles or CSS modules only when absolutely necessary
 
 **Icons:**
+
 - Use `@phosphor-icons/react` for buttons and inputs
 - Example: `import { Plus } from "@phosphor-icons/react"; <Plus />`
 - Use color for plain icon buttons
 - Don't override default `size` or `weight` unless requested
 
 **Notifications:**
+
 - Use `sonner` for toasts
 - Example: `import { toast } from 'sonner'`
 
 **Loading States:**
+
 - Always add loading states, spinners, placeholder animations
 - Use skeletons until content renders
 
 ### Layout Implementation
 
 **Spacing Strategy:**
+
 - Use grid/flex wrappers with `gap` for spacing
 - Prioritize wrappers over direct margins/padding on children
 - Nest wrappers as needed for complex layouts
 
 **Conditional Styling:**
+
 - Use ternary operators or clsx/classnames utilities
 - Example: `className={clsx('base-class', { 'active-class': isActive })}`
 
 ### Responsive Design
 
 **Fluid Layouts:**
+
 - Use relative units (%, em, rem) instead of fixed pixels
 - Implement CSS Grid and Flexbox for flexible layouts
 - Design mobile-first, then scale up
 
 **Media Queries:**
+
 - Use breakpoints based on content needs, not specific devices
 - Test across range of devices and orientations
 
 **Touch Targets:**
+
 - Minimum 44x44 pixels for interactive elements
 - Provide adequate spacing between touch targets
 - Addhover states for desktop, focus states for touch/keyboard
 
 **Performance:**
+
 - Optimize assets for mobile networks
 - Use CSS animations over JavaScript
 - Implement lazy loading for images and videos
@@ -795,6 +872,7 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 ## Accessibility Standards
 
 **Core Requirements:**
+
 - Follow WCAG 2.1 AA guidelines
 - Ensure keyboard navigability for all interactive elements
 - Minimum touch target size: 44×44px
@@ -802,6 +880,7 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 - Provide alternative text for images and non-text content
 
 **Implementation Details:**
+
 - Use descriptive variable and function names
 - Event functions: prefix with "handle" (handleClick, handleKeyDown)
 - Add accessibility attributes:
@@ -838,18 +917,21 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 ### Testing Checklist
 
 **Visual Testing:**
+
 - Use playwright MCP when available for automated testing
 - Check responsive behavior at common breakpoints
 - Verify touch targets on mobile
 - Test with different content lengths (short, long, edge cases)
 
 **Accessibility Testing:**
+
 - Test keyboard navigation
 - Verify screen reader compatibility
 - Check color contrast ratios
 - Ensure focus states are visible
 
 **Cross-Device Testing:**
+
 - Test on actual devices, not just emulators
 - Check different browsers (Chrome, Firefox, Safari)
 - Verify touch interactions on mobile
@@ -860,6 +942,7 @@ Consolidated checklist for atmospheric visual effects (complements Color & Typog
 ### Example 1: Designing a Button
 
 **Initial Question to Ask:**
+
 ```
 Before I implement this button, I have a few design questions:
 1. What's the primary action you want to emphasize?
@@ -868,21 +951,21 @@ Before I implement this button, I have a few design questions:
 ```
 
 **After Getting Approval, Implementation:**
-```tsx
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "@phosphor-icons/react";
 
-<Button
-  className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg transition-colors duration-200"
->
+```tsx
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from '@phosphor-icons/react';
+
+<Button className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg transition-colors duration-200">
   Get Started
   <ArrowRight className="ml-2" />
-</Button>
+</Button>;
 ```
 
 ### Example 2: Typography Hierarchy
 
 **Question First:**
+
 ```
 For this content hierarchy, I'm thinking:
 - Headline: Large, bold, attention-grabbing
@@ -893,14 +976,11 @@ Should we go bold and contemporary, or subtle and refined?
 ```
 
 **Implementation After Approval:**
+
 ```tsx
 <div className="space-y-4">
-  <h1 className="text-5xl font-bold tracking-tight text-slate-900">
-    Headline Here
-  </h1>
-  <h2 className="text-2xl text-slate-600">
-    Supporting subheading
-  </h2>
+  <h1 className="text-5xl font-bold tracking-tight text-slate-900">Headline Here</h1>
+  <h2 className="text-2xl text-slate-600">Supporting subheading</h2>
   <p className="text-base leading-relaxed text-slate-700">
     Body text optimized for readability with proper line height.
   </p>
@@ -910,6 +990,7 @@ Should we go bold and contemporary, or subtle and refined?
 ### Example 3: Unique Color Palette Suggestion
 
 **Presenting Options:**
+
 ```
 I'd like to suggest three color directions that break from typical SaaS patterns:
 
@@ -934,6 +1015,7 @@ Which direction feels right for your brand?
 ## Common Patterns to Avoid
 
 ❌ **NEVER:**
+
 - Use Inter, Roboto, Arial, Space Grotesk as primary fonts
 - Use generic SaaS blue (#3B82F6) or purple gradients on white
 - Copy Apple's design language or use glass morphism
@@ -944,6 +1026,7 @@ Which direction feels right for your brand?
 - Create cluttered interfaces where elements compete
 
 ✅ **ALWAYS:**
+
 - Ask about purpose, tone, constraints, differentiation FIRST
 - Then commit BOLDLY to a distinctive aesthetic direction
 - Use unexpected, characterful typography choices
@@ -958,21 +1041,25 @@ Which direction feels right for your brand?
 Guidelines exist to prevent mediocrity, not to limit excellence. Break them when:
 
 **Context demands it:**
+
 - Client brand already uses Inter? Use it brilliantly, don't force alternatives
 - Glass morphism IS the aesthetic? Commit fully, don't half-execute
 - The brief calls for Apple-like refinement? Study and exceed, don't avoid
 
 **You have a stronger idea:**
+
 - A "banned" pattern executed with intention beats a "safe" pattern executed without conviction
 - If you can articulate WHY you're breaking a rule, break it
 - Mediocre rule-following < bold rule-breaking with purpose
 
 **The unexpected is the point:**
+
 - Intentional dissonance (clashing fonts, jarring colors) can be powerful
 - "Ugly" design is a legitimate aesthetic choice when deliberate
 - Comfort is the enemy of memorable
 
 **Rule-breaking checklist:**
+
 1. Can you explain the creative intent?
 2. Is it a conscious choice, not laziness?
 3. Does it serve the user/brand/context?
@@ -983,6 +1070,7 @@ If yes to all → break the rule confidently.
 ## References
 
 **Progressive Disclosure Files:**
+
 - ACCESSIBILITY.md - Accessibility essentials (WCAG AA baseline)
 - MOTION-SPEC.md - Animation timing and easing
 - RESPONSIVE-DESIGN.md - Mobile-first breakpoints and patterns

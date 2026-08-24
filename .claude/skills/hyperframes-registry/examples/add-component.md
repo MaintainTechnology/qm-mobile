@@ -31,10 +31,10 @@ Open `compositions/components/shimmer-sweep.html` and read the comment header.
 **JS** — paste the auto-injection script (before timeline code):
 
 ```js
-document.querySelectorAll(".shimmer-sweep-target").forEach((el) => {
-  if (!el.querySelector(".shimmer-mask")) {
-    const mask = document.createElement("div");
-    mask.className = "shimmer-mask";
+document.querySelectorAll('.shimmer-sweep-target').forEach(el => {
+  if (!el.querySelector('.shimmer-mask')) {
+    const mask = document.createElement('div');
+    mask.className = 'shimmer-mask';
     el.appendChild(mask);
   }
 });
@@ -44,14 +44,14 @@ document.querySelectorAll(".shimmer-sweep-target").forEach((el) => {
 
 ```js
 tl.fromTo(
-  ".shimmer-sweep-target",
+  '.shimmer-sweep-target',
   {
-    "--shimmer-pos": "-20%",
+    '--shimmer-pos': '-20%',
   },
   {
-    "--shimmer-pos": "120%",
+    '--shimmer-pos': '120%',
     duration: 1.2,
-    ease: "power2.inOut",
+    ease: 'power2.inOut',
     stagger: 0.15,
   },
   1.5,

@@ -5,11 +5,13 @@ A cost-optimized variant of `/signaling-kb-builder` that uses a virtual assistan
 ## When to Use
 
 Use this skill when:
+
 - Processing large batches of transcripts where API costs would be prohibitive
 - You have VA capacity available for manual query execution
 - You want to maximize cost efficiency over processing speed
 
 Use `/signaling-kb-builder` instead when:
+
 - You need fully automated processing
 - Processing small batches (< 10 queries)
 - Speed is more important than cost
@@ -95,6 +97,7 @@ python3 scripts/merge_enrichment_results.py \
 ## Batch File Format
 
 The batch file is a JSON file optimized for:
+
 - VA workflow (clear structure, incremental saves)
 - VectorDB quality (preserves relationships)
 - Future automation (machine-readable)
@@ -141,6 +144,7 @@ Copy this section to your VA:
 ### Deep Research Batch Processing Instructions
 
 **Setup:**
+
 1. Open the JSON file in VS Code (or any text editor with JSON support)
 2. Log into perplexity.ai with Pro account
 3. Ensure "Deep Research" mode is enabled (toggle at top)
@@ -162,10 +166,12 @@ Copy this section to your VA:
 11. Move to the next query
 
 **When finished:**
+
 - Move the completed file to `.signaling-kb/completed-enrichment/`
 - Notify for Phase 4 merge processing
 
 **Tips:**
+
 - Save after each query to avoid losing work
 - If a query fails or times out, mark status as `"failed"` and add a note
 - Take breaks as needed - progress is saved incrementally
@@ -191,11 +197,11 @@ Copy this section to your VA:
 
 ## Cost Comparison
 
-| Approach | 50 Queries | 200 Queries |
-|----------|------------|-------------|
-| API ($5/request) | $250 | $1,000 |
-| **VA + Web UI** | ~$0 (Pro subscription) | ~$0 |
-| VA time @ $15/hr | ~$40 (2.5 hrs) | ~$150 (10 hrs) |
+| Approach         | 50 Queries             | 200 Queries    |
+| ---------------- | ---------------------- | -------------- |
+| API ($5/request) | $250                   | $1,000         |
+| **VA + Web UI**  | ~$0 (Pro subscription) | ~$0            |
+| VA time @ $15/hr | ~$40 (2.5 hrs)         | ~$150 (10 hrs) |
 
 **Net savings:** ~$210 for 50 queries, ~$850 for 200 queries
 
@@ -218,6 +224,7 @@ This allows incremental KB growth without re-enriching existing content.
 ### JSON Syntax Errors After VA Edits
 
 Common issues:
+
 - Missing quotes around strings
 - Unescaped quotes inside response text
 - Missing commas between array items
@@ -239,6 +246,7 @@ The merge script processes only queries with `"status": "completed"`. Pending qu
 ## Changelog
 
 ### 2026-01-23 - Initial Release
+
 - Created `/signaling-kb-manual` skill as cost-optimized alternative to `/signaling-kb-builder`
 - Implemented 4-phase VA-assisted workflow
 - Added JSON batch format for VA handoff

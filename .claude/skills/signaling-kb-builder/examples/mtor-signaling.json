@@ -4,20 +4,11 @@
   "axis_name": "Nutrient Sensing & Energetics",
   "shift_domain": "S",
   "sub_pathway_name": "mTOR Signaling",
-  
+
   "description": "The mechanistic target of rapamycin (mTOR) pathway is a master regulator of cell growth, integrating signals from nutrients (especially amino acids), growth factors (IGF-1, insulin), and energy status (ATP levels). mTOR exists in two complexes: mTORC1 (promotes anabolism, inhibits autophagy) and mTORC2 (regulates metabolism and survival). This pathway is central to aging biology and is a key target for longevity interventions.",
-  
-  "core_nodes": [
-    "MTOR",
-    "RPTOR",
-    "RICTOR",
-    "MLST8",
-    "EIF4EBP1",
-    "RPS6KB1",
-    "ULK1",
-    "AKT1"
-  ],
-  
+
+  "core_nodes": ["MTOR", "RPTOR", "RICTOR", "MLST8", "EIF4EBP1", "RPS6KB1", "ULK1", "AKT1"],
+
   "upstream_triggers": [
     "Amino acids (especially leucine, arginine)",
     "Insulin/IGF-1 via PI3K-AKT",
@@ -26,7 +17,7 @@
     "Oxygen availability",
     "Mechanical loading (in muscle)"
   ],
-  
+
   "downstream_effects": [
     "Protein synthesis (via S6K1 and 4E-BP1)",
     "Lipid synthesis",
@@ -35,7 +26,7 @@
     "Mitochondrial biogenesis (complex regulation)",
     "Ribosome biogenesis"
   ],
-  
+
   "crosstalk": [
     {
       "target_pathway": "axis-2-proteostasis/autophagy",
@@ -68,7 +59,7 @@
       "bidirectional": false
     }
   ],
-  
+
   "interventions_targeting": [
     {
       "intervention_id": "rapamycin",
@@ -107,7 +98,7 @@
       "via": "Reduced nutrient and growth factor signaling"
     }
   ],
-  
+
   "biomarker_relevance": [
     {
       "biomarker_id": "igf1",
@@ -125,7 +116,7 @@
       "notes": "4E-BP1 phosphorylation indicates mTORC1 activity"
     }
   ],
-  
+
   "key_evidence": [
     {
       "statement": "mTOR inhibition with rapamycin extends lifespan in multiple model organisms including yeast, worms, flies, and mice",
@@ -161,12 +152,12 @@
       "extraction_ref": "ext_042"
     }
   ],
-  
+
   "source_type": "expert_lecture",
   "extraction_refs": ["ext_001", "ext_023", "ext_042", "ext_067"],
-  
+
   "conflicts": [],
-  
+
   "created_at": "2025-01-15T09:00:00Z",
   "updated_at": "2025-01-16T12:00:00Z"
 }

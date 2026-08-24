@@ -87,7 +87,7 @@ function selectedTierLineItems(
 ): { label: string; items: TierLineItem[]; totalIncGstCents: number | null } | null {
   const wanted = quote.selected_tier?.toLowerCase();
   const order: readonly TierKey[] = (TIER_KEYS as readonly string[]).includes(wanted ?? '')
-    ? [wanted as TierKey, ...TIER_KEYS.filter((k) => k !== wanted)]
+    ? [wanted as TierKey, ...TIER_KEYS.filter(k => k !== wanted)]
     : TIER_KEYS;
   for (const key of order) {
     const tier = quote[key];
@@ -145,7 +145,8 @@ export function QuoteDetailModal({
     dim: colors.textDim,
   };
   const tone = toneColor[badge.tone];
-  const amount = quote.total_inc_gst == null ? null : formatAud(centsFromApiDollars(quote.total_inc_gst));
+  const amount =
+    quote.total_inc_gst == null ? null : formatAud(centsFromApiDollars(quote.total_inc_gst));
 
   // One primary action per status, never both — approving a held quote IS the tradie's send.
   const primaryAction: 'approve' | 'send' | null = canApprove(quote)
@@ -215,12 +216,18 @@ export function QuoteDetailModal({
             <Text style={[styles.chipText, { color: tone }]}>{badge.label.toUpperCase()}</Text>
           </View>
 
-          <View style={[styles.amountCard, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
+          <View
+            style={[
+              styles.amountCard,
+              { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
+            ]}
+          >
             <Text style={[styles.amountLabel, { color: colors.textDim }]}>TOTAL INC GST</Text>
             <Text style={[styles.amountValue, { color: colors.accentText }]}>{amount ?? '—'}</Text>
             {quote.selected_tier ? (
               <Text style={[styles.tierNote, { color: colors.textSec }]}>
-                {quote.selected_tier.charAt(0).toUpperCase() + quote.selected_tier.slice(1)} tier selected
+                {quote.selected_tier.charAt(0).toUpperCase() + quote.selected_tier.slice(1)} tier
+                selected
               </Text>
             ) : null}
           </View>
@@ -232,11 +239,10 @@ export function QuoteDetailModal({
               </Text>
               <View style={[styles.itemsCard, { borderColor: colors.inkLine }]}>
                 {tierLineItems.items.map((item, i) => (
-                  <View
-                    key={i}
-                    style={[styles.itemRow, { borderBottomColor: colors.inkLine }]}
-                  >
-                    <Text style={[styles.itemDesc, { color: colors.textSec }]}>{item.description}</Text>
+                  <View key={i} style={[styles.itemRow, { borderBottomColor: colors.inkLine }]}>
+                    <Text style={[styles.itemDesc, { color: colors.textSec }]}>
+                      {item.description}
+                    </Text>
                     <Text style={[styles.itemQty, { color: colors.textDim }]}>
                       {item.quantity ?? 1}
                       {item.unit_price_ex_gst != null
@@ -266,7 +272,9 @@ export function QuoteDetailModal({
           {quote.scope_of_works ? (
             <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: colors.textDim }]}>SCOPE OF WORKS</Text>
-              <Text style={[styles.sectionBody, { color: colors.textSec }]}>{quote.scope_of_works}</Text>
+              <Text style={[styles.sectionBody, { color: colors.textSec }]}>
+                {quote.scope_of_works}
+              </Text>
             </View>
           ) : null}
 
@@ -308,7 +316,10 @@ export function QuoteDetailModal({
           <View
             style={[
               styles.actionBar,
-              { borderTopColor: colors.inkLine, paddingBottom: Math.max(insets.bottom, spacing.lg) },
+              {
+                borderTopColor: colors.inkLine,
+                paddingBottom: Math.max(insets.bottom, spacing.lg),
+              },
             ]}
           >
             {error ? (
@@ -316,11 +327,17 @@ export function QuoteDetailModal({
                 {actionErrorMessage(error)}
               </Text>
             ) : justApproved ? (
-              <Text style={[styles.okText, { color: colors.successBright }]}>Approved and sent.</Text>
+              <Text style={[styles.okText, { color: colors.successBright }]}>
+                Approved and sent.
+              </Text>
             ) : justSent ? (
-              <Text style={[styles.okText, { color: colors.successBright }]}>Sent to the customer.</Text>
+              <Text style={[styles.okText, { color: colors.successBright }]}>
+                Sent to the customer.
+              </Text>
             ) : armed ? (
-              <Text style={[styles.hintText, { color: colors.warningBright }]}>Tap again to confirm.</Text>
+              <Text style={[styles.hintText, { color: colors.warningBright }]}>
+                Tap again to confirm.
+              </Text>
             ) : null}
 
             {pending ? (

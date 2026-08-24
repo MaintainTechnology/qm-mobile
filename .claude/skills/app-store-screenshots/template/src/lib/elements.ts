@@ -1,19 +1,15 @@
-import type { BuiltInElementId, ElementId, TextElementId } from "./types";
+import type { BuiltInElementId, ElementId, TextElementId } from './types';
 
-export const BUILT_IN_ELEMENT_IDS: BuiltInElementId[] = [
-  "caption",
-  "device",
-  "deviceSecondary",
-];
+export const BUILT_IN_ELEMENT_IDS: BuiltInElementId[] = ['caption', 'device', 'deviceSecondary'];
 
-export const TEXT_ELEMENT_PREFIX = "text:";
+export const TEXT_ELEMENT_PREFIX = 'text:';
 
 export function isBuiltInElementId(id: ElementId | string): id is BuiltInElementId {
   return (BUILT_IN_ELEMENT_IDS as string[]).includes(id);
 }
 
 export function isTextElementId(id: ElementId | string | null | undefined): id is TextElementId {
-  return typeof id === "string" && id.startsWith(TEXT_ELEMENT_PREFIX);
+  return typeof id === 'string' && id.startsWith(TEXT_ELEMENT_PREFIX);
 }
 
 export function toTextElementId(id: string): TextElementId {

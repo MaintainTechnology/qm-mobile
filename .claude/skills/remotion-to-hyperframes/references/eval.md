@@ -87,8 +87,8 @@ HF outputs `yuv420p` (limited-range). The mismatch costs ~0.05 SSIM.
 Every fixture's `remotion.config.ts` sets:
 
 ```ts
-Config.setVideoImageFormat("png");
-Config.setColorSpace("bt709");
+Config.setVideoImageFormat('png');
+Config.setColorSpace('bt709');
 ```
 
 If the user's source doesn't have these, add them in the translation

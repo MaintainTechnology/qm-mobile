@@ -1,7 +1,7 @@
 /**
  * `menu` — account summary, pricing book editors and sign out (spec web-parity G1–G3, A5).
  */
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/expo';
 import { useQueryClient } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import { useRouter } from 'expo-router';

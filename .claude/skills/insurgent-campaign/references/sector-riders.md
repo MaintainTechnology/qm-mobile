@@ -20,7 +20,7 @@ demand, distribution, and trust compound in each sector.
 
 **Structural advantage:** the room is the product. Attendees meet each other, form
 the cohort bond, and come back next year (or send their colleagues). Referral
-flywheels compound *through the attendee network*, not through marketing spend.
+flywheels compound _through the attendee network_, not through marketing spend.
 Recurring cadence — same time each quarter, same format — beats one-shot launches
 because it builds category reliability.
 
@@ -36,7 +36,7 @@ open notebook).
 
 **Common failure mode:** selling information in a world where information is free.
 The cohort-based course competing on "learn X" loses to a free YouTube playlist
-on the same topic. What you sell is the *room*: the peers, the accountability, the
+on the same topic. What you sell is the _room_: the peers, the accountability, the
 direct feedback, the alumni network. Market the room, not the curriculum.
 
 **Metric emphasis:** applications-to-admits ratio, cohort-to-alumni network
@@ -172,7 +172,7 @@ count.
 
 ## Rider 6 — Personal Brand / Solo Practitioner / Independent Creator
 
-**Structural advantage:** the person *is* the product. Consistency of voice
+**Structural advantage:** the person _is_ the product. Consistency of voice
 and format over time builds a trust moat that no agency or competitor can
 manufacture — they cannot fake your specific point of view, your specific
 vocabulary, your specific takes. One niche, held for 2+ years, compounds.

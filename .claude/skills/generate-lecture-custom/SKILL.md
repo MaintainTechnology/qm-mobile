@@ -2,7 +2,7 @@
 name: generate-lecture-custom
 description: Generate a single lecture using the custom pipeline (bypasses VectorShift)
 user_invocable: true
-arguments: "<outline_path> --target <lecture> [--output PATH] [--dossier PATH] [--materials FOLDER]"
+arguments: '<outline_path> --target <lecture> [--output PATH] [--dossier PATH] [--materials FOLDER]'
 allowed-tools: Read, Bash, Glob, Grep, Write
 ---
 
@@ -17,6 +17,7 @@ Generate a single lecture using direct API calls to Gemini, Claude, Perplexity, 
 ```
 
 **Examples:**
+
 - `/generate-lecture-custom outline.md --target "Lecture 1"`
 - `/generate-lecture-custom "course materials/outline.md" --target "GLP-1 Agonists"`
 - `/generate-lecture-custom outline.md --target "Lecture 3" --output ./my-outputs/`
@@ -24,6 +25,7 @@ Generate a single lecture using direct API calls to Gemini, Claude, Perplexity, 
 ## When to Use This Skill
 
 Use this skill when:
+
 - You want to generate a single lecture from an outline
 - You're experiencing issues with VectorShift polling
 - You want more control over the generation process
@@ -33,16 +35,16 @@ Use this skill when:
 
 This skill uses the custom pipeline at `lib/lecture_pipeline/` which orchestrates:
 
-| Step | Provider | Model | Purpose |
-|------|----------|-------|---------|
-| 1 | Gemini | gemini-2.5-pro-preview | Extract lecture context |
-| 2 | Claude | claude-haiku-4.5 | Generate KB queries |
-| 3 | VectorShift | KB API | Search knowledge base |
-| 4 | Perplexity | sonar-deep-research | Deep web research |
-| 5 | Gemini | gemini-2.5-pro-preview | Create blueprint |
-| 6 | Claude | claude-opus-4.5 | Generate HTML/SVG slides |
-| 7 | Gemini | gemini-2.5-pro-preview | Generate voiceover |
-| 8 | Perplexity | sonar-reasoning-pro | Find references |
+| Step | Provider    | Model                  | Purpose                  |
+| ---- | ----------- | ---------------------- | ------------------------ |
+| 1    | Gemini      | gemini-2.5-pro-preview | Extract lecture context  |
+| 2    | Claude      | claude-haiku-4.5       | Generate KB queries      |
+| 3    | VectorShift | KB API                 | Search knowledge base    |
+| 4    | Perplexity  | sonar-deep-research    | Deep web research        |
+| 5    | Gemini      | gemini-2.5-pro-preview | Create blueprint         |
+| 6    | Claude      | claude-opus-4.5        | Generate HTML/SVG slides |
+| 7    | Gemini      | gemini-2.5-pro-preview | Generate voiceover       |
+| 8    | Perplexity  | sonar-reasoning-pro    | Find references          |
 
 ## Required Environment Variables
 
@@ -71,6 +73,7 @@ If any keys are missing, inform the user which environment variables need to be 
 ### Step 2: Parse Arguments
 
 Extract from the skill invocation:
+
 - `outline_path`: Path to course outline markdown
 - `--target`: Which lecture to generate (required)
 - `--output`: Output directory (optional, default: `./outputs`)
@@ -92,6 +95,7 @@ Add `--dossier "{dossier_path}"` if a dossier was provided.
 ### Step 4: Report Results
 
 After completion, show the user:
+
 - List of generated files
 - Location of output directory
 - Any errors that occurred
@@ -100,15 +104,15 @@ After completion, show the user:
 
 For each lecture, the following files are saved:
 
-| File | Content |
-|------|---------|
-| `{lecture}_slides.json` | JSON slides with SVG diagrams |
-| `{lecture}_transcript.md` | TTS-ready voiceover script |
-| `{lecture}_blueprint.md` | Slide-by-slide plan |
-| `{lecture}_research.md` | Deep research dossier |
-| `{lecture}_context.md` | Extracted lecture context |
-| `{lecture}_kb_queries.json` | KB search queries |
-| `{lecture}_references.json` | Authoritative citations |
+| File                        | Content                       |
+| --------------------------- | ----------------------------- |
+| `{lecture}_slides.json`     | JSON slides with SVG diagrams |
+| `{lecture}_transcript.md`   | TTS-ready voiceover script    |
+| `{lecture}_blueprint.md`    | Slide-by-slide plan           |
+| `{lecture}_research.md`     | Deep research dossier         |
+| `{lecture}_context.md`      | Extracted lecture context     |
+| `{lecture}_kb_queries.json` | KB search queries             |
+| `{lecture}_references.json` | Authoritative citations       |
 
 ## Example Workflow
 
@@ -129,23 +133,25 @@ Output:
 
 ## Comparison to VectorShift Pipeline
 
-| Aspect | VectorShift | Custom Pipeline |
-|--------|-------------|-----------------|
-| Orchestration | VectorShift cloud | Local Python |
-| Polling | Async with 5s intervals | Direct API calls |
-| Debugging | Limited visibility | Full logging |
-| Reliability | Inconsistent results delivery | Synchronous, predictable |
-| Cost | Markup on API calls | Direct API pricing |
+| Aspect        | VectorShift                   | Custom Pipeline          |
+| ------------- | ----------------------------- | ------------------------ |
+| Orchestration | VectorShift cloud             | Local Python             |
+| Polling       | Async with 5s intervals       | Direct API calls         |
+| Debugging     | Limited visibility            | Full logging             |
+| Reliability   | Inconsistent results delivery | Synchronous, predictable |
+| Cost          | Markup on API calls           | Direct API pricing       |
 
 ## Troubleshooting
 
 **Missing API keys:**
+
 ```bash
 export GOOGLE_API_KEY="your_key"
 export PERPLEXITY_API_KEY="your_key"
 ```
 
 **Import errors:**
+
 ```bash
 pip install google-generativeai httpx tenacity click
 ```

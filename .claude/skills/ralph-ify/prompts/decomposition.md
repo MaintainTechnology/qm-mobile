@@ -37,12 +37,14 @@ For each work unit from the analysis, create a PRD item:
 ### 2. Priority Assignment
 
 Assign priorities using this scheme:
+
 - **1-99**: Core/critical items (must complete for workflow to succeed)
 - **100-199**: Important but not blocking items
 - **200-299**: Optional/enhancement items
 - **Within each tier**: Lower number = higher priority
 
 Priority rules:
+
 1. Items with no dependencies get lower numbers (they can start first)
 2. Items on the critical path get lower numbers
 3. Items with high iteration value get slightly lower numbers (more time for retries)
@@ -50,6 +52,7 @@ Priority rules:
 ### 3. Dependency Resolution
 
 Ensure dependencies are correctly specified:
+
 - Use the exact ID format from the items array
 - Verify no circular dependencies exist
 - Ensure all referenced dependencies exist
@@ -57,12 +60,14 @@ Ensure dependencies are correctly specified:
 ### 4. Sizing Validation
 
 Verify each item fits in one context window:
+
 - Description + acceptance criteria should be < 2000 tokens
 - If an item seems too large, flag it for splitting
 
 ### 5. Config Recommendations
 
 Based on the analysis, recommend:
+
 - `maxIterations`: Total iterations across all items
 - `maxFailuresPerItem`: How many retries before blocking
 
@@ -110,6 +115,7 @@ Before outputting, verify:
 ## Example Transformation
 
 **Analysis Input:**
+
 ```yaml
 work_units:
   - id: PARSE
@@ -119,6 +125,7 @@ work_units:
 ```
 
 **PRD Output:**
+
 ```json
 {
   "id": "PARSE-001",

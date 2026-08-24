@@ -32,8 +32,8 @@ Then drive the transition with GSAP:
 
 ```js
 // Manual fade (presentation={fade()})
-tl.to(sceneA, { opacity: 0, duration: 0.5, ease: "none" }, 1.5);
-tl.fromTo(sceneB, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: "none" }, 1.5);
+tl.to(sceneA, { opacity: 0, duration: 0.5, ease: 'none' }, 1.5);
+tl.fromTo(sceneB, { opacity: 0 }, { opacity: 1, duration: 0.5, ease: 'none' }, 1.5);
 ```
 
 ## Presentation table
@@ -90,17 +90,7 @@ const customPresentation: PresentationComponent = ({
   presentationProgress,
   presentationDirection,
 }) => {
-  return (
-    <div
-      style={
-        {
-          /* compute transform from progress */
-        }
-      }
-    >
-      {children}
-    </div>
-  );
+  return <div style={{/* compute transform from progress */}}>{children}</div>;
 };
 ```
 

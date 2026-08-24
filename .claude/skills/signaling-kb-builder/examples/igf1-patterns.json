@@ -3,14 +3,14 @@
   "full_name": "Insulin-like Growth Factor 1",
   "aliases": ["IGF-1", "somatomedin C"],
   "category": "hormone",
-  
+
   "reference_range": {
     "low": 100,
     "high": 300,
     "unit": "ng/mL",
     "notes": "Reference range varies by age and lab; this is approximate adult range"
   },
-  
+
   "interpretation_patterns": [
     {
       "pattern_id": "low-igf1-with-insulin-resistance",
@@ -104,7 +104,7 @@
       "confidence": "low"
     }
   ],
-  
+
   "optimal_ranges_by_context": [
     {
       "range_id": "longevity-40-60",
@@ -149,7 +149,7 @@
       "confidence": "low"
     }
   ],
-  
+
   "interventions_affecting": [
     {
       "intervention_id": "growth-hormone",
@@ -192,13 +192,13 @@
       "notes": "Prolonged fasting suppresses IGF-1 as adaptive response"
     }
   ],
-  
+
   "pathways_involved": [
     "axis-1-nutrient-sensing/igf1-axis",
     "axis-1-nutrient-sensing/mtor-signaling",
     "axis-7-regeneration/growth-signaling"
   ],
-  
+
   "related_biomarkers": [
     {
       "biomarker_id": "igfbp3",
@@ -216,7 +216,7 @@
       "notes": "Insulin resistance affects hepatic IGF-1 response to GH"
     }
   ],
-  
+
   "range_conflicts": [
     {
       "conflict_id": "conflict_igf1_range_longevity_001",
@@ -248,11 +248,11 @@
       "created_at": "2025-01-16T11:00:00Z"
     }
   ],
-  
+
   "interpretation_conflicts": [],
-  
+
   "extraction_refs": ["ext_018", "ext_019", "ext_056", "ext_057", "ext_062", "ext_089"],
-  
+
   "created_at": "2025-01-15T11:00:00Z",
   "updated_at": "2025-01-16T11:00:00Z"
 }

@@ -10,7 +10,7 @@ turns into a parameterized HF composition.
   id="MyVideo"
   component={MyVideo}
   schema={z.object({ title: z.string(), duration: z.number() })}
-  defaultProps={{ title: "Hello", duration: 90 }}
+  defaultProps={{ title: 'Hello', duration: 90 }}
   calculateMetadata={({ props }) => ({
     durationInFrames: props.duration,
     fps: 30,

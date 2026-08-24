@@ -1,12 +1,12 @@
-import type { Metadata } from "next";
-import { Inter } from "next/font/google";
-import "./globals.css";
+import type { Metadata } from 'next';
+import { Inter } from 'next/font/google';
+import './globals.css';
 
-const font = Inter({ subsets: ["latin"] });
+const font = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
-  title: "App Store Screenshots",
-  description: "Design and export App Store + Google Play screenshots.",
+  title: 'App Store Screenshots',
+  description: 'Design and export App Store + Google Play screenshots.',
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

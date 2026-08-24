@@ -4,7 +4,7 @@ You are building a rich context dossier for **{{product_name}}** before any lens
 
 ## Why This Phase Exists
 
-The KBV2 knowledge base contains 1,165 curated markdown documents across four categories — pathways, interventions, biomarkers, and conflicts — each written with mechanistic depth, structured appendices, verifiable citations, and clinical perspective. By building a comprehensive dossier *before* lenses execute, every subsequent phase benefits from grounded, cross-referenced context.
+The KBV2 knowledge base contains 1,165 curated markdown documents across four categories — pathways, interventions, biomarkers, and conflicts — each written with mechanistic depth, structured appendices, verifiable citations, and clinical perspective. By building a comprehensive dossier _before_ lenses execute, every subsequent phase benefits from grounded, cross-referenced context.
 
 ## Architecture: Pipeline + Local Enrichment
 
@@ -45,10 +45,12 @@ cd "/Users/anantvinjamoori/Vectorshift Pipelines" && python3 -u cli/run_signalin
 ```
 
 **Pipeline inputs:**
+
 - `product_name`: The product or category being analyzed
 - `search_context`: Additional context about the analysis (e.g., "category guide for microbiome testing", "single product deep-dive for creatine monohydrate")
 
 **Pipeline outputs:** A JSON dossier with:
+
 - `kbv2_review_meta` — Search metadata (chunks retrieved, categories covered)
 - `entities_found` — All pathways, interventions, biomarkers, conflicts, molecular targets found
 - `cross_document_synthesis` — Mechanistic network, recurring themes, narrative threads, conflict synthesis
@@ -57,6 +59,7 @@ cd "/Users/anantvinjamoori/Vectorshift Pipelines" && python3 -u cli/run_signalin
 - `raw_chunks_summary` — Brief summaries of what each KB search stage found
 
 **This pipeline runs two-stage iterative search:**
+
 1. **Broad retrieval** — Sonnet 4.6 expands the query, then 4 parallel KB searches (top-15 with Cohere reranking) across Pathways, Interventions, Biomarkers, and Conflicts
 2. **Targeted retrieval** — Opus 4.6 analyzes broad results, identifies gaps, generates follow-up query, then 4 more parallel KB searches (top-10)
 3. **Dossier synthesis** — Opus 4.6 synthesizes all 8 search results into the structured JSON dossier
@@ -81,6 +84,7 @@ The pipeline dossier may identify files worth reading deeper. Check:
 **Local file reads are OPTIONAL and TARGETED** — only read files that will add value beyond what the pipeline already provides. The pipeline's semantic search covers the same 1,165 documents; local reads are for when you need the full document rather than top-k chunks.
 
 **KBV2 folder:** `kb-v2-all/`
+
 ```
 kb-v2-all/
 ├── pathways/       (152 files)  — pathway_{name}.md
@@ -199,15 +203,15 @@ The pipeline returns JSON matching this schema (with local enrichments appended)
 
 ## Quality Gate (KBV2 Review — 7/8 to pass)
 
-| ID | Criterion | Pass Condition |
-|----|-----------|----------------|
-| K.1 `pipeline_executed` | Pipeline ran successfully and returned valid JSON |
-| K.2 `entity_breadth` | Entities found in at least 3 of 4 categories |
-| K.3 `cross_document_synthesis` | At least 3 recurring themes identified across documents |
-| K.4 `narrative_threads` | At least 3 narrative threads proposed for the final output |
-| K.5 `citation_harvest` | At least 15 unique PMIDs/DOIs harvested |
-| K.6 `conflict_integration` | At least 2 conflicts surfaced with recommended framing |
-| K.7 `lens_priming` | Priming data provided for all 4 downstream phases (L1, L2, L3, Synthesis) |
+| ID                              | Criterion                                                                       | Pass Condition |
+| ------------------------------- | ------------------------------------------------------------------------------- | -------------- |
+| K.1 `pipeline_executed`         | Pipeline ran successfully and returned valid JSON                               |
+| K.2 `entity_breadth`            | Entities found in at least 3 of 4 categories                                    |
+| K.3 `cross_document_synthesis`  | At least 3 recurring themes identified across documents                         |
+| K.4 `narrative_threads`         | At least 3 narrative threads proposed for the final output                      |
+| K.5 `citation_harvest`          | At least 15 unique PMIDs/DOIs harvested                                         |
+| K.6 `conflict_integration`      | At least 2 conflicts surfaced with recommended framing                          |
+| K.7 `lens_priming`              | Priming data provided for all 4 downstream phases (L1, L2, L3, Synthesis)       |
 | K.8 `connections_not_summaries` | Synthesis focuses on cross-document connections, not individual chunk summaries |
 
 ## Critical Principles

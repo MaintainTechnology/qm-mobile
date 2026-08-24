@@ -205,7 +205,13 @@
           "biomarker_id": { "type": "string" },
           "relationship": {
             "type": "string",
-            "enum": ["precursor", "metabolite", "ratio_component", "correlated", "inverse_correlated"]
+            "enum": [
+              "precursor",
+              "metabolite",
+              "ratio_component",
+              "correlated",
+              "inverse_correlated"
+            ]
           },
           "notes": { "type": "string" }
         }

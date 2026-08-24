@@ -100,7 +100,11 @@ describe('combinedIncludedTotals', () => {
 describe('includedIndices1Based', () => {
   it('returns 1-based indices for included structures only', () => {
     const quote: MultiRoofQuote = {
-      structures: [structure({ buildingId: 'a' }), structure({ buildingId: 'b' }), structure({ buildingId: 'c' })],
+      structures: [
+        structure({ buildingId: 'a' }),
+        structure({ buildingId: 'b' }),
+        structure({ buildingId: 'c' }),
+      ],
       combined: { area_m2: 0, tiers: NO_COMBINED_TIERS },
       routing: { decision: 'auto_quote', reason: '' },
       inspection_structures: [],
@@ -138,7 +142,10 @@ describe('singleQuotableIncluded', () => {
         structure({
           buildingId: 'a',
           role: 'primary',
-          price: { ...structure({}).price, routing: { decision: 'inspection_required', reason: 'Complex form' } },
+          price: {
+            ...structure({}).price,
+            routing: { decision: 'inspection_required', reason: 'Complex form' },
+          },
         }),
       ],
       combined: { area_m2: 0, tiers: NO_COMBINED_TIERS },
@@ -156,7 +163,10 @@ describe('includedCount and includedInspectionStructures', () => {
       buildingId: 'b',
       role: 'secondary',
       label: 'Rear garage',
-      price: { ...structure({}).price, routing: { decision: 'inspection_required', reason: 'Complex form' } },
+      price: {
+        ...structure({}).price,
+        routing: { decision: 'inspection_required', reason: 'Complex form' },
+      },
     });
     const quote: MultiRoofQuote = {
       structures: [a, b],
@@ -176,7 +186,10 @@ describe('includedCount and includedInspectionStructures', () => {
     const a = structure({ buildingId: 'a', role: 'primary' });
     const b = structure({
       buildingId: 'b',
-      price: { ...structure({}).price, routing: { decision: 'inspection_required', reason: 'Complex form' } },
+      price: {
+        ...structure({}).price,
+        routing: { decision: 'inspection_required', reason: 'Complex form' },
+      },
     });
     const quote: MultiRoofQuote = {
       structures: [a, b],

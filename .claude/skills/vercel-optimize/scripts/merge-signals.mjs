@@ -15,7 +15,9 @@ const log = (...args) => console.error('[merge-signals]', ...args);
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.signalsPath || !args.codebasePath) {
-    console.error('usage: node scripts/merge-signals.mjs <signals.json> <codebase.json> [--out merged.json] [--force]');
+    console.error(
+      'usage: node scripts/merge-signals.mjs <signals.json> <codebase.json> [--out merged.json] [--force]',
+    );
     process.exit(1);
   }
 
@@ -39,10 +41,14 @@ export function mergeSignals(signals, codebase) {
   assertObject(codebase, 'codebase scan');
 
   if (!signals.schemaVersion) {
-    throw new Error('signals.json is missing schemaVersion; pass collect-signals output as the first file.');
+    throw new Error(
+      'signals.json is missing schemaVersion; pass collect-signals output as the first file.',
+    );
   }
   if (!Array.isArray(codebase.routes) || !Array.isArray(codebase.findings) || !codebase.stack) {
-    throw new Error('codebase.json must be scan-codebase output with stack, routes[], and findings[].');
+    throw new Error(
+      'codebase.json must be scan-codebase output with stack, routes[], and findings[].',
+    );
   }
 
   return {
@@ -55,7 +61,7 @@ export function annotateCodebaseScan(signals, codebase) {
   const index = buildRouteMetricIndex(signals);
   return {
     ...codebase,
-    findings: (codebase.findings ?? []).map((finding) => annotateFinding(finding, index)),
+    findings: (codebase.findings ?? []).map(finding => annotateFinding(finding, index)),
   };
 }
 
@@ -71,7 +77,7 @@ function annotateFinding(finding, index) {
 
 function buildRouteMetricIndex(signals) {
   const out = new Map();
-  const ensure = (route) => {
+  const ensure = route => {
     const canonical = canonicalizeRoute(route);
     const existing = out.get(canonical) ?? { route: canonical };
     out.set(canonical, existing);
@@ -168,8 +174,10 @@ function assertObject(value, label) {
 }
 
 async function writeOutput(path, body, { force }) {
-  if (!force && await exists(path)) {
-    throw new Error(`output file already exists: ${path}. Use a fresh run directory or pass --force to overwrite.`);
+  if (!force && (await exists(path))) {
+    throw new Error(
+      `output file already exists: ${path}. Use a fresh run directory or pass --force to overwrite.`,
+    );
   }
   await mkdir(dirname(path), { recursive: true });
   await writeFile(path, body);
@@ -184,8 +192,11 @@ async function exists(path) {
   }
 }
 
-if (process.argv[1] && realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))) {
-  main().catch((err) => {
+if (
+  process.argv[1] &&
+  realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+) {
+  main().catch(err => {
     console.error('[merge-signals] FAILED:', err.message);
     process.exit(1);
   });

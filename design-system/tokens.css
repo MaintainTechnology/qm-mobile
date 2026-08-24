@@ -44,8 +44,9 @@
   --logo-notch: #e3c13c;
 
   /* ─── Type ─── */
-  --font-sans: "Manrope", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-  --font-mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
+  --font-sans:
+    'Manrope', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
   --text-display: 34px; /* lh 36, tracking -0.04em, caps  */
   --text-headline: 26px; /* lh 28, tracking -0.04em, caps  */
   --text-title: 18px; /* lh 24, tracking -0.02em        */
@@ -97,7 +98,7 @@
 /* ── Light theme, "warm paper" (device preference or [data-theme] pin).
       The sunlight theme: same accent, ink text, taupe hairlines. ── */
 @media (prefers-color-scheme: light) {
-  :root:not([data-theme="dark"]) {
+  :root:not([data-theme='dark']) {
     color-scheme: light;
     --ink-deep: #faf8f4;
     --ink: #f3eee7;
@@ -119,7 +120,7 @@
     --noise-opacity: 0.03;
   }
 }
-:root[data-theme="light"] {
+:root[data-theme='light'] {
   color-scheme: light;
   --ink-deep: #faf8f4;
   --ink: #f3eee7;
@@ -147,7 +148,7 @@
   isolation: isolate;
 }
 .qm-grain::after {
-  content: "";
+  content: '';
   position: absolute;
   inset: 0;
   z-index: 1;

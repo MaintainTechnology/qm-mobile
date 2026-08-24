@@ -51,15 +51,15 @@ All clips are sums of sinusoids baked to keyframes (every 1–2 frames, 24 fps).
 Core idiom: `angle(t) = A * sin(2π * t/T + φ)` per bone, with phase offsets φ
 creating wave propagation and gait patterns.
 
-| Creature | Skeleton | Locomotion formula |
-|---|---|---|
-| Winged (dragon, bird) | spine chain + 2-segment wings + tail | fly: wings ±35–45°, outer segment lags inner by 0.15–0.25 of the cycle (flex illusion); body bobs in COUNTER-phase to the downstroke; legs tucked (constant); tail wave |
-| Quadruped (wolf, dog) | spine + neck/head + 4 legs (2 segments) + tail | walk: diagonal pairs in counter-phase — LF+RH at φ=0, RF+LH at φ=π; spine sways laterally at half amplitude; head bob small |
-| Hexapod (insect) | thorax + 6 legs | alternating tripod: legs {L1,R2,L3} φ=0, {R1,L2,R3} φ=π |
-| Octopod (spider) | cephalothorax + 8 legs | two tetrapod groups in counter-phase; adjacent legs offset by π/4 for ripple |
-| Serpentine (snake) | 8–12 segment spine chain | traveling wave: segment i gets φ = i * 2π/N, lateral rotation ±20–30°; amplitude grows toward tail |
-| Aquatic (fish) | spine chain + fins | same traveling wave but amplitude concentrated in rear third; fins counter-flap at 2× frequency, small amplitude |
-| Slime / blob (no skeleton) | none — or 1 root bone | squash & stretch on scale: `sz = 1 + A*sin(ωt)`, `sx = sy = 1/sqrt(sz)` (volume preservation); add small location bounce synced to squash |
+| Creature                   | Skeleton                                       | Locomotion formula                                                                                                                                                      |
+| -------------------------- | ---------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Winged (dragon, bird)      | spine chain + 2-segment wings + tail           | fly: wings ±35–45°, outer segment lags inner by 0.15–0.25 of the cycle (flex illusion); body bobs in COUNTER-phase to the downstroke; legs tucked (constant); tail wave |
+| Quadruped (wolf, dog)      | spine + neck/head + 4 legs (2 segments) + tail | walk: diagonal pairs in counter-phase — LF+RH at φ=0, RF+LH at φ=π; spine sways laterally at half amplitude; head bob small                                             |
+| Hexapod (insect)           | thorax + 6 legs                                | alternating tripod: legs {L1,R2,L3} φ=0, {R1,L2,R3} φ=π                                                                                                                 |
+| Octopod (spider)           | cephalothorax + 8 legs                         | two tetrapod groups in counter-phase; adjacent legs offset by π/4 for ripple                                                                                            |
+| Serpentine (snake)         | 8–12 segment spine chain                       | traveling wave: segment i gets φ = i * 2π/N, lateral rotation ±20–30°; amplitude grows toward tail                                                                      |
+| Aquatic (fish)             | spine chain + fins                             | same traveling wave but amplitude concentrated in rear third; fins counter-flap at 2× frequency, small amplitude                                                        |
+| Slime / blob (no skeleton) | none — or 1 root bone                          | squash & stretch on scale: `sz = 1 + A*sin(ωt)`, `sx = sy = 1/sqrt(sz)` (volume preservation); add small location bounce synced to squash                               |
 
 Idle for any creature: breathing (chest scale or rotation ±2–4°, 4 s cycle),
 slow head sway, tail/appendage micro-wave, wing micro-adjust.

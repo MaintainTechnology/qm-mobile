@@ -6,6 +6,7 @@ description: Research topics and generate preview graphics for NGM Live show epi
 # Show Prep: NGM Live Episode Research & Preview Graphics
 
 Two-phase skill for preparing **Next Generation Medicine (NGM) Live** episodes:
+
 1. **Research & Curate** — Surface the best 3-5 discussion-ready topics using WebSearch and optionally `/last30days`
 2. **Preview Graphic** — Generate a high-res LinkedIn-sized (2400x1254 @2x) show announcement PNG
 
@@ -46,6 +47,7 @@ Skip this phase if `--graphic-only` is set or if the user provided topics direct
 4. **Influencer opinion shifts** — Trusted voices changing positions with reasons and data that convinced them. Example: "Rhonda Patrick restarts NR supplementation after Parkinson's trial data"
 
 **Bad topics (too generic):**
+
 - "AI in Healthcare Update"
 - "Recent Biotech Funding Developments"
 - "New Longevity Research"
@@ -55,11 +57,13 @@ Skip this phase if `--graphic-only` is set or if the user provided topics direct
 **Primary method: WebSearch** — Run 4-5 parallel WebSearch queries targeting specific names, trials, companies, and dollar figures (not broad categories).
 
 Good queries:
+
 - `"Ez-PAVE trial results LDL cholesterol 2026"`
 - `"Eli Lilly Insilico $2.75 billion deal March 2026"`
 - `"David Sinclair Life Biosciences FDA human trial 2026"`
 
 Bad queries:
+
 - `"longevity medicine breakthroughs"`
 - `"healthcare AI news"`
 
@@ -99,32 +103,39 @@ For each of the final 3-5 topics, synthesize a structured brief:
 
 ```markdown
 ## 🔴 Topic N: [Specific Headline — not generic]
+
 **Hook:** [Scroll-stopping question or claim, <60 chars]
 **Category:** [Research | Industry | Funding | AI | Controversy]
 
 ### Why It Matters
+
 2-3 sentences explaining significance. Be specific: names, numbers, dates.
 
 ### Key Data Points
+
 - [Specific stat, study citation, or funding figure]
 - [Study: Author et al., Journal, Year, n=X, key finding]
 - [Company/product specific detail]
 
 ### Contrarian Angle
+
 The uncomfortable question, the opposing view, or the thing nobody is saying.
 This is what makes it a discussion, not a lecture.
 
 ### Discussion Questions
+
 1. [Question that opens the conversation — accessible to general audience]
 2. [Follow-up that goes deeper — for the clinicians and biotech watchers]
 3. [Question that connects to the audience's personal health or career]
 
 ### Sources
+
 - [Title](url)
 - [Title](url)
 ```
 
 **Quality checks for each topic:**
+
 - Does the headline name specific things (not "AI in Healthcare Update")?
 - Are there at least 3 specific data points with numbers?
 - Is the contrarian angle genuine (not a strawman)?
@@ -150,18 +161,21 @@ If `--research-only`, stop here. Otherwise, proceed to Phase 2.
 ### Step 1: Generate Hooks
 
 For each topic in the brief, write a scroll-stopping hook:
+
 - Frame as provocative question, contrarian take, or surprising claim
 - Keep under 60 characters
 - Pick ONE key word/phrase to highlight in gold (the `highlight` field)
 - Make it accessible to a general audience, not just clinicians
 
 **Good hooks:**
-- "New Trial Settles the *LDL* Debate?"
-- "Lilly Just Paid *$2.75B* for AI-Made Drugs"
-- "The First Human Trial to *Reverse Aging*"
-- "Why Rhonda Patrick Changed Her Mind on *NAD+*"
+
+- "New Trial Settles the _LDL_ Debate?"
+- "Lilly Just Paid _$2.75B_ for AI-Made Drugs"
+- "The First Human Trial to _Reverse Aging_"
+- "Why Rhonda Patrick Changed Her Mind on _NAD+_"
 
 **Bad hooks (too clinical/boring):**
+
 - "GLP-1 Receptor Agonist Longevity Data Review"
 - "Recent Biotech Funding Developments"
 
@@ -192,6 +206,7 @@ Write the config to `content/show-prep/YYYY-MM-DD-config.json`:
 ```
 
 **Config notes:**
+
 - `time_label` is required — the headline renders as "[DAY_LABEL] at [TIME_LABEL]" (do NOT append "on NGM Live" — the NGM Live label is already in the header)
 - `headline` is stored in the config but NOT displayed in the graphic (hooks only)
 - The graphic does NOT include a LIVE badge — keep it clean and professional
@@ -207,6 +222,7 @@ python3 generate-preview.py YYYY-MM-DD-config.json
 This produces: `content/show-prep/YYYY-MM-DD-show-preview.png`
 
 **Renderer specs:**
+
 - Viewport: 1200x627, rendered at **2x device scale** (2400x1254 actual pixels)
 - Background: Midnight blue (#0B1120) with abstract SVG art (flowing arcs, constellation dots, concentric rings)
 - Font: Plus Jakarta Sans (loaded from Google Fonts)
@@ -220,37 +236,37 @@ This produces: `content/show-prep/YYYY-MM-DD-show-preview.png`
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `content/show-prep/preview-template.html` | LinkedIn graphic HTML template (with SVG background art) |
-| `content/show-prep/generate-preview.py` | Playwright PNG renderer (2x scale) |
-| `content/show-prep/YYYY-MM-DD-show-brief.md` | Episode research brief |
-| `content/show-prep/YYYY-MM-DD-config.json` | Graphic config (topics + hooks + time) |
-| `content/show-prep/YYYY-MM-DD-show-preview.png` | LinkedIn preview graphic |
+| File                                            | Purpose                                                  |
+| ----------------------------------------------- | -------------------------------------------------------- |
+| `content/show-prep/preview-template.html`       | LinkedIn graphic HTML template (with SVG background art) |
+| `content/show-prep/generate-preview.py`         | Playwright PNG renderer (2x scale)                       |
+| `content/show-prep/YYYY-MM-DD-show-brief.md`    | Episode research brief                                   |
+| `content/show-prep/YYYY-MM-DD-config.json`      | Graphic config (topics + hooks + time)                   |
+| `content/show-prep/YYYY-MM-DD-show-preview.png` | LinkedIn preview graphic                                 |
 
 ## API Reference
 
-| Service | Use |
-|---------|-----|
-| WebSearch | Primary research — targeted queries with specific names, trials, figures |
-| `/last30days` skill | Supplemental social signal data — Reddit, X, YouTube, HN (configured at `~/.config/last30days/.env`) |
-| Perplexity Deep Research (optional) | Deep dives on finalists via `perplexity/sonar-deep-research` through OpenRouter |
-| `OPENROUTER_API_KEY` | In `.env` — used by last30days and Perplexity |
+| Service                             | Use                                                                                                  |
+| ----------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| WebSearch                           | Primary research — targeted queries with specific names, trials, figures                             |
+| `/last30days` skill                 | Supplemental social signal data — Reddit, X, YouTube, HN (configured at `~/.config/last30days/.env`) |
+| Perplexity Deep Research (optional) | Deep dives on finalists via `perplexity/sonar-deep-research` through OpenRouter                      |
+| `OPENROUTER_API_KEY`                | In `.env` — used by last30days and Perplexity                                                        |
 
 ## Design System
 
-| Element | Value |
-|---------|-------|
-| Background | `#0B1120` (midnight blue) |
-| Surface | `#0F1628` |
-| Gold accent | `#D4A040` / `#E8BE60` |
-| Live accent | `#D06848` (used sparingly) |
-| Font | Plus Jakarta Sans (400-800) |
-| Highlight | Gold italic on keyword via `.hl` class |
-| Resolution | 2x device scale (2400x1254 actual) |
-| No LIVE badge | Removed — too cheesy |
-| No topic subtitles | Hooks only in the graphic |
-| Headline format | "[DAY] at [TIME]" — use the actual date, never "Tomorrow". No "on NGM Live" (redundant with header). |
+| Element            | Value                                                                                                |
+| ------------------ | ---------------------------------------------------------------------------------------------------- |
+| Background         | `#0B1120` (midnight blue)                                                                            |
+| Surface            | `#0F1628`                                                                                            |
+| Gold accent        | `#D4A040` / `#E8BE60`                                                                                |
+| Live accent        | `#D06848` (used sparingly)                                                                           |
+| Font               | Plus Jakarta Sans (400-800)                                                                          |
+| Highlight          | Gold italic on keyword via `.hl` class                                                               |
+| Resolution         | 2x device scale (2400x1254 actual)                                                                   |
+| No LIVE badge      | Removed — too cheesy                                                                                 |
+| No topic subtitles | Hooks only in the graphic                                                                            |
+| Headline format    | "[DAY] at [TIME]" — use the actual date, never "Tomorrow". No "on NGM Live" (redundant with header). |
 
 ## Tips
 
@@ -258,6 +274,6 @@ This produces: `content/show-prep/YYYY-MM-DD-show-preview.png`
 - Edit the brief as needed — it's your show prep doc, not a script
 - The preview graphic is designed for LinkedIn but also works on X/Twitter
 - If a topic feels weak after the deep dive, drop it and promote the next candidate
-- The contrarian angle is what makes each topic a *discussion*, not a lecture
+- The contrarian angle is what makes each topic a _discussion_, not a lecture
 - When last30days returns thin results (Reddit 403s, timeouts), fall back to WebSearch immediately — don't wait
 - Always include `time_label: "11AM PST"` in the config

@@ -64,31 +64,37 @@ The next 18 months will determine which clinicians own this infrastructure layer
 
 **Opening:** Concrete scenario with specific numbers ($740B → $890B, 20% jump)
 
-**Colon Technique:** 
+**Colon Technique:**
+
 - "Here's what that analysis misses: the infrastructure."
 - "The problem isn't the drug. It's the infrastructure between prescription and outcome."
 - "The opportunity breaks into three categories: dose optimization, supply chain, and outcome tracking."
 
 **Em-Dash Usage:**
+
 - Clarification: "—a 20% jump driven almost entirely by tirzepatide demand"
 - Aside: "—the Austin-based CGM analytics company valued at $150 million—"
 - Contrast: "—requires systems that don't exist in most clinics"
 
 **One-Sentence Paragraphs:**
+
 - "It's pure infrastructure."
 - "History suggests the infrastructure layer gets built by specialists."
 
 **Evidence Cascade:**
+
 - Levels Health example → Empower Pharmacy example → Calibrate Health example
 - Connected with "The opportunity breaks into three categories"
 
 **Specificity:**
+
 - "$740 billion to $890 billion" (not "significant growth")
 - "23% of cases" (not "many patients")
 - "September 2024 and January 2025" (not "recently")
 - "40% of the telehealth GLP-1 market" (not "large market share")
 
 **Forward-Looking Close:**
+
 - "The next 18 months will determine which clinicians own this infrastructure layer"
 - NOT "In conclusion, we've covered the GLP-1 infrastructure opportunity"
 

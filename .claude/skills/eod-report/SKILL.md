@@ -21,7 +21,7 @@ Run `date "+%B %d, %Y"` to get today (for example "June 05, 2026"). Everything i
 2. Git, if this is a repo, to ground the summary in real changes:
    - `git log --since="00:00" --until="now" --pretty=format:"%h %s"` for commits made today
    - `git status --short` and `git diff --stat` for uncommitted work done today
-   Use these to confirm what really changed and to catch things the conversation glossed over. The narrative still comes from the session; git keeps it honest.
+     Use these to confirm what really changed and to catch things the conversation glossed over. The narrative still comes from the session; git keeps it honest.
 
 Merge both into one list of finished items. Collapse duplicates (one item per real accomplishment, even if it took several messages or commits).
 

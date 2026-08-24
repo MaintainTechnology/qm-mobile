@@ -15,14 +15,13 @@
  *     is proven with the typed password, then `GET /api/tenant/me` decides: no tenant → resume
  *     here mid-session; a tenant already exists → straight to the dashboard.
  */
-import {
-  isClerkAPIResponseError,
-  useAuth,
-  useClerk,
-  useSignIn,
-  useSignUp,
-  useUser,
-} from '@clerk/clerk-expo';
+import { isClerkAPIResponseError, useAuth, useClerk, useUser } from '@clerk/expo';
+// Clerk Core 3 promoted the signal-based useSignIn/useSignUp to the default export.
+// Those return { error } from create() and drop setActive/isLoaded entirely, which
+// this multi-step wizard is built on, so it stays on the resource-shaped hooks that
+// Core 3 keeps at /legacy. Porting to signals is a rewrite of the whole flow, not an
+// import swap.
+import { useSignIn, useSignUp } from '@clerk/expo/legacy';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {

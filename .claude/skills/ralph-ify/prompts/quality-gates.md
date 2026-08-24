@@ -9,6 +9,7 @@ You are designing quality gates for a RALPH-style skill. Quality gates are the m
 ## Your Task
 
 For each item type in the PRD, design 4-8 quality checks that:
+
 1. Are objective and measurable
 2. Provide specific feedback when failed
 3. Enable meaningful iteration
@@ -16,6 +17,7 @@ For each item type in the PRD, design 4-8 quality checks that:
 ### Quality Gate Anatomy
 
 Each quality gate has:
+
 - **Name**: Descriptive identifier
 - **Check Function**: What to evaluate
 - **Pass Condition**: Threshold for passing
@@ -36,7 +38,7 @@ For each item type:
 
 Generate quality gates in this structure:
 
-```markdown
+````markdown
 # Quality Gates: {skill-name}
 
 ## Gate: {ITEM_TYPE}
@@ -47,11 +49,11 @@ Generate quality gates in this structure:
 
 ### Checks
 
-| # | Check | Criteria | Severity | Failure Suggestion |
-|---|-------|----------|----------|-------------------|
-| 1 | {name} | {what to evaluate} | Critical/Standard | "To fix: {specific action}" |
-| 2 | {name} | {what to evaluate} | Standard | "To fix: {specific action}" |
-| ... | ... | ... | ... | ... |
+| #   | Check  | Criteria           | Severity          | Failure Suggestion          |
+| --- | ------ | ------------------ | ----------------- | --------------------------- |
+| 1   | {name} | {what to evaluate} | Critical/Standard | "To fix: {specific action}" |
+| 2   | {name} | {what to evaluate} | Standard          | "To fix: {specific action}" |
+| ... | ...    | ...                | ...               | ...                         |
 
 ### Evaluation Logic
 
@@ -82,11 +84,13 @@ def evaluate_{item_type}(output, context):
         "results": results
     }
 ```
+````
 
 ---
 
 ## Repeat for each item type...
-```
+
+````
 
 ## Quality Check Categories
 
@@ -146,4 +150,4 @@ Draw from these common check categories:
 | 4 | has_cta | Includes clear call-to-action | Standard | "To fix: Add a specific ask or next step in the closing paragraph" |
 | 5 | personalization | References recipient by name or context | Standard | "To fix: Add recipient's name and reference their specific situation" |
 | 6 | no_salesy_language | Avoids pushy sales phrases | Standard | "To fix: Replace '{matched phrase}' with softer language" |
-```
+````

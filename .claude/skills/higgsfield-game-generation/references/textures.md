@@ -51,6 +51,7 @@ masked-inpaint composite) and `seamless.py` (legacy standalone seam fix).
 
    Use the path supplied by the active skill loader or search the agent's installed skills
    directory for `higgsfield-game-generation/SKILL.md`, then export its parent directory.
+
 3. Still nothing → stop and report the exact path tried; a run without
    the bundled scripts is a blocker, not a license to improvise.
 
@@ -211,11 +212,11 @@ Add-ons, appended as extra sentences when they apply:
 
 - structured materials (bricks, planks, tiles):
   `The repeating units must be aligned so rows continue across the tile
-  borders: unit boundaries at the left edge continue into the right edge
-  and across top/bottom.`
+borders: unit boundaries at the left edge continue into the right edge
+and across top/bottom.`
 - the reference is itself a tiled preview (visible periodic repetition):
   `Reduce the visible periodic repetition of distinctive features so the
-  pattern feels organic.`
+pattern feels organic.`
 - stock image: `Remove any watermark text.`
 
 ## 2. Offset-inpaint pass — structured seams that survive Phase 1
@@ -257,12 +258,12 @@ python3 "$GAME_SKILL/scripts/pipeline.py" {id}_rolled.png \
     --inpaint gpt_cross_output.png -o textures/{id} --ref textures/{id}_ref.png
 ```
 
-   It takes from the model's output **only the center cross**, bounded by
-   cyclic min-cut paths laid where original and repaint agree (the SD
-   seamless-tile extensions do the same with a real inpaint mask — this
-   emulates it for models without mask support); ~70% of the tile stays
-   the untouched original. The composite is unrolled (the repaired cross
-   becomes the wrap), then the normal post-process runs.
+It takes from the model's output **only the center cross**, bounded by
+cyclic min-cut paths laid where original and repaint agree (the SD
+seamless-tile extensions do the same with a real inpaint mask — this
+emulates it for models without mask support); ~70% of the tile stays
+the untouched original. The composite is unrolled (the repaired cross
+becomes the wrap), then the normal post-process runs.
 
 The edge-seam ratio alone can look perfect while an interior defect hides
 in the patched zone — Phase 3 inspection must include **1:1 (100% zoom)

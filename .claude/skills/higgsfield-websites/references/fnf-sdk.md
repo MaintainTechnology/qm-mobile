@@ -163,22 +163,22 @@ All calls stay server-side after the Higgsfield auth guard and reuse the same
 `createWorkflowPlatformAdapter({ baseUrl: 'https://fnf.internal' })`:
 
 ```ts
-import { createCharacterClient } from '@higgsfield/fnf/characters'
-import { createJobClient } from '@higgsfield/fnf/client'
-import { soulV2Image } from '@higgsfield/fnf/jobs'
-import { createReferenceClient } from '@higgsfield/fnf/references'
-import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform'
+import { createCharacterClient } from '@higgsfield/fnf/characters';
+import { createJobClient } from '@higgsfield/fnf/client';
+import { soulV2Image } from '@higgsfield/fnf/jobs';
+import { createReferenceClient } from '@higgsfield/fnf/references';
+import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform';
 
 const adapter = createWorkflowPlatformAdapter({
   baseUrl: 'https://fnf.internal',
   confirm: async () => confirmationToken,
-})
+});
 
-const elements = createReferenceClient({ adapter })
-const characters = createCharacterClient({ adapter })
-const jobs = createJobClient({ adapter, jobs: [soulV2Image] })
+const elements = createReferenceClient({ adapter });
+const characters = createCharacterClient({ adapter });
+const jobs = createJobClient({ adapter, jobs: [soulV2Image] });
 
-const library = await elements.list({ category: 'character', size: 50 })
+const library = await elements.list({ category: 'character', size: 50 });
 
 // images are MediaRef values returned by media.upload(...) or compatible
 // image job refs. Upload browser Files with multipart FormData first.
@@ -186,10 +186,10 @@ const pending = await characters.create({
   name: 'My character',
   type: 'soul_2',
   images,
-})
-const character = await characters.wait(pending)
+});
+const character = await characters.wait(pending);
 if (character.status === 'failed')
-  throw new Error(character.failReason ?? 'Character training failed')
+  throw new Error(character.failReason ?? 'Character training failed');
 
 const result = await jobs.submit({
   model: 'text2image_soul_v2',
@@ -199,7 +199,7 @@ const result = await jobs.submit({
     aspectRatio: '3:4',
     batchSize: 4,
   },
-})
+});
 ```
 
 Character contract:
@@ -241,11 +241,11 @@ import {
   buildRealtimeChainEditRequest,
   createRealtimeClient,
   type RealtimeChainEditInput,
-} from '@higgsfield/fnf/realtime'
-import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform'
+} from '@higgsfield/fnf/realtime';
+import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform';
 
-const adapter = createWorkflowPlatformAdapter({ baseUrl: 'https://fnf.internal' })
-const realtime = createRealtimeClient({ adapter, jobAdapter: adapter })
+const adapter = createWorkflowPlatformAdapter({ baseUrl: 'https://fnf.internal' });
+const realtime = createRealtimeClient({ adapter, jobAdapter: adapter });
 
 const input: RealtimeChainEditInput = {
   params: {
@@ -254,24 +254,22 @@ const input: RealtimeChainEditInput = {
     aspectRatio: '1:1',
     images, // explicit MediaRef/image-job refs; at most four
   },
-}
+};
 const cost = await realtime.estimateChainCost({
   resolution: input.params.resolution,
   aspectRatio: input.params.aspectRatio,
-})
+});
 // Browser: request approval for the exact validated wire.
-const wire = buildRealtimeChainEditRequest(input)
-const confirmationToken = await window.hf.requestGeneration(
-  'flux_klein_realtime',
-  wire,
-  { credits: cost.credits },
-)
+const wire = buildRealtimeChainEditRequest(input);
+const confirmationToken = await window.hf.requestGeneration('flux_klein_realtime', wire, {
+  credits: cost.credits,
+});
 // Authenticated server function: submit the same input with its opaque token.
-const edit = await realtime.editChain(input, { confirmationToken })
-const generation = await realtime.pollEditJob(edit.jobId)
+const edit = await realtime.editChain(input, { confirmationToken });
+const generation = await realtime.pollEditJob(edit.jobId);
 
 // Continue by passing edit.chainId and a new explicit image set.
-await realtime.finalizeChain({ chainId: edit.chainId })
+await realtime.finalizeChain({ chainId: edit.chainId });
 ```
 
 The confirmation call runs in the browser through
@@ -304,11 +302,11 @@ Realtime contract:
 ## Common Imports
 
 ```ts
-import { createJobClient } from '@higgsfield/fnf/client'
-import { createMediaClient } from '@higgsfield/fnf/media'
-import { createProfileClient } from '@higgsfield/fnf/profile'
-import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform'
-import { nanoBanana2, seedance2_0 } from '@higgsfield/fnf/jobs'
+import { createJobClient } from '@higgsfield/fnf/client';
+import { createMediaClient } from '@higgsfield/fnf/media';
+import { createProfileClient } from '@higgsfield/fnf/profile';
+import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform';
+import { nanoBanana2, seedance2_0 } from '@higgsfield/fnf/jobs';
 ```
 
 ## Server Pattern
@@ -316,28 +314,28 @@ import { nanoBanana2, seedance2_0 } from '@higgsfield/fnf/jobs'
 Create the adapter inside server-only code after auth has been checked.
 
 ```ts
-const auth = await requireCurrentUser()
+const auth = await requireCurrentUser();
 if (!auth.ok) {
   return new Response(JSON.stringify(auth.body), {
     status: auth.status,
     headers: { 'content-type': 'application/json' },
-  })
+  });
 }
 ```
 
 Then create SDK clients with the fnf.internal logical-operation adapter:
 
 ```ts
-const FNF_INTERNAL_BASE_URL = 'https://fnf.internal'
+const FNF_INTERNAL_BASE_URL = 'https://fnf.internal';
 
 const adapter = createWorkflowPlatformAdapter({
   baseUrl: FNF_INTERNAL_BASE_URL,
   observability,
-})
+});
 
-const jobs = createJobClient({ adapter, jobs: [seedance2_0, nanoBanana2] })
-const media = createMediaClient({ mediaAdapter: adapter })
-const profile = createProfileClient({ profileAdapter: adapter })
+const jobs = createJobClient({ adapter, jobs: [seedance2_0, nanoBanana2] });
+const media = createMediaClient({ mediaAdapter: adapter });
+const profile = createProfileClient({ profileAdapter: adapter });
 ```
 
 Generated websites use fnf.internal only:
@@ -346,7 +344,7 @@ Generated websites use fnf.internal only:
 const adapter = createWorkflowPlatformAdapter({
   baseUrl: 'https://fnf.internal',
   observability,
-})
+});
 ```
 
 Do not pass `getToken`. Do not send `Authorization`. The platform attaches
@@ -377,25 +375,25 @@ fetch('https://fnf.internal/jobs') // hand-written request; use the SDK adapter
 Generated websites must not decide fnf.internal HTTP methods themselves. Use SDK
 clients, and let `createWorkflowPlatformAdapter` send the correct operation:
 
-| SDK operation | fnf.internal method/path |
-| --- | --- |
-| job submit | `POST /jobs/submit` |
-| job cost | `POST /jobs/cost` |
-| job cancel | `POST /jobs/{id}/cancel` |
-| media presign | `POST /jobs/media/presign` |
-| media confirm | `POST /jobs/media/{id}/confirm` |
-| job get | `GET /jobs/{id}` |
-| job set get | `GET /jobs/sets/{id}` |
-| job list/feed | `GET /jobs?gen_type=...&size=...` |
-| media get/list | `GET /jobs/media/{id}` / `GET /jobs/media?...` |
-| Element get/list | `GET /reference-elements/{id}` / `GET /reference-elements?...` |
-| character train/read | `POST /custom-references` / `GET /custom-references/{id}` |
-| realtime edit/cost/finalize | `POST /realtime/chain/edit` / `POST /realtime/chain/cost` / `POST /realtime/chain/finalize` |
-| saved style list/create | `GET /realtime/custom-styles` / `POST /realtime/custom-styles` |
-| saved style update/delete | `PATCH /realtime/custom-styles/{id}` / `DELETE /realtime/custom-styles/{id}` |
-| profile user | `GET /user` |
-| workspace list/current/wallet | `GET /workspaces`, `/workspaces/current`, `/workspaces/wallet` |
-| workspace switch | `POST /workspaces/switch` |
+| SDK operation                 | fnf.internal method/path                                                                    |
+| ----------------------------- | ------------------------------------------------------------------------------------------- |
+| job submit                    | `POST /jobs/submit`                                                                         |
+| job cost                      | `POST /jobs/cost`                                                                           |
+| job cancel                    | `POST /jobs/{id}/cancel`                                                                    |
+| media presign                 | `POST /jobs/media/presign`                                                                  |
+| media confirm                 | `POST /jobs/media/{id}/confirm`                                                             |
+| job get                       | `GET /jobs/{id}`                                                                            |
+| job set get                   | `GET /jobs/sets/{id}`                                                                       |
+| job list/feed                 | `GET /jobs?gen_type=...&size=...`                                                           |
+| media get/list                | `GET /jobs/media/{id}` / `GET /jobs/media?...`                                              |
+| Element get/list              | `GET /reference-elements/{id}` / `GET /reference-elements?...`                              |
+| character train/read          | `POST /custom-references` / `GET /custom-references/{id}`                                   |
+| realtime edit/cost/finalize   | `POST /realtime/chain/edit` / `POST /realtime/chain/cost` / `POST /realtime/chain/finalize` |
+| saved style list/create       | `GET /realtime/custom-styles` / `POST /realtime/custom-styles`                              |
+| saved style update/delete     | `PATCH /realtime/custom-styles/{id}` / `DELETE /realtime/custom-styles/{id}`                |
+| profile user                  | `GET /user`                                                                                 |
+| workspace list/current/wallet | `GET /workspaces`, `/workspaces/current`, `/workspaces/wallet`                              |
+| workspace switch              | `POST /workspaces/switch`                                                                   |
 
 If the browser calls an app-local route for generation, that app route must be a
 mutation route such as `POST /api/generate`; it must not be `GET`. The route
@@ -441,17 +439,16 @@ File in browser
 Client upload example:
 
 ```ts
-const form = new FormData()
-form.append('file', file)
+const form = new FormData();
+form.append('file', file);
 
 const response = await fetch('/api/media/upload', {
   method: 'POST',
   body: form,
-})
+});
 
-const upload = await response.json()
-if (!upload.ok)
-  throw new Error(upload.error?.code ?? 'upload_failed')
+const upload = await response.json();
+if (!upload.ok) throw new Error(upload.error?.code ?? 'upload_failed');
 ```
 
 Do not set the `content-type` header manually for `FormData`; the browser must
@@ -460,50 +457,47 @@ add the multipart boundary.
 Server upload route example:
 
 ```ts
-import { createFileRoute } from '@tanstack/react-router'
-import { createMediaClient } from '@higgsfield/fnf/media'
+import { createFileRoute } from '@tanstack/react-router';
+import { createMediaClient } from '@higgsfield/fnf/media';
 
 export const Route = createFileRoute('/api/media/upload')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const auth = await requireCurrentUser()
+        const auth = await requireCurrentUser();
         if (!auth.ok) {
           return Response.json(
             { ok: false, error: { code: 'unauthorized', status: auth.status } },
             { status: auth.status },
-          )
+          );
         }
 
-        const form = await request.formData()
-        const file = form.get('file')
+        const form = await request.formData();
+        const file = form.get('file');
         if (!(file instanceof File)) {
-          return Response.json(
-            { ok: false, error: { code: 'missing_file' } },
-            { status: 400 },
-          )
+          return Response.json({ ok: false, error: { code: 'missing_file' } }, { status: 400 });
         }
 
         console.info('[api/media/upload] file', {
           contentType: file.type,
           size: file.size,
-        })
+        });
 
-        const bytes = new Uint8Array(await file.arrayBuffer())
-        const media = createMediaClient({ mediaAdapter: adapter })
+        const bytes = new Uint8Array(await file.arrayBuffer());
+        const media = createMediaClient({ mediaAdapter: adapter });
         const result = await media.upload({
           source: bytes,
           filename: 'upload',
           contentType: file.type,
           type: 'image',
           forceIpCheck: true,
-        })
+        });
 
-        return Response.json({ ok: true, ref: result.ref })
+        return Response.json({ ok: true, ref: result.ref });
       },
     },
   },
-})
+});
 ```
 
 Generation route input must look like this:
@@ -531,7 +525,7 @@ Register exactly the models the website exposes:
 const jobs = createJobClient({
   adapter,
   jobs: [seedance2_0, nanoBanana2],
-})
+});
 ```
 
 Use public camelCase settings:
@@ -547,7 +541,7 @@ await jobs.submit({
     resolution: '720p',
     batchSize: 1,
   },
-})
+});
 ```
 
 Never send snake_case settings from UI code. The SDK maps `aspectRatio` to
@@ -557,45 +551,46 @@ job schemas.
 Server-function submit example:
 
 ```ts
-import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
-import { createJobClient } from '@higgsfield/fnf/client'
-import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform'
-import { nanoBanana2 } from '@higgsfield/fnf/jobs'
+import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
+import { createJobClient } from '@higgsfield/fnf/client';
+import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform';
+import { nanoBanana2 } from '@higgsfield/fnf/jobs';
 
 export const generate = createServerFn({ method: 'POST' })
-  .inputValidator(z.object({
-    prompt: z.string().min(1),
-    // set by the browser confirmation modal — see "Submission Confirmation Gate"
-    confirmed: z.literal(true),
-  }))
+  .inputValidator(
+    z.object({
+      prompt: z.string().min(1),
+      // set by the browser confirmation modal — see "Submission Confirmation Gate"
+      confirmed: z.literal(true),
+    }),
+  )
   .handler(async ({ data }) => {
-    const auth = await requireCurrentUser()
+    const auth = await requireCurrentUser();
     if (!auth.ok) {
       return {
         ok: false as const,
         code: 'unauthorized',
         status: auth.status,
-      }
+      };
     }
 
     const adapter = createWorkflowPlatformAdapter({
       baseUrl: 'https://fnf.internal',
       confirm: async () => {
-        if (!data.confirmed)
-          throw new Error('user did not confirm the submission')
+        if (!data.confirmed) throw new Error('user did not confirm the submission');
       },
-    })
+    });
 
-    const jobs = createJobClient({ adapter, jobs: [nanoBanana2] })
+    const jobs = createJobClient({ adapter, jobs: [nanoBanana2] });
     const result = await jobs.submit({
       model: 'nano_banana_2',
       prompt: { instruction: data.prompt },
       settings: { aspectRatio: '3:4', resolution: '1k', batchSize: 1 },
-    })
+    });
 
-    return { ok: true as const, result }
-  })
+    return { ok: true as const, result };
+  });
 ```
 
 Do not use `createServerFn({ method: "GET" })` or a `GET` server route for
@@ -608,16 +603,16 @@ ONLY, zero-token (no `getToken`/`userId` — the platform attaches the visitor's
 identity and bills their credits):
 
 ```ts
-import { createLlmClient } from '@higgsfield/fnf'
-const llm = createLlmClient({ baseUrl: 'https://fnf.internal/llm' })
+import { createLlmClient } from '@higgsfield/fnf';
+const llm = createLlmClient({ baseUrl: 'https://fnf.internal/llm' });
 
-const [model] = await llm.listModels()
-if (!model) throw new Error('No LLM models are currently available')
+const [model] = await llm.listModels();
+if (!model) throw new Error('No LLM models are currently available');
 
 const res = await llm.complete({
   model,
   messages: [{ role: 'user', content: '…' }],
-})
+});
 // llm.stream(...) yields OpenAI-shape SSE deltas; tool-calling supported
 // (LlmToolDef / LlmToolCall). In React: FnfProvider's `llm` prop + useFnfLlmClient().
 ```
@@ -657,11 +652,10 @@ const adapter = createWorkflowPlatformAdapter({
   baseUrl: 'https://fnf.internal',
   // Runs during jobs.submit, after validation, before any network call.
   confirm: async () => {
-    if (!data.confirmed)
-      throw new Error('user did not confirm the submission')
-    return data.confirmationToken // optional; sent as confirmation_token
+    if (!data.confirmed) throw new Error('user did not confirm the submission');
+    return data.confirmationToken; // optional; sent as confirmation_token
   },
-})
+});
 ```
 
 Rules:
@@ -679,8 +673,8 @@ Every real generation website must show submitted and historical generations wit
 real media previews. Use the template helpers by default:
 
 ```tsx
-import { HiggsfieldGenerationCard } from "@/components/higgsfield-generation-card"
-import { selectGenerationMedia } from "@/lib/higgsfield-generation-results"
+import { HiggsfieldGenerationCard } from '@/components/higgsfield-generation-card';
+import { selectGenerationMedia } from '@/lib/higgsfield-generation-results';
 ```
 
 The helper uses the SDK read model:
@@ -705,7 +699,7 @@ import {
   getRawUrl,
   hasResult,
   isTerminalJobStatus,
-} from "@higgsfield/fnf/client"
+} from '@higgsfield/fnf/client';
 ```
 
 Never inspect raw backend `results.raw.url` objects in website UI. The SDK adapter
@@ -740,13 +734,13 @@ const upload = await media.upload({
   filename: 'input.png',
   type: 'image',
   forceIpCheck: true,
-})
+});
 
 await jobs.submit({
   model: 'nano_banana_2',
   media: { image: upload.ref },
   prompt: { instruction: prompt },
-})
+});
 ```
 
 Attach/resolve media metadata before submit when local validation depends on
@@ -763,9 +757,9 @@ fails clearly before presign/transfer.
 Use the profile domain for account/workspace panels:
 
 ```ts
-const snapshot = await profile.getSnapshot()
-const credits = await profile.getCredits({ includeOnDemand: true })
-await profile.switchWorkspace({ workspaceId })
+const snapshot = await profile.getSnapshot();
+const credits = await profile.getCredits({ includeOnDemand: true });
+await profile.switchWorkspace({ workspaceId });
 ```
 
 Workspace switching updates backend context only. The website still owns routing,
@@ -864,10 +858,10 @@ problems:
 const adapter = createWorkflowPlatformAdapter({
   baseUrl: 'https://fnf.internal',
   observability,
-})
+});
 
-const jobs = createJobClient({ adapter, jobs: [nanoBanana2], observability })
-const media = createMediaClient({ mediaAdapter: adapter, observability })
+const jobs = createJobClient({ adapter, jobs: [nanoBanana2], observability });
+const media = createMediaClient({ mediaAdapter: adapter, observability });
 ```
 
 Without adapter observability you may see `fnf.job.submit` fail but not the

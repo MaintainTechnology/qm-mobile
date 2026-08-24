@@ -14,8 +14,8 @@ export const metadata = {
 export function gate(signals) {
   const rows = extractRows(signals);
   return rows
-    .filter((r) => r.writes > 100 && r.reads > 0 && r.writes / r.reads > 0.5)
-    .map((r) => {
+    .filter(r => r.writes > 100 && r.reads > 0 && r.writes / r.reads > 0.5)
+    .map(r => {
       const ratio = r.writes / r.reads;
       return {
         kind: metadata.id,
@@ -54,7 +54,7 @@ function extractRows(signals) {
   }
 
   const routes = new Set([...writeByRoute.keys(), ...readByRoute.keys()]);
-  return [...routes].map((route) => ({
+  return [...routes].map(route => ({
     route,
     writes: writeByRoute.get(route) ?? 0,
     reads: readByRoute.get(route) ?? 0,

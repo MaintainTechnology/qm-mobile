@@ -2,7 +2,7 @@
 name: generate-lectures-and-render
 description: Generate lectures from a course outline using VectorShift and automatically render them in the physician preview system
 user_invocable: true
-arguments: "<outline_path> [--physician ID] [--course ID] [--dry-run] [--start N] [--end N] [--materials PATH] [--no-llm-parser]"
+arguments: '<outline_path> [--physician ID] [--course ID] [--dry-run] [--start N] [--end N] [--materials PATH] [--no-llm-parser]'
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -17,6 +17,7 @@ Generate complete lecture packages from a course outline and automatically regis
 ```
 
 **Examples:**
+
 - `/generate-lectures-and-render outline.md` - Generate all, prompt for physician/course
 - `/generate-lectures-and-render outline.md --physician dr-abid-husain --course advanced-cardio`
 - `/generate-lectures-and-render outline.md --dry-run` - Preview only
@@ -32,6 +33,7 @@ When this skill is invoked, execute these phases:
 #### Step 1.1: Parse Arguments
 
 Extract from invocation:
+
 - `outline_path` (required)
 - `--physician ID` (optional)
 - `--course ID` (optional)
@@ -40,11 +42,13 @@ Extract from invocation:
 #### Step 1.2: Prompt for Missing Info
 
 If `--physician` not provided, ask:
+
 ```
 What is the physician ID? (e.g., dr-john-smith)
 ```
 
 If `--course` not provided, ask:
+
 ```
 What is the course ID? (e.g., metabolic-health)
 ```
@@ -52,6 +56,7 @@ What is the course ID? (e.g., metabolic-health)
 #### Step 1.3: Check Registry
 
 Read the registry file:
+
 ```
 content/physician-courses/registry.ts
 ```
@@ -61,24 +66,28 @@ Check if physician ID exists in `physicianRegistry`.
 #### Step 1.4: Handle New vs Existing Physician
 
 **If NEW physician**, collect metadata:
+
 - Physician name (e.g., "Dr. John Smith")
 - Credentials (e.g., "MD", "MD, PhD")
 - Specialty (e.g., "Metabolic Medicine")
 - Bio (optional, one sentence)
 
 **If EXISTING physician**, check if course exists:
+
 - If course exists: will add lectures to existing course
 - If course is new: collect course title and description
 
 #### Step 1.5: Collect Course Info (if new course)
 
 Ask for:
+
 - Course title (e.g., "Advanced Cardiovascular Therapies")
 - Course description (one sentence)
 
 #### Step 1.6: Show Execution Plan
 
 Display summary:
+
 ```
 PHYSICIAN: dr-john-smith (New/Existing)
 COURSE: metabolic-health (New/Existing)
@@ -110,6 +119,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/iterative_lecture_runn
 #### Step 2.2: Monitor Progress
 
 The runner will:
+
 1. Parse outline to find lectures
 2. Match materials to PDFs
 3. Submit async jobs to VectorShift
@@ -117,6 +127,7 @@ The runner will:
 5. Save outputs to `outputs/{course_name}/`
 
 Output files per lecture:
+
 - `lecture_N_slides.json` - The JSON we need
 - `lecture_N_transcript.md`
 - `lecture_N_blueprint.md`
@@ -136,6 +147,7 @@ mkdir -p "content/physician-courses/{physician}/{course}"
 ```
 
 Example:
+
 ```bash
 mkdir -p "content/physician-courses/dr-john-smith/metabolic-health"
 ```
@@ -150,6 +162,7 @@ cp "outputs/{course_name}/lecture_N_slides.json" \
 ```
 
 Example:
+
 ```bash
 cp "outputs/Metabolic_Health/lecture_1_slides.json" \
    "content/physician-courses/dr-john-smith/metabolic-health/lecture-1.json"
@@ -173,6 +186,7 @@ import drSmithMetabolicLecture2 from './dr-john-smith/metabolic-health/lecture-2
 ```
 
 Import naming convention: `dr{LastName}{CourseShort}Lecture{N}`
+
 - Extract last name from physician ID: `dr-john-smith` → `Smith`
 - Shorten course ID: `metabolic-health` → `Metabolic`
 - Add lecture number: `Lecture1`, `Lecture2`, etc.
@@ -246,11 +260,13 @@ Import naming convention: `dr{LastName}{CourseShort}Lecture{N}`
 #### Step 4.1: Construct Preview URLs
 
 URL pattern:
+
 ```
 http://localhost:3000/preview/courses/{physician}/{course}-{N}
 ```
 
 Examples:
+
 ```
 http://localhost:3000/preview/courses/dr-john-smith/metabolic-health-1
 http://localhost:3000/preview/courses/dr-john-smith/metabolic-health-2
@@ -277,28 +293,28 @@ Remaining preview URLs:
 
 ## Options Reference
 
-| Flag | Description |
-|------|-------------|
-| `<outline_path>` | Required: Path to course outline markdown |
-| `--physician ID` | Pre-specify physician ID (skips prompt) |
-| `--course ID` | Pre-specify course ID (skips prompt) |
-| `--dry-run` | Show execution plan without running pipeline |
-| `--start N` | Start from lecture N |
-| `--end N` | Stop after lecture N |
+| Flag               | Description                                     |
+| ------------------ | ----------------------------------------------- |
+| `<outline_path>`   | Required: Path to course outline markdown       |
+| `--physician ID`   | Pre-specify physician ID (skips prompt)         |
+| `--course ID`      | Pre-specify course ID (skips prompt)            |
+| `--dry-run`        | Show execution plan without running pipeline    |
+| `--start N`        | Start from lecture N                            |
+| `--end N`          | Stop after lecture N                            |
 | `--materials PATH` | Custom materials folder (default: Abid Husain/) |
-| `--no-llm-parser` | Use regex parser instead of LLM |
+| `--no-llm-parser`  | Use regex parser instead of LLM                 |
 
 ---
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Outline not found | Ask for correct path |
-| Generation fails for a lecture | Continue with remaining, report failures |
-| Invalid JSON output | Warn but still copy (renderer handles gracefully) |
-| Registry parse error | Show manual edit instructions |
-| All lectures fail | Report failures, skip registry update |
+| Error                          | Action                                            |
+| ------------------------------ | ------------------------------------------------- |
+| Outline not found              | Ask for correct path                              |
+| Generation fails for a lecture | Continue with remaining, report failures          |
+| Invalid JSON output            | Warn but still copy (renderer handles gracefully) |
+| Registry parse error           | Show manual edit instructions                     |
+| All lectures fail              | Report failures, skip registry update             |
 
 ## Output Retrieval Fallback
 

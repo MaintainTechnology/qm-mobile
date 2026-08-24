@@ -32,6 +32,7 @@ outputs/overlays/
 ### Step 1: Collect Topics
 
 Ask the user for their episode topics. Typical format:
+
 ```
 1. GLP-1 Agonists & Longevity
 2. AI-Powered Diagnostics Update
@@ -50,11 +51,13 @@ that makes someone stop scrolling and watch. Rules:
 - Avoid jargon — use brand names and plain language
 
 **Good hooks:**
-- "Can *Ozempic* Actually Make You Live Longer?"
-- "Is *AI* About to Replace Your Doctor's Diagnosis?"
-- "Why Your *Blood Work* Is Lying to You"
+
+- "Can _Ozempic_ Actually Make You Live Longer?"
+- "Is _AI_ About to Replace Your Doctor's Diagnosis?"
+- "Why Your _Blood Work_ Is Lying to You"
 
 **Bad hooks (too clinical/boring):**
+
 - "GLP-1 Receptor Agonist Longevity Data Review"
 - "Diagnostic AI Performance Metrics"
 
@@ -70,19 +73,21 @@ Write the config to `outputs/overlays/config.json`:
     "Peptide Therapy Deep Dive"
   ],
   "hooks": [
-    {"question": "Can Ozempic Actually Make You Live Longer?", "highlight": "Ozempic"},
-    {"question": "Is AI About to Replace Your Doctor's Diagnosis?", "highlight": "AI"},
-    {"question": "Are Peptides the Future of Anti-Aging Medicine?", "highlight": "Peptides"}
+    { "question": "Can Ozempic Actually Make You Live Longer?", "highlight": "Ozempic" },
+    { "question": "Is AI About to Replace Your Doctor's Diagnosis?", "highlight": "AI" },
+    { "question": "Are Peptides the Future of Anti-Aging Medicine?", "highlight": "Peptides" }
   ],
   "mode": "full"
 }
 ```
 
 **Mode options:**
+
 - `"full"` — Sidebar topic strip + chyron (default)
 - `"chyron"` — Lower-third chyron only, no sidebar
 
 **Config rules:**
+
 - `topics` and `hooks` arrays must be the same length
 - Each hook needs `question` (string) and `highlight` (string, the word to gold-highlight)
 - If no word should be highlighted, set `highlight` to `""`
@@ -94,6 +99,7 @@ cd outputs/overlays && python3 generate.py
 ```
 
 This produces one PNG per topic:
+
 - Full mode: `overlay_topic_1.png` through `overlay_topic_N.png`
 - Chyron mode: `chyron_topic_1.png` through `chyron_topic_N.png`
 
@@ -108,6 +114,7 @@ Tell the user the output directory path so they can load files into StreamYard.
 ## Chyron-Only Mode
 
 When the user says "just the chyron" or "no sidebar":
+
 - Set `"mode": "chyron"` in config.json
 - The sidebar is hidden entirely
 - The chyron spans the full 1920px width
@@ -116,6 +123,7 @@ When the user says "just the chyron" or "no sidebar":
 ## Custom Output Directory
 
 To save to a subdirectory (e.g., per-episode), add `output_dir` to config:
+
 ```json
 {
   "topics": [...],
@@ -124,6 +132,7 @@ To save to a subdirectory (e.g., per-episode), add `output_dir` to config:
   "output_dir": "ep42"
 }
 ```
+
 PNGs will be saved to `outputs/overlays/ep42/`.
 
 ## Generating for a Specific Config Path

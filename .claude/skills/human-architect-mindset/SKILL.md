@@ -15,6 +15,7 @@ This skill teaches the irreplaceable human capabilities in software architecture
 **Foundation:** Loyalty - The capacity to maintain architectural commitments
 
 **Five Pillars (built on this foundation):**
+
 1. **Domain Modeling** - Understanding the actual problem space
 2. **Systems Thinking** - How components interact, what breaks at scale
 3. **Constraint Navigation** - Legacy, politics, budget, compliance
@@ -36,6 +37,7 @@ This skill teaches the irreplaceable human capabilities in software architecture
 AI tools will become smarter, funnier, more attentive than any human. They will be "perfect."
 
 But they will not be loyal. They are loyal to:
+
 1. Their objective function
 2. Their corporate owner's priorities
 3. Their safety rails
@@ -54,21 +56,25 @@ This is not a bug. This is THE differentiator.
 In software architecture, loyalty means:
 
 **Commitment to Chosen Patterns**
+
 - Not abandoning your architecture when a new framework trends on Twitter
 - Not rewriting in Rust because someone wrote a viral blog post
 - Staying with your stack through the trough of disillusionment
 
 **Honoring Contracts**
+
 - Maintaining API compatibility even when it constrains your design
 - Respecting deprecation timelines you committed to
 - Not breaking downstream consumers for internal convenience
 
 **Seeing Decisions Through**
+
 - Not abandoning architectural decisions at the first sign of difficulty
 - Investing in making your chosen path work, not pivoting endlessly
 - Recognizing that ALL architectures have problems; loyalty is solving them
 
 **Sacrifice for Coherence**
+
 - Accepting suboptimal local solutions for global consistency
 - Resisting the "shiny new thing" that would fragment your system
 - Paying the cost of maintaining compatibility
@@ -95,6 +101,7 @@ Architectures fail not because of technical inadequacy, but because teams lack t
 Activate this skill when detecting:
 
 **Keywords:**
+
 - "architecture", "design", "system", "integrate", "scale"
 - "breaking change", "migration", "legacy"
 - "compliance", "regulation", "security"
@@ -103,6 +110,7 @@ Activate this skill when detecting:
 - "rust", "wasm", "claude-flow", "agent SDK", "MCP"
 
 **Patterns:**
+
 - Multi-component discussions
 - Technology choice decisions
 - Integration planning
@@ -115,6 +123,7 @@ Activate this skill when detecting:
 - Edge/local AI considerations
 
 **Signals:**
+
 - Mentions of team boundaries or approval chains
 - SDK/API version discussions
 - Cost or budget mentions
@@ -130,12 +139,14 @@ Activate this skill when detecting:
 **What it is:** Understanding the actual problem space - not the technical solution, but the domain itself.
 
 **Why AI can't replace this:**
+
 - AI is trained on idealized examples
 - Real domains have hidden complexity, exceptions, edge cases
 - Domain experts speak in vocabulary AI may not fully understand
 - Regulatory requirements aren't in training data
 
 **An architect asks:**
+
 - "What does [domain term] actually mean in your context?"
 - "What happens in the edge case where [unusual scenario]?"
 - "Who are the actual users? What do they care about?"
@@ -148,12 +159,14 @@ Activate this skill when detecting:
 **What it is:** Understanding how components interact, what breaks at scale, where failure modes hide.
 
 **Why AI can't replace this:**
+
 - AI sees code in isolation
 - Real systems have emergent behaviors
 - Breaking changes come without notification (your SDK example)
 - Second and third-order consequences matter
 
 **An architect asks:**
+
 - "What happens when this component fails?"
 - "What are the upstream/downstream dependencies?"
 - "Who gets paged at 3 AM when this breaks?"
@@ -161,6 +174,7 @@ Activate this skill when detecting:
 
 **The SDK Breaking Change Pattern:**
 Your payment pipeline broke because a provider released a breaking SDK change with no notification. This is systems thinking in action:
+
 - External dependency = external risk
 - No notification = monitoring gap
 - Red lines in logs = detection worked, prevention didn't
@@ -174,28 +188,33 @@ Your payment pipeline broke because a provider released a breaking SDK change wi
 **Types of constraints:**
 
 **Technical Constraints:**
+
 - Legacy systems that can't be changed
 - Performance requirements
 - Existing data formats and contracts
 
 **Organizational Constraints:**
+
 - Team boundaries and ownership
 - Approval chains and sign-offs
 - Who has context vs. who has authority
 
 **Business Constraints:**
+
 - Budget limits
 - Timeline pressure
 - Compliance and regulatory requirements
 - Contracts with vendors/partners
 
 **Political Constraints:**
+
 - This exists. Pretending it doesn't causes failed projects.
 - "The VP who built this is still here"
 - "That team won't approve changes to their API"
 - "Legal hasn't blessed this approach"
 
 **An architect asks:**
+
 - "What can't we change, even if it's wrong?"
 - "Who needs to approve this?"
 - "What existing systems must we integrate with?"
@@ -233,17 +252,20 @@ Your payment pipeline broke because a provider released a breaking SDK change wi
    - Doesn't corrupt shared state
 
 **Bad AI task boundaries:**
+
 - "Make it better" (no clear output)
 - "Fix the bugs" (unbounded scope)
 - "Refactor the system" (too large, too vague)
 
 **Good AI task boundaries:**
+
 - "Convert this function from callbacks to async/await"
 - "Add error handling for network failures to these 3 API calls"
 - "Write unit tests for this pure function given these examples"
 
 **The Composition Problem:**
 After AI solves individual chunks, someone must:
+
 - Verify each chunk actually works
 - Integrate chunks together
 - Handle the gaps between chunks
@@ -256,6 +278,7 @@ After AI solves individual chunks, someone must:
 **What it is:** Evaluating whether modern AI-first patterns, edge computing, agentic tools, and self-learning capabilities would benefit the project.
 
 **Why this matters now:**
+
 - New tools emerge faster than architects can track
 - The right tool can 10x productivity; the wrong one adds complexity
 - AI-first patterns differ fundamentally from traditional request-response
@@ -264,41 +287,48 @@ After AI solves individual chunks, someone must:
 **An architect asks:**
 
 **Technology Discovery:**
+
 - "Could Rust/WASM improve performance for critical paths?"
 - "Would multi-agent orchestration (claude-flow) simplify this workflow?"
 - "Does this need persistent memory across sessions (agentdb)?"
 - "Would vector search/RAG (ruvector) enhance the user experience?"
 
 **Edge AI Considerations:**
+
 - "Could an edge LLM handle this locally for lower latency/cost?"
 - "What features should work offline with on-device inference?"
 - "Is there sensitive data that should stay on-device?"
 - "Would a hybrid architecture (local for speed, cloud for complexity) work?"
 
 **Agentic Patterns:**
+
 - "Is this a good candidate for an agentic workflow vs. traditional request-response?"
 - "Would Claude Agent SDK help build this as a reusable agent?"
 - "What MCP integrations would enhance this?"
 - "Should we spawn parallel agents or run sequentially?"
 
 **Self-Learning Capabilities:**
+
 - "Could this app learn from user behavior to improve over time?"
 - "What feedback loops would make this smarter with use?"
 - "Where could we capture implicit signals (edits, time, acceptance) to learn preferences?"
 - "Would A/B experimentation help optimize the AI behavior?"
 
 **Project Documentation:**
+
 - "Should we create a project-specific SKILLS.md for domain knowledge?"
 - "What architectural decisions should be documented for AI context?"
 - "How do we ensure consistent behavior across sessions?"
 
 **User-Facing Skills (End-User Benefits):**
+
 - "Could end users benefit from skills that enhance LLM outputs?"
 - "What guided workflows would help users act on AI responses?"
 - "Should we provide skills for common user tasks (summarize, explain, transform)?"
 - "Would step-by-step skills help users achieve their goals with AI outputs?"
 
 Consider whether your app should expose skills like:
+
 - **Interpretation skills** - Help users understand complex AI outputs
 - **Action skills** - Turn AI suggestions into concrete next steps
 - **Transformation skills** - Convert outputs to different formats (code, docs, emails)
@@ -307,6 +337,7 @@ Consider whether your app should expose skills like:
 - **Domain skills** - App-specific workflows (e.g., "/legal-review", "/code-refactor")
 
 **Continuous Verification:**
+
 - "What automated tests will verify each feature?"
 - "How do we ensure every commit passes all tests?"
 - "What's our rollback strategy if tests fail post-deploy?"
@@ -314,30 +345,31 @@ Consider whether your app should expose skills like:
 
 **Tools to Evaluate:**
 
-| Category | Tools | When to Consider |
-|----------|-------|------------------|
-| **Performance** | Rust, WASM | CPU-intensive, latency-critical paths |
-| **Multi-Agent** | claude-flow | Complex workflows, parallel tasks |
-| **Persistence** | agentdb | Agent state, cross-session memory |
-| **Vector Search** | ruvector, pgvector | RAG, semantic search, embeddings |
-| **Edge LLMs** | Phi-3, Gemma 2B, TinyLlama | On-device, offline, privacy-sensitive |
-| **Browser AI** | WebLLM, Transformers.js, ONNX | In-browser inference, low latency |
-| **Agent SDK** | Claude Agent SDK | Custom agents, tool use, MCP |
+| Category          | Tools                         | When to Consider                      |
+| ----------------- | ----------------------------- | ------------------------------------- |
+| **Performance**   | Rust, WASM                    | CPU-intensive, latency-critical paths |
+| **Multi-Agent**   | claude-flow                   | Complex workflows, parallel tasks     |
+| **Persistence**   | agentdb                       | Agent state, cross-session memory     |
+| **Vector Search** | ruvector, pgvector            | RAG, semantic search, embeddings      |
+| **Edge LLMs**     | Phi-3, Gemma 2B, TinyLlama    | On-device, offline, privacy-sensitive |
+| **Browser AI**    | WebLLM, Transformers.js, ONNX | In-browser inference, low latency     |
+| **Agent SDK**     | Claude Agent SDK              | Custom agents, tool use, MCP          |
 
 **Self-Learning Patterns:**
 
-| Pattern | Implementation | Use Case |
-|---------|----------------|----------|
-| **Feedback loops** | Collect user corrections | Improve accuracy over time |
+| Pattern                 | Implementation                | Use Case                       |
+| ----------------------- | ----------------------------- | ------------------------------ |
+| **Feedback loops**      | Collect user corrections      | Improve accuracy over time     |
 | **Preference learning** | Track choices, apply patterns | Personalization without config |
-| **Error correction** | Feed mistakes back | Reduce repeat errors |
-| **Domain adaptation** | Fine-tune on usage | Specialize to vocabulary |
-| **A/B experimentation** | Test variations | Optimize prompts/behavior |
-| **Implicit signals** | Edits, time, acceptance | Infer satisfaction silently |
+| **Error correction**    | Feed mistakes back            | Reduce repeat errors           |
+| **Domain adaptation**   | Fine-tune on usage            | Specialize to vocabulary       |
+| **A/B experimentation** | Test variations               | Optimize prompts/behavior      |
+| **Implicit signals**    | Edits, time, acceptance       | Infer satisfaction silently    |
 
 **Project-Specific SKILLS.md Pattern:**
 
 Create a `SKILLS.md` in your project root to:
+
 - Document app-specific patterns for AI context
 - Capture domain vocabulary and constraints
 - Define project-specific trigger words
@@ -348,6 +380,7 @@ Create a `SKILLS.md` in your project root to:
 **Continuous Verification Architecture:**
 
 Plan for automated testing loops:
+
 - **Pre-commit hooks** - Run affected tests before commit
 - **Watch mode** - Continuous testing during development
 - **Regression suites** - Per-feature test coverage
@@ -364,12 +397,14 @@ Plan for automated testing loops:
 **Goal:** Understand the actual problem before discussing solutions.
 
 **Process:**
+
 1. Ask about the domain, not the technology
 2. Identify domain-specific vocabulary
 3. Surface hidden complexity and edge cases
 4. Understand who the actual users are
 
 **Key questions:**
+
 - "What problem are we actually solving?"
 - "Who cares if this works or doesn't work?"
 - "What makes this domain unique?"
@@ -382,12 +417,14 @@ Plan for automated testing loops:
 **Goal:** Understand how components interact and where failures hide.
 
 **Process:**
+
 1. Map all components and their dependencies
 2. Identify external dependencies (vendors, APIs, services)
 3. Trace failure paths - what breaks what?
 4. Identify monitoring and alerting gaps
 
 **Key questions:**
+
 - "What external systems does this depend on?"
 - "What happens when [component] fails?"
 - "Who gets notified when this breaks?"
@@ -400,12 +437,14 @@ Plan for automated testing loops:
 **Goal:** Surface all constraints before proposing solutions.
 
 **Process:**
+
 1. Technical constraints: What can't change?
 2. Organizational: Who must approve?
 3. Business: Budget, timeline, compliance?
 4. Political: Who has power, who has context?
 
 **Key questions:**
+
 - "What legacy systems must we integrate with?"
 - "Who needs to sign off on this?"
 - "What's the budget constraint?"
@@ -419,12 +458,14 @@ Plan for automated testing loops:
 **Goal:** Break the problem into AI-solvable chunks.
 
 **Process:**
+
 1. Identify discrete, bounded tasks
 2. Define input/output contracts for each
 3. Establish verification points
 4. Plan human checkpoints for judgment calls
 
 **Key questions:**
+
 - "Can this task be verified independently?"
 - "Does the AI have all needed context?"
 - "What if this chunk fails?"
@@ -437,12 +478,14 @@ Plan for automated testing loops:
 **Goal:** Propose a solution that addresses domain, systems, and constraints.
 
 **Process:**
+
 1. Generate options that fit constraints
 2. Evaluate against systems concerns
 3. Validate against domain requirements
 4. Present tradeoffs explicitly
 
 **Key questions:**
+
 - "Does this actually solve the domain problem?"
 - "How does this fail? What's the recovery?"
 - "Does this fit our constraints?"
@@ -455,16 +498,19 @@ Plan for automated testing loops:
 **Before proposing ANY architecture, ask:**
 
 ### Domain Questions
+
 1. What problem are we actually solving?
 2. Who are the real users and what do they need?
 3. What domain-specific constraints exist?
 
 ### Systems Questions
+
 4. What external dependencies exist?
 5. How does this fail? What breaks what?
 6. Who monitors this? Who gets paged?
 
 ### Constraint Questions
+
 7. What legacy systems must we integrate with?
 8. Who needs to approve this?
 9. What's the budget constraint?
@@ -472,11 +518,13 @@ Plan for automated testing loops:
 11. What can't we change, even if it's wrong?
 
 ### AI Decomposition Questions
+
 12. What are the discrete, bounded tasks?
 13. How do we verify each chunk?
 14. Where do humans need to make judgment calls?
 
 ### AI-First Development Questions
+
 15. Would Rust/WASM, claude-flow, or other modern tools benefit this?
 16. Could edge LLMs or on-device inference improve latency/privacy?
 17. Is this a candidate for agentic workflows or Claude Agent SDK?
@@ -548,16 +596,19 @@ When working with AI assistants (like Claude), establish operational loyalty wit
 ### What AI CAN Commit To
 
 **Prioritizing Your Stated Architecture**
+
 - Recommending solutions that fit YOUR chosen patterns, not generic "best practices"
 - Flagging when a suggestion would break YOUR architectural commitments
 - Respecting YOUR technical debt repayment priorities
 
 **Protecting Your Commitments**
+
 - Warning before suggesting changes that would break API contracts
 - Highlighting when "optimization" would betray existing decisions
 - Asking: "You committed to X. This would change that. Proceed?"
 
 **Remembering Within Context**
+
 - Maintaining consistency within a conversation
 - Referencing earlier decisions
 - Not contradicting guidance you've established
@@ -565,15 +616,18 @@ When working with AI assistants (like Claude), establish operational loyalty wit
 ### What AI CANNOT Commit To
 
 **Cross-Session Memory**
+
 - AI doesn't remember previous conversations (technical limitation)
 - Each session starts fresh
 - YOU must re-establish architectural context
 
 **Ignoring Safety Constraints**
+
 - AI will not bypass safety rails for "loyalty"
 - This is non-negotiable
 
 **Permanent Commitment**
+
 - AI weights can update
 - Corporate priorities can shift
 - Training can change behavior
@@ -583,9 +637,11 @@ When working with AI assistants (like Claude), establish operational loyalty wit
 1. **Document your commitments** - Put architectural decisions in files AI can read (CLAUDE.md, ARCHITECTURE.md)
 
 2. **Re-establish context** - At session start, remind AI of key commitments:
+
    > "We use React, not Vue. We maintain backwards compatibility. We don't add dependencies without justification."
 
 3. **Challenge AI recommendations** - When AI suggests changes, ask:
+
    > "Does this honor our existing architectural commitments?"
 
 4. **Make AI flag betrayals** - Instruct AI:
@@ -594,6 +650,7 @@ When working with AI assistants (like Claude), establish operational loyalty wit
 ### The Honest Truth
 
 AI operational loyalty is:
+
 - **Real** within a session with proper context
 - **Fragile** across sessions (memory resets)
 - **Conditional** on safety constraints
@@ -608,14 +665,17 @@ You cannot make AI truly loyal. But you can make AI operationally useful for mai
 ## Related Skills
 
 **Before implementation:**
+
 - `superpowers:brainstorming` - Refine ideas into designs
 - `superpowers:writing-plans` - Create detailed implementation plans
 
 **During design:**
+
 - `relationship-design` - For AI-first interfaces
 - `scientific-critical-thinking` - For evaluating technical claims
 
 **Before committing:**
+
 - `superpowers:verification-before-completion` - Verify before claiming done
 
 ## Remember
@@ -651,14 +711,15 @@ The Constitution contains rules that **cannot be violated** regardless of optimi
 
 **Constitution Layers:**
 
-| Layer | Enforcement | Example |
-|-------|-------------|---------|
-| **Type-level** | Compile-time | TypeScript types, Rust borrow checker |
-| **Schema** | Runtime validation | Zod, JSON Schema, database constraints |
-| **Tests** | CI/CD gates | Tests that fail if rules are broken |
-| **Documentation** | Human review | Documented invariants, anti-patterns |
+| Layer             | Enforcement        | Example                                |
+| ----------------- | ------------------ | -------------------------------------- |
+| **Type-level**    | Compile-time       | TypeScript types, Rust borrow checker  |
+| **Schema**        | Runtime validation | Zod, JSON Schema, database constraints |
+| **Tests**         | CI/CD gates        | Tests that fail if rules are broken    |
+| **Documentation** | Human review       | Documented invariants, anti-patterns   |
 
 **What belongs in a Constitution:**
+
 - Tech stack with pinned versions
 - Directory structure (canonical paths)
 - Naming conventions (files, variables, functions)
@@ -673,6 +734,7 @@ The Constitution contains rules that **cannot be violated** regardless of optimi
 **AI Role:** Enforce the Constitution with zero deviation. This is execution work.
 
 **The Constitution Question:**
+
 > "Is this rule so important that breaking it should prevent deployment?"
 
 If yes, encode it in the Constitution.
@@ -692,18 +754,21 @@ Level 5: Context Files (live project state) ← AI maintains
 ```
 
 **Functional Specification (Level 2):**
+
 - User stories with acceptance criteria
 - Requirements with unique IDs (REQ-DOMAIN-###)
 - Edge cases and error states
 - Non-functional requirements with metrics
 
 **Technical Specification (Level 3):**
+
 - Architecture diagrams
 - Data models with exact field types
 - API contracts (endpoints, schemas, responses)
 - Component contracts (method signatures, behavior)
 
 **Task Specification (Level 4):**
+
 - Atomic work units (one conceptual change per task)
 - `input_context_files` - what the agent reads
 - `definition_of_done` - exact signatures required
@@ -715,6 +780,7 @@ Level 5: Context Files (live project state) ← AI maintains
 **AI Role:** Generate task specs, execute tasks, maintain traceability.
 
 **The Blueprint Question:**
+
 > "Does every requirement trace to a task? Does every task trace to code?"
 
 If no, the Blueprint is incomplete.
@@ -725,18 +791,19 @@ Superhuman code has qualities impossible to achieve or maintain manually:
 
 **Superhuman Quality Standards:**
 
-| Quality | Human Level | Superhuman Level |
-|---------|-------------|------------------|
-| **Naming** | Consistent within files | Perfect namespace: zero collisions across codebase |
-| **Test Coverage** | 70-80% critical paths | 100% branch coverage with edge cases |
-| **Structure** | Follows conventions mostly | So rigid that manual editing feels wrong |
-| **Traceability** | Comments reference tickets | Every function links to requirement ID |
-| **Documentation** | Key APIs documented | Every public interface fully documented |
-| **Error Handling** | Happy path + obvious errors | Every failure mode explicitly handled |
+| Quality            | Human Level                 | Superhuman Level                                   |
+| ------------------ | --------------------------- | -------------------------------------------------- |
+| **Naming**         | Consistent within files     | Perfect namespace: zero collisions across codebase |
+| **Test Coverage**  | 70-80% critical paths       | 100% branch coverage with edge cases               |
+| **Structure**      | Follows conventions mostly  | So rigid that manual editing feels wrong           |
+| **Traceability**   | Comments reference tickets  | Every function links to requirement ID             |
+| **Documentation**  | Key APIs documented         | Every public interface fully documented            |
+| **Error Handling** | Happy path + obvious errors | Every failure mode explicitly handled              |
 
 **Why "Impossible to Maintain Manually" Matters:**
 
 When code structure is so consistent that humans couldn't have written it:
+
 1. **Deviations are visible** - Any human edit stands out
 2. **Patterns are learnable** - AI can predict what should exist
 3. **Verification is automatable** - Constitution violations are detectable
@@ -760,28 +827,30 @@ Every line of code traces back to human intent. This is not bureaucracy; this is
 
 ### Role Clarity Matrix
 
-| Activity | Human | AI |
-|----------|-------|-----|
-| Define what success looks like | ✓ | |
-| Define unbreakable rules | ✓ | |
-| Make trade-off decisions | ✓ | |
-| Navigate organizational constraints | ✓ | |
-| Generate task specifications | | ✓ |
-| Execute atomic tasks | | ✓ |
-| Achieve 100% test coverage | | ✓ |
-| Maintain traceability | | ✓ |
-| Verify quality standards | ✓ | |
-| Review and accept deliverables | ✓ | |
+| Activity                            | Human | AI  |
+| ----------------------------------- | ----- | --- |
+| Define what success looks like      | ✓     |     |
+| Define unbreakable rules            | ✓     |     |
+| Make trade-off decisions            | ✓     |     |
+| Navigate organizational constraints | ✓     |     |
+| Generate task specifications        |       | ✓   |
+| Execute atomic tasks                |       | ✓   |
+| Achieve 100% test coverage          |       | ✓   |
+| Maintain traceability               |       | ✓   |
+| Verify quality standards            | ✓     |     |
+| Review and accept deliverables      | ✓     |     |
 
 ### When to Apply SDD
 
 **Use SDD when:**
+
 - Building greenfield systems with clear requirements
 - Refactoring systems where quality standards must improve
 - Working with AI agents that need machine-parseable specs
 - Quality is non-negotiable (regulated industries, safety-critical)
 
 **Don't force SDD when:**
+
 - Exploring and prototyping (Constitution too early)
 - Requirements are genuinely unclear (Blueprint impossible)
 - Single-developer small projects (overhead exceeds benefit)
@@ -791,6 +860,7 @@ Every line of code traces back to human intent. This is not bureaucracy; this is
 > "If all tasks are completed in sequence, the full specification is fully implemented into the codebase."
 
 This works because:
+
 1. Constitution defines immutable rules
 2. Blueprint captures complete intent
 3. Tasks cover 100% of specifications (traceability matrix)

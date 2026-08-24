@@ -17,6 +17,7 @@ Generate comprehensive, clinically rigorous directory entries for the NGM Common
 ```
 
 **Arguments:**
+
 - `<product_name>` - Product to analyze (e.g., "Metformin", "Pendulum Glucose Control")
 - `--output-dir PATH` - Custom output directory (default: content/commons/)
 - `--resume` - Resume from last checkpoint if interrupted
@@ -92,12 +93,14 @@ This skill applies a **KBV2 deep review** followed by three distinct analytical 
 **Method:** Calls the **Signaling KB Semantic Search v2** VectorShift pipeline, which performs two-stage iterative semantic search (Sonnet 4.6 query expansion → 4 parallel KB searches → Opus 4.6 gap analysis → 4 targeted follow-up searches → Opus 4.6 dossier synthesis) across 4 category-specific Knowledge Bases containing 1,165 documents with voyage-4-large embeddings.
 
 **KBs searched:**
+
 - Pathways (152 docs) — Signaling cascades, metabolic axes, pathway crosstalk
 - Interventions (413 docs) — Supplements, drugs, diets, therapies with dosing & evidence
 - Biomarkers (297 docs) — Clinical markers with interpretation patterns & reference ranges
 - Conflicts (303 docs) — Unresolved debates, assay limitations, evidence gaps
 
 **Process:**
+
 1. **Call pipeline** — Run `python3 cli/run_signaling_kb_search.py "<product_name>" --context "<context>" --output .ralph-3lens/kbv2_dossier.json` from the Vectorshift Pipelines directory
 2. **Review output** — Evaluate entity coverage, cross-document connections, citation quality, lens priming completeness
 3. **Local file enrichment** (optional) — Read specific `kb-v2-all/` files identified in `files_to_read_deeper[]` or by cross-references for full-document depth beyond what semantic search chunks provide
@@ -105,6 +108,7 @@ This skill applies a **KBV2 deep review** followed by three distinct analytical 
 **Prompt:** `prompts/kbv2_deep_review.md`
 
 **Quality Gate (7/8 to pass):**
+
 - K.1 `pipeline_executed`: Pipeline ran successfully and returned valid JSON
 - K.2 `entity_breadth`: Entities found in at least 3 of 4 categories
 - K.3 `cross_document_synthesis`: At least 3 recurring themes identified across documents
@@ -125,17 +129,19 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Purpose:** Explain HOW the product works from foundational principles, grounded in KBV2 pathway data
 
 **Process:**
+
 1. Classify product type: biological | technological | service | hybrid
 2. Identify primary molecular/system targets — **cross-reference against KBV2 pathway files**
 3. Map signaling pathways (upstream → downstream) — **using KBV2 pathway crosstalk data**
 4. Generate SVG pathway diagram — **incorporating KBV2 network structure**
 5. Create educational analogies
 
-**KBV2 Integration:** Lens 1 receives the KBV2 dossier's `lens_priming.for_lens_1` which includes grounding pathways, key targets, and diagram elements from the local KB files. The mechanistic analysis should be *grounded in* these curated pathway documents rather than generated from scratch.
+**KBV2 Integration:** Lens 1 receives the KBV2 dossier's `lens_priming.for_lens_1` which includes grounding pathways, key targets, and diagram elements from the local KB files. The mechanistic analysis should be _grounded in_ these curated pathway documents rather than generated from scratch.
 
 **Prompt:** `prompts/lens1_mechanistic.md`
 
 **Quality Gate (5/6 to pass):**
+
 - L1.1 `mechanism_depth`: Specific targets named
 - L1.2 `pathway_accuracy`: Pathways correctly mapped
 - L1.3 `cascade_completeness`: Full trigger → outcome chain
@@ -148,6 +154,7 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Purpose:** Document what the peer-reviewed evidence demonstrates
 
 **Process:**
+
 1. Execute deep research via Perplexity (OpenRouter)
 2. Extract PMIDs/DOIs from results
 3. Grade evidence quality (RCT > Observational > Case > Mechanistic)
@@ -157,6 +164,7 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Prompt:** `prompts/lens2_literature.md`
 
 **Quality Gate (6/7 to pass):**
+
 - L2.1 `citation_validity`: PMIDs/DOIs resolve to real papers
 - L2.2 `evidence_breadth`: 3+ distinct studies cited
 - L2.3 `study_details`: Sample sizes and designs included
@@ -174,6 +182,7 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Source:** `kb-v2-all/` — 1,165 curated markdown files across pathways, interventions, biomarkers, and conflicts. No external API calls needed.
 
 **Process:**
+
 1. Start from KBV2 dossier's `lens_priming.for_lens_3` — intervention landscape, actionability map seeds, and files to read
 2. Read any additional KBV2 files identified during lens execution that weren't in the original dossier
 3. Follow cross-references in documents to discover related files (pathway → intervention → biomarker chains)
@@ -185,6 +194,7 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Prompt:** `prompts/lens3_kb_query.md`
 
 **Quality Gate (5/6 to pass):**
+
 - L3.1 `kb_search_exhaustive`: All query types attempted (direct, target, pathway, indication/biomarker)
 - L3.2 `related_interventions_found`: Related nodes surfaced (minimum 3)
 - L3.3 `mechanism_alignment`: KB claims align with Lens 1
@@ -197,6 +207,7 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Purpose:** Integrate three lenses and the KBV2 dossier into a coherent, deeply grounded narrative
 
 **Process:**
+
 1. Resolve conflicts between lenses — **using KBV2 conflict files for authoritative framing**
 2. Weight evidence appropriately
 3. Generate integrated narrative — **structured around KBV2 narrative threads**
@@ -206,12 +217,14 @@ Execute all three lenses. Each lens receives the KBV2 Context Dossier as input. 
 **Prompt:** `prompts/synthesis.md`
 
 **Conflict Resolution Rules:**
+
 - L1 vs L2 conflict → Evidence (L2) precedence, note discrepancy
 - L2 vs L3 conflict → Surface as "area of ongoing research"
 - L3 has newer data → Update with KB insights
 - **KBV2 conflict file exists** → Use its characterization to frame the uncertainty (these are curated assessments of what the field actually debates)
 
 **Quality Gate (6/6 to pass):**
+
 - S.1 `lens_integration`: All three lenses represented
 - S.2 `conflict_addressed`: Discrepancies noted
 - S.3 `evidence_graded`: Confidence communicated
@@ -326,14 +339,14 @@ COMPLETED: 2026-01-26T10:45:00Z
 
 All LLM calls route through OpenRouter using `OPENROUTER_API_KEY` from environment.
 
-| Phase | Model / Source | Purpose |
-|-------|---------------|---------|
+| Phase            | Model / Source                                                                  | Purpose                                                                      |
+| ---------------- | ------------------------------------------------------------------------------- | ---------------------------------------------------------------------------- |
 | KBV2 Deep Review | VectorShift pipeline: `Signaling KB Semantic Search v2` (Sonnet 4.6 + Opus 4.6) | Two-stage iterative semantic search across 4 KBs (voyage-4-large embeddings) |
-| Lens 1 | `anthropic/claude-opus-4-6` | Mechanistic reasoning (grounded in KBV2 pathways) |
-| Lens 2 | `perplexity/sonar-deep-research` | Literature review (informed by KBV2 gaps) |
-| Lens 3 | Local files (`kb-v2-all/`) + pipeline dossier | KB cross-referencing (read local files for depth beyond search chunks) |
-| Synthesis | `anthropic/claude-opus-4-6` | Integration (with KBV2 narrative threads & conflicts) |
-| Quality Gates | `anthropic/claude-opus-4-6` | Evaluation |
+| Lens 1           | `anthropic/claude-opus-4-6`                                                     | Mechanistic reasoning (grounded in KBV2 pathways)                            |
+| Lens 2           | `perplexity/sonar-deep-research`                                                | Literature review (informed by KBV2 gaps)                                    |
+| Lens 3           | Local files (`kb-v2-all/`) + pipeline dossier                                   | KB cross-referencing (read local files for depth beyond search chunks)       |
+| Synthesis        | `anthropic/claude-opus-4-6`                                                     | Integration (with KBV2 narrative threads & conflicts)                        |
+| Quality Gates    | `anthropic/claude-opus-4-6`                                                     | Evaluation                                                                   |
 
 **VectorShift Pipeline:** `cli/run_signaling_kb_search.py` in `/Users/anantvinjamoori/Vectorshift Pipelines/`
 **Pipeline ID:** `69a859911633ae82dca34874` (registered as `signaling_kb_search` in registry)
@@ -365,6 +378,7 @@ All LLM calls route through OpenRouter using `OPENROUTER_API_KEY` from environme
 - **DON'T:** Reference "expert lecture" source types without peer-reviewed backing
 
 Example transformation:
+
 ```
 KB data: mechanism_claims[].peer_reviewed_citations[0].doi = "10.1126/science.aat9076"
 
@@ -377,6 +391,7 @@ KB data: mechanism_claims[].peer_reviewed_citations[0].doi = "10.1126/science.aa
 ## Output Format: Elevated Scientific Listicle
 
 The output is an **elevated, highly scientific, research-driven listicle**—not a superficial "top 5" list. This format:
+
 - Satisfies LLM extraction patterns (structured for AI citation)
 - Provides genuine clinical value (substantive enough that practitioners learn)
 - Positions vendors positively ("notable for" framing, no rankings)
@@ -391,20 +406,21 @@ The output is an **elevated, highly scientific, research-driven listicle**—not
 
 ### Required Content Depth
 
-| Section | Word Count | Key Elements |
-|---------|------------|--------------|
-| Quick Reference Table | N/A | 5-6 rows, 4-5 columns at page top |
-| Executive Summary | 300-400 | Clinical value proposition |
-| Technology | 800-1000 | H3 per methodology, comparison table, diagram |
-| Evidence | 600-800 | Graded table, nuance callouts, inline Q&A |
-| Each Entity | 400-600 | Quick facts, approach depth, clinical fit, evidence |
-| Decision Support | 500-700 | Action pathways table, expectations |
-| FAQ | 500-800 | 6-10 Q&A pairs, front-loaded answers |
-| **Total** | **5,000-7,000** | Comprehensive clinical guide |
+| Section               | Word Count      | Key Elements                                        |
+| --------------------- | --------------- | --------------------------------------------------- |
+| Quick Reference Table | N/A             | 5-6 rows, 4-5 columns at page top                   |
+| Executive Summary     | 300-400         | Clinical value proposition                          |
+| Technology            | 800-1000        | H3 per methodology, comparison table, diagram       |
+| Evidence              | 600-800         | Graded table, nuance callouts, inline Q&A           |
+| Each Entity           | 400-600         | Quick facts, approach depth, clinical fit, evidence |
+| Decision Support      | 500-700         | Action pathways table, expectations                 |
+| FAQ                   | 500-800         | 6-10 Q&A pairs, front-loaded answers                |
+| **Total**             | **5,000-7,000** | Comprehensive clinical guide                        |
 
 ### Inline Q&A Distribution
 
 Q&A blocks must be woven throughout—not siloed in FAQ section:
+
 - Technology section: methodology comparisons
 - Evidence section: interpretation guidance
 - Decision support: actionability questions
@@ -420,51 +436,54 @@ See `context/aeo-best-practices.md` for detailed AEO requirements.
 
 ### Design System Requirements
 
-| Element | Specification |
-|---------|---------------|
-| **Fonts** | Google Fonts: `Inter` (sans) + `Cormorant Garamond` (serif) — NEVER use system fonts |
-| **Color Palette** | Warm editorial: `--ink-900: #302C27`, `--gold: #C49A6C`, `--green: #5C8A6B` |
-| **Layout** | `max-width: 860px`, centered, `padding: 48px 20px` |
-| **Entity Cards** | `.entity-section` with `border: 1px solid`, `border-radius: 12px` |
-| **Tables** | `.quick-reference` with dark header row (`--ink-900`) |
-| **Breadcrumbs** | Always include navigation back to overview |
-| **Framework Badge** | Fixed position bottom-right: `3lens-v1 | {category}` |
+| Element             | Specification                                                                        |
+| ------------------- | ------------------------------------------------------------------------------------ |
+| **Fonts**           | Google Fonts: `Inter` (sans) + `Cormorant Garamond` (serif) — NEVER use system fonts |
+| **Color Palette**   | Warm editorial: `--ink-900: #302C27`, `--gold: #C49A6C`, `--green: #5C8A6B`          |
+| **Layout**          | `max-width: 860px`, centered, `padding: 48px 20px`                                   |
+| **Entity Cards**    | `.entity-section` with `border: 1px solid`, `border-radius: 12px`                    |
+| **Tables**          | `.quick-reference` with dark header row (`--ink-900`)                                |
+| **Breadcrumbs**     | Always include navigation back to overview                                           |
+| **Framework Badge** | Fixed position bottom-right: `3lens-v1                                               | {category}` |
 
 ### Category Color Mapping
 
-| Category | Primary Color | Badge Class |
-|----------|---------------|-------------|
-| Gut Microbiome | `--green: #5C8A6B` | `.badge-green` |
-| Oral Microbiome | `--blue: #5C7A8A` | `.badge-blue` |
-| Vaginal Microbiome | `--purple: #7A6C8A` | `.badge-purple` |
+| Category            | Primary Color       | Badge Class     |
+| ------------------- | ------------------- | --------------- |
+| Gut Microbiome      | `--green: #5C8A6B`  | `.badge-green`  |
+| Oral Microbiome     | `--blue: #5C7A8A`   | `.badge-blue`   |
+| Vaginal Microbiome  | `--purple: #7A6C8A` | `.badge-purple` |
 | SIBO Breath Testing | `--orange: #D4845C` | `.badge-orange` |
-| Overview/Default | `--gold: #C49A6C` | `.badge-gold` |
+| Overview/Default    | `--gold: #C49A6C`   | `.badge-gold`   |
 
 ### Required HTML Structure
 
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <!-- Google Fonts - REQUIRED -->
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
-</head>
-<body>
-  <article>
-    <nav class="breadcrumb">...</nav>
-    <header>...</header>
-    <section><!-- Quick Reference Table --></section>
-    <section><!-- Executive Summary with .summary-box --></section>
-    <div class="kb-insight"><!-- KB Citation Callout --></div>
-    <div class="entity-section"><!-- Vendor 1 --></div>
-    <div class="entity-section"><!-- Vendor 2 --></div>
-    <!-- ... -->
-    <section><!-- Clinical Decision Support --></section>
-    <section><!-- FAQ --></section>
-    <section class="sources"><!-- Sources with PMIDs --></section>
-  </article>
-  <div class="framework-badge">3lens-v1 | {category}</div>
-</body>
+  <head>
+    <!-- Google Fonts - REQUIRED -->
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <article>
+      <nav class="breadcrumb">...</nav>
+      <header>...</header>
+      <section><!-- Quick Reference Table --></section>
+      <section><!-- Executive Summary with .summary-box --></section>
+      <div class="kb-insight"><!-- KB Citation Callout --></div>
+      <div class="entity-section"><!-- Vendor 1 --></div>
+      <div class="entity-section"><!-- Vendor 2 --></div>
+      <!-- ... -->
+      <section><!-- Clinical Decision Support --></section>
+      <section><!-- FAQ --></section>
+      <section class="sources"><!-- Sources with PMIDs --></section>
+    </article>
+    <div class="framework-badge">3lens-v1 | {category}</div>
+  </body>
 </html>
 ```
 
@@ -548,18 +567,18 @@ The guide format separates content into two layers with different depth levels:
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
-> **Why no company directory layer?** Naming companies for free in the guide body reduces the commercial value of Featured Partner sponsorships. Instead, the guide provides a *platform-type framework* that teaches clinicians how to evaluate any company in the space, while Featured Partners receive the only explicit company mentions — visible to practitioners actively learning about the category.
+> **Why no company directory layer?** Naming companies for free in the guide body reduces the commercial value of Featured Partner sponsorships. Instead, the guide provides a _platform-type framework_ that teaches clinicians how to evaluate any company in the space, while Featured Partners receive the only explicit company mentions — visible to practitioners actively learning about the category.
 
 ### How Guide Mode Changes Each Phase
 
-| Phase | Default (Listicle) | Guide Mode |
-|-------|-------------------|------------|
-| **Lens 1-3** | Same | Same — all lenses execute identically |
-| **Synthesis** | Uses `prompts/synthesis.md` | Uses `prompts/synthesis_guide.md` |
-| **Assembly** | Uses `prompts/html_template.md` + `templates/directory_page.html` | Uses `prompts/html_template_guide.md` + `templates/guide_page.html` |
-| **Output JSON** | `directory_content.json` | `guide_content.json` |
-| **Output HTML** | `directory_page.html` | `guide_page.html` |
-| **Framework badge** | `3lens-v1 | {category}` | `3lens-guide-v2 | {category}` |
+| Phase               | Default (Listicle)                                                | Guide Mode                                                          |
+| ------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
+| **Lens 1-3**        | Same                                                              | Same — all lenses execute identically                               |
+| **Synthesis**       | Uses `prompts/synthesis.md`                                       | Uses `prompts/synthesis_guide.md`                                   |
+| **Assembly**        | Uses `prompts/html_template.md` + `templates/directory_page.html` | Uses `prompts/html_template_guide.md` + `templates/guide_page.html` |
+| **Output JSON**     | `directory_content.json`                                          | `guide_content.json`                                                |
+| **Output HTML**     | `directory_page.html`                                             | `guide_page.html`                                                   |
+| **Framework badge** | `3lens-v1                                                         | {category}`                                                         | `3lens-guide-v2 | {category}` |
 
 ### Guide-Specific JSON Schema
 
@@ -619,42 +638,43 @@ The guide format separates content into two layers with different depth levels:
 
 **Synthesis (Guide Mode) — 10/12 to pass:**
 
-| Gate | Check |
-|------|-------|
-| G.1 `first_principles_lead` | Guide opens with conceptual framework, not company names |
-| G.2 `methodology_education` | Each approach explained from mechanisms, not product descriptions |
-| G.3 `evaluation_framework_present` | Clear criteria for what "good" looks like |
-| G.4 `no_company_names` | **ZERO specific company names in guide body** — uses platform-type frameworks instead |
-| G.5 `partner_labeling` | Featured partner sections clearly labeled "Featured Partner" |
-| G.6 `platform_types_framework` | Commercial landscape presented via platform-type categories with "What to Ask" and "Typical Price Range" columns |
-| G.7 `no_ranking_in_guide` | Guide teaches principles, never ranks or recommends |
-| G.8 `kb_integration` | KB insights woven into framework sections (not siloed) |
-| G.9 `depth_gradient_clear` | Visual/structural difference between guide, partner profiles |
-| G.10 `vendor_tone_check` | Same banned language rules as default mode |
-| G.11 `editorial_design_v2` | Uses Cormorant Garamond + Source Serif 4 + DM Sans; NO card grids; typography-driven hierarchy |
-| G.12 `mechanism_diagrams` | At least 1 SVG shows actual biological machinery (enzymes, metabolites, signaling arrows) — not generic infographic boxes |
+| Gate                               | Check                                                                                                                     |
+| ---------------------------------- | ------------------------------------------------------------------------------------------------------------------------- |
+| G.1 `first_principles_lead`        | Guide opens with conceptual framework, not company names                                                                  |
+| G.2 `methodology_education`        | Each approach explained from mechanisms, not product descriptions                                                         |
+| G.3 `evaluation_framework_present` | Clear criteria for what "good" looks like                                                                                 |
+| G.4 `no_company_names`             | **ZERO specific company names in guide body** — uses platform-type frameworks instead                                     |
+| G.5 `partner_labeling`             | Featured partner sections clearly labeled "Featured Partner"                                                              |
+| G.6 `platform_types_framework`     | Commercial landscape presented via platform-type categories with "What to Ask" and "Typical Price Range" columns          |
+| G.7 `no_ranking_in_guide`          | Guide teaches principles, never ranks or recommends                                                                       |
+| G.8 `kb_integration`               | KB insights woven into framework sections (not siloed)                                                                    |
+| G.9 `depth_gradient_clear`         | Visual/structural difference between guide, partner profiles                                                              |
+| G.10 `vendor_tone_check`           | Same banned language rules as default mode                                                                                |
+| G.11 `editorial_design_v2`         | Uses Cormorant Garamond + Source Serif 4 + DM Sans; NO card grids; typography-driven hierarchy                            |
+| G.12 `mechanism_diagrams`          | At least 1 SVG shows actual biological machinery (enzymes, metabolites, signaling arrows) — not generic infographic boxes |
 
 ### Design System: Guide Page (v2 — Editorial Typography)
 
-**Guide pages use `templates/guide_page.html`** with the **v2 editorial design system** — a typography-driven hierarchy. Think *Nature Reviews* meets *Kinfolk*. NO card grids, NO container-heavy patterns.
+**Guide pages use `templates/guide_page.html`** with the **v2 editorial design system** — a typography-driven hierarchy. Think _Nature Reviews_ meets _Kinfolk_. NO card grids, NO container-heavy patterns.
 
 **Fonts:** Cormorant Garamond (display/headers), Source Serif 4 (body), DM Sans (UI/labels/tables)
 **Color palette:** `--paper: #FEFDFB`, `--accent: #8B7355`, `--green: #4A7A5A`, `--blue: #4A6A7A`, `--orange: #B06840`, `--purple: #6A5A7A`
 
-| Component | Class | Purpose |
-|-----------|-------|---------|
-| Bottom line | `.bottom-line` | Single prose paragraph with left accent border (replaces summary cards) |
-| Section marker | `.section-marker` + `.section-num` | Roman numerals (I, II, III) in accent color |
-| Pull quote | `.pull-quote` | Centered Cormorant italic between thin rules |
-| Evaluation criterion | `.criterion` + `.criterion-header` + `.criterion-name` + `.criterion-question` | Vertical typographic stack with thin rules (NOT card grid) |
-| Mechanistic note | `.mechanistic-note` | Green left border insight callout (no box) |
-| Collapsible detail | `<details>` + `.detail-body` | Left border indent for dense content |
-| Platform-types table | Standard `<table>` with typographic headers | Categories the commercial landscape by type (no company names) |
-| Featured partner | `.featured-partner` + `.badge-partner` | Deep profile card with accent border (sponsors only) |
-| Partner CTA | `.partner-cta` | Dark-background "Become a Featured Partner" block |
-| Layer label | `.layer-label-wrap` + `.layer-label` | Centered label between thin rules dividing content layers |
+| Component            | Class                                                                          | Purpose                                                                 |
+| -------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| Bottom line          | `.bottom-line`                                                                 | Single prose paragraph with left accent border (replaces summary cards) |
+| Section marker       | `.section-marker` + `.section-num`                                             | Roman numerals (I, II, III) in accent color                             |
+| Pull quote           | `.pull-quote`                                                                  | Centered Cormorant italic between thin rules                            |
+| Evaluation criterion | `.criterion` + `.criterion-header` + `.criterion-name` + `.criterion-question` | Vertical typographic stack with thin rules (NOT card grid)              |
+| Mechanistic note     | `.mechanistic-note`                                                            | Green left border insight callout (no box)                              |
+| Collapsible detail   | `<details>` + `.detail-body`                                                   | Left border indent for dense content                                    |
+| Platform-types table | Standard `<table>` with typographic headers                                    | Categories the commercial landscape by type (no company names)          |
+| Featured partner     | `.featured-partner` + `.badge-partner`                                         | Deep profile card with accent border (sponsors only)                    |
+| Partner CTA          | `.partner-cta`                                                                 | Dark-background "Become a Featured Partner" block                       |
+| Layer label          | `.layer-label-wrap` + `.layer-label`                                           | Centered label between thin rules dividing content layers               |
 
 **CRITICAL DESIGN RULES:**
+
 1. **No card grids** — NEVER use `.principles-grid`, `.summary-cards`, or card-in-grid patterns
 2. **No company names in guide body** — Use platform-type frameworks; only sponsors get named in Featured Partner profiles
 3. **Max 3 sentences per paragraph** — Bold the first sentence
@@ -682,15 +702,15 @@ When `--company-profile <company_name>` is passed, the generator produces a **de
 
 ### How Company Profile Mode Changes Each Phase
 
-| Phase | Default (Listicle) | Company Profile |
-|-------|-------------------|-----------------|
-| **KBV2 Deep Review** | Same | Same — full KB scan |
-| **Lens 1-3** | Multi-entity analysis | Focused on single company within category context |
-| **Synthesis** | Uses `prompts/synthesis.md` | Uses `prompts/synthesis_company.md` |
-| **Assembly** | Uses `templates/directory_page.html` | Uses `templates/company_page.html` |
-| **Output JSON** | `directory_content.json` | `company_content.json` |
-| **Output HTML** | `directory_page.html` | `company_page.html` |
-| **Framework badge** | `3lens-v1 \| {category}` | `company-v1 \| {category}` |
+| Phase                | Default (Listicle)                   | Company Profile                                   |
+| -------------------- | ------------------------------------ | ------------------------------------------------- |
+| **KBV2 Deep Review** | Same                                 | Same — full KB scan                               |
+| **Lens 1-3**         | Multi-entity analysis                | Focused on single company within category context |
+| **Synthesis**        | Uses `prompts/synthesis.md`          | Uses `prompts/synthesis_company.md`               |
+| **Assembly**         | Uses `templates/directory_page.html` | Uses `templates/company_page.html`                |
+| **Output JSON**      | `directory_content.json`             | `company_content.json`                            |
+| **Output HTML**      | `directory_page.html`                | `company_page.html`                               |
+| **Framework badge**  | `3lens-v1 \| {category}`             | `company-v1 \| {category}`                        |
 
 ### Content Structure
 
@@ -724,40 +744,40 @@ Company Hero (name, tagline, badge, quick facts grid)
 
 ### Tier-Aware Content Depth
 
-| Aspect | Tier 2 (Company Page) | Tier 3 (Strategic Partner) |
-|--------|----------------------|--------------------------|
-| **Total words** | 4,000-6,000 | 6,000-8,000 |
-| **Inline Q&A** | Minimum 3 | Minimum 5 |
-| **Badge** | "Verified Partner" | "Strategic Partner" |
-| **Video section** | Included | Included |
-| **KB integration** | Standard | Extended (more intervention mappings) |
+| Aspect             | Tier 2 (Company Page) | Tier 3 (Strategic Partner)            |
+| ------------------ | --------------------- | ------------------------------------- |
+| **Total words**    | 4,000-6,000           | 6,000-8,000                           |
+| **Inline Q&A**     | Minimum 3             | Minimum 5                             |
+| **Badge**          | "Verified Partner"    | "Strategic Partner"                   |
+| **Video section**  | Included              | Included                              |
+| **KB integration** | Standard              | Extended (more intervention mappings) |
 
 ### Company Profile Quality Gates (5/5 must pass)
 
-| Gate | Check |
-|------|-------|
-| CP.1 `clinical_voice_throughout` | Every section answers "so what?" from a clinician's perspective |
-| CP.2 `vendor_positive_framing` | Company positioned via "notable for" — zero ranking language |
-| CP.3 `evidence_honestly_graded` | All studies have explicit evidence levels; unknowns acknowledged |
-| CP.4 `kb_wisdom_integrated` | KBV2 content enriches at least 3 of 5 major sections |
-| CP.5 `actionability_clear` | Clinician can answer "should I use this?" after reading |
+| Gate                             | Check                                                            |
+| -------------------------------- | ---------------------------------------------------------------- |
+| CP.1 `clinical_voice_throughout` | Every section answers "so what?" from a clinician's perspective  |
+| CP.2 `vendor_positive_framing`   | Company positioned via "notable for" — zero ranking language     |
+| CP.3 `evidence_honestly_graded`  | All studies have explicit evidence levels; unknowns acknowledged |
+| CP.4 `kb_wisdom_integrated`      | KBV2 content enriches at least 3 of 5 major sections             |
+| CP.5 `actionability_clear`       | Clinician can answer "should I use this?" after reading          |
 
 ### Design System: Company Page
 
 **Company pages use `templates/company_page.html`** with these components:
 
-| Component | Class | Purpose |
-|-----------|-------|---------|
-| Company header | `.company-header` | Breadcrumb, badge, title, subtitle |
-| Quick facts | `.quick-facts` | Grid of key company data points |
-| Summary box | `.summary-box` | Gold-bordered executive summary |
-| Evidence table | `.evidence-table` | Study details with evidence badges |
-| Evidence badges | `.evidence-strong` / `.evidence-moderate` / `.evidence-emerging` / `.evidence-preliminary` | Color-coded evidence levels |
-| Inline Q&A | `.inline-qa` | Green-bordered Q&A callouts |
-| KB insight | `.kb-insight` | Green left-border knowledge base insights |
-| Comparison table | `.comparison-table` + `.current-company` | Category positioning with highlighted row |
-| Video section | `.video-section` | Vendor video embed placeholder |
-| Vendor CTA | `.vendor-cta` | Gold-bordered call-to-action |
+| Component        | Class                                                                                      | Purpose                                   |
+| ---------------- | ------------------------------------------------------------------------------------------ | ----------------------------------------- |
+| Company header   | `.company-header`                                                                          | Breadcrumb, badge, title, subtitle        |
+| Quick facts      | `.quick-facts`                                                                             | Grid of key company data points           |
+| Summary box      | `.summary-box`                                                                             | Gold-bordered executive summary           |
+| Evidence table   | `.evidence-table`                                                                          | Study details with evidence badges        |
+| Evidence badges  | `.evidence-strong` / `.evidence-moderate` / `.evidence-emerging` / `.evidence-preliminary` | Color-coded evidence levels               |
+| Inline Q&A       | `.inline-qa`                                                                               | Green-bordered Q&A callouts               |
+| KB insight       | `.kb-insight`                                                                              | Green left-border knowledge base insights |
+| Comparison table | `.comparison-table` + `.current-company`                                                   | Category positioning with highlighted row |
+| Video section    | `.video-section`                                                                           | Vendor video embed placeholder            |
+| Vendor CTA       | `.vendor-cta`                                                                              | Gold-bordered call-to-action              |
 
 ### Example Invocation
 
@@ -777,21 +797,25 @@ Company Hero (name, tagline, badge, quick facts grid)
 ## Troubleshooting
 
 **Lens 1 fails L1.5 (diagram_validity):**
+
 - Check SVG viewBox dimensions match content
 - Ensure 40px padding on all sides
 - Validate text doesn't overflow containers
 
 **Lens 2 fails L2.1 (citation_validity):**
+
 - Some Perplexity citations may be hallucinated
 - Cross-verify PMIDs via PubMed API
 - Remove unverifiable citations
 
 **Lens 3 finds no KB node:**
+
 - Product may be new to KB
 - Graceful degradation via L3.6
 - Use indirect queries (target, pathway) to find related interventions
 
 **Synthesis fails S.2 (conflict_addressed):**
+
 - Review all three lens outputs for discrepancies
 - Explicitly note where lenses disagree
 - Provide characterization of conflict nature

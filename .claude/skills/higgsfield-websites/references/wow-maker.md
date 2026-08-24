@@ -39,7 +39,7 @@ first and plan to "add polish later" — you won't.
 
 **Restraint is NOT an excuse to skip wow.** "Clean", "minimal", "trustworthy",
 "Linear-like", "Notion-like" briefs STILL require a real wow moment — restraint means
-the wow is *precise and deliberate*, not absent. Linear has a deliberate gradient +
+the wow is _precise and deliberate_, not absent. Linear has a deliberate gradient +
 smooth scroll; Notion has crisp motion; a children's clinic can have animated stats +
 a soft signature effect. Never use a minimal/serious brief as cover to ship a plain
 page.
@@ -90,6 +90,7 @@ a param/model is rejected, run `higgsfield model list` +
 stock/picsum as the final asset.
 
 **What to generate, and where it lands:**
+
 - **Hero image / background** — the centerpiece visual (full-bleed or behind glass).
 - **Section textures / atmospheric plates** — backdrops that crossfade per section.
 - **Video loop / showreel** — a seamless `seedance_2_0` clip for a hero or band.
@@ -114,41 +115,41 @@ mandates. Pair every one with generated assets (§1) and the SSR pattern (bottom
 
 - **Particle-morph hero** `[W]` — ~4-6k Three.js instanced points that morph through
   the scroll (sphere → the product's silhouette → disperse), recolored/relit per
-  scroll stage. *Build:* `three` instanced points + a scroll-driven lerp between
-  precomputed target positions. *Fits:* premium product/brand (perfume, spirits,
+  scroll stage. _Build:_ `three` instanced points + a scroll-driven lerp between
+  precomputed target positions. _Fits:_ premium product/brand (perfume, spirits,
   jewelry, tech). Tune shape/finish/`envColor` to the niche so it never reads generic.
 - **Fluid + smooth-scroll studio** `[W]` — a fixed WebGL fluid/gradient backdrop with
   a rotating point cloud, weighty Lenis scroll, GSAP ScrollTrigger reveals, and a
-  **staggered 2-column video grid** (not a carousel). *Build:* `three` + `gsap` +
-  `lenis` (or `@shadergradient/react` for the backdrop). *Fits:* studios, agencies.
+  **staggered 2-column video grid** (not a carousel). _Build:_ `three` + `gsap` +
+  `lenis` (or `@shadergradient/react` for the backdrop). _Fits:_ studios, agencies.
 - **Camera-dolly product switcher** `[W]` — the active product dollies toward camera
   while the next approaches from depth and the bg color lerps; drag/wheel/tabs +
-  spring snap + autoplay. *Build:* `@react-three/fiber` + `gsap`, scenes as data.
-  *Fits:* multi-variant product / flavor showcases.
+  spring snap + autoplay. _Build:_ `@react-three/fiber` + `gsap`, scenes as data.
+  _Fits:_ multi-variant product / flavor showcases.
 - **Hold-to-spin 3D showroom** `[W]` — a clay/toy-look turntable: a 3D subject on a
-  stepped platform, hold to spin with inertia, click hotspots for detail. *Build:*
+  stepped platform, hold to spin with inertia, click hotspots for detail. _Build:_
   `three` + `@react-three/fiber` + `@react-three/drei` (+ `image_to_3d` assets).
-  *Fits:* apparel, physical products, collectibles.
+  _Fits:_ apparel, physical products, collectibles.
 - **Cursor X-ray reveal** `[C]` — a full-screen photo with an aligned "X-ray"
   substrate beneath; a soft feathered lens follows the cursor and dissolves the cover
-  into the truth underneath. *Build:* pure React + a CSS `mask-image` at the cursor,
-  no 3D/GSAP. *Fits:* editorial deep-dives, "look inside" product stories. (Strictly
+  into the truth underneath. _Build:_ pure React + a CSS `mask-image` at the cursor,
+  no 3D/GSAP. _Fits:_ editorial deep-dives, "look inside" product stories. (Strictly
   B&W + one breathing accent reads most premium.)
 - **Scroll-scrub film** `[C]` — an AI-generated ~15s film extracted to frames and
   drawn on a `<canvas>`, scrubbed forward/back by scroll, caption cards fading in.
-  *Build:* generate the film (§1) → ffmpeg frames into `public/frames/` → canvas +
-  rAF scrub. *Fits:* high-impact brand reveals / launches (dark, cinematic).
+  _Build:_ generate the film (§1) → ffmpeg frames into `public/frames/` → canvas +
+  rAF scrub. _Fits:_ high-impact brand reveals / launches (dark, cinematic).
 - **Frosted-card scrubber** `[C]` — the warm, light variant: a lifestyle film scrubs
-  behind translucent frosted serif cards, then resolves into content panels. *Fits:*
+  behind translucent frosted serif cards, then resolves into content panels. _Fits:_
   boutiques, cafés, florists, ateliers.
 - **Magnetic gallery wall** `[C]` — an infinite draggable wall of tiles with magnetic
-  hover, 3D tilt, a burst intro, and click-to-zoom into a circular gallery. *Build:*
-  one shared pointer-physics handler + inertia + modulo wrap. *Fits:* portfolios,
+  hover, 3D tilt, a burst intro, and click-to-zoom into a circular gallery. _Build:_
+  one shared pointer-physics handler + inertia + modulo wrap. _Fits:_ portfolios,
   galleries, visual merch.
 - **Kinetic portfolio** `[C]` — the full motion suite: Lenis smooth scroll, GSAP
   reveals + scroll-velocity skew, magnetic elements, custom cursor + hero spotlight,
-  one marquee, a Swiper vinyl carousel, live clock. *Build:* `gsap` + `lenis` +
-  `swiper`. *Fits:* personal sites, résumés, creative showcases.
+  one marquee, a Swiper vinyl carousel, live clock. _Build:_ `gsap` + `lenis` +
+  `swiper`. _Fits:_ personal sites, résumés, creative showcases.
 
 ---
 
@@ -181,22 +182,22 @@ mandates. Pair every one with generated assets (§1) and the SSR pattern (bottom
 
 ## 4. Framework toolkit (npm deps — add to `app/package.json` when used)
 
-| Library (npm) | License | Wow it adds | SSR |
-|---|---|---|---|
-| `motion` (`motion/react`) | MIT | enter/exit (`AnimatePresence`), layout/FLIP, springs, `useScroll`/`useInView`, gestures | `[C]` |
-| `gsap` + `@gsap/react` | GSAP Standard License (free, all plugins) | ScrollTrigger pinned/scrubbed sequences, timelines, `SplitText`; use `useGSAP()` | `[C]` |
-| `lenis` (`lenis/react`) | MIT | weighted buttery smooth scroll; `<ReactLenis root>` | `[C]` |
-| `three` + `@react-three/fiber` + `@react-three/drei` | MIT | real-time 3D, GLTF/PBR, glass, particle fields, camera flythroughs | `[W]` |
-| `@react-three/postprocessing` + `postprocessing` | Zlib/MIT | bloom, DOF, glitch, chromatic aberration on the R3F stack | `[W]` |
-| `@shadergradient/react` | MIT | premium animated 3D gradient hero/section backdrop (peers: `three`, `@react-three/fiber`, `three-stdlib`, `camera-controls`) | `[W]` |
-| `@tsparticles/react` + `@tsparticles/slim` / `@tsparticles/confetti` | MIT | particle fields, interactive backgrounds, confetti (vanilla canvas) | `[C]` |
-| `cobe` | MIT | the 5KB rotating WebGL globe | `[W]` |
-| `ogl` | Unlicense | bespoke custom-shader hero without three.js bulk | `[W]` |
-| `maath` | MIT | math/easing helpers for R3F (point spheres, `easing.damp`) | `[S]` |
-| `animejs` (v4) | MIT | SVG line-draw/morph, staggered reveals, timelines | `[C]` |
-| `@number-flow/react` | MIT | animated odometer number/price transitions | `[C]` |
-| `split-type` | MIT | split text into lines/words/chars (pair with GSAP/Motion) | `[C]` |
-| `swiper` | MIT | touch sliders / coverflow carousels | `[C]` |
+| Library (npm)                                                        | License                                   | Wow it adds                                                                                                                  | SSR   |
+| -------------------------------------------------------------------- | ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----- |
+| `motion` (`motion/react`)                                            | MIT                                       | enter/exit (`AnimatePresence`), layout/FLIP, springs, `useScroll`/`useInView`, gestures                                      | `[C]` |
+| `gsap` + `@gsap/react`                                               | GSAP Standard License (free, all plugins) | ScrollTrigger pinned/scrubbed sequences, timelines, `SplitText`; use `useGSAP()`                                             | `[C]` |
+| `lenis` (`lenis/react`)                                              | MIT                                       | weighted buttery smooth scroll; `<ReactLenis root>`                                                                          | `[C]` |
+| `three` + `@react-three/fiber` + `@react-three/drei`                 | MIT                                       | real-time 3D, GLTF/PBR, glass, particle fields, camera flythroughs                                                           | `[W]` |
+| `@react-three/postprocessing` + `postprocessing`                     | Zlib/MIT                                  | bloom, DOF, glitch, chromatic aberration on the R3F stack                                                                    | `[W]` |
+| `@shadergradient/react`                                              | MIT                                       | premium animated 3D gradient hero/section backdrop (peers: `three`, `@react-three/fiber`, `three-stdlib`, `camera-controls`) | `[W]` |
+| `@tsparticles/react` + `@tsparticles/slim` / `@tsparticles/confetti` | MIT                                       | particle fields, interactive backgrounds, confetti (vanilla canvas)                                                          | `[C]` |
+| `cobe`                                                               | MIT                                       | the 5KB rotating WebGL globe                                                                                                 | `[W]` |
+| `ogl`                                                                | Unlicense                                 | bespoke custom-shader hero without three.js bulk                                                                             | `[W]` |
+| `maath`                                                              | MIT                                       | math/easing helpers for R3F (point spheres, `easing.damp`)                                                                   | `[S]` |
+| `animejs` (v4)                                                       | MIT                                       | SVG line-draw/morph, staggered reveals, timelines                                                                            | `[C]` |
+| `@number-flow/react`                                                 | MIT                                       | animated odometer number/price transitions                                                                                   | `[C]` |
+| `split-type`                                                         | MIT                                       | split text into lines/words/chars (pair with GSAP/Motion)                                                                    | `[C]` |
+| `swiper`                                                             | MIT                                       | touch sliders / coverflow carousels                                                                                          | `[C]` |
 
 drei caveat: use `<Environment files={…}>` with a self-hosted CC0 HDRI in `public/`,
 not `preset=` (it fetches a CDN at runtime). Keep all `three`/shader code in a
@@ -211,6 +212,7 @@ Namespaced registries must be registered in `app/components.json` first (block b
 URL-based ones install directly.
 
 ### `app/components.json` → `registries`
+
 ```jsonc
 "registries": {
   "@magicui":           "https://magicui.design/r/{name}.json",
@@ -223,36 +225,47 @@ URL-based ones install directly.
   "@eldoraui":          "https://eldoraui.site/r/{name}.json"
 }
 ```
+
 (`@shadcn` is built in. Verify a URL at wire-time if an `add` 404s.)
 
 ### shadcn/ui — base layer + app blocks · `npx shadcn@latest add <name>`
+
 Primitives (mostly `[S]`/`[C]`): `button` `card` `input` `select` `dialog` `drawer` `sheet` `sonner` `tabs` `accordion` `breadcrumb` `navigation-menu` `command` (⌘K) `table` `skeleton` `spinner`. Rich `[C]`: `carousel` (embla), `data-table` (TanStack Table), `chart` (recharts), `date-picker`. Full blocks: `sidebar-07/03/08/15/16`, `dashboard-01`, `login-01/03/04`, `calendar-01…32`, `products-01`.
 
 ### Magic UI — effects/backgrounds/text · `npx shadcn@latest add "https://magicui.design/r/<name>.json"`
+
 Backgrounds: `light-rays` `[W]`, `warp-background` `[C]`, `retro-grid` `[S]`, `ripple` `[S]`, `meteors` `[S]`, `particles` `[C]`, `flickering-grid` `[C]`, `dot-pattern`/`grid-pattern` `[S]`, `border-beam` `[S]`. Cards: `magic-card` `[C]`, `neon-gradient-card` `[S]`, `bento-grid` `[S]`, `shine-border` `[S]`. Buttons: `shimmer-button`/`rainbow-button`/`interactive-hover-button`/`pulsating-button` `[S]`. Text: `aurora-text`/`animated-shiny-text` `[S]`, `sparkles-text`/`morphing-text`/`hyper-text`/`number-ticker` `[C]`. Scroll/marquee: `text-reveal`/`blur-fade` `[C]`, `marquee` `[S]`, `scroll-based-velocity` `[C]`. Misc: `globe` `[W]`, `orbiting-circles` `[S]`, `animated-beam` `[C]`, `confetti` `[C]`, `dock` `[C]`, `terminal` `[C]`, `safari`/`iphone` mockups `[S]`, `smooth-cursor` `[C]`.
 
 ### Cult UI (free) · `npx shadcn@latest add https://www.cult-ui.com/r/<name>.json`
+
 Heroes: `hero-liquid-metal`/`hero-dithering`/`hero-heatmap` `[W]`, `hero-color-panel` `[C]`, `hero-static-radial-gradient` `[S]`. Backgrounds/shader: `shader-lens-blur`/`canvas-fractal-grid`/`distorted-glass`/`dither-image`/`morph-surface` `[W]`, `bg-animated-gradient`/`bg-media` `[C]`, `stripe-bg-guides` `[S]`. Text: `gradient-heading` `[S]`, `text-animate`/`typewriter`/`pixel-heading-word`/`text-gif` `[C]`. Buttons: `texture-button`/`metal-button`/`neumorph-button` `[S]`, `family-button`/`bg-animate-button`/`border-beam-button` `[C]`. Cards: `texture-card`/`minimal-card`/`cutout-card` `[S]`, `expandable-card`/`shift-card` `[C]`. Nav/misc `[C]`: `dock`/`floating-panel`/`side-panel`/`direction-aware-tabs`/`three-d-carousel`/`feature-carousel`/`logo-carousel`/`dynamic-island`/`sortable-list`/`color-picker`/`terminal-animation`/`animated-number`.
 
 ### SmoothUI · `npx shadcn@latest add @smoothui/<name>`
+
 Cards: `apple-invites`/`app-download-stack`/`expandable-cards`/`glow-hover-card`/`scrollable-card-stack` `[C]`. Text: `reveal-text`/`scramble-hover`/`typewriter-text`/`wave-text`/`number-flow`/`price-flow`/`scroll-reveal-paragraph` `[C]`. Buttons: `magnetic-button`/`clip-corners-button`/`dot-morph-button`/`button-copy` `[C]`. Inputs: `power-off-slide`/`exposure-slider`/`scrubber`/`animated-file-upload` `[C]`. Misc: `siri-orb`/`dynamic-island`/`animated-tabs`/`gooey-popover`/`cursor-follow`/`infinite-slider`/`reviews-carousel`/`book`/`animated-avatar-group` `[C]`, `contribution-graph` `[S]`.
 
 ### chanhdai (@ncdai) · `npx shadcn@latest add @ncdai/<name>`
+
 Text: `apple-hello-effect` (handwritten SVG signature)/`shimmering-text`/`fluid-gradient-text`/`text-flip` `[C]`, `spinning-circular-text` `[S]`. Hero/bg/cards `[C]`: `hero-01`/`dot-grid-spotlight`/`glow-card-grid`/`testimonial-spotlight`/`team-01`. Inputs `[C]`: `wheel-picker`/`elastic-slider`/`slide-to-unlock`. Marquee/nav: `testimonials-marquee` `[S]`, `logos-carousel`/`line-nav`/`share-menu`/`toc-minimap`/`scroll-fade-effect` `[C]`. Misc `[C]`: `theme-switcher`/`copy-button`/`spotlight-logo`/`icon-swap`/`github-contributions`.
 
 ### motion-primitives · `npx shadcn@latest add "https://motion-primitives.com/c/<name>.json"`
+
 Text `[C]`: `text-effect`/`text-shimmer`/`text-morph`/`text-scramble`/`text-roll`/`text-loop`/`spinning-text`/`animated-number`/`sliding-number`. Scroll `[C]`: `in-view`/`animated-group`/`scroll-progress`. Surfaces: `glow-effect`/`spotlight`/`border-trail`/`tilt`/`animated-background` `[C]`, `progressive-blur` `[S]`. Interaction `[C]`: `magnetic`/`cursor`/`dock`/`infinite-slider`/`carousel`/`image-comparison`/`morphing-dialog`/`morphing-popover`/`transition-panel`/`disclosure`/`accordion`.
 
 ### Kokonut UI (free) · `npx shadcn@latest add @kokonutui/<name>`
+
 Backgrounds/hero `[C]`: `background-paths`/`beams-background`/`shape-hero`. Cards: `liquid-glass-card`/`tweet-card`/`bento-grid` `[S]`, `card-flip`/`card-stack`/`apple-activity-card`/`carousel-cards` `[C]`. Text: `shimmer-text`/`glitch-text` `[S]`, `type-writer`/`matrix-text`/`dynamic-text`/`scroll-text` `[C]`. Buttons: `gradient-button`/`social-button`/`switch-button` `[S]`, `particle-button`/`attract-button`/`hold-button` `[C]`. AI inputs `[C]`: `ai-prompt`/`ai-input-search`/`ai-voice`/`action-search-bar`/`file-upload`. Nav/misc `[C]`: `smooth-tab`/`toolbar`/`profile-dropdown`/`smooth-drawer`.
 
 ### Tailark — full marketing blocks · `npx shadcn@latest add @tailark/<name>` (themes: `dusk` dark, `mist` light) — nearly all `[S]`
+
 Heroes: `hero-section-1/4/7/9`, `mist-hero-section-1`. Features: `features-2/8/11`, `mist-features-3`. Pricing: `pricing-1/4`, `mist-pricing-1`. Testimonials: `testimonials-1/4`, `mist-testimonials-2`. CTA: `call-to-action-1/3`. Footer: `footer-1/4`, `mist-footer-2`. Also: `faqs-2` `[C]`, `stats-1`, `logo-cloud-1`, `integrations-1`, `team-1`, `comparator-1`, `content-1`, `contact-1`/`login-1`/`sign-up-1` `[C]`.
 
 ### Animata · `npx shadcn add https://animata.design/r/<category>/<name>.json`
+
 Backgrounds: `animated-beam`/`blurry-blob`/`moving-gradient` `[S]`, `shooting-stars`/`interactive-grid` `[C]`, `boids-ecosystem` `[W]`. Buttons: `ai-button`/`shining-button`/`duolingo`/`slide-arrow-button` `[S]`, `ripple-button` `[C]`. Cards: `flip-card`/`animated-border-trail` `[S]`, `glowing-card`/`tilted-card`/`card-stack`/`expandable` `[C]`. Text: `animated-gradient-text`/`glitch-text` `[S]`, `typing-text`/`wave-reveal`/`counter`/`scroll-reveal` `[C]`. Misc: `marquee`/`spinner` `[S]`, `animated-dock`/`cursor-tracker`/`trailing-image`/`images-reveal`/`orbiting-items`/`split-reveal` `[C]`.
 
 ### Eldora UI (@eldoraui) · `npx shadcn@latest add @eldoraui/<name>`
+
 Text `[C]`: `wavytext`/`blurintext`/`wordpullup`/`letterpullup`/`fadetext`/`gradualspacing`/`multidirectionslide`/`scaleletter`/`docktext`. Backgrounds: `novatrixbackground` `[W]`, `grid`/`hackerbackground`/`photonbeam` `[C]`. 3D/maps: `cobeglobe` `[W]`, `map`/`animatedframeworks` `[C]`. Sections/misc: `marquee` `[S]`, `animatedlist`/`testimonialslider`/`logotimeline`/`integrations`/`terminal` `[C]`, `cardfliphover`/`animatedbadge`/`animatedshinybutton`/`livebutton` `[S]`, device frames (`safaribrowser`/`macbookpro`/`iphone17pro`/`ipad`/`browser`) `[S]`.
 
 ---
@@ -261,19 +274,29 @@ Text `[C]`: `wavytext`/`blurintext`/`wordpullup`/`letterpullup`/`fadetext`/`grad
 
 ```tsx
 // app/src/components/client-only.tsx — render children only after mount
-import { useEffect, useState, type ReactNode } from "react";
-export function ClientOnly({ children, fallback = null }: { children: ReactNode; fallback?: ReactNode }) {
+import { useEffect, useState, type ReactNode } from 'react';
+export function ClientOnly({
+  children,
+  fallback = null,
+}: {
+  children: ReactNode;
+  fallback?: ReactNode;
+}) {
   const [m, setM] = useState(false);
   useEffect(() => setM(true), []);
   return m ? <>{children}</> : <>{fallback}</>;
 }
 ```
+
 ```tsx
 // [W] WebGL: lazy + ClientOnly so three/shaders never run during SSR
-const Scene = lazy(() => import("./scene")); // default export
+const Scene = lazy(() => import('./scene')); // default export
 <ClientOnly fallback={<div className="min-h-dvh bg-[var(--bg)]" />}>
-  <Suspense fallback={null}><Scene /></Suspense>
-</ClientOnly>
+  <Suspense fallback={null}>
+    <Scene />
+  </Suspense>
+</ClientOnly>;
 ```
+
 Gate motion behind reduced-motion: `useReducedMotion()` (Motion) or
 `matchMedia("(prefers-reduced-motion: reduce)")`, and render the static fallback when set.

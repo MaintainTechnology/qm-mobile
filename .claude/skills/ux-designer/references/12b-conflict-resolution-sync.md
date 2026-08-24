@@ -25,6 +25,7 @@ Result: "HelloWorld" (consistent for both)
 ```
 
 **UX Implications:**
+
 - Low-latency feel with optimistic updates
 - Requires constant server connection
 - Complex to implement correctly for rich content
@@ -58,7 +59,7 @@ Prevent simultaneous edits on the same element.
 }
 
 .component--locked::after {
-  content: "🔒 Editing: " attr(data-locked-by);
+  content: '🔒 Editing: ' attr(data-locked-by);
   position: absolute;
   top: -24px;
   left: 0;
@@ -80,7 +81,7 @@ let lockTimer;
 function refreshLock() {
   clearTimeout(lockTimer);
   lockTimer = setTimeout(() => {
-    showDialog("Are you still editing? Lock will release in 30 seconds.");
+    showDialog('Are you still editing? Lock will release in 30 seconds.');
     // If no response, release lock
   }, LOCK_TIMEOUT);
 }
@@ -102,7 +103,7 @@ async function updateDocument(change) {
   } catch (error) {
     // 3. Rollback if failed
     revertLocalChange(change);
-    showError("Failed to save. Your change was reverted.");
+    showError('Failed to save. Your change was reverted.');
   }
 }
 ```
@@ -187,7 +188,7 @@ Show who changed what and when.
 ```css
 /* Inline attribution on hover */
 .text-block[data-author]::before {
-  content: attr(data-author) " • " attr(data-edited);
+  content: attr(data-author) ' • ' attr(data-edited);
   position: absolute;
   top: -20px;
   left: 0;
@@ -202,8 +203,12 @@ Show who changed what and when.
 }
 
 /* Author highlight colors */
-.text-block[data-author="alice"] { border-left: 3px solid #e63946; }
-.text-block[data-author="bob"] { border-left: 3px solid #2a9d8f; }
+.text-block[data-author='alice'] {
+  border-left: 3px solid #e63946;
+}
+.text-block[data-author='bob'] {
+  border-left: 3px solid #2a9d8f;
+}
 ```
 
 ---
@@ -258,13 +263,13 @@ Show who changed what and when.
 
 ### Permission Levels
 
-| Level | Capabilities |
-|-------|-------------|
-| Owner | Full control, transfer ownership, delete |
-| Admin | Manage members, edit settings, edit content |
-| Editor | Edit content, add comments |
-| Commenter | View content, add comments |
-| Viewer | View only |
+| Level     | Capabilities                                |
+| --------- | ------------------------------------------- |
+| Owner     | Full control, transfer ownership, delete    |
+| Admin     | Manage members, edit settings, edit content |
+| Editor    | Edit content, add comments                  |
+| Commenter | View content, add comments                  |
+| Viewer    | View only                                   |
 
 ### Permission Dialog Pattern
 
@@ -330,6 +335,7 @@ Show who changed what and when.
 ```
 
 **Key Principles:**
+
 - Avoid technical jargon ("no network connection" vs "offline")
 - Show last sync time
 - Indicate that work is safe
@@ -353,7 +359,7 @@ Show who changed what and when.
 ```javascript
 // Graceful reconnection
 async function handleReconnection() {
-  showBanner("Reconnecting...");
+  showBanner('Reconnecting...');
 
   try {
     // 1. Fetch remote changes
@@ -370,7 +376,7 @@ async function handleReconnection() {
 
     showBanner("You're back online!", { duration: 3000 });
   } catch (error) {
-    showBanner("Reconnection failed. Retrying...");
+    showBanner('Reconnection failed. Retrying...');
     scheduleRetry();
   }
 }
@@ -380,11 +386,11 @@ async function handleReconnection() {
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Lock inactivity timeout | 60s | Before prompting release |
-| Reconnection retry | 1s, 2s, 4s, 8s... | Exponential backoff |
-| Optimistic timeout | 5-10s | Before showing sync error |
+| Metric                  | Value             | Context                   |
+| ----------------------- | ----------------- | ------------------------- |
+| Lock inactivity timeout | 60s               | Before prompting release  |
+| Reconnection retry      | 1s, 2s, 4s, 8s... | Exponential backoff       |
+| Optimistic timeout      | 5-10s             | Before showing sync error |
 
 ---
 

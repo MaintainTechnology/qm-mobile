@@ -9,6 +9,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 ## When to Use
 
 Use this skill when you need to:
+
 - Build a new feature that sends data to a VectorShift pipeline and waits for results
 - Add async analysis to a new page (e.g., a new report type, chatbot, or AI processing feature)
 - Replicate the biomarker analysis pattern for a different pipeline
@@ -43,12 +44,12 @@ Browser                         Our API                      VectorShift
 
 ### Why This Pattern
 
-| Alternative | Why it doesn't work |
-|---|---|
-| VectorShift `background:true` | Returns `{status: "completed"}` with NO output data for many pipelines |
+| Alternative                    | Why it doesn't work                                                                  |
+| ------------------------------ | ------------------------------------------------------------------------------------ |
+| VectorShift `background:true`  | Returns `{status: "completed"}` with NO output data for many pipelines               |
 | Server-side sync via `after()` | Vercel kills long-running `after()` calls; VS drops server connections after ~10 min |
-| Server-side proxy | Vercel serverless functions timeout (max 300s, pipelines can take 10-15 min) |
-| **Browser-direct sync** | No timeout limit on browser `fetch` - works for 15+ minute pipelines |
+| Server-side proxy              | Vercel serverless functions timeout (max 300s, pipelines can take 10-15 min)         |
+| **Browser-direct sync**        | No timeout limit on browser `fetch` - works for 15+ minute pipelines                 |
 
 ---
 
@@ -69,7 +70,7 @@ Add your pipeline ID to `PIPELINE_TYPE_MAP`:
 ```typescript
 const PIPELINE_TYPE_MAP: Record<string, string> = {
   // ... existing entries ...
-  'YOUR_PIPELINE_ID': 'your_feature_name',
+  YOUR_PIPELINE_ID: 'your_feature_name',
 };
 ```
 
@@ -98,12 +99,12 @@ function buildYourFeatureInputs(userFormData: YourFormData): Record<string, any>
     Other_files: userFormData.files.map(file => ({
       metadata: {
         name: file.name,
-        mime_type: file.type || "application/octet-stream",
+        mime_type: file.type || 'application/octet-stream',
       },
       raw_bytes: file.base64Data, // base64-encoded, no data URL prefix
-      type: "file",
+      type: 'file',
     })),
-    language: userFormData.language || "English",
+    language: userFormData.language || 'English',
     // ... any other pipeline inputs
   };
 }
@@ -117,13 +118,13 @@ Convert `File` objects to VectorShift's expected base64 format:
 async function encodeFileForVectorShift(file: File): Promise<{
   metadata: { name: string; mime_type: string };
   raw_bytes: string;
-  type: "file";
+  type: 'file';
 }> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const base64 = reader.result as string;
-      const base64Data = base64.split(",")[1]; // Strip data URL prefix
+      const base64Data = base64.split(',')[1]; // Strip data URL prefix
       if (!base64Data) {
         reject(new Error(`Failed to encode file: ${file.name}`));
         return;
@@ -131,10 +132,10 @@ async function encodeFileForVectorShift(file: File): Promise<{
       resolve({
         metadata: {
           name: file.name,
-          mime_type: file.type || "application/octet-stream",
+          mime_type: file.type || 'application/octet-stream',
         },
         raw_bytes: base64Data,
-        type: "file",
+        type: 'file',
       });
     };
     reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
@@ -152,12 +153,12 @@ import {
   runAsyncLIPPipeline,
   resumeAsyncLIPPipeline,
   cancelLIPPipeline,
-} from "@/utils/lipPipelineAsync";
+} from '@/utils/lipPipelineAsync';
 
 // In your component:
 const [isProcessing, setIsProcessing] = useState(false);
 const [progress, setProgress] = useState(0);
-const [progressMessage, setProgressMessage] = useState("");
+const [progressMessage, setProgressMessage] = useState('');
 const [currentTaskId, setCurrentTaskId] = useState<string | null>(null);
 const abortControllerRef = useRef<AbortController | null>(null);
 
@@ -173,7 +174,7 @@ const handleSubmit = async () => {
 
     const result = await runAsyncLIPPipeline(
       inputs,
-      "YOUR_PIPELINE_ID",
+      'YOUR_PIPELINE_ID',
       // onProgress callback
       (progress, message) => {
         setProgress(progress);
@@ -182,34 +183,37 @@ const handleSubmit = async () => {
       // onPollUpdate (optional)
       undefined,
       // onTaskIdReceived - save for cancellation + resume
-      (taskId) => {
+      taskId => {
         setCurrentTaskId(taskId);
         // Persist to localStorage for resume after page reload
-        localStorage.setItem("your-feature-running-task", JSON.stringify({
-          taskId,
-          pipelineId: "YOUR_PIPELINE_ID",
-          startedAt: Date.now(),
-        }));
+        localStorage.setItem(
+          'your-feature-running-task',
+          JSON.stringify({
+            taskId,
+            pipelineId: 'YOUR_PIPELINE_ID',
+            startedAt: Date.now(),
+          }),
+        );
       },
       // abort signal for cancellation
-      abortController.signal
+      abortController.signal,
     );
 
     if (result.success) {
       const outputs = result.outputs || {};
       // Extract your pipeline's specific output keys
-      const report = outputs.output_0 || outputs.your_output_key || "";
-      const visual = outputs.Visual_Report || outputs.your_visual_key || "";
+      const report = outputs.output_0 || outputs.your_output_key || '';
+      const visual = outputs.Visual_Report || outputs.your_visual_key || '';
       // Display results...
     } else {
-      throw new Error(result.error || "Pipeline failed");
+      throw new Error(result.error || 'Pipeline failed');
     }
   } catch (err: any) {
     // Handle error...
   } finally {
     setIsProcessing(false);
     setCurrentTaskId(null);
-    localStorage.removeItem("your-feature-running-task");
+    localStorage.removeItem('your-feature-running-task');
   }
 };
 ```
@@ -223,13 +227,13 @@ const handleCancel = async () => {
 
   // Tell VectorShift to stop processing
   if (currentTaskId) {
-    await cancelLIPPipeline("YOUR_PIPELINE_ID", currentTaskId);
+    await cancelLIPPipeline('YOUR_PIPELINE_ID', currentTaskId);
   }
 
   setIsProcessing(false);
   setProgress(0);
   setCurrentTaskId(null);
-  localStorage.removeItem("your-feature-running-task");
+  localStorage.removeItem('your-feature-running-task');
 };
 ```
 
@@ -238,7 +242,7 @@ const handleCancel = async () => {
 ```typescript
 useEffect(() => {
   // Check if there's a running task from before page reload
-  const stored = localStorage.getItem("your-feature-running-task");
+  const stored = localStorage.getItem('your-feature-running-task');
   if (!stored) return;
 
   const task = JSON.parse(stored);
@@ -246,7 +250,7 @@ useEffect(() => {
   const MAX_AGE = 60 * 60 * 1000; // 60 minutes
 
   if (elapsed > MAX_AGE) {
-    localStorage.removeItem("your-feature-running-task");
+    localStorage.removeItem('your-feature-running-task');
     return;
   }
 
@@ -265,14 +269,14 @@ useEffect(() => {
       setProgressMessage(message);
     },
     undefined,
-    abortController.signal
-  ).then((result) => {
+    abortController.signal,
+  ).then(result => {
     if (result.success) {
       const outputs = result.outputs || {};
       // Extract and display results...
     }
     setIsProcessing(false);
-    localStorage.removeItem("your-feature-running-task");
+    localStorage.removeItem('your-feature-running-task');
   });
 }, []);
 ```
@@ -287,25 +291,16 @@ function extractYourFeatureResults(outputs: Record<string, any>): {
   visualReport: string;
 } {
   // Try multiple possible key names (VectorShift is inconsistent)
-  const textReport =
-    outputs.output_0 ||
-    outputs.your_text_key ||
-    outputs.text_report ||
-    "";
+  const textReport = outputs.output_0 || outputs.your_text_key || outputs.text_report || '';
 
-  let visualReport =
-    outputs.Visual_Report ||
-    outputs.your_visual_key ||
-    outputs.html_report ||
-    "";
+  let visualReport = outputs.Visual_Report || outputs.your_visual_key || outputs.html_report || '';
 
   // Fallback: scan all keys for HTML content
   if (!visualReport) {
     for (const [key, value] of Object.entries(outputs)) {
       if (
-        typeof value === "string" &&
-        (value.trim().startsWith("<!DOCTYPE") ||
-          value.trim().startsWith("<html"))
+        typeof value === 'string' &&
+        (value.trim().startsWith('<!DOCTYPE') || value.trim().startsWith('<html'))
       ) {
         visualReport = value;
         break;
@@ -324,30 +319,34 @@ function extractYourFeatureResults(outputs: Record<string, any>): {
 These files are **pipeline-agnostic** and shared across all VectorShift features. Do NOT duplicate them:
 
 ### Frontend Utility
-| File | Exports | Purpose |
-|------|---------|---------|
-| `src/utils/lipPipelineAsync.ts` | `runAsyncLIPPipeline()` | Start pipeline + poll for result |
-| | `resumeAsyncLIPPipeline()` | Resume polling after page reload |
-| | `cancelLIPPipeline()` | Cancel a running pipeline |
+
+| File                            | Exports                    | Purpose                          |
+| ------------------------------- | -------------------------- | -------------------------------- |
+| `src/utils/lipPipelineAsync.ts` | `runAsyncLIPPipeline()`    | Start pipeline + poll for result |
+|                                 | `resumeAsyncLIPPipeline()` | Resume polling after page reload |
+|                                 | `cancelLIPPipeline()`      | Cancel a running pipeline        |
 
 ### API Routes
-| Route | Method | Purpose |
-|-------|--------|---------|
-| `/api/vectorshift/lip-pipeline/start-async` | POST | Register task in DB, return taskId |
-| `/api/vectorshift/lip-pipeline/status/[taskId]` | GET | Check pipeline status from DB |
-| `/api/vectorshift/lip-pipeline/store-result` | POST | Save VectorShift result to DB |
-| `/api/vectorshift/get-upload-url` | POST | Return VS API URL + auth header |
-| `/api/vectorshift/lip-pipeline/[pipelineId]/terminate` | POST | Cancel running pipeline |
-| `/api/vectorshift/lip-pipeline/update-run-id` | POST | Update VS run_id for a task |
+
+| Route                                                  | Method | Purpose                            |
+| ------------------------------------------------------ | ------ | ---------------------------------- |
+| `/api/vectorshift/lip-pipeline/start-async`            | POST   | Register task in DB, return taskId |
+| `/api/vectorshift/lip-pipeline/status/[taskId]`        | GET    | Check pipeline status from DB      |
+| `/api/vectorshift/lip-pipeline/store-result`           | POST   | Save VectorShift result to DB      |
+| `/api/vectorshift/get-upload-url`                      | POST   | Return VS API URL + auth header    |
+| `/api/vectorshift/lip-pipeline/[pipelineId]/terminate` | POST   | Cancel running pipeline            |
+| `/api/vectorshift/lip-pipeline/update-run-id`          | POST   | Update VS run_id for a task        |
 
 ### Database
-| Table | Schema File | Purpose |
-|-------|-------------|---------|
+
+| Table                       | Schema File            | Purpose                                |
+| --------------------------- | ---------------------- | -------------------------------------- |
 | `vectorshift_pipeline_runs` | `shared/schema.ts:744` | Track all pipeline runs, store results |
 
 ### Environment Variables
-| Variable | Purpose |
-|----------|---------|
+
+| Variable              | Purpose                        |
+| --------------------- | ------------------------------ |
 | `VECTORSHIFT_API_KEY` | VectorShift API authentication |
 
 ---
@@ -357,20 +356,22 @@ These files are **pipeline-agnostic** and shared across all VectorShift features
 The `calculateProgressFromResult()` function in `lipPipelineAsync.ts` determines progress based on which output keys exist. It currently handles two pipeline types:
 
 ### Biomarker Pipeline Keys
-| Key | Progress | Meaning |
-|-----|----------|---------|
-| (none) | 5-45% | Time-based estimation |
-| `output_0` | 50% | Text report generated |
-| `output_0` + `credits_node_1` | 60% | Stage 1 complete |
-| `Visual_Report` | 90% | Visual report generated |
-| `Visual_Report` + `credits_node_2` | 95% | Stage 2 complete |
+
+| Key                                | Progress | Meaning                 |
+| ---------------------------------- | -------- | ----------------------- |
+| (none)                             | 5-45%    | Time-based estimation   |
+| `output_0`                         | 50%      | Text report generated   |
+| `output_0` + `credits_node_1`      | 60%      | Stage 1 complete        |
+| `Visual_Report`                    | 90%      | Visual report generated |
+| `Visual_Report` + `credits_node_2` | 95%      | Stage 2 complete        |
 
 ### Advanced Pipeline Keys
-| Key | Progress | Meaning |
-|-----|----------|---------|
-| `final_report_output` | 60% | Text report complete |
-| `visual_report_output` / `output_1` | 85% | Visual report generated |
-| Both | 95% | Finalizing |
+
+| Key                                 | Progress | Meaning                 |
+| ----------------------------------- | -------- | ----------------------- |
+| `final_report_output`               | 60%      | Text report complete    |
+| `visual_report_output` / `output_1` | 85%      | Visual report generated |
+| Both                                | 95%      | Finalizing              |
 
 ### Adding Progress for a New Pipeline
 
@@ -381,8 +382,8 @@ function calculateProgressFromResult(result: any, pollCount: number) {
   // ... existing biomarker + advanced checks ...
 
   // --- Your new pipeline progress ---
-  const hasYourOutput1 = !!(result.your_key_1);
-  const hasYourOutput2 = !!(result.your_key_2);
+  const hasYourOutput1 = !!result.your_key_1;
+  const hasYourOutput2 = !!result.your_key_2;
 
   if (hasYourOutput1 && hasYourOutput2) {
     return { progress: 95, message: 'Finalizing your report...' };
@@ -405,11 +406,20 @@ The biomarker dashboard maps raw VectorShift errors to user-friendly messages. R
 
 ```typescript
 const PIPELINE_ERROR_MAP: { pattern: RegExp; friendly: FriendlyError }[] = [
-  { pattern: /mistral.*ocr.*file.*parsing.*failed/i, friendly: { message: "OCR couldn't read your file", retryable: true } },
-  { pattern: /timeout|timed out/i, friendly: { message: "Analysis timed out", retryable: true } },
-  { pattern: /rate limit|429/i, friendly: { message: "High traffic", retryable: true } },
-  { pattern: /empty.*response/i, friendly: { message: "No biomarker data detected", retryable: true } },
-  { pattern: /500|internal.*server/i, friendly: { message: "Temporary server issue", retryable: true } },
+  {
+    pattern: /mistral.*ocr.*file.*parsing.*failed/i,
+    friendly: { message: "OCR couldn't read your file", retryable: true },
+  },
+  { pattern: /timeout|timed out/i, friendly: { message: 'Analysis timed out', retryable: true } },
+  { pattern: /rate limit|429/i, friendly: { message: 'High traffic', retryable: true } },
+  {
+    pattern: /empty.*response/i,
+    friendly: { message: 'No biomarker data detected', retryable: true },
+  },
+  {
+    pattern: /500|internal.*server/i,
+    friendly: { message: 'Temporary server issue', retryable: true },
+  },
 ];
 ```
 
@@ -419,12 +429,12 @@ Consider extracting this to a shared utility if multiple pages need error mappin
 
 ## Polling Configuration
 
-| Parameter | Value | Notes |
-|-----------|-------|-------|
-| Poll interval | 5 seconds | Hardcoded in `lipPipelineAsync.ts` |
-| Max polls | 720 | 60 minutes total (720 * 5s) |
-| Max consecutive failures | 10 | Aborts after 10 failed status checks in a row |
-| Resume max polls | 360 | 30 minutes for resumed tasks |
+| Parameter                | Value     | Notes                                         |
+| ------------------------ | --------- | --------------------------------------------- |
+| Poll interval            | 5 seconds | Hardcoded in `lipPipelineAsync.ts`            |
+| Max polls                | 720       | 60 minutes total (720 * 5s)                   |
+| Max consecutive failures | 10        | Aborts after 10 failed status checks in a row |
+| Resume max polls         | 360       | 30 minutes for resumed tasks                  |
 
 ---
 

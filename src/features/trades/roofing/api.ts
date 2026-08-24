@@ -28,7 +28,10 @@ export function useMeasureRoof() {
 }
 
 export function useSaveRoof() {
-  return useApiMutation<SaveRoofRequest, SaveRoofResponse>('/api/roofing/save', SaveRoofResponseSchema);
+  return useApiMutation<SaveRoofRequest, SaveRoofResponse>(
+    '/api/roofing/save',
+    SaveRoofResponseSchema,
+  );
 }
 
 export function useSaveRoofAsQuote() {

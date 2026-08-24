@@ -24,6 +24,7 @@ This skill transforms from a simple scanner into an autonomous opportunity proce
 **NEW (v3): Master Command Center** - Anti-degradation system prevents the recurring pattern of context loss between sessions. Every session must follow the Command Center protocol. See [Command Center Protocol](#command-center-protocol) below.
 
 **IMPORTANT - Email Drafting Rules:**
+
 1. **Search ALL threads** - When researching a contact, search for ALL emails with that person (by email address), not just the original thread. People may have responded in separate threads.
 2. **Draft in existing threads** - When drafting follow-up emails, create them as replies to the most recent thread with that contact. Never create a new thread for a follow-up.
 3. **Check SENT folder** - Always verify what we've already sent to avoid duplicate outreach.
@@ -145,27 +146,28 @@ ledger.save()             # Save draft history
 
 ### Command Center Files
 
-| File | Purpose | Location |
-|------|---------|----------|
-| `context_registry.json` | Tracks what context was gathered per opportunity | `.bizdev/command-center/` |
-| `draft_ledger.json` | Version history of all drafts with quality scores | `.bizdev/command-center/` |
-| `health_snapshots.json` | System health over time (30 snapshots kept) | `.bizdev/command-center/` |
-| `session_log.json` | Audit trail of all actions per session | `.bizdev/command-center/` |
+| File                    | Purpose                                           | Location                  |
+| ----------------------- | ------------------------------------------------- | ------------------------- |
+| `context_registry.json` | Tracks what context was gathered per opportunity  | `.bizdev/command-center/` |
+| `draft_ledger.json`     | Version history of all drafts with quality scores | `.bizdev/command-center/` |
+| `health_snapshots.json` | System health over time (30 snapshots kept)       | `.bizdev/command-center/` |
+| `session_log.json`      | Audit trail of all actions per session            | `.bizdev/command-center/` |
 
 ### Command Center Modules
 
-| Module | Purpose |
-|--------|---------|
-| `context_registry.py` | Tracks context completeness per opportunity |
-| `draft_ledger.py` | Versions all drafts with quality scores |
-| `degradation_detector.py` | Detects system regression between sessions |
-| `command_center.py` | Full orchestrator (use for complex sessions) |
-| `unified_task_streams.py` | Aggregates personal, product, and professional tasks |
-| `proactive_drafter.py` | Document Studio integration for auto-teed-up drafts/proposals |
+| Module                    | Purpose                                                       |
+| ------------------------- | ------------------------------------------------------------- |
+| `context_registry.py`     | Tracks context completeness per opportunity                   |
+| `draft_ledger.py`         | Versions all drafts with quality scores                       |
+| `degradation_detector.py` | Detects system regression between sessions                    |
+| `command_center.py`       | Full orchestrator (use for complex sessions)                  |
+| `unified_task_streams.py` | Aggregates personal, product, and professional tasks          |
+| `proactive_drafter.py`    | Document Studio integration for auto-teed-up drafts/proposals |
 
 ### Quality Gate: Context Completeness
 
 The new `evaluate_context_completeness` gate in `quality_gates.py` checks:
+
 1. Was transcript searched for this contact?
 2. Was email searched for this contact?
 3. Was unified context generated (merged transcript + email)?
@@ -182,11 +184,11 @@ The Command Center now aggregates tasks from THREE streams into a unified view:
 
 ### Stream Overview
 
-| Stream | Color | Sources | Default Owner |
-|--------|-------|---------|---------------|
-| **Personal & Admin** | Green | Julie's Slack priorities, Motion recaps, manual | anant |
-| **Product & Engineering** | Purple | Motion team meetings, Slack #product/#dev, GitHub issues | jeff |
-| **BizDev & Professional** | Gold | Pipeline actions, email threads, transcripts, Motion sales meetings | anant |
+| Stream                    | Color  | Sources                                                             | Default Owner |
+| ------------------------- | ------ | ------------------------------------------------------------------- | ------------- |
+| **Personal & Admin**      | Green  | Julie's Slack priorities, Motion recaps, manual                     | anant         |
+| **Product & Engineering** | Purple | Motion team meetings, Slack #product/#dev, GitHub issues            | jeff          |
+| **BizDev & Professional** | Gold   | Pipeline actions, email threads, transcripts, Motion sales meetings | anant         |
 
 ### Quick Commands - Multi-Stream
 
@@ -237,18 +239,18 @@ cc.import_slack_tasks(slack_tasks)
 
 ### Task Data File
 
-| File | Purpose | Location |
-|------|---------|----------|
+| File                 | Purpose                        | Location                  |
+| -------------------- | ------------------------------ | ------------------------- |
 | `unified_tasks.json` | All tasks across three streams | `.bizdev/command-center/` |
 
 ### Task Priority & Staleness
 
-| Priority | Stale After | Action |
-|----------|-------------|--------|
-| Critical | 1 day | Do today |
-| High | 7 days | This week |
-| Medium | 14 days | This sprint |
-| Low | 30 days | Backlog |
+| Priority | Stale After | Action      |
+| -------- | ----------- | ----------- |
+| Critical | 1 day       | Do today    |
+| High     | 7 days      | This week   |
+| Medium   | 14 days     | This sprint |
+| Low      | 30 days     | Backlog     |
 
 ---
 
@@ -307,17 +309,17 @@ if next_brief:
 
 ### Readiness Levels
 
-| Level | Meaning | Action |
-|-------|---------|--------|
-| **READY** | All context gathered, quality gate passed | Generate immediately via document-studio |
-| **ALMOST** | 1-2 minor gaps (e.g., unified context missing) | Run unblock steps, then generate |
-| **BLOCKED** | Major context missing (no transcript/email search) | Must gather context first |
-| **ALREADY_DRAFTED** | Good draft exists (quality >= 0.7) | Skip unless refinement needed |
+| Level               | Meaning                                            | Action                                   |
+| ------------------- | -------------------------------------------------- | ---------------------------------------- |
+| **READY**           | All context gathered, quality gate passed          | Generate immediately via document-studio |
+| **ALMOST**          | 1-2 minor gaps (e.g., unified context missing)     | Run unblock steps, then generate         |
+| **BLOCKED**         | Major context missing (no transcript/email search) | Must gather context first                |
+| **ALREADY_DRAFTED** | Good draft exists (quality >= 0.7)                 | Skip unless refinement needed            |
 
 ### Tee-Up Data Files
 
-| File | Purpose | Location |
-|------|---------|----------|
+| File               | Purpose                             | Location                  |
+| ------------------ | ----------------------------------- | ------------------------- |
 | `teeup_queue.json` | Ready and almost-ready draft briefs | `.bizdev/command-center/` |
 
 ---
@@ -327,12 +329,14 @@ if next_brief:
 The dashboard now includes two auto-generated columns:
 
 ### 1. **Status Column** (Auto-Generated)
+
 - Summarizes recent email activity and meeting outcomes
 - Shows activity level (active/warm/cooling/cold)
 - Captures sentiment (positive/negative/pending)
 - Expandable detail view with topics discussed
 
 ### 2. **Next Steps Column** (Auto-Generated)
+
 - Actionable items with urgency levels (critical/high/medium/low)
 - Direct links to ready-to-send email and proposal drafts
 - "+ Email" / "+ Proposal" buttons to generate missing drafts
@@ -398,9 +402,7 @@ Each opportunity now has `auto_status` and `auto_next_steps` fields:
       "type": "email",
       "urgency": "high"
     },
-    "secondary_actions": [
-      {"action": "Add approach notes for better drafting", "type": "note"}
-    ],
+    "secondary_actions": [{ "action": "Add approach notes for better drafting", "type": "note" }],
     "email_draft": ".bizdev/drafts/emails/opp-001-larry-siegel.md",
     "proposal_draft": ".bizdev/drafts/proposals/opp-001-larry-siegel.html",
     "urgency": "high"
@@ -412,16 +414,16 @@ Each opportunity now has `auto_status` and `auto_next_steps` fields:
 
 The comprehensive dashboard at `content/docs/bizdev-dashboard-comprehensive.html` includes:
 
-| Column | Content |
-|--------|---------|
-| Score | Priority score (0-100) |
-| Contact | Name, company, ID |
-| Type | Opportunity type badge |
-| Days | Days since last contact |
-| **Status** | Activity level + summary (expandable) |
-| **Next Steps** | Action + urgency + draft buttons |
-| Notes | Note count (click to view/add) |
-| Actions | Refresh (↻) and Archive (✕) buttons |
+| Column         | Content                               |
+| -------------- | ------------------------------------- |
+| Score          | Priority score (0-100)                |
+| Contact        | Name, company, ID                     |
+| Type           | Opportunity type badge                |
+| Days           | Days since last contact               |
+| **Status**     | Activity level + summary (expandable) |
+| **Next Steps** | Action + urgency + draft buttons      |
+| Notes          | Note count (click to view/add)        |
+| Actions        | Refresh (↻) and Archive (✕) buttons   |
 
 ### Viewing the Dashboard
 
@@ -468,13 +470,13 @@ The system uses **Haiku 4.5 subagents** to deeply analyze each transcript, email
 
 ### Why Iterative Processing?
 
-| Aspect | Batch Scanning | Iterative + Subagents |
-|--------|----------------|----------------------|
-| **Quality** | Shallow pattern matching | Deep analysis per item |
+| Aspect                  | Batch Scanning                       | Iterative + Subagents                                    |
+| ----------------------- | ------------------------------------ | -------------------------------------------------------- |
+| **Quality**             | Shallow pattern matching             | Deep analysis per item                                   |
 | **Multi-Opp Detection** | Often misses secondary opportunities | Creates consulting + enterprise + membership per contact |
-| **Commitments** | Frequently missed | Explicitly extracted with deadlines |
-| **State** | All-or-nothing | Incremental, resumable |
-| **Parallelism** | Sequential | 3-5 subagents simultaneously |
+| **Commitments**         | Frequently missed                    | Explicitly extracted with deadlines                      |
+| **State**               | All-or-nothing                       | Incremental, resumable                                   |
+| **Parallelism**         | Sequential                           | 3-5 subagents simultaneously                             |
 
 ### Execution Protocol
 
@@ -485,6 +487,7 @@ The system uses **Haiku 4.5 subagents** to deeply analyze each transcript, email
 ```
 
 **Steps:**
+
 1. **List all transcripts** from Drive folder (last N months)
 2. **List all email threads** via gog CLI (non-marketing, external contacts)
 3. **List all relevant Slack threads** via MCP
@@ -502,6 +505,7 @@ The system uses **Haiku 4.5 subagents** to deeply analyze each transcript, email
 ```
 
 **Steps:**
+
 1. Load `crm-state.json` with `last_scan` timestamp
 2. Fetch only NEW items since last scan
 3. Process each new item with Haiku subagent
@@ -529,6 +533,7 @@ Return ONLY valid JSON, no additional text.
 ```
 
 **Parallel dispatch example (3 items):**
+
 ```
 # In a single message, dispatch multiple subagents:
 Task(model="haiku", prompt="Analyze transcript 1...", description="Extract: Larry Siegel")
@@ -539,6 +544,7 @@ Task(model="haiku", prompt="Analyze Slack DM 3...", description="Extract: Julie 
 ### Extraction Prompt Templates
 
 See `extraction_prompts.md` for detailed prompts:
+
 - **Transcript Extraction**: Multi-opportunity detection, pain points, commitments, quotes
 - **Email Thread Extraction**: Thread status, response needed, relationship signals
 - **Slack Thread Extraction**: Tasks, decisions, blockers, category classification
@@ -579,6 +585,7 @@ See `extraction_prompts.md` for detailed prompts:
 ### Quality Gates
 
 Each extraction result is validated before merging:
+
 1. **JSON validity** - Must parse correctly
 2. **Required fields** - contacts[], opportunities[], source{}
 3. **Confidence threshold** - Only opportunities with confidence >= 0.5 are included
@@ -609,6 +616,7 @@ The dashboard now automatically generates contextual email drafts and proposals 
 **Before generating ANY proposal**, you MUST search transcripts and emails for pricing commitments. Default pricing should ONLY be used when no specific pricing was discussed.
 
 **Required Search Pattern:**
+
 ```bash
 # Search for pricing discussions
 grep -i "199\|299\|499\|discount\|special\|offer\|month" .bizdev/drafts/*<contact>*
@@ -616,16 +624,18 @@ grep -i "pricing\|rate\|cost" <transcript_file>
 ```
 
 **Extract these fields from transcripts:**
-| Field | Example | Where to Find |
-|-------|---------|---------------|
-| `agreed_price` | $199/month | "I can do $199 for you" |
-| `discount_reason` | Referral from Lale | "Since Lale introduced us" |
-| `discount_percent` | 60% | "That's 60% off standard" |
-| `duration` | 6 months | "For the first 6 months" |
-| `special_terms` | Unlimited reports | "I'll include unlimited" |
+
+| Field              | Example            | Where to Find              |
+| ------------------ | ------------------ | -------------------------- |
+| `agreed_price`     | $199/month         | "I can do $199 for you"    |
+| `discount_reason`  | Referral from Lale | "Since Lale introduced us" |
+| `discount_percent` | 60%                | "That's 60% off standard"  |
+| `duration`         | 6 months           | "For the first 6 months"   |
+| `special_terms`    | Unlimited reports  | "I'll include unlimited"   |
 
 **Quality Gate - Pricing Validation:**
 Before finalizing a proposal, verify:
+
 1. ✅ Searched ALL transcripts mentioning contact name
 2. ✅ Searched ALL email threads with contact
 3. ✅ Checked `.bizdev/drafts/email-*` for prior draft context
@@ -633,6 +643,7 @@ Before finalizing a proposal, verify:
 5. ✅ If no pricing discussed → use default from `pricing_config.py`
 
 **Failure Mode (What Went Wrong with Arda Lembet):**
+
 - Transcript clearly stated "$199/month (discounted from $499)"
 - Transcript noted "50% discount that Lale had negotiated"
 - Proposal was generated with default $499/month
@@ -644,37 +655,39 @@ Before finalizing a proposal, verify:
 
 ### File Locations
 
-| Type | Markdown Source | HTML (Browser) |
-|------|-----------------|----------------|
-| Emails | `.bizdev/drafts/emails/*.md` | `content/docs/bizdev-drafts/emails/*.html` |
+| Type      | Markdown Source                   | HTML (Browser)                                |
+| --------- | --------------------------------- | --------------------------------------------- |
+| Emails    | `.bizdev/drafts/emails/*.md`      | `content/docs/bizdev-drafts/emails/*.html`    |
 | Proposals | `.bizdev/drafts/proposals/*.html` | `content/docs/bizdev-drafts/proposals/*.html` |
 
 ### Email Templates by Type
 
-| Opportunity Type | Cold | Warm Follow-up | Re-engagement |
-|------------------|------|----------------|---------------|
-| **Consulting** | Pattern recognition hook | Post-meeting follow-up | Value-add return |
-| **Enterprise** | Lab report time savings | Demo/sandbox offer | New features update |
-| **Commons** | AI discoverability hook | Partnership benefits | Profile update |
-| **Media** | Content collaboration | Format discussion | Topic refresh |
+| Opportunity Type | Cold                     | Warm Follow-up         | Re-engagement       |
+| ---------------- | ------------------------ | ---------------------- | ------------------- |
+| **Consulting**   | Pattern recognition hook | Post-meeting follow-up | Value-add return    |
+| **Enterprise**   | Lab report time savings  | Demo/sandbox offer     | New features update |
+| **Commons**      | AI discoverability hook  | Partnership benefits   | Profile update      |
+| **Media**        | Content collaboration    | Format discussion      | Topic refresh       |
 
 ### Proposal Templates
 
-| Type | Default Rate | Includes | Override |
-|------|--------------|----------|----------|
-| **Consulting** | $10,000/month | Weekly meetings, Slack integration, strategy formulation | Check transcript for negotiated rate |
-| **Enterprise** | $499/month | 200 reports, AI Lab Report Generator, customization | Check transcript for discounts/special offers |
+| Type           | Default Rate  | Includes                                                 | Override                                      |
+| -------------- | ------------- | -------------------------------------------------------- | --------------------------------------------- |
+| **Consulting** | $10,000/month | Weekly meetings, Slack integration, strategy formulation | Check transcript for negotiated rate          |
+| **Enterprise** | $499/month    | 200 reports, AI Lab Report Generator, customization      | Check transcript for discounts/special offers |
 
 **⚠️ ALWAYS check transcripts for pricing commitments before using defaults.**
 
 ### Using the Outreach Links
 
 1. **Start the local server:**
+
    ```bash
    cd content/docs && python3 -m http.server 8888
    ```
 
 2. **Open the dashboard:**
+
    ```bash
    open "http://localhost:8888/bizdev-dashboard-2026-02-03.html"
    ```
@@ -690,12 +703,14 @@ Before finalizing a proposal, verify:
 #### Before Generating ANY Email:
 
 1. **ALWAYS Fetch Latest Thread First**:
+
    ```bash
    GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co \
      gog gmail search "from:{email} OR to:{email}" --max 5
    ```
 
 2. **Get Full Thread Content**:
+
    ```bash
    GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co \
      gog gmail thread {THREAD_ID}
@@ -715,18 +730,19 @@ Before finalizing a proposal, verify:
 #### Never Use Hardcoded/Cached Context
 
 The system MUST fetch fresh email content before generating. Never use:
+
 - Hardcoded `ENRICHED_DATA` dictionaries
 - Cached signals from previous sessions
 - Assumed context from unrelated transcripts
 
 #### Anti-Hallucination Rules
 
-| Pattern | ❌ Avoid | ✅ Instead |
-|---------|----------|-----------|
-| Vague reference | "Your point about the challenges you're facing" | "Your point about teaching timeline constraints" |
-| Generic callback | "Based on what you shared" | "When you mentioned needing reports for 20 locations" |
-| Invented context | "The topics we discussed" | Reference actual signal content |
-| False familiarity | "Great connecting earlier" | Only use when there WAS a prior connection |
+| Pattern           | ❌ Avoid                                        | ✅ Instead                                            |
+| ----------------- | ----------------------------------------------- | ----------------------------------------------------- |
+| Vague reference   | "Your point about the challenges you're facing" | "Your point about teaching timeline constraints"      |
+| Generic callback  | "Based on what you shared"                      | "When you mentioned needing reports for 20 locations" |
+| Invented context  | "The topics we discussed"                       | Reference actual signal content                       |
+| False familiarity | "Great connecting earlier"                      | Only use when there WAS a prior connection            |
 
 #### Context Validation Module
 
@@ -758,6 +774,7 @@ python3 .bizdev/scripts/fetch_email_context.py --thread 19bbda6ce9a1205b
 ```
 
 Or use gog CLI directly:
+
 ```bash
 # Search for emails
 GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co \
@@ -799,25 +816,25 @@ python3 .bizdev/scripts/generate_draft_for_opportunity.py opp-002 proposal
 
 ### OLD vs NEW Draft Generator Comparison
 
-| Aspect | OLD (`generate_drafts.py`) | NEW (`iterative_draft_generator.py`) |
-|--------|---------------------------|--------------------------------------|
-| Pain points | ❌ IGNORED completely | ✅ Extracts and references all |
-| Key quotes | ❌ IGNORED completely | ✅ Quotes their words back |
-| Follow-up requests | ❌ IGNORED completely | ✅ Addresses specifically |
-| Notes | ❌ Truncated to 50 chars | ✅ Full notes included |
-| Quality gates | ❌ NONE | ✅ 3-iteration refinement loop |
-| Personalization | ❌ Name only | ✅ Full context personalization |
-| Consulting upsell | ❌ NONE | ✅ Tasteful enterprise upsell |
-| MCP context | ❌ NONE | ✅ Gmail/Drive enrichment workflows |
+| Aspect             | OLD (`generate_drafts.py`) | NEW (`iterative_draft_generator.py`) |
+| ------------------ | -------------------------- | ------------------------------------ |
+| Pain points        | ❌ IGNORED completely      | ✅ Extracts and references all       |
+| Key quotes         | ❌ IGNORED completely      | ✅ Quotes their words back           |
+| Follow-up requests | ❌ IGNORED completely      | ✅ Addresses specifically            |
+| Notes              | ❌ Truncated to 50 chars   | ✅ Full notes included               |
+| Quality gates      | ❌ NONE                    | ✅ 3-iteration refinement loop       |
+| Personalization    | ❌ Name only               | ✅ Full context personalization      |
+| Consulting upsell  | ❌ NONE                    | ✅ Tasteful enterprise upsell        |
+| MCP context        | ❌ NONE                    | ✅ Gmail/Drive enrichment workflows  |
 
 ### Scripts Reference
 
-| Script | Purpose | Use When |
-|--------|---------|----------|
-| `iterative_draft_generator.py` | Full iterative draft generation with LLM | Batch generation with API key |
-| `generate_draft_for_opportunity.py` | Generate prompt for Claude to execute | Within Claude skill execution |
-| `mcp_context_enricher.py` | Enrich context from Gmail/Drive/Slack | Before drafting for full context |
-| ~~`generate_drafts.py`~~ | ❌ DEPRECATED - produces generic output | NEVER USE |
+| Script                              | Purpose                                  | Use When                         |
+| ----------------------------------- | ---------------------------------------- | -------------------------------- |
+| `iterative_draft_generator.py`      | Full iterative draft generation with LLM | Batch generation with API key    |
+| `generate_draft_for_opportunity.py` | Generate prompt for Claude to execute    | Within Claude skill execution    |
+| `mcp_context_enricher.py`           | Enrich context from Gmail/Drive/Slack    | Before drafting for full context |
+| ~~`generate_drafts.py`~~            | ❌ DEPRECATED - produces generic output  | NEVER USE                        |
 
 ---
 
@@ -847,12 +864,12 @@ python3 .bizdev/scripts/generate_draft_for_opportunity.py opp-002 proposal
 
 ### New Files
 
-| File | Purpose |
-|------|---------|
-| `opportunity_tracker.py` | Unified tracking with email cross-reference |
-| `templates/pipeline-priority.html` | Priority-sorted dashboard template |
-| `.bizdev/opportunities-enhanced.json` | Full enriched opportunity data |
-| `.bizdev/daily-actions.md` | Today's priority actions |
+| File                                  | Purpose                                     |
+| ------------------------------------- | ------------------------------------------- |
+| `opportunity_tracker.py`              | Unified tracking with email cross-reference |
+| `templates/pipeline-priority.html`    | Priority-sorted dashboard template          |
+| `.bizdev/opportunities-enhanced.json` | Full enriched opportunity data              |
+| `.bizdev/daily-actions.md`            | Today's priority actions                    |
 
 ### Priority Score Calculation
 
@@ -868,12 +885,12 @@ Where:
 
 ### Urgency Levels
 
-| Level | Criteria | Action |
-|-------|----------|--------|
-| 🔴 Critical | Awaiting >14 days OR status=stale | Do today |
-| 🟡 High | Priority ≥70 OR needs_followup | This week |
-| 🟢 Medium | Priority ≥50 | Nurture |
-| ⚪ Low | Priority <50 | Background |
+| Level       | Criteria                          | Action     |
+| ----------- | --------------------------------- | ---------- |
+| 🔴 Critical | Awaiting >14 days OR status=stale | Do today   |
+| 🟡 High     | Priority ≥70 OR needs_followup    | This week  |
+| 🟢 Medium   | Priority ≥50                      | Nurture    |
+| ⚪ Low      | Priority <50                      | Background |
 
 ### Gmail Access (gog CLI) - REQUIRED for Email Generation
 
@@ -894,6 +911,7 @@ GOG_KEYRING_PASSWORD=ngm GOG_ACCOUNT=anant@nextgenerationmedicine.co \
 ```
 
 **Helper Script**:
+
 ```bash
 # Use the fetch_email_context.py helper for structured output
 python3 .bizdev/scripts/fetch_email_context.py --email contact@example.com --format-prompt
@@ -935,9 +953,9 @@ The `scan-deep` command uses Claude 3.5 Haiku to analyze each transcript with:
 
 ### New Files
 
-| File | Purpose |
-|------|---------|
-| `fast_llm_client.py` | Haiku 4.5 API client |
+| File                   | Purpose                  |
+| ---------------------- | ------------------------ |
+| `fast_llm_client.py`   | Haiku 4.5 API client     |
 | `iterative_scanner.py` | Deep scan execution loop |
 
 ---
@@ -978,18 +996,20 @@ The `scan-deep` command uses Claude 3.5 Haiku to analyze each transcript with:
 
 ### Consulting Services
 
-| Tier | Rate | Commitment | When to Use |
-|------|------|------------|-------------|
-| **Standard** | $10,000/month | 3-month upfront ($30,000), then month-to-month | **DEFAULT for ALL proposals** |
-| **Early-Stage** | $5,000/month | 3-month upfront ($15,000), then month-to-month | **ONLY when user explicitly instructs** |
+| Tier            | Rate          | Commitment                                     | When to Use                             |
+| --------------- | ------------- | ---------------------------------------------- | --------------------------------------- |
+| **Standard**    | $10,000/month | 3-month upfront ($30,000), then month-to-month | **DEFAULT for ALL proposals**           |
+| **Early-Stage** | $5,000/month  | 3-month upfront ($15,000), then month-to-month | **ONLY when user explicitly instructs** |
 
-**IMPORTANT:** 
+**IMPORTANT:**
+
 - Default to $10,000/month for all proposals
 - The $5,000/month rate is reserved exclusively for early-stage companies/startups
 - Apply the $5,000 rate ONLY when the user explicitly instructs you to do so
 - Never present both options in the same proposal—use one rate or the other
 
 **Deliverables include:**
+
 - Weekly synchronous meetings
 - Integration into client team operating systems (Slack, Notion, etc.)
 - Product specification review and feedback
@@ -998,12 +1018,12 @@ The `scan-deep` command uses Claude 3.5 Haiku to analyze each transcript with:
 
 ### Longevity Platform (Report Generator)
 
-| Tier | Rate | Included |
-|------|------|----------|
-| **Base** | $499/month | 200 generated reports |
+| Tier       | Rate           | Included                      |
+| ---------- | -------------- | ----------------------------- |
+| **Base**   | $499/month     | 200 generated reports         |
 | **Volume** | Tiered pricing | Scales beyond baseline volume |
 
-*Note: Include platform pricing only when relevant to the opportunity or when user requests it.*
+_Note: Include platform pricing only when relevant to the opportunity or when user requests it._
 
 ---
 
@@ -1012,18 +1032,21 @@ The `scan-deep` command uses Claude 3.5 Haiku to analyze each transcript with:
 **IMPORTANT:** Weave these into all proposals and emails.
 
 ### 1. World-Class Expertise
+
 - Track record building multiple $100M+ healthcare companies
 - Pioneered the first vertically integrated longevity clinic in the United States
 - Current advisor to industry leaders including MidiHealth and Superpower
 - Unparalleled industry perspective from active engagement with top-tier organizations
 
 ### 2. Proprietary Technology Platform
+
 - Built on years of curated longevity and frontier medicine data
 - Cell biology-first approach vs. conventional guidelines—the future of medicine
 - Delivers insights fundamentally irreplicable by generic LLMs or competing platforms
 - Continuously updated core asset capturing cutting-edge research
 
 ### 3. Integrated Cross-Domain Mastery
+
 - Rare convergence of deep expertise across technology, medicine, and business
 - This integration is virtually unavailable elsewhere in the market
 - Translates to accelerated timelines and cost savings for clients
@@ -1040,6 +1063,7 @@ The `scan-deep` command uses Claude 3.5 Haiku to analyze each transcript with:
 ### Why Consulting is Compelling
 
 Dr. Vinjamoori's consulting practice is derived from:
+
 - **Pioneering experience** building one of the first vertically integrated longevity clinics in the United States
 - **Working with the top names in the space** — current advisor to industry leaders, with a track record spanning multiple $100M+ healthcare companies
 - **Truly world-class expertise** that's virtually impossible to find elsewhere
@@ -1048,12 +1072,12 @@ Dr. Vinjamoori's consulting practice is derived from:
 
 Unlike hiring separate specialists, NGM consulting covers **any aspect of your business**:
 
-| Domain | What's Covered |
-|--------|----------------|
-| **Clinical** | Protocol development, service line design, clinical operations, quality assurance, provider training |
+| Domain         | What's Covered                                                                                                  |
+| -------------- | --------------------------------------------------------------------------------------------------------------- |
+| **Clinical**   | Protocol development, service line design, clinical operations, quality assurance, provider training            |
 | **Technology** | Product strategy, AI/ML implementation, platform architecture, technical due diligence, build vs. buy decisions |
-| **Operations** | Scaling playbooks, workflow optimization, team structure, vendor selection, operational efficiency |
-| **Business** | Go-to-market strategy, pricing models, partnership development, fundraising positioning, competitive analysis |
+| **Operations** | Scaling playbooks, workflow optimization, team structure, vendor selection, operational efficiency              |
+| **Business**   | Go-to-market strategy, pricing models, partnership development, fundraising positioning, competitive analysis   |
 
 **Cost Savings Message:** Clients save money and accelerate timelines by getting an integrated perspective from one advisor who spans clinical, tech, and ops—rather than coordinating multiple expensive specialists who don't talk to each other.
 
@@ -1067,9 +1091,11 @@ Unlike hiring separate specialists, NGM consulting covers **any aspect of your b
 ### Example Upsell Language
 
 **In emails:**
+
 > "If it would be helpful, I also work with a select number of companies on broader clinical and operational strategy—drawing from my experience building Modern Age and advising companies like Superpower and Midi Health. Happy to discuss if that's relevant to where you're headed."
 
 **In proposals:**
+
 > "While the Report Generator addresses your immediate lab interpretation needs, I've noticed [COMPANY] is also navigating [CHALLENGE from transcript]. If valuable, I offer strategic advisory that spans clinical, technology, and operations—an integrated perspective that typically requires multiple consultants to achieve."
 
 ### When NOT to Upsell
@@ -1083,14 +1109,14 @@ Unlike hiring separate specialists, NGM consulting covers **any aspect of your b
 
 ## Opportunity Types
 
-| Type | Description | Value Range |
-|------|-------------|-------------|
-| **Consulting** | Advisory retainers, clinical strategy, product guidance | $5,000 - $10,000/month |
-| **Membership** | Longevity Intelligence Platform subscriptions | $499/month (200 reports) |
-| **Report Generator** | AI lab report capability (standalone) | $499/month base tier |
-| **Commons Partnership** | Vendor profiles on NGM Commons + LinkedIn features | $5,000 - $12,500/year |
-| **Enterprise** | Multi-location platform deployments, API integrations | Custom pricing |
-| **Media/Content** | Podcast appearances, content collaboration | Brand value |
+| Type                    | Description                                             | Value Range              |
+| ----------------------- | ------------------------------------------------------- | ------------------------ |
+| **Consulting**          | Advisory retainers, clinical strategy, product guidance | $5,000 - $10,000/month   |
+| **Membership**          | Longevity Intelligence Platform subscriptions           | $499/month (200 reports) |
+| **Report Generator**    | AI lab report capability (standalone)                   | $499/month base tier     |
+| **Commons Partnership** | Vendor profiles on NGM Commons + LinkedIn features      | $5,000 - $12,500/year    |
+| **Enterprise**          | Multi-location platform deployments, API integrations   | Custom pricing           |
+| **Media/Content**       | Podcast appearances, content collaboration              | Brand value              |
 
 ---
 
@@ -1101,14 +1127,17 @@ Unlike hiring separate specialists, NGM consulting covers **any aspect of your b
 The old deep scan produced **251 opportunities from 144 unique contacts** (avg 1.7 opps per contact). This is because **one contact can have multiple opportunity types** based on what they discussed or expressed interest in.
 
 **Example: Larry Siegel (Yunique Medical)**
+
 - Row 1: `enterprise` - Platform deployment for 20 clinic locations
 - Row 2: `consulting` - Hormone pellet dosing algorithm collaboration
 
 **Example: Catherine Grant**
+
 - Row 1: `consulting` - DPC practice strategy
 - Row 2: `enterprise` - Lab interpretation workflow integration
 
 **Example: Tom Joseph**
+
 - Row 1: `consulting` - TRT/peptides telehealth advisory
 - Row 2: `membership` - LIP platform for new practice
 
@@ -1133,13 +1162,14 @@ FOR each transcript:
 
 ### Expected Output Scale
 
-| Scan Input | Expected Opportunities |
-|------------|------------------------|
-| 50 transcripts | 75-125 opportunities |
-| 100 transcripts | 150-250 opportunities |
-| 150 transcripts | 225-375 opportunities |
+| Scan Input      | Expected Opportunities |
+| --------------- | ---------------------- |
+| 50 transcripts  | 75-125 opportunities   |
+| 100 transcripts | 150-250 opportunities  |
+| 150 transcripts | 225-375 opportunities  |
 
 If your scan produces significantly fewer opportunities than this scale, you're likely:
+
 - De-duplicating by contact (wrong - keep multiple types per contact)
 - Filtering too aggressively (include medium confidence)
 - Not analyzing transcript content for multi-type signals
@@ -1147,6 +1177,7 @@ If your scan produces significantly fewer opportunities than this scale, you're 
 ### Dashboard Row Format
 
 Each row in the dashboard should show:
+
 - **Contact**: Name + badges (UNIFIED if transcript+email, urgency level)
 - **Company**: Company name
 - **Type**: Specific opportunity type (consulting, enterprise, etc.)
@@ -1163,6 +1194,7 @@ Contacts with BOTH transcript AND email history get a **"UNIFIED"** badge to ind
 ### Implementation Checklist
 
 When implementing deep scan:
+
 - [ ] Process each transcript individually (fresh LLM context)
 - [ ] Extract MULTIPLE opportunity types per transcript
 - [ ] Create separate rows for each opportunity type
@@ -1175,12 +1207,13 @@ When implementing deep scan:
 
 **IMPORTANT:** NGM Commons partnerships include exposure through Dr. Vinjamoori's LinkedIn—one of the most trusted and high-engagement accounts in the emerging longevity space (10K+ followers, consistently high engagement from physicians, executives, and investors).
 
-| Tier | LinkedIn Benefits |
-|------|-------------------|
-| **Partner** ($5,000/year) | Featured LinkedIn post (1x) introducing the partner and their value to the longevity community |
+| Tier                       | LinkedIn Benefits                                                                                                                                                                           |
+| -------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Partner** ($5,000/year)  | Featured LinkedIn post (1x) introducing the partner and their value to the longevity community                                                                                              |
 | **Sponsor** ($12,500/year) | Multiple LinkedIn placements including: dedicated feature post, LinkedIn Live stream appearance, ongoing social amplification in relevant discussions, and co-branded content opportunities |
 
 **When discussing Commons partnerships, always mention:**
+
 - Research-driven profile on NGM Commons with AI discoverability
 - LinkedIn exposure to the longevity medicine community
 - The difference in social amplification between Partner (single post) and Sponsor (multiple touchpoints including live streams)
@@ -1192,12 +1225,14 @@ When implementing deep scan:
 Every output is evaluated against explicit criteria:
 
 ### Opportunity Analysis Gate
+
 - Signal confidence ≥ 0.6 for at least one signal
 - Contact info completeness (name + email OR company)
 - Classification confidence ≥ 0.5
 - No contradictory signals
 
 ### Email Draft Gate
+
 - Opens with value, not cliche phrases
 - Under word limit (cold: 200, warm: 300)
 - References specific pain points
@@ -1205,6 +1240,7 @@ Every output is evaluated against explicit criteria:
 - No salesy patterns
 
 ### Proposal Gate
+
 - All required sections present
 - No placeholder text
 - Pricing matches recommended tier
@@ -1248,6 +1284,7 @@ open "http://localhost:8080/bizdev-pipeline-deep-scan.html"
 ```
 
 To stop the server:
+
 ```bash
 pkill -f "python3 -m http.server 8080"
 ```
@@ -1255,6 +1292,7 @@ pkill -f "python3 -m http.server 8080"
 ### Email HTML Generation
 
 Emails are stored as markdown in `.bizdev/drafts/emails/` but rendered as HTML in `content/docs/bizdev-drafts/emails/` for browser viewing with:
+
 - Styled header with To/Subject metadata
 - Properly formatted body with bold text and lists
 - **Copy Email** button for one-click copy to clipboard
@@ -1271,7 +1309,7 @@ for f in .bizdev/drafts/emails/*.md; do
   to=$(grep "^To:" "$f" | sed 's/^To: //')
   subject=$(grep "^Subject:" "$f" | sed 's/^Subject: //')
   body=$(sed '1,/^---$/d' "$f" | sed '1,/^---$/d')
-  
+
   cat > "content/docs/bizdev-drafts/emails/${name}.html" << HTMLEOF
 <!DOCTYPE html>
 <html>
@@ -1334,38 +1372,38 @@ done
 
 ### Core Modules
 
-| File | Purpose |
-|------|---------|
-| `SKILL.md` | This documentation |
-| `main.py` | Entry point and orchestration |
-| `types.py` | Data structures and enums |
-| `prompts.py` | LLM prompt templates |
-| `analyzer.py` | Scoring and classification |
-| `dashboard.py` | HTML pipeline generation |
+| File                | Purpose                                                  |
+| ------------------- | -------------------------------------------------------- |
+| `SKILL.md`          | This documentation                                       |
+| `main.py`           | Entry point and orchestration                            |
+| `types.py`          | Data structures and enums                                |
+| `prompts.py`        | LLM prompt templates                                     |
+| `analyzer.py`       | Scoring and classification                               |
+| `dashboard.py`      | HTML pipeline generation                                 |
 | `pricing_config.py` | **Centralized pricing & value proposition (2026-01-18)** |
 
 ### Iterative Modules
 
-| File | Purpose |
-|------|---------|
-| `prd_generator.py` | Task generation (Ralph-style) |
-| `quality_gates.py` | Evaluation criteria and rubrics |
-| `email_drafter.py` | Email generation with value prop integration |
-| `email_searcher.py` | Gmail context search |
-| `context_loader.py` | NGM context aggregation |
-| `subagents.py` | Fresh-context delegation |
-| `proposal_bridge.py` | Proposal integration with pricing tiers |
+| File                 | Purpose                                                         |
+| -------------------- | --------------------------------------------------------------- |
+| `prd_generator.py`   | Task generation (Ralph-style)                                   |
+| `quality_gates.py`   | Evaluation criteria and rubrics                                 |
+| `email_drafter.py`   | Email generation with value prop integration                    |
+| `email_searcher.py`  | Gmail context search                                            |
+| `context_loader.py`  | NGM context aggregation                                         |
+| `subagents.py`       | Fresh-context delegation                                        |
+| `proposal_bridge.py` | Proposal integration with pricing tiers                         |
 | `unified_context.py` | **Cross-references transcripts AND emails for unified context** |
 
 ### Templates
 
-| File | Purpose |
-|------|---------|
-| `templates/pipeline.html` | Dashboard HTML template |
-| `templates/components.html` | UI components |
-| `templates/email_templates.md` | Email patterns by type |
-| `templates/evaluation_rubrics.md` | Quality gate rubrics |
-| `changelogs/changelog-template.md` | Session log template |
+| File                               | Purpose                 |
+| ---------------------------------- | ----------------------- |
+| `templates/pipeline.html`          | Dashboard HTML template |
+| `templates/components.html`        | UI components           |
+| `templates/email_templates.md`     | Email patterns by type  |
+| `templates/evaluation_rubrics.md`  | Quality gate rubrics    |
+| `changelogs/changelog-template.md` | Session log template    |
 
 ---
 
@@ -1419,13 +1457,13 @@ When drafting emails or proposals for an opportunity, the system now cross-refer
 
 ### Key Functions
 
-| Function | Purpose |
-|----------|---------|
-| `generate_unified_context_workflow()` | Main orchestration - gathers all context sources |
-| `extract_transcript_context()` | Extracts key signals from meeting transcripts |
-| `extract_email_context()` | Extracts signals from email threads |
-| `merge_contexts()` | Deduplicates and orders touchpoints chronologically |
-| `generate_email_prompt_with_unified_context()` | Builds LLM prompt with full context |
+| Function                                       | Purpose                                             |
+| ---------------------------------------------- | --------------------------------------------------- |
+| `generate_unified_context_workflow()`          | Main orchestration - gathers all context sources    |
+| `extract_transcript_context()`                 | Extracts key signals from meeting transcripts       |
+| `extract_email_context()`                      | Extracts signals from email threads                 |
+| `merge_contexts()`                             | Deduplicates and orders touchpoints chronologically |
+| `generate_email_prompt_with_unified_context()` | Builds LLM prompt with full context                 |
 
 ### Usage
 
@@ -1441,21 +1479,25 @@ The unified context is automatically used when:
 ## Unified Context for: Dr. James Smith
 
 ### Relationship Summary
+
 - **First Contact:** Meeting (2026-01-10)
 - **Total Touchpoints:** 4 (2 meetings, 2 email threads)
 - **Relationship Stage:** warm_engaged
 
 ### Key Signals (Chronological)
+
 1. [Meeting 2026-01-10] Discussed lab interpretation challenges
 2. [Email 2026-01-12] Sent API documentation, asked about timeline
 3. [Meeting 2026-01-18] Demoed report generator, mentioned budget approval pending
 4. [Email 2026-01-20] Confirmed interest in pilot program
 
 ### Open Action Items
+
 - [ ] Send pricing proposal (from meeting 2026-01-18)
 - [ ] Schedule follow-up with their tech lead (from email 2026-01-20)
 
 ### Pain Points Mentioned
+
 - Manual lab interpretation taking too much time
 - Staff overwhelmed with patient volume
 - Need for scalable solution before Q2
@@ -1496,22 +1538,22 @@ Status: IN_PROGRESS
 Step 1: Scanning...
   ✓ 3 signals extracted
   ✓ Contact: Dr. James Smith, Smith Wellness
-  
+
 Step 2: Quality Gate (Opportunity)
   ✓ Signal confidence: 0.78 (≥0.6)
   ✓ Contact completeness: PASS
   ✓ Classification: consulting (0.82)
-  
+
 Step 3: Drafting Email...
   → Searching Gmail for prior context...
     Found: 2 prior threads with Dr. Smith
   → Generating warm follow-up email
-  
+
 Step 4: Quality Gate (Email)
   ✗ FAIL: Opens with sales pitch
   → Iteration 1: Refining...
   ✓ PASS: Value-first opening, clear CTA
-  
+
 Step 5: Drafting Proposal (score: 72 ≥ 60)
   ✓ Proposal generated
   ✓ Quality Gate: PASS
@@ -1581,37 +1623,37 @@ Configure these in `.mcp.json`:
 
 ### Score Thresholds
 
-| Setting | Default | Description |
-|---------|---------|-------------|
-| `email_score_threshold` | 40 | Min confidence to draft email |
-| `proposal_score_threshold` | 60 | Min confidence to draft proposal |
-| `lookback_months` | 6 | How far back to scan |
+| Setting                    | Default | Description                      |
+| -------------------------- | ------- | -------------------------------- |
+| `email_score_threshold`    | 40      | Min confidence to draft email    |
+| `proposal_score_threshold` | 60      | Min confidence to draft proposal |
+| `lookback_months`          | 6       | How far back to scan             |
 
 ---
 
 ## Key Differences from v1
 
-| Aspect | v1 (Original) | v2 (Iterative) |
-|--------|---------------|----------------|
-| Execution | Single-pass | Iterative with retries |
-| Quality | None | Explicit gates per output |
-| Drafts | Manual | Automatic with evaluation |
-| Context | Per-run | Persisted in progress.txt |
-| Subagents | None | Fresh context for drafting |
-| Email Search | Basic | Deep search for conversation history |
-| Audit | None | Full session changelogs |
-| Learning | None | Patterns compound in progress.txt |
+| Aspect              | v1 (Original) | v2 (Iterative)                                     |
+| ------------------- | ------------- | -------------------------------------------------- |
+| Execution           | Single-pass   | Iterative with retries                             |
+| Quality             | None          | Explicit gates per output                          |
+| Drafts              | Manual        | Automatic with evaluation                          |
+| Context             | Per-run       | Persisted in progress.txt                          |
+| Subagents           | None          | Fresh context for drafting                         |
+| Email Search        | Basic         | Deep search for conversation history               |
+| Audit               | None          | Full session changelogs                            |
+| Learning            | None          | Patterns compound in progress.txt                  |
 | **Context Sources** | Single source | **Unified: Transcripts + Emails cross-referenced** |
 
 ---
 
 ## Related Skills
 
-| Skill | Integration |
-|-------|-------------|
-| `proposal-generator` | HTML proposal creation |
-| `edusales-writer` | Email drafting patterns |
-| `document-studio` | Design system, brand guidelines |
+| Skill                | Integration                      |
+| -------------------- | -------------------------------- |
+| `proposal-generator` | HTML proposal creation           |
+| `edusales-writer`    | Email drafting patterns          |
+| `document-studio`    | Design system, brand guidelines  |
 | `outreach-responder` | LinkedIn/email response crafting |
 
 ---
@@ -1622,12 +1664,12 @@ Configure these in `.mcp.json`:
 
 On Feb 4, 2026, we discovered that the "new" scan methodology was missing significant data compared to the Jan 24 scan:
 
-| Metric | Old Scan (Jan 17-24) | New Scan (Feb 4) |
-|--------|----------------------|------------------|
-| Transcripts Found | 196 | 36 |
-| Opportunities | 251 | 24 |
-| Unique Contacts | 144 | ~30 |
-| Eric Huynh | ✅ Present | ❌ Missing |
+| Metric            | Old Scan (Jan 17-24) | New Scan (Feb 4) |
+| ----------------- | -------------------- | ---------------- |
+| Transcripts Found | 196                  | 36               |
+| Opportunities     | 251                  | 24               |
+| Unique Contacts   | 144                  | ~30              |
+| Eric Huynh        | ✅ Present           | ❌ Missing       |
 
 **Root Cause:** The transcript discovery logic was too restrictive, missing 407 of 443 transcripts in Google Drive.
 
@@ -1641,6 +1683,7 @@ mcp__google-drive__list_files(folder_id="1CfvHgljboEJy9TB29ZvUp6nIavgODDkI", pag
 ```
 
 **Expected transcript counts:**
+
 - Google Drive folder: 443 total files
 - After filtering PDFs with "transcript" in name: ~420
 - External (sales) transcripts: ~365
@@ -1650,10 +1693,10 @@ mcp__google-drive__list_files(folder_id="1CfvHgljboEJy9TB29ZvUp6nIavgODDkI", pag
 
 The dashboard must track THREE categories from DIFFERENT sources:
 
-| Category | Sources | Example Tasks |
-|----------|---------|---------------|
-| **Sales/BizDev** | Transcripts + Emails + **Motion Recaps** | Larry Siegel proposal, INEXION demo, Welldercare API |
-| **Product Work** | **Motion Recaps** + Slack #ngm-partnership | Build Slack bot, launch directory, upload sessions |
+| Category           | Sources                                          | Example Tasks                                              |
+| ------------------ | ------------------------------------------------ | ---------------------------------------------------------- |
+| **Sales/BizDev**   | Transcripts + Emails + **Motion Recaps**         | Larry Siegel proposal, INEXION demo, Welldercare API       |
+| **Product Work**   | **Motion Recaps** + Slack #ngm-partnership       | Build Slack bot, launch directory, upload sessions         |
 | **Personal/Admin** | **Julie's Daily Slack Messages** + Motion Recaps | Leela's library books, Hawaii itinerary, compound planning |
 
 ### CRITICAL: Julie's Daily Priorities (Personal Tasks Source)
@@ -1661,6 +1704,7 @@ The dashboard must track THREE categories from DIFFERENT sources:
 **Julie posts daily priority messages in Slack** that contain personal/admin tasks. These are the PRIMARY source for personal task extraction.
 
 **How to extract:**
+
 ```bash
 # Search Julie's daily messages
 mcp__slack__conversations_search_messages(
@@ -1671,6 +1715,7 @@ mcp__slack__conversations_search_messages(
 ```
 
 **Personal task patterns to extract:**
+
 - "Overdue Books of Leela need to return" → Library books
 - "Finalized Itinerary for Hawaii Trip" → Travel planning
 - "Check Leela's camp Activity for Summer Break" → Summer camp booking
@@ -1685,6 +1730,7 @@ mcp__slack__conversations_search_messages(
 **Motion sends email recaps after every meeting** with summaries and action items. These are a comprehensive source for ALL THREE categories.
 
 **How to fetch:**
+
 ```bash
 # Search for Motion recap emails (last 3 months)
 gog gmail search "from:motion subject:recap after:2025/11/01" --max=100
@@ -1694,6 +1740,7 @@ gog gmail thread <email_id>
 ```
 
 **Categorization logic:**
+
 - **sales_bizdev** (default): Any external meeting (e.g., "Larry Siegel <> Anant", "INEXION follow up")
 - **product_work**: Internal team meetings (keywords: "Weekly Team", "Albert", "Sarthak", "Jeph", "Markus", "Julie 1:1", "AI Working Session")
 - **personal_admin**: Personal meetings (keywords: "Compound Planning", "family", "personal")
@@ -1703,16 +1750,18 @@ gog gmail thread <email_id>
 **Output file:** `.bizdev/motion-recaps-extracted.json`
 
 **Feb 2026 scan results:**
-| Category | Count |
-|----------|-------|
-| Sales/BizDev meetings | 79 |
-| Product Work meetings | 20 |
-| Personal/Admin meetings | 1 |
-| **Total Recaps** | 100 |
-| **Unique Contacts** | 111 |
-| **Action Items** | 26 |
+
+| Category                | Count |
+| ----------------------- | ----- |
+| Sales/BizDev meetings   | 79    |
+| Product Work meetings   | 20    |
+| Personal/Admin meetings | 1     |
+| **Total Recaps**        | 100   |
+| **Unique Contacts**     | 111   |
+| **Action Items**        | 26    |
 
 **Key contacts discovered via Motion recaps:**
+
 - Eric Huynh (Erik-Anant Catch Up)
 - Philip Deibel
 - Umar Latif
@@ -1725,6 +1774,7 @@ gog gmail thread <email_id>
 - Kanishka Acharya (Welldercare)
 
 **Action items to merge:**
+
 - "build a Claude/Moldbot in Slack" → product_work
 - "launch the conference site and directory listing" → product_work
 - "share the API spec and sample executions" → sales_bizdev (Welldercare)
@@ -1733,6 +1783,7 @@ gog gmail thread <email_id>
 ### Legacy Data Reference
 
 The old comprehensive scan data exists at:
+
 ```
 .ai-workspaces/.bizdev/
 ├── contacts_deduplicated.json  # 139 contacts, 195 opportunities
@@ -1773,6 +1824,7 @@ Before considering a scan "complete", verify:
 ### Migration Script (if needed)
 
 To migrate old data to new system:
+
 ```python
 import json
 
@@ -1799,16 +1851,19 @@ for contact in old_contacts:
 ## Troubleshooting
 
 ### "Folder ID not found"
+
 - Verify the folder ID is correct (from URL)
 - Ensure service account has access to the folder
 - Share the folder with the service account email
 
 ### "No opportunities detected"
+
 - Check that transcripts contain relevant keywords
 - Verify lookback window covers the file dates
 - Try expanding search terms
 
 ### "Gmail connection failed"
+
 - Verify domain-wide delegation is configured
 - Check GMAIL_USER_EMAIL is set correctly
 - Ensure service account has Gmail API scope
@@ -1822,6 +1877,7 @@ for contact in old_contacts:
 The MCP Google Drive `get_file_content` tool returns **raw PDF binary data** when fetching PDF files. This binary data gets corrupted during JSON serialization, resulting in "needs OCR" or "corrupted PDF" errors even when the PDF contains extractable text.
 
 **Symptoms:**
+
 - `%PDF-1.3` header visible in raw content
 - pdfplumber returns "Data-loss while decompressing corrupted data"
 - Files incorrectly logged as "image-based, needs OCR"
@@ -1894,6 +1950,7 @@ def download_and_extract_pdf(file_id: str, name: str) -> str:
 - **JSON files** - Works fine
 
 **Never use MCP for:**
+
 - PDF files (use `gog drive download`)
 - Binary files (images, etc.)
 
@@ -1915,14 +1972,17 @@ If a PDF fails extraction, log it to `.bizdev/pdf-extraction-issues.json`:
 ```
 
 ### "Quality gate keeps failing"
+
 - Review the specific failures in the output
 - Check the evaluation_rubrics.md for criteria
 - Try the suggestions provided by the gate
 
 ### Resume interrupted session
+
 ```
 /bizdev-opportunity execute
 ```
+
 This loads the existing PRD and continues from the last pending task.
 
 ---
@@ -2008,32 +2068,32 @@ python3 .bizdev/scripts/generate_master_dashboard.py
 
 ### Task Categories
 
-| Category | Default Owner | Color |
-|----------|---------------|-------|
-| `product` | jeff | Purple |
-| `bizdev` | unassigned | Gold |
-| `personal` | unassigned | Green |
-| `engineering` | ayen | Blue |
-| `backend` | julie | Orange |
+| Category      | Default Owner | Color  |
+| ------------- | ------------- | ------ |
+| `product`     | jeff          | Purple |
+| `bizdev`      | unassigned    | Gold   |
+| `personal`    | unassigned    | Green  |
+| `engineering` | ayen          | Blue   |
+| `backend`     | julie         | Orange |
 
 ### Team Structure
 
-| Member | Role | Slack Channels |
-|--------|------|----------------|
-| **Jeff** | Product & Strategy | #product |
-| **Julie** | Backend & Transcripts | #backend |
-| **Ayen** | Engineering | #dev |
+| Member    | Role                  | Slack Channels |
+| --------- | --------------------- | -------------- |
+| **Jeff**  | Product & Strategy    | #product       |
+| **Julie** | Backend & Transcripts | #backend       |
+| **Ayen**  | Engineering           | #dev           |
 
 ### HTTP Server Endpoints
 
 When running `python3 .bizdev/scripts/scan_recent.py --server`:
 
-| Endpoint | Method | Purpose |
-|----------|--------|---------|
-| `/scan-recent` | POST | Full scan (emails + Motion) |
-| `/scan-emails` | POST | Email scan only |
-| `/scan-motion` | POST | Motion recap scan only |
-| `/scan-status` | GET | Return last scan state |
+| Endpoint       | Method | Purpose                     |
+| -------------- | ------ | --------------------------- |
+| `/scan-recent` | POST   | Full scan (emails + Motion) |
+| `/scan-emails` | POST   | Email scan only             |
+| `/scan-motion` | POST   | Motion recap scan only      |
+| `/scan-status` | GET    | Return last scan state      |
 
 ### Slack Task Extraction
 
@@ -2052,6 +2112,7 @@ Need to <verb>...
 ```
 
 Priority keywords:
+
 - **High**: urgent, asap, critical, important, blocker, p0, p1, today, now
 - **Medium**: soon, this week, p2, when you can
 - **Low**: later, eventually, nice to have, p3, backlog, someday
@@ -2098,12 +2159,12 @@ python3 .bizdev/scripts/thoroughness_auditor.py report
 
 ### What It Checks
 
-| Source | Verification Method |
-|--------|---------------------|
-| Motion Recaps | Alternative regex patterns for action detection |
-| BizDev Opps | Task coverage, stale records, duplicates |
-| Drafts | Email/proposal coverage for high-priority opps |
-| Cross-Reference | Names in transcripts vs opportunity records |
+| Source          | Verification Method                             |
+| --------------- | ----------------------------------------------- |
+| Motion Recaps   | Alternative regex patterns for action detection |
+| BizDev Opps     | Task coverage, stale records, duplicates        |
+| Drafts          | Email/proposal coverage for high-priority opps  |
+| Cross-Reference | Names in transcripts vs opportunity records     |
 
 ### Output Files
 
@@ -2112,6 +2173,7 @@ python3 .bizdev/scripts/thoroughness_auditor.py report
 ### Coverage Scores
 
 The auditor calculates coverage scores (0-100%) for each source:
+
 - ✅ **80%+**: Good coverage
 - ⚠️ **60-79%**: Needs attention
 - ❌ **<60%**: Critical gaps

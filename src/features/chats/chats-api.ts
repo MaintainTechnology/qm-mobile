@@ -75,7 +75,11 @@ export function useSendChatReply(conversationId: string) {
             ? {
                 chats: prev.chats.map(chat =>
                   chat.id === conversationId
-                    ? { ...chat, messages: [...chat.messages, message], last_message_at: message.created_at }
+                    ? {
+                        ...chat,
+                        messages: [...chat.messages, message],
+                        last_message_at: message.created_at,
+                      }
                     : chat,
                 ),
               }

@@ -5,7 +5,8 @@
   "main": "expo-router/entry",
   "scripts": {
     "start": "expo start --go",
-    "android": "expo start --go --android",
+    "android": "expo start --dev-client --android",
+    "android:go": "expo start --go --android",
     "ios": "expo start --go --ios",
     "web": "expo start --web",
     "lint": "expo lint",
@@ -13,16 +14,16 @@
     "typecheck": "tsc --noEmit",
     "test": "jest --watch",
     "test:ci": "jest --ci",
+    "test:e2e": "playwright test",
     "check": "npm run typecheck && npm run lint && npm run test:ci",
     "doctor": "npx expo-doctor",
     "start:dev-client": "expo start --dev-client"
   },
   "dependencies": {
     "@ai-sdk/react": "^4.0.61",
-    "@clerk/clerk-expo": "^2.20.0",
+    "@clerk/expo": "^4.5.2",
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo-google-fonts/manrope": "^0.4.2",
-    "@expo/ui": "~0.2.0-beta.9",
     "@react-navigation/native": "^7.1.8",
     "@shopify/flash-list": "2.0.2",
     "@stardazed/streams-text-encoding": "^1.0.2",
@@ -61,10 +62,13 @@
     "zod": "^4.4.3"
   },
   "devDependencies": {
+    "@clerk/testing": "^2.2.28",
+    "@playwright/test": "^1.62.1",
     "@testing-library/react-native": "^14.0.1",
     "@types/jest": "29.5.14",
     "@types/react": "~19.1.17",
     "@types/ungap__structured-clone": "^1.2.0",
+    "dotenv": "^17.4.2",
     "eslint": "^9.39.5",
     "eslint-config-expo": "~10.0.0",
     "eslint-config-prettier": "^10.1.8",
@@ -77,10 +81,11 @@
     "preset": "jest-expo",
     "testPathIgnorePatterns": [
       "/node_modules/",
-      "/.claude/"
+      "/.claude/",
+      "/e2e/"
     ],
     "transformIgnorePatterns": [
-      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|native-base|standard-navigation|@shopify/flash-list|ai|@ai-sdk|@tanstack))",
+      "/node_modules/(?!(.pnpm|react-native|@react-native|@react-native-community|expo|@expo|@expo-google-fonts|react-navigation|@react-navigation|native-base|standard-navigation|@shopify/flash-list|ai|@ai-sdk|@clerk|@tanstack))",
       "/node_modules/react-native-reanimated/plugin/",
       "/node_modules/@react-native/babel-preset/"
     ]

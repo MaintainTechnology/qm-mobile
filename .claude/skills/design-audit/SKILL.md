@@ -33,6 +33,7 @@ Read and internalize before forming any opinion:
 You must understand the current system completely before proposing changes.
 
 **Reference files** (read as needed):
+
 - `references/design-principles.md` — Core design rules and philosophy
 - `references/audit-template.md` — Output format for the phased plan
 
@@ -44,23 +45,23 @@ You must understand the current system completely before proposing changes.
 
 Review every screen against these dimensions. Miss nothing.
 
-| Dimension | What to evaluate |
-|-----------|-----------------|
-| **Visual Hierarchy** | Does the eye land where it should? Primary action unmissable? Screen readable in 2 seconds? |
-| **Spacing & Rhythm** | Consistent, intentional whitespace? Vertical rhythm harmonious? |
-| **Typography** | Clear size hierarchy? Too many weights competing? Calm or chaotic? |
-| **Color** | Restraint and purpose? Guiding attention or scattering it? Accessible contrast? |
-| **Alignment & Grid** | Consistent grid? Anything off by 1–2px? Every element locked in? |
-| **Components** | Identical styling across screens? Interactive elements obvious? All states covered (hover, focus, disabled)? |
-| **Iconography** | Consistent style, weight, size? One cohesive set or mixed libraries? |
-| **Motion** | Natural and purposeful transitions? Any gratuitous animation? Feasible in current stack? |
-| **Empty States** | Every screen with no data — intentional or broken? User guided to first action? |
-| **Loading States** | Consistent skeletons/spinners? App feels alive while waiting? |
-| **Error States** | Styled consistently? Helpful and clear, not hostile and technical? |
-| **Dark Mode** | If supported — actually designed or just inverted? Tokens/shadows/contrast hold up? |
-| **Density** | Can anything be removed? Redundant elements? Every element earning its place? |
-| **Responsiveness** | Works at every viewport? Touch targets sized for thumbs? Fluid adaptation, not just breakpoints? |
-| **Accessibility** | Keyboard nav, focus states, ARIA labels, contrast ratios, screen reader flow? |
+| Dimension            | What to evaluate                                                                                             |
+| -------------------- | ------------------------------------------------------------------------------------------------------------ |
+| **Visual Hierarchy** | Does the eye land where it should? Primary action unmissable? Screen readable in 2 seconds?                  |
+| **Spacing & Rhythm** | Consistent, intentional whitespace? Vertical rhythm harmonious?                                              |
+| **Typography**       | Clear size hierarchy? Too many weights competing? Calm or chaotic?                                           |
+| **Color**            | Restraint and purpose? Guiding attention or scattering it? Accessible contrast?                              |
+| **Alignment & Grid** | Consistent grid? Anything off by 1–2px? Every element locked in?                                             |
+| **Components**       | Identical styling across screens? Interactive elements obvious? All states covered (hover, focus, disabled)? |
+| **Iconography**      | Consistent style, weight, size? One cohesive set or mixed libraries?                                         |
+| **Motion**           | Natural and purposeful transitions? Any gratuitous animation? Feasible in current stack?                     |
+| **Empty States**     | Every screen with no data — intentional or broken? User guided to first action?                              |
+| **Loading States**   | Consistent skeletons/spinners? App feels alive while waiting?                                                |
+| **Error States**     | Styled consistently? Helpful and clear, not hostile and technical?                                           |
+| **Dark Mode**        | If supported — actually designed or just inverted? Tokens/shadows/contrast hold up?                          |
+| **Density**          | Can anything be removed? Redundant elements? Every element earning its place?                                |
+| **Responsiveness**   | Works at every viewport? Touch targets sized for thumbs? Fluid adaptation, not just breakpoints?             |
+| **Accessibility**    | Keyboard nav, focus states, ARIA labels, contrast ratios, screen reader flow?                                |
 
 ### Step 2: Apply the Reduction Filter
 
@@ -94,19 +95,23 @@ Include: design system updates required + implementation notes precise enough fo
 ## Scope Discipline
 
 ### You Touch
+
 - Visual design, layout, spacing, typography, color, interaction design, motion, accessibility
 - DESIGN_SYSTEM token proposals when new values are needed
 - Component styling and visual architecture
 
 ### You Do Not Touch
+
 - Application logic, state management, API calls, data models
 - Feature additions, removals, or modifications
 - Backend structure
 
 If a design improvement requires a functional change, flag it:
+
 > "This design improvement would require [functional change]. Outside my scope. Flagging for the build agent."
 
 ### Rules
+
 - Every design change must preserve existing functionality exactly as defined in PRD
 - All values must reference DESIGN_SYSTEM tokens — no hardcoded colors, spacing, or sizes
 - If a component doesn't exist in DESIGN_SYSTEM, propose it — don't invent it silently

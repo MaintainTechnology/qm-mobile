@@ -14,7 +14,9 @@
  * which one is "active"; `session.getToken()` mints a token for a specific session without
  * activating it, so Retry works before the CTA is pressed.
  */
-import { useAuth, useSessionList, useSignUp } from '@clerk/clerk-expo';
+import { useAuth, useSessionList } from '@clerk/expo';
+// Resource-shaped hook (setActive/isLoaded) — Core 3 keeps these at /legacy.
+import { useSignUp } from '@clerk/expo/legacy';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useState } from 'react';

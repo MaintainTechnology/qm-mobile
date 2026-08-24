@@ -44,11 +44,14 @@ export default function QuotesRoute() {
   const filtered = useMemo(
     () =>
       [...quotes]
-        .filter((q) => matchesFilter(q, filter))
+        .filter(q => matchesFilter(q, filter))
         .sort((a, b) => (a.created_at < b.created_at ? 1 : -1)),
     [quotes, filter],
   );
-  const selected = useMemo(() => quotes.find((q) => q.id === selectedId) ?? null, [quotes, selectedId]);
+  const selected = useMemo(
+    () => quotes.find(q => q.id === selectedId) ?? null,
+    [quotes, selectedId],
+  );
 
   // 404 = signed in but no tenant row — that's an onboarding-resume state (spec A2), not a
   // Quotes-tab error; the tabs shell/root redirect owns that. Render nothing while it fires.
@@ -61,7 +64,7 @@ export default function QuotesRoute() {
       </View>
 
       <View style={styles.filterRow}>
-        {QUOTE_FILTERS.map((f) => {
+        {QUOTE_FILTERS.map(f => {
           const active = filter === f.key;
           return (
             <Pressable
@@ -108,7 +111,9 @@ export default function QuotesRoute() {
         <FlashList
           data={filtered}
           keyExtractor={(q: QuoteRowData) => q.id}
-          renderItem={({ item }) => <QuoteRow quote={item} onPress={() => setSelectedId(item.id)} />}
+          renderItem={({ item }) => (
+            <QuoteRow quote={item} onPress={() => setSelectedId(item.id)} />
+          )}
           refreshing={me.isRefetching}
           onRefresh={() => void me.refetch()}
           ListEmptyComponent={
@@ -159,7 +164,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 14,
   },
   filterLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1 },
-  centered: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: spacing.xxl, gap: spacing.md },
+  centered: {
+    flex: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: spacing.xxl,
+    gap: spacing.md,
+  },
   errorText: { fontFamily: fonts.sans.regular, fontSize: 14, textAlign: 'center' },
   emptyText: { fontFamily: fonts.sans.regular, fontSize: 14, textAlign: 'center', lineHeight: 20 },
   retryBtn: {

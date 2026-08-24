@@ -20,6 +20,7 @@ Traditional UX optimizes individual screens and isolated interactions. Agentic U
 ## When to Use
 
 Use this skill when:
+
 - Designing AI-powered applications, chatbots, or agent systems
 - Building interfaces with repeated user interactions over time
 - Creating systems that should learn from user behavior
@@ -30,6 +31,7 @@ Use this skill when:
 - Building collaborative planning features (human + AI co-creation)
 
 **When NOT to use:**
+
 - Simple one-time transactions with no user accounts
 - Static content websites with no personalization needs
 - Systems where memory/learning creates privacy concerns
@@ -44,6 +46,7 @@ Use this skill when:
 **New model:** Maintain dynamic, evolving relationship models
 
 **Design for:**
+
 - **Behavioral patterns:** Not just "user clicked X" but "user spends 20 min frustrated searching for Y on Tuesday evenings"
 - **Emotional context:** Recognize frustration, urgency, exploration, decision-making modes
 - **Temporal evolution:** How preferences change over weeks/months
@@ -56,24 +59,28 @@ Use this skill when:
 Design interfaces that earn autonomy through graduated trust:
 
 **Stage 1: Transparency Phase**
+
 - Show all reasoning, decision processes, confidence levels
 - Explain why the system suggests actions
 - Reveal data sources and logic paths
 - User wants to see everything
 
 **Stage 2: Selective Disclosure Phase**
+
 - Show reasoning only for important/uncertain decisions
 - Quiet confidence for routine actions
 - System learns when to show work vs. act confidently
 - User trusts but verifies
 
 **Stage 3: Autonomous Action Phase**
+
 - Act independently with subtle confirmation patterns
 - Clear escalation paths for mistakes
 - User delegates entire decision categories
 - Trust through consistent, aligned behavior
 
 **Design patterns:**
+
 - Progressive disclosure controls (let users adjust transparency level)
 - Confidence indicators (system certainty visualization)
 - Trust recovery protocols (clear undo/correction paths)
@@ -88,12 +95,14 @@ Design interfaces that earn autonomy through graduated trust:
 **From:** User logs in → completes task → logs out → system forgets
 
 **To:** System maintains continuous awareness of:
+
 - User's ongoing goals and projects
 - Communication preferences and patterns
 - Learning from what works for this individual
 - Relationship depth over time
 
 **Implementation patterns:**
+
 - **Memory visualization:** Show what system remembers (preferences, goals, patterns)
 - **Context indicators:** Subtle cues showing how past interactions influence current suggestions
 - **Forgetting controls:** User agency over what gets remembered vs. forgotten
@@ -108,12 +117,14 @@ Design interfaces that earn autonomy through graduated trust:
 **To:** Design goal-alignment mechanisms where system dynamically constructs paths
 
 **Agentic systems:**
+
 - Maintain awareness of underlying user objectives
 - Adapt interaction patterns based on what works
 - Learn from imperfect demonstrations and natural language feedback
 - Construct custom workflows for individual users
 
 **Design for:**
+
 - **Goal continuity:** Persistent awareness of user objectives across sessions
 - **Proactive nudging:** Gentle next-step suggestions without intrusion
 - **Collaborative planning:** Human + AI jointly developing approaches
@@ -128,24 +139,28 @@ Traditional UX metrics (session duration, conversion rates, clicks) miss the poi
 **Measure instead:**
 
 **Relationship Quality**
+
 - Trust scores and delegation comfort
 - User confidence in system decisions
 - How often users second-guess the system
 - Comfort with autonomous actions
 
 **Compounding Value**
+
 - Experience improvement over time
 - Increasingly complex problems solved
 - Better outcomes through accumulated understanding
 - Month 6 vs. Month 1 comparison
 
 **Context Accuracy**
+
 - System understanding of intent and preferences
 - Alignment with user values and goals
 - Situational needs recognition
 - Prediction accuracy for important decisions
 
 **Democratic Alignment**
+
 - Alignment with broader human values
 - Socially acceptable behavior boundaries
 - Ethical decision-making
@@ -195,6 +210,7 @@ For your specific use case:
 ### Phase 5: Define Success Metrics
 
 Choose 2-3 metrics from each category:
+
 - Relationship Quality indicators
 - Compounding Value measures
 - Context Accuracy signals
@@ -207,16 +223,19 @@ Track these over weeks/months, not just sessions.
 ### Memory-Aware Interface Components
 
 **Contextual Timeline**
+
 - Show user's journey over time
 - Highlight preference evolution
 - Display key relationship moments
 
 **Emotional State Indicators**
+
 - Recognize frustration, urgency, exploration
 - Adapt interface based on detected state
 - Show system's understanding of context
 
 **Dynamic Suggestions Panel**
+
 - Based on current goal + historical patterns
 - Confidence indicators for each suggestion
 - Explain why these suggestions now
@@ -224,16 +243,19 @@ Track these over weeks/months, not just sessions.
 ### Trust-Building Components
 
 **Reasoning Display (Transparency Phase)**
+
 - Show decision logic
 - Display confidence levels
 - Reveal data sources
 
 **Confidence Meter**
+
 - Visual indicator of system certainty
 - Hover to see reasoning
 - Adjust autonomy based on confidence
 
 **Undo/Correct Patterns**
+
 - One-click correction of autonomous actions
 - System learns from corrections
 - Clear escalation paths
@@ -241,16 +263,19 @@ Track these over weeks/months, not just sessions.
 ### Collaborative Planning Components
 
 **Goal Dashboard**
+
 - Ongoing objectives visualization
 - Progress indicators
 - System suggestions for next steps
 
 **Planning Canvas**
+
 - Human + AI co-create plans
 - System contributes capabilities
 - User provides judgment and strategy
 
 **Preference Evolution Map**
+
 - Show how system's understanding improved
 - User control over what's learned
 - Forgetting controls
@@ -258,31 +283,37 @@ Track these over weeks/months, not just sessions.
 ## Common Mistakes
 
 ### ❌ Treating Memory Like Static Settings
+
 **Problem:** Storing preferences as key-value pairs (theme: dark) instead of evolving patterns
 
 **Fix:** Design dynamic models that understand behavioral patterns, temporal context, and evolution over time
 
 ### ❌ Binary Trust Model
+
 **Problem:** System is either fully transparent or fully autonomous from day one
 
 **Fix:** Design three-stage trust evolution with gradual autonomy and user-controlled trust levels
 
 ### ❌ Using Traditional UX Metrics
+
 **Problem:** Measuring session duration and conversion rates for relationship-based systems
 
 **Fix:** Track relationship quality, compounding value, context accuracy over weeks/months
 
 ### ❌ Forgetting Privacy Controls
+
 **Problem:** System remembers everything with no user control
 
 **Fix:** Build forgetting controls, memory visualization, and clear data retention policies
 
 ### ❌ Designing Screens Instead of Relationships
+
 **Problem:** Focusing on pixel-perfect interfaces without relationship architecture
 
 **Fix:** Start with relationship model, then design screens that support ongoing partnership
 
 ### ❌ No Trust Recovery Path
+
 **Problem:** When system makes mistakes, users lose all trust permanently
 
 **Fix:** Design clear correction paths, system learning from mistakes, and trust recovery protocols
@@ -290,34 +321,37 @@ Track these over weeks/months, not just sessions.
 ## Real-World Applications
 
 **See [EXAMPLES.md](EXAMPLES.md) for:**
+
 - EU B2B relationship cockpit (automotive service networks)
 - Memory-aware content discovery (streaming services)
 - Collaborative planning assistant (project management)
 - Trust-evolving financial advisor
 
 **See [REFERENCE.md](REFERENCE.md) for:**
+
 - Detailed research foundation (DeepMind, Anthropic, OpenAI)
 - Technical implementation patterns
 - Memory architecture designs
 - Metrics implementation guides
 
 **See [CHECKLIST.md](CHECKLIST.md) for:**
+
 - Relationship UX audit checklist
 - Memory & data contracts sprint guide
 - Trust evolution design worksheet
 
 ## Quick Reference
 
-| Traditional UX | Agentic UX |
-|----------------|------------|
-| Session duration | Relationship depth over months |
-| Conversion rates | Trust scores and delegation comfort |
+| Traditional UX      | Agentic UX                             |
+| ------------------- | -------------------------------------- |
+| Session duration    | Relationship depth over months         |
+| Conversion rates    | Trust scores and delegation comfort    |
 | Click-through rates | Compounding value (Month 6 vs Month 1) |
-| Isolated screens | Continuous relationship context |
-| Static preferences | Dynamic pattern evolution |
-| One-size-fits-all | Individually adaptive interfaces |
-| Explicit navigation | Goal-aligned path construction |
-| Binary permissions | Graduated trust evolution |
+| Isolated screens    | Continuous relationship context        |
+| Static preferences  | Dynamic pattern evolution              |
+| One-size-fits-all   | Individually adaptive interfaces       |
+| Explicit navigation | Goal-aligned path construction         |
+| Binary permissions  | Graduated trust evolution              |
 
 ## Remember
 

@@ -177,31 +177,37 @@ The ones who don't? [STRUGGLING IN SOME WAY]
 ## Hook Swipe File
 
 **Hypothetical Hooks:**
+
 - "If I had to start over with $0 and no connections..."
 - "If I could only teach one skill to my [kids/team/audience]..."
 - "If everything I built disappeared tomorrow..."
 
 **Contrarian Hooks:**
+
 - "Unpopular opinion: [THING EVERYONE BELIEVES] is wrong."
 - "Stop [COMMON ADVICE]. It's killing your [RESULTS]."
 - "The best [ROLE] I know doesn't [EXPECTED BEHAVIOR]."
 
 **Story Hooks:**
+
 - "3 years ago, I [FAILURE/STRUGGLE]. Here's what changed."
 - "Last week, a [PERSON] asked me [QUESTION]. My answer surprised them."
 - "I almost [QUIT/GAVE UP]. Then I discovered [THING]."
 
 **Curiosity Hooks:**
+
 - "I've [DONE IMPRESSIVE THING]. Here's the one thing that made the difference."
 - "After [EXPERIENCE], I'll never [DO THING] again."
 - "The secret to [RESULT] isn't what you think."
 
 **Results Hooks:**
+
 - "[NUMBER] [RESULT] in [TIMEFRAME]. Here's exactly how."
 - "I went from [BAD STATE] to [GOOD STATE]. Here's the playbook."
 - "This one change [MULTIPLIED/TRANSFORMED] my [METRIC]."
 
 **Pattern Interrupt Hooks:**
+
 - "Don't read this if you [ALREADY SUCCESSFUL AT THING]."
 - "This post will make some people angry."
 - "I'm going to share something I've never shared publicly."

@@ -18,20 +18,21 @@ Combines lecture generation with automatic preview system registration.
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
-| `<outline_path>` | Required: path to course outline |
-| `--physician ID` | Physician ID (e.g., dr-john-smith) |
-| `--course ID` | Course ID (e.g., metabolic-health) |
-| `--dry-run` | Preview plan without executing |
-| `--start N` | Start from lecture N |
-| `--end N` | End at lecture N |
-| `--materials PATH` | Custom materials folder |
-| `--no-llm-parser` | Use regex parser |
+| Flag               | Description                        |
+| ------------------ | ---------------------------------- |
+| `<outline_path>`   | Required: path to course outline   |
+| `--physician ID`   | Physician ID (e.g., dr-john-smith) |
+| `--course ID`      | Course ID (e.g., metabolic-health) |
+| `--dry-run`        | Preview plan without executing     |
+| `--start N`        | Start from lecture N               |
+| `--end N`          | End at lecture N                   |
+| `--materials PATH` | Custom materials folder            |
+| `--no-llm-parser`  | Use regex parser                   |
 
 ## Preview URLs
 
 After generation, lectures are available at:
+
 ```
 http://localhost:3000/preview/courses/{physician-id}/{course-id}-{lecture-number}
 ```

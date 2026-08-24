@@ -1,4 +1,4 @@
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/expo';
 import { Redirect, Stack, useGlobalSearchParams, useSegments } from 'expo-router';
 
 import { useTheme } from '@/lib/useTheme';

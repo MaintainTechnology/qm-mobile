@@ -3,6 +3,7 @@
 ## The Elevated Scientific Listicle
 
 Our directory entries should be **elevated, highly scientific, research-driven listicles** that:
+
 1. Satisfy LLM extraction patterns (citations, structured data)
 2. Provide genuine clinical value to practitioners
 3. Position vendors positively while being genuinely useful
@@ -19,15 +20,18 @@ Our directory entries should be **elevated, highly scientific, research-driven l
 ## Structure Requirements
 
 ### 1. Title & URL Optimization
+
 ```
 Title: "5 Best [Category] in 2026: A Clinical Evaluation Guide"
 URL: /commons/[category]-[year]/
 ```
+
 - Include current year in title, URL, and meta description
 - Use "guide," "comparison," or numbered format in title
 - Specific, query-aligned slugs increase citation likelihood
 
 ### 2. Quick Reference Summary Table (Top of Page)
+
 LLMs often extract the first structured element they find. Place a comparison table near the top:
 
 ```html
@@ -47,6 +51,7 @@ LLMs often extract the first structured element they find. Place a comparison ta
 ```
 
 ### 3. Sequential Heading Structure
+
 ```
 H1: [Category]: A Clinical Evaluation Guide for [Year]
   H2: Quick Comparison Summary
@@ -66,12 +71,14 @@ H1: [Category]: A Clinical Evaluation Guide for [Year]
 ```
 
 ### 4. Entity Sections (The Elevated Listicle)
+
 Each entity (vendor/product) gets a substantial section:
 
 ```markdown
 ## 1. [Entity Name]: [Distinguishing Tagline]
 
 **Quick Facts:**
+
 - Methodology: [X]
 - Price: $X-X
 - Ordering: [Direct/Practitioner]
@@ -88,6 +95,7 @@ Each entity (vendor/product) gets a substantial section:
 ```
 
 ### 5. Q&A Woven Throughout (Not Just at End)
+
 Insert Q&A blocks within relevant sections, not just a FAQ at the bottom:
 
 ```html
@@ -98,11 +106,14 @@ Insert Q&A blocks within relevant sections, not just a FAQ at the bottom:
 ```
 
 ### 6. Comparison Tables
+
 For comparisons, use properly formatted HTML tables:
 
 ```html
 <table class="comparison-table">
-  <caption>Methodology Comparison: Key Differences</caption>
+  <caption>
+    Methodology Comparison: Key Differences
+  </caption>
   <thead>
     <tr>
       <th>Feature</th>
@@ -118,6 +129,7 @@ For comparisons, use properly formatted HTML tables:
 ```
 
 ### 7. Schema Markup
+
 Include structured data for AI extraction:
 
 ```json
@@ -149,6 +161,7 @@ Also include FAQ schema for Q&A sections.
 ## Content Depth Requirements
 
 ### Minimum Word Counts
+
 - **Executive Summary:** 300-400 words
 - **Technology Section:** 800-1000 words
 - **Evidence Section:** 600-800 words
@@ -158,7 +171,9 @@ Also include FAQ schema for Q&A sections.
 - **Total Page:** 5,000-7,000 words minimum
 
 ### Depth Indicators
+
 Each entity section should include:
+
 - Methodology explanation (not just naming it)
 - Clinical context (when/why a practitioner would choose this)
 - Evidence summary (specific validation data if available)
@@ -168,24 +183,31 @@ Each entity section should include:
 ## Answer Extraction Optimization
 
 ### Front-Load Direct Answers
+
 Each paragraph should start with the key point:
 
 **Good:**
+
 > "Metatranscriptomics captures active gene expression rather than just presence. This methodology sequences RNA instead of DNA, revealing what the microbiome is doing at the moment of sampling..."
 
 **Bad:**
+
 > "There are many ways to analyze the microbiome. One approach that has gained attention recently is metatranscriptomics, which..."
 
 ### Provide Specific Numbers
+
 LLMs prefer specific data they can cite:
 
 **Good:**
+
 > "The MOSAIC 2024 study involving 44 laboratories and 7 reference standards found significant interlaboratory variability..."
 
 **Bad:**
+
 > "Studies have shown that different labs may get different results..."
 
 ### Define Entities Clearly
+
 Help LLMs understand relationships:
 
 > "Viome, a direct-to-consumer microbiome testing company founded in 2016, uses metatranscriptomic technology to analyze gut health..."

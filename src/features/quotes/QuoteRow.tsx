@@ -21,7 +21,8 @@ export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () 
     dim: colors.textDim,
   };
   const tone = toneColor[badge.tone];
-  const amount = quote.total_inc_gst == null ? '—' : formatAud(centsFromApiDollars(quote.total_inc_gst));
+  const amount =
+    quote.total_inc_gst == null ? '—' : formatAud(centsFromApiDollars(quote.total_inc_gst));
 
   return (
     <Pressable
@@ -30,14 +31,21 @@ export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () 
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
-        { borderBottomColor: colors.inkLine, backgroundColor: pressed ? colors.ink : 'transparent' },
+        {
+          borderBottomColor: colors.inkLine,
+          backgroundColor: pressed ? colors.ink : 'transparent',
+        },
       ]}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
         <Text style={[styles.name, { color: colors.textPri }]} numberOfLines={1}>
           {customerLabel(quote)}
         </Text>
-        <Text style={[styles.job, { color: colors.textSec }]} numberOfLines={1} ellipsizeMode="tail">
+        <Text
+          style={[styles.job, { color: colors.textSec }]}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
           {formatJobType(quote.job_type)}
           {quote.suburb ? ` · ${quote.suburb}` : ''}
         </Text>

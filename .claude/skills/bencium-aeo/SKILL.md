@@ -10,6 +10,7 @@ description: Generate AEO-optimized content (Answer Engine Optimization) for AI 
 ## When to Use This Skill
 
 Use this skill when:
+
 - User asks to optimize content for AI search/citations
 - User mentions ChatGPT, Claude, Gemini visibility
 - User wants FAQ schema, JSON-LD, or structured data for AI
@@ -26,29 +27,34 @@ Use this skill when:
 ## Quick Reference: Key Principles
 
 ### The 18-Token Extraction Rule
+
 LLMs extract self-contained sentences of ~18 tokens (~15-20 words). Key claims must be complete, quotable statements requiring zero surrounding context.
 
 **Good:** "Eight-API synthesis reduces property analysis errors by 67%." (9 tokens)
 **Bad:** "Our system is incredibly fast and delivers amazing results." (vague)
 
 ### Single-Topic Focus Pages
+
 Single-concept pages vastly outperform multi-topic content. Create focused URLs like `domain.com/specific-concept` rather than comprehensive guides.
 
 ### Citations + Statistics = 30-40% More Visibility
+
 Every major claim needs:
+
 - Verifiable data with methodology
 - Date of data collection
 - Expert attribution (Name + Credentials + Org)
 
 ### Freshness is Critical
+
 95% of AI citations come from content updated in last 10 months. Static content dies.
 
 ### Authority Level Determines Strategy
 
-| Authority Level | Optimization Approach |
-|-----------------|----------------------|
-| **Challenger** (new sites, low authority) | Aggressive: 5-7 extraction points per page, heavy citations, weekly micro-updates |
-| **Established** (top-ranked, well-known) | Light touch: 1-2 strategic points, trust existing credibility, avoid over-optimization |
+| Authority Level                           | Optimization Approach                                                                  |
+| ----------------------------------------- | -------------------------------------------------------------------------------------- |
+| **Challenger** (new sites, low authority) | Aggressive: 5-7 extraction points per page, heavy citations, weekly micro-updates      |
+| **Established** (top-ranked, well-known)  | Light touch: 1-2 strategic points, trust existing credibility, avoid over-optimization |
 
 **Princeton finding:** Rank-5 sites gained 115% visibility with aggressive optimization. Rank-1 sites that over-optimized lost 30%.
 
@@ -57,19 +63,23 @@ Every major claim needs:
 When user requests AEO content, generate:
 
 ### 1. Product Overview (50 words)
+
 - What it is (one clause)
 - Scope/timeframe context
 - Why it matters (value proposition)
 - "Last updated" date
 
 ### 2. 15 FAQs with Schema
+
 - Questions: 7-12 words, natural language
 - Answers: 30-50 words (sweet spot for AI extraction)
 - FAQPage JSON-LD schema with `datePublished` and `dateModified`
 - Persistent anchor IDs (#faq-slug)
 
 ### 3. Evidence Panels
+
 For every important claim:
+
 - Claim statement
 - Methodology
 - Data source + URL
@@ -78,6 +88,7 @@ For every important claim:
 - Contact for questions
 
 ### 4. JSON-LD Schema
+
 - FAQPage (most important)
 - HowTo (for guides)
 - Product (for product pages)
@@ -86,6 +97,7 @@ For every important claim:
 ## Anti-Patterns (What to Avoid)
 
 ### Traditional SEO Tactics Harm GEO
+
 - Keyword stuffing
 - Generic listicles without original insight
 - Vague hedged language ("may help", "could potentially")
@@ -93,6 +105,7 @@ For every important claim:
 - Over-optimization on established sites
 
 ### Content Structure Errors
+
 - FAQ answers over 50 words
 - Buried answers (put conclusion first)
 - Pronoun ambiguity ("it" instead of "the product")
@@ -103,12 +116,12 @@ For every important claim:
 
 When analyzing content for AEO readiness, score (0-10):
 
-| Dimension | What to Check |
-|-----------|--------------|
+| Dimension      | What to Check                                      |
+| -------------- | -------------------------------------------------- |
 | **Extraction** | How many citation-ready sentences under 18 tokens? |
-| **Focus** | Single topic or sprawling multi-topic? |
-| **Authority** | Expert attribution with credentials? Citations? |
-| **Freshness** | Updated within 90 days? Dated content? |
+| **Focus**      | Single topic or sprawling multi-topic?             |
+| **Authority**  | Expert attribution with credentials? Citations?    |
+| **Freshness**  | Updated within 90 days? Dated content?             |
 
 **Quick test:** Can you copy-paste 3 sentences that fully answer a question without context?
 
@@ -136,5 +149,6 @@ After implementation, test with:
 ## Full Documentation
 
 For complete templates, examples, and detailed guidelines, read:
+
 - `prd.md` - Full AEO content generation guide with HTML templates
 - `story-structured.md` - Framework summary from Princeton study

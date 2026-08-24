@@ -29,6 +29,7 @@ Generate LinkedIn posts, Instagram scripts, and lead magnets from research paper
 ## Output
 
 Content is saved to:
+
 - `content/social-content/linkedin-posts/`
 - `content/social-content/instagram-scripts/`
 - `content/learn-platform/lead-magnets/`

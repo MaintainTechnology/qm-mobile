@@ -7,6 +7,7 @@ Guidelines for creating SVG diagrams that look like they belong in Cell, Nature,
 ## Design Philosophy
 
 Create diagrams that Andrew Huberman or Peter Attia would share on Instagram:
+
 - Insightful perspectives that make hard concepts easy to grasp
 - Balance between detailed and simple enough for social media
 - Focus on ONE core insight per diagram
@@ -20,73 +21,89 @@ Create diagrams that Andrew Huberman or Peter Attia would share on Instagram:
 Choose the most appropriate type for the concept being visualized.
 
 ### Mechanism Pathway
+
 **For:** Biological processes, cause-effect chains, signaling cascades
 
 **Structure:**
+
 - Linear or branching flow
 - Arrows indicating direction and causation
 - Labeled nodes for each state/step
 - Use gradients for depth
 
 **Example elements:**
+
 - Substrate → Enzyme → Product arrows
 - Receptor → Signal cascade → Cellular response
 - Gene → mRNA → Protein pathway
 
 ### Process Flow
+
 **For:** Step-by-step sequences, workflows, timelines
 
 **Structure:**
+
 - Clear START and END points
 - Numbered steps (3-6 ideal)
 - Directional arrows between steps
 - Horizontal or vertical layout
 
 ### Comparison (Side-by-Side)
+
 **For:** Before/after, traditional vs. new, contrasting approaches
 
 **Structure:**
+
 - Two columns or panels clearly labeled
 - Visual parallel between sides
 - Contrasting colors to highlight differences
 - Summary labels at bottom
 
 **Critical sizing:**
+
 - Each panel minimum 160px wide × 200px tall
 - ALL labels must be INSIDE their colored box
 - Calculate: (number of text lines × 25px) + 100px padding = minimum height
 
 ### Network/Hub
+
 **For:** Interconnected concepts, ecosystems, multi-factor relationships
 
 **Structure:**
+
 - Central node with radiating connections
 - Glowing nodes for emphasis
 - Connection lines with labels
 - Size indicates importance
 
 ### Timeline
+
 **For:** Chronological events, treatment phases, historical progression
 
 **Structure:**
+
 - Horizontal progression line with gradient
 - Circular markers at key points
 - Labels above and below
 - Color progression (can indicate change)
 
 ### Concept/Hierarchy
+
 **For:** Abstract ideas, organizational structures, layered concepts
 
 **Structure:**
+
 - Pyramid, stacked layers, or tree structure
 - Clear visual groupings
 - Size/position shows importance
 - Isometric view for depth
 
 ### Quadrant/Positioning Chart
+
 **For:** Competitive landscapes, 2x2 matrices, strategic positioning
 
 **Structure:**
+
 - Two axes dividing space into 4 quadrants
 - Items positioned by their coordinates on both dimensions
 - Clear quadrant labels describing each zone
@@ -96,21 +113,24 @@ Choose the most appropriate type for the concept being visualized.
 
 In SVG, y=0 is at the TOP of the canvas. This creates counterintuitive positioning:
 
-| Desired Position | SVG Y Value |
-|------------------|-------------|
-| HIGH (visually at top) | LOW cy value (e.g., cy="120") |
+| Desired Position         | SVG Y Value                    |
+| ------------------------ | ------------------------------ |
+| HIGH (visually at top)   | LOW cy value (e.g., cy="120")  |
 | LOW (visually at bottom) | HIGH cy value (e.g., cy="380") |
 
 **Standard axis conventions:**
+
 - **Y-axis (vertical):** Values INCREASE going UP (higher = better should be at TOP = low cy)
 - **X-axis (horizontal):** Values INCREASE going RIGHT (higher = right = high cx)
 
 **Mandatory for quadrant diagrams:**
+
 1. Add explicit "HIGH" and "LOW" labels on each axis
 2. Position "best" items at the TOP (low cy values) if Y represents something desirable
 3. Quadrant labels should match the positioning (top quadrants = high Y-value outcomes)
 
 **Example - Outcome Focus axis:**
+
 ```svg
 <!-- HIGH outcome focus = TOP of chart = low cy value -->
 <text x="68" y="80">HIGH</text>
@@ -131,7 +151,7 @@ In SVG, y=0 is at the TOP of the canvas. This creates counterintuitive positioni
 
 The garlic diagram is the **quality bar**, not the **template**. What makes it work — the palette, typography, polish, copy voice, and editorial framing — should show up in every diagram we ship, regardless of layout. What layout to use is a separate decision that depends on the content (hub, cascade, comparison, timeline, metaphor scene, etc. — see "Diagram Types" above and "Visual Metaphor Library" below).
 
-This section codifies the *style* qualities. Layout conventions live in their own sections.
+This section codifies the _style_ qualities. Layout conventions live in their own sections.
 
 ### Six Style Qualities That Apply to Every Diagram
 
@@ -192,19 +212,23 @@ Apply this everywhere labels appear — inside spoke cards (hub layout), inside 
 **The invariant:** A reader who does not know the pathway abbreviations still understands the outcome. The mechanistic term is always present — we don't dumb down. But the benefit/effect is what the eye lands on first.
 
 **Bad label (mechanism-first, no translation):**
+
 > `NRF2 ↑` / `Activates antioxidant response element transcription`
 
 **Good label (Style Standard):**
+
 > kicker: `NRF2 ↑`
 > headline: `Antioxidant defenses rise`
 > subtitle: `Glutathione, HO-1, NQO1`
 
 Same pattern in a comparison panel:
+
 > kicker (left column): `RAPAMYCIN · 62h HALF-LIFE`
 > headline: `Scalpel: narrow window`
 > subtitle: `mTORC1 only at correct dose/timing`
 
 Same pattern in a cascade step:
+
 > kicker: `STEP 2 · ALLIINASE ACTIVATION`
 > headline: `Crushing sparks the chemistry`
 > subtitle: `Alliin → allicin in 10 seconds`
@@ -224,12 +248,14 @@ Other polish cues that show up in strong diagrams: dashed guide rings or baselin
 Hero diagrams — the single biggest diagram in a lead magnet, a LinkedIn image, a slide deck title card — need editorial framing that makes them self-contained shareable assets. Inline sub-figures inside a lead magnet can skip the header (the article's heading already serves that role) but should still carry a lightweight footer rule + attribution line.
 
 **Header (hero diagrams only):**
+
 - Kicker (Familjen Grotesk 14px, weight 700, letter-spacing 4, accent): `NEXT GENERATION MEDICINE · [SECTION TAG]`
 - Thin centered rule (`<line stroke="#DEDBD2" stroke-width="1">`)
-- Title (Zen Old Mincho 44–52px, ink): a scroll-stopping editorial headline — *not* a figure caption
+- Title (Zen Old Mincho 44–52px, ink): a scroll-stopping editorial headline — _not_ a figure caption
 - Deck (Familjen Grotesk italic 18–22px, ink-3): one-line elaboration
 
 **Footer banner (every diagram that will be shared standalone, including every LinkedIn/social graphic and every lead-magnet hero):**
+
 - Horizontal rule at ~10% from the bottom
 - Left side: unifying-insight kicker (Familjen Grotesk 13px, weight 600, tracked, accent), one-line explainer (Familjen Grotesk 12px, ink-3), source citation with DOI + effect size (Familjen Grotesk 11px italic, ink-4)
 - Right side, right-aligned: `NGM` wordmark (Familjen Grotesk 13px, weight 700, letter-spacing 2, ink), URL `nextgenerationmedicine.co` (Familjen Grotesk 10px, ink-3), author byline (Familjen Grotesk 10px, ink-3)
@@ -255,9 +281,9 @@ All use the same radial-gradient paper background. All use `overflow="visible"`.
 
 **Canonical example:** `content/graphics/garlic-linkedin/garlic-longevity-hub.html`
 
-The Hub Layout is one of several valid layouts. It is appropriate *only when the content actually has radial structure* — one central concept with 3–10 downstream outcomes where the spokes don't have a meaningful order among themselves. The garlic diagram is the canonical hub example because garlic → H₂S persulfidation → eight roughly-parallel longevity outcomes genuinely is radial.
+The Hub Layout is one of several valid layouts. It is appropriate _only when the content actually has radial structure_ — one central concept with 3–10 downstream outcomes where the spokes don't have a meaningful order among themselves. The garlic diagram is the canonical hub example because garlic → H₂S persulfidation → eight roughly-parallel longevity outcomes genuinely is radial.
 
-Many great diagrams are not hubs. Use the other layouts in "Diagram Types" above, "Visual Metaphor Library" below, or invent a layout that suits the content. What matters is that *every* diagram — regardless of layout — meets the Style Standard above.
+Many great diagrams are not hubs. Use the other layouts in "Diagram Types" above, "Visual Metaphor Library" below, or invent a layout that suits the content. What matters is that _every_ diagram — regardless of layout — meets the Style Standard above.
 
 ### When to Use the Hub Layout
 
@@ -276,7 +302,7 @@ Many great diagrams are not hubs. Use the other layouts in "Diagram Types" above
 
 ### Hub-Specific Structural Rules
 
-These are *in addition* to the universal Style Standard:
+These are _in addition_ to the universal Style Standard:
 
 - **Radial node placement on a clock face.** 8 nodes: 12, 1:30, 3, 4:30, 6, 7:30, 9, 10:30. 6 nodes: 12, 2, 4, 6, 8, 10. 5 nodes: 72° spacing.
 - **Dashed concentric ring guides** at roughly 270px and 370px radius (on a 1200×1200 canvas) at `stroke="#DEDBD2"`, `stroke-dasharray="2,6"`, `opacity="0.5"`.
@@ -341,27 +367,28 @@ These are *in addition* to the universal Style Standard:
 
 The drawn subject at the center of a Hub, inside a Comparison panel, or anchoring a Metaphor Scene is the highest-effort visual. This catalog is a starter; invent new subjects when a topic demands it. The constraint set — single silhouette, 2–3 internal highlight strokes, warm tone, radial-gradient fill, 140–170px major axis for focal subjects — stays constant across layouts.
 
-| Topic | Subject shape | Key visual features |
-|---|---|---|
-| Garlic / Allium | Bulb silhouette + cloves + stem | 5 vertical ridges, tan gradient, small green stem |
-| Rapamycin / small molecule | Stylized pill/capsule | Half-tone fill split, blister-pack shadow |
-| Exercise / skeletal muscle | Flexed-arm or muscle-fiber silhouette | Striation lines, warm flesh tone |
-| Brain / cognition | Top-down brain silhouette | Gyri as curved lines, symmetric |
-| Liver / metabolic hub | Organ-shape silhouette | Lobe separation, rich burgundy gradient |
-| Mitochondrion | Cristae-ridged oval | Double-membrane detail, warm amber |
-| Sleep / circadian | Moon + sun split disc | Half light / half dark, no hard line |
-| Gut microbiome | Coiled intestine | Gentle tube curl, neutral tan |
-| Hormone (estrogen, GLP-1) | Molecular ball-and-stick silhouette | 3–4 circles connected by lines |
-| Heart / cardiovascular | Anatomical heart silhouette | Chambered outline, warm red gradient |
-| Cell membrane / receptor | Bilayer with protein silhouette | Dotted bilayer, receptor as ribbon |
+| Topic                      | Subject shape                         | Key visual features                               |
+| -------------------------- | ------------------------------------- | ------------------------------------------------- |
+| Garlic / Allium            | Bulb silhouette + cloves + stem       | 5 vertical ridges, tan gradient, small green stem |
+| Rapamycin / small molecule | Stylized pill/capsule                 | Half-tone fill split, blister-pack shadow         |
+| Exercise / skeletal muscle | Flexed-arm or muscle-fiber silhouette | Striation lines, warm flesh tone                  |
+| Brain / cognition          | Top-down brain silhouette             | Gyri as curved lines, symmetric                   |
+| Liver / metabolic hub      | Organ-shape silhouette                | Lobe separation, rich burgundy gradient           |
+| Mitochondrion              | Cristae-ridged oval                   | Double-membrane detail, warm amber                |
+| Sleep / circadian          | Moon + sun split disc                 | Half light / half dark, no hard line              |
+| Gut microbiome             | Coiled intestine                      | Gentle tube curl, neutral tan                     |
+| Hormone (estrogen, GLP-1)  | Molecular ball-and-stick silhouette   | 3–4 circles connected by lines                    |
+| Heart / cardiovascular     | Anatomical heart silhouette           | Chambered outline, warm red gradient              |
+| Cell membrane / receptor   | Bilayer with protein silhouette       | Dotted bilayer, receptor as ribbon                |
 
 Use drawn subjects in any layout that has a physical referent: inside a comparison panel's left and right sides, as the "actor" in a metaphor scene, as a mile-marker along a timeline, as a node in a cascade. The Style Standard travels across layouts.
 
 ### Hub Layout Validation — Before Shipping Any Hub Diagram
 
 For Hub Layout diagrams, verify both the universal Style Standard (palette, typography, drawn subject, label hierarchy, polish, editorial framing, standalone readability) AND the hub-specific structural rules above:
-- Is the center a *drawn subject*, not a labeled circle?
-- Does every spoke-card have a plain-English headline *larger* than its mechanistic kicker?
+
+- Is the center a _drawn subject_, not a labeled circle?
+- Does every spoke-card have a plain-English headline _larger_ than its mechanistic kicker?
 - Is the spoke valence consistent (all beneficial = all pine; all risks = all clay; mixed = wrong layout)?
 - Is the palette the NGM Sei × Ma palette (`#FAF9F5`/`#ECEAE2`/`#232220`/`#3E5A6E`/`#4F6B57`/`#DEDBD2`), not the retired diagram-guidelines palette?
 - Is there a footer banner with unifying insight + source + NGM branding?
@@ -375,11 +402,11 @@ For Hub Layout diagrams, verify both the universal Style Standard (palette, typo
 
 ### Why Metaphors Over Flowcharts
 
-| Flowchart approach | Metaphor approach |
-|---|---|
-| Box: "Bacterial DPP-4" → Arrow: "degrades" → Box: "GLP-1 inactive" | Pac-man pathogen devouring a fragile molecule, leaving scattered fragments |
-| Box: "NF-κB" → Arrow → Box: "IL-1β, IL-6" → Arrow → Box: "Bone loss" | Flame sources igniting cytokine embers that erode a jagged bone edge |
-| Box: "AGEs" → Arrow → Box: "PKCβ2↑" → Arrow → Box: "Runx2↓" | Sugar rain activating a parking brake lever that locks a gear wheel |
+| Flowchart approach                                                   | Metaphor approach                                                          |
+| -------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Box: "Bacterial DPP-4" → Arrow: "degrades" → Box: "GLP-1 inactive"   | Pac-man pathogen devouring a fragile molecule, leaving scattered fragments |
+| Box: "NF-κB" → Arrow → Box: "IL-1β, IL-6" → Arrow → Box: "Bone loss" | Flame sources igniting cytokine embers that erode a jagged bone edge       |
+| Box: "AGEs" → Arrow → Box: "PKCβ2↑" → Arrow → Box: "Runx2↓"          | Sugar rain activating a parking brake lever that locks a gear wheel        |
 
 Metaphors are memorable because they create a **visual narrative** — a story the reader can replay in their mind without re-reading the diagram.
 
@@ -392,24 +419,25 @@ Before writing any SVG code for a lead magnet diagram:
 3. **Name the outcome** — What results? (signal loss, inflammation, bone loss, repair)
 4. **Find the physical-world analog:**
 
-| Biological Action | Metaphor Candidates |
-|---|---|
-| Enzymatic degradation | Predator devouring prey, acid dissolving, shredder destroying |
-| Inflammatory cascade | Spreading fire, chain of dominoes, alarm bells propagating |
-| Pathway inhibition / blockade | Parking brake engaged, locked gate, dam holding back water |
-| Drug bypassing resistance | Armored vehicle, shield deflecting, alternate route around roadblock |
-| Receptor activation | Key turning in lock, switch flipping on, gear engaging |
-| Feedback loop / vicious cycle | Whirlpool, circular chain, snake eating its own tail |
-| Dose-response threshold | Water level rising to spillway, dimmer switch, thermostat |
-| Competitive binding | Musical chairs, parking spaces filling, lock with two keys |
-| Tissue repair / regeneration | Scaffolding going up on a building, brick wall being rebuilt, garden regrowing |
-| Evidence hierarchy | Stacking blocks (tallest = strongest), pyramid layers, foundation to roof |
+| Biological Action             | Metaphor Candidates                                                            |
+| ----------------------------- | ------------------------------------------------------------------------------ |
+| Enzymatic degradation         | Predator devouring prey, acid dissolving, shredder destroying                  |
+| Inflammatory cascade          | Spreading fire, chain of dominoes, alarm bells propagating                     |
+| Pathway inhibition / blockade | Parking brake engaged, locked gate, dam holding back water                     |
+| Drug bypassing resistance     | Armored vehicle, shield deflecting, alternate route around roadblock           |
+| Receptor activation           | Key turning in lock, switch flipping on, gear engaging                         |
+| Feedback loop / vicious cycle | Whirlpool, circular chain, snake eating its own tail                           |
+| Dose-response threshold       | Water level rising to spillway, dimmer switch, thermostat                      |
+| Competitive binding           | Musical chairs, parking spaces filling, lock with two keys                     |
+| Tissue repair / regeneration  | Scaffolding going up on a building, brick wall being rebuilt, garden regrowing |
+| Evidence hierarchy            | Stacking blocks (tallest = strongest), pyramid layers, foundation to roof      |
 
 5. **Give the diagram a narrative title** — Not "NF-κB/NLRP3 Pathway" but "The Spreading Fire". The title is the reader's entry point.
 
 ### Proven Metaphor Patterns (with SVG techniques)
 
 #### The Hungry Predator
+
 **For:** Enzymatic degradation, pathogen consuming a substrate
 **Visual:** Pac-man/chomping shape with jagged teeth, fragile target molecule, scattered fragments as debris
 **SVG elements:** `<path>` for pac-man wedge mouth, `<polyline>` for teeth, `<circle>` for target, short `<line>` segments at angles for fragments
@@ -417,6 +445,7 @@ Before writing any SVG code for a lead magnet diagram:
 **Example:** P. gingivalis DPP-4 devouring GLP-1 vs. GLP-1RA with shield icon soaring over
 
 #### The Spreading Fire
+
 **For:** Inflammatory cascades, cytokine storms, NF-κB/NLRP3 activation
 **Visual:** Flame-shaped ignition sources, scattered ember circles (one per cytokine), jagged eroding surface
 **SVG elements:** `<path>` with bezier curves for flame silhouettes, `<circle>` with low-opacity fill for embers, `<polyline>` zigzag for bone erosion
@@ -424,6 +453,7 @@ Before writing any SVG code for a lead magnet diagram:
 **Example:** NF-κB + NLRP3 as dual ignition sources, IL-1β/IL-6/TNF-α/IL-18/ROS as scattered embers, M1 macrophage as "destroy" circle, GLP-1RA as dome with M2/RANKL/cytokine outcome cards
 
 #### The Parking Brake
+
 **For:** Pathway inhibition, molecular blockade, enzyme-mediated suppression of a transcription factor
 **Visual:** Brake lever (up = engaged, down = released), locked gear vs. spinning gear, cracked surface vs. healthy cross-hatched surface
 **SVG elements:** `<line>` with `stroke-linecap="round"` for lever, `<circle>` for knob, `<rect>` with internal `<line>` cross-hatching for healthy tissue, `<path>` cracks for damaged tissue
@@ -431,17 +461,20 @@ Before writing any SVG code for a lead magnet diagram:
 **Example:** AGEs as falling rain onto PKCβ2 brake lever, locked Runx2 gear with padlock icon, vs. GLP-1RA hand pushing lever down, freed spinning gear with trabecular bone pattern
 
 #### The Shield / Armor
+
 **For:** Drug resistance to degradation, protective mechanisms
 **Visual:** Shield icon on a molecule, bounce sparks where enzyme hits, clear travel arc bypassing danger
 **SVG elements:** `<path>` shield shape, short `<line>` sparks at deflection point, `<path>` bezier arc for bypass trajectory
 **Example:** GLP-1RA molecule with shield vs. DPP-4 enzyme that can't bite through
 
 #### The Rising Water
+
 **For:** Dose-response thresholds, accumulation effects, tipping points
 **Visual:** Container with rising fill level, threshold line, spillway
 **SVG elements:** `<rect>` container, `<rect>` with animated fill height, dashed `<line>` for threshold, `<path>` for overflow
 
 #### The Locked Gate / Dam
+
 **For:** Signaling blockade, receptor antagonism, competitive inhibition
 **Visual:** Gate/dam structure blocking flow, key/drug opening the gate, flow resuming on the other side
 **SVG elements:** `<rect>` for gate structure, `<path>` for water/signal flow, gate in open vs. closed position
@@ -467,6 +500,7 @@ Brand mark (bottom-right): "NextGenMed"
 ### Self-Check for Visual Metaphors
 
 Before finalizing a metaphor-based diagram:
+
 1. [ ] Does the diagram have a narrative title (not a pathway name)?
 2. [ ] Would a non-scientist understand the visual story at a glance?
 3. [ ] Is the metaphor consistent throughout (no mixing fire + water + gears in one diagram)?
@@ -494,7 +528,7 @@ Before finalizing a metaphor-based diagram:
 <svg viewBox="0 0 600 450" overflow="visible" xmlns="http://www.w3.org/2000/svg">
   <!-- Background -->
   <rect width="100%" height="100%" fill="#ECEAE2" stroke="none"/>
-  
+
   <!-- Content with 40px padding from all edges -->
   <!-- Bottom content should not exceed y=410 to maintain padding -->
 </svg>
@@ -519,10 +553,12 @@ Before finalizing a metaphor-based diagram:
 5. **External labels go OUTSIDE** - Labels describing a container from outside need 10px+ gap
 
 **Container sizing formula:**
+
 - Minimum height = (number of text lines × 25px) + 40px top padding + 40px bottom padding
 - Minimum width = longest text line width + 30px left padding + 30px right padding
 
 ### Invalid SVG Attributes (DO NOT USE)
+
 - ❌ `stroke-none` (use `stroke="none"`)
 - ❌ `fill-none` (use `fill="none"`)
 - ❌ Attributes without equals sign and quotes
@@ -556,6 +592,7 @@ Before finalizing a metaphor-based diagram:
 ## Typography
 
 ### Title Text
+
 ```svg
 <text
   font-family="'Zen Old Mincho', 'Noto Serif JP', Georgia, serif"
@@ -568,6 +605,7 @@ Before finalizing a metaphor-based diagram:
 ```
 
 ### Label Text
+
 ```svg
 <text
   font-family="'Familjen Grotesk', system-ui, sans-serif"
@@ -581,6 +619,7 @@ Before finalizing a metaphor-based diagram:
 ```
 
 ### Category Labels (Uppercase)
+
 ```svg
 <text
   font-family="'Familjen Grotesk', sans-serif"
@@ -598,6 +637,7 @@ Before finalizing a metaphor-based diagram:
 ## Visual Techniques
 
 ### Gradient Fills (for depth)
+
 ```svg
 <defs>
   <linearGradient id="slateGrad" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -609,6 +649,7 @@ Before finalizing a metaphor-based diagram:
 ```
 
 ### Drop Shadows (for elevation)
+
 ```svg
 <defs>
   <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
@@ -619,6 +660,7 @@ Before finalizing a metaphor-based diagram:
 ```
 
 ### Rounded Corners
+
 ```svg
 <rect x="10" y="10" width="100" height="60" rx="3" ry="3" fill="#4F6B57" stroke="none"/>
 ```
@@ -626,6 +668,7 @@ Before finalizing a metaphor-based diagram:
 Corners stay nearly square (radius 2-3px) per the Sei × Ma editorial aesthetic — never pills, never rounded-xl.
 
 ### Dashed Lines (for relationships)
+
 ```svg
 <line stroke-dasharray="5,5" stroke="#DEDBD2" stroke-width="1.5" .../>
 ```
@@ -684,7 +727,7 @@ For 3-element horizontal flows in a 700px viewBox:
 ### ViewBox Sizing for Horizontal Layouts
 
 | # of Elements | Recommended viewBox Width |
-|---------------|---------------------------|
+| ------------- | ------------------------- |
 | 2 elements    | 500-550px                 |
 | 3 elements    | 650-700px                 |
 | 4 elements    | 800-850px                 |
@@ -745,12 +788,14 @@ If any check fails, regenerate with specific corrections.
 ## Common Mistakes to Avoid
 
 **❌ Text spilling below container:**
+
 ```svg
 <rect x="100" y="100" width="150" height="120" fill="#4F6B57"/>
 <text y="210">Subtitle</text>  <!-- y=210 is OUTSIDE the box (100+120=220) -->
 ```
 
 **✅ Text fully contained:**
+
 ```svg
 <rect x="100" y="100" width="150" height="180" fill="#4F6B57"/>
 <text y="130">Label</text>      <!-- 30px inside top -->
@@ -759,18 +804,21 @@ If any check fails, regenerate with specific corrections.
 ```
 
 **❌ External label on the edge:**
+
 ```svg
 <text y="100">Consumer</text>  <!-- ON the top edge - ambiguous -->
 <rect x="100" y="100" width="150" height="150" fill="#4F6B57"/>
 ```
 
 **✅ External label clearly above with gap:**
+
 ```svg
 <text y="80">Consumer</text>  <!-- 20px gap before box -->
 <rect x="100" y="100" width="150" height="150" fill="#4F6B57"/>
 ```
 
 **❌ Horizontal elements overlapping (THE MOST COMMON BUG):**
+
 ```svg
 <!-- Box A ends at x=460 but Box B starts at x=400 - OVERLAP! -->
 <rect x="260" y="70" width="200" height="70"/>  <!-- ends at 460 -->
@@ -778,6 +826,7 @@ If any check fails, regenerate with specific corrections.
 ```
 
 **✅ Horizontal elements properly spaced:**
+
 ```svg
 <!-- Box A ends at x=440, gap of 40px, Box B starts at x=480 -->
 <rect x="220" y="70" width="220" height="70"/>  <!-- ends at 440 -->

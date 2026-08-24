@@ -19,16 +19,17 @@ Windows-patched variant of `generate-outline`. Generates course outlines with au
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
+| Flag                   | Description                            |
+| ---------------------- | -------------------------------------- |
 | `--materials <folder>` | Folder containing materials (required) |
-| `--outline <file>` | Existing outline to revise |
-| `--dry-run` | Preview without API calls |
-| `--output <folder>` | Custom output folder |
+| `--outline <file>`     | Existing outline to revise             |
+| `--dry-run`            | Preview without API calls              |
+| `--output <folder>`    | Custom output folder                   |
 
 ## Output
 
 Each run generates:
+
 - `accumulated_insights.md` — Per-file insights extracted in Phase 1
 - `course_dossier.md` — Deep research from Perplexity
 - `course_outline.md` — Structured 10-15 lecture curriculum
@@ -41,12 +42,12 @@ Each run generates:
 
 ## Differences from `generate-outline`
 
-| | `generate-outline` (mac/linux) | `generate-outline-win` (Windows) |
-|---|---|---|
-| Runner path | `/Users/anantvinjamoori/Vectorshift Pipelines/cli/outline_creator_runner.py` | `scripts/outline_creator_runner_win.py` (in this repo) |
-| API key source | `vs_pipelines.config` module | `.env` at repo root |
-| LibreOffice | `/Applications/LibreOffice.app/...` | `C:\Program Files\LibreOffice\program\soffice.exe` |
-| Ghostscript binary | `gs` | `gswin64c` / `gswin32c` / `gs` |
-| Install commands | `brew` | `winget` |
+|                    | `generate-outline` (mac/linux)                                               | `generate-outline-win` (Windows)                       |
+| ------------------ | ---------------------------------------------------------------------------- | ------------------------------------------------------ |
+| Runner path        | `/Users/anantvinjamoori/Vectorshift Pipelines/cli/outline_creator_runner.py` | `scripts/outline_creator_runner_win.py` (in this repo) |
+| API key source     | `vs_pipelines.config` module                                                 | `.env` at repo root                                    |
+| LibreOffice        | `/Applications/LibreOffice.app/...`                                          | `C:\Program Files\LibreOffice\program\soffice.exe`     |
+| Ghostscript binary | `gs`                                                                         | `gswin64c` / `gswin32c` / `gs`                         |
+| Install commands   | `brew`                                                                       | `winget`                                               |
 
 See [SKILL.md](SKILL.md) for full documentation.

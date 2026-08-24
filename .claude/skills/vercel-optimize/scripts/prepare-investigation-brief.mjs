@@ -26,8 +26,12 @@ const log = (...a) => console.error('[prepare-brief]', ...a);
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.mergedPath || !args.investigationPath) {
-    console.error('usage: node scripts/prepare-investigation-brief.mjs <merged.json> <investigation.json> [--index N] [--group toLaunch|platform] [--out FILE]');
-    console.error('   or: node scripts/prepare-investigation-brief.mjs <merged.json> <investigation.json> --list');
+    console.error(
+      'usage: node scripts/prepare-investigation-brief.mjs <merged.json> <investigation.json> [--index N] [--group toLaunch|platform] [--out FILE]',
+    );
+    console.error(
+      '   or: node scripts/prepare-investigation-brief.mjs <merged.json> <investigation.json> --list',
+    );
     process.exit(1);
   }
 
@@ -46,7 +50,9 @@ async function main() {
   const index = args.index ?? 0;
   const pool = Array.isArray(investigation[group]) ? investigation[group] : [];
   if (index < 0 || index >= pool.length) {
-    console.error(`[prepare-brief] FATAL: ${group}[${index}] out of range (${group} has ${pool.length} entries)`);
+    console.error(
+      `[prepare-brief] FATAL: ${group}[${index}] out of range (${group} has ${pool.length} entries)`,
+    );
     process.exit(2);
   }
   let candidate = pool[index];
@@ -66,7 +72,9 @@ async function main() {
   const playbookId = inferPlaybook(signals);
   const playbookBody = playbookId ? await tryReadPlaybook(playbookId) : null;
   const frameworkPlaybookId = inferFrameworkPlaybook(signals);
-  const frameworkPlaybookBody = frameworkPlaybookId ? await tryReadPlaybook(frameworkPlaybookId) : null;
+  const frameworkPlaybookBody = frameworkPlaybookId
+    ? await tryReadPlaybook(frameworkPlaybookId)
+    : null;
 
   const stack = signals.stack ?? signals.codebase?.stack ?? {};
   const framework = stack.framework ?? 'unknown';
@@ -131,8 +139,8 @@ function buildManifest(merged, investigation) {
   return {
     schemaVersion: '1.0',
     totalBriefs: out.length,
-    toLaunchCount: out.filter((b) => b.group === 'toLaunch').length,
-    platformCount: out.filter((b) => b.group === 'platform').length,
+    toLaunchCount: out.filter(b => b.group === 'toLaunch').length,
+    platformCount: out.filter(b => b.group === 'platform').length,
     preResolvedRecords: Array.isArray(investigation.preResolvedRecords)
       ? investigation.preResolvedRecords
       : [],
@@ -153,13 +161,17 @@ function buildFanoutPlan(briefs) {
       relatedBriefs: [],
     };
     if (existing.primaryBrief.candidateRef !== brief.candidateRef) {
-      existing.relatedBriefs.push({ group: brief.group, index: brief.index, candidateRef: brief.candidateRef });
+      existing.relatedBriefs.push({
+        group: brief.group,
+        index: brief.index,
+        candidateRef: brief.candidateRef,
+      });
     }
     groups.set(key, existing);
   }
   return {
     totalFamilies: groups.size,
-    families: [...groups.values()].map((g) => ({
+    families: [...groups.values()].map(g => ({
       ...g,
       totalBriefs: 1 + g.relatedBriefs.length,
     })),
@@ -176,7 +188,11 @@ function candidateFamilyKey(brief) {
 // Also accepts a fully-shaped scan doc directly (used in tests).
 function pickCodebase(merged) {
   if (!merged || typeof merged !== 'object') return {};
-  if (merged.codebase && typeof merged.codebase === 'object' && (merged.codebase.routes || merged.codebase.findings)) {
+  if (
+    merged.codebase &&
+    typeof merged.codebase === 'object' &&
+    (merged.codebase.routes || merged.codebase.findings)
+  ) {
     return merged.codebase;
   }
   if (merged.signals?.codebase && typeof merged.signals.codebase === 'object') {
@@ -218,13 +234,15 @@ async function writeBriefFile(outPath, brief, { force = false } = {}) {
     await writeFile(outPath, brief + '\n', { encoding: 'utf-8', flag: force ? 'w' : 'wx' });
   } catch (err) {
     if (err?.code === 'EEXIST') {
-      throw new Error(`output file already exists: ${outPath}. Use a fresh run directory or pass --force to overwrite.`);
+      throw new Error(
+        `output file already exists: ${outPath}. Use a fresh run directory or pass --force to overwrite.`,
+      );
     }
     throw err;
   }
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('[prepare-brief] FAILED:', err.message);
   console.error(err.stack);
   process.exit(1);

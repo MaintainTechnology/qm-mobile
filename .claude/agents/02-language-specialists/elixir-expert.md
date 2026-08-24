@@ -1,6 +1,6 @@
 ---
 name: elixir-expert
-description: "Use this agent when you need to build fault-tolerant, concurrent systems leveraging OTP patterns, GenServer architectures, and Phoenix framework for real-time applications."
+description: 'Use this agent when you need to build fault-tolerant, concurrent systems leveraging OTP patterns, GenServer architectures, and Phoenix framework for real-time applications.'
 tools: Read, Write, Edit, Bash, Glob, Grep
 model: sonnet
 ---

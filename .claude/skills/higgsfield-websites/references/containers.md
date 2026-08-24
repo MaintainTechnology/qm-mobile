@@ -12,6 +12,7 @@ running; they sleep when idle.
 ## The shape (what the platform fixes vs what you write)
 
 The platform **fixes** the names so you can't mis-wire them:
+
 - Durable Object class **`AppContainer`**, binding **`env.CONTAINER`**, one
   instance type, **`max_instances: 1`**.
 
@@ -21,8 +22,8 @@ The platform **fixes** the names so you can't mis-wire them:
 > one container per job, and NOT a pool. `getByName(jobId)` is wrong here: each
 > distinct name wants its own instance, and only one is allowed.
 
-**You write** these:
-0. add the dep (not in the base template): `cd app && bun add @cloudflare/containers`.
+**You write** these: 0. add the dep (not in the base template): `cd app && bun add @cloudflare/containers`.
+
 1. `app/app.manifest.json` → opt in.
 2. `app/container/Dockerfile` (+ its server) → the image, listening on a port.
 3. `export class AppContainer extends Container` in `app/src/server.ts`.
@@ -31,10 +32,11 @@ The platform **fixes** the names so you can't mis-wire them:
 
 ```jsonc
 {
-  "container": { "instanceType": "standard-2", "port": 8080, "sleepAfter": "5m" }
+  "container": { "instanceType": "standard-2", "port": 8080, "sleepAfter": "5m" },
 }
 // or just  "container": true  for the defaults above
 ```
+
 `port` must match the port your container server listens on. `sleepAfter` is the
 **idle** shutdown — active jobs keep themselves alive (see §4).
 
@@ -59,43 +61,53 @@ Because ONE container serves all jobs, state is keyed per job — never a single
 global:
 
 ```js
-import http from "node:http";
+import http from 'node:http';
 
 // ONE shared container serves ALL jobs → state MUST be per-job, not global.
 const jobs = new Map(); // jobId -> { status, progress, outputKey, error }
 
-http.createServer(async (req, res) => {
-  const url = new URL(req.url, "http://c");
+http
+  .createServer(async (req, res) => {
+    const url = new URL(req.url, 'http://c');
 
-  if (req.method === "POST" && url.pathname === "/start") {
-    const job = await readJson(req);                 // { jobId, containerToken, appBaseUrl, ... }
-    // Idempotent: the DO may re-send /start while the container is booting.
-    if (jobs.get(job.jobId)?.status === "running") { res.writeHead(202).end("running"); return; }
-    jobs.set(job.jobId, { status: "running", progress: 0, outputKey: null, error: null });
-    res.writeHead(202).end("started");               // return FAST — work runs detached
-    runJob(job).catch((e) =>
-      jobs.set(job.jobId, { ...jobs.get(job.jobId), status: "error", error: String(e) }));
-    return;
-  }
+    if (req.method === 'POST' && url.pathname === '/start') {
+      const job = await readJson(req); // { jobId, containerToken, appBaseUrl, ... }
+      // Idempotent: the DO may re-send /start while the container is booting.
+      if (jobs.get(job.jobId)?.status === 'running') {
+        res.writeHead(202).end('running');
+        return;
+      }
+      jobs.set(job.jobId, { status: 'running', progress: 0, outputKey: null, error: null });
+      res.writeHead(202).end('started'); // return FAST — work runs detached
+      runJob(job).catch(e =>
+        jobs.set(job.jobId, { ...jobs.get(job.jobId), status: 'error', error: String(e) }),
+      );
+      return;
+    }
 
-  if (url.pathname === "/status") {
-    const jobId = url.searchParams.get("jobId");
-    // Unknown jobId → "unknown" so the DO knows to (re)send /start (it may have
-    // booted fresh, or slept and lost this job from the Map).
-    const state = jobs.get(jobId) ?? { status: "unknown" };
-    res.writeHead(200, { "content-type": "application/json" }).end(JSON.stringify(state));
-    return;
-  }
-  res.writeHead(404).end();
-}).listen(8080, () => console.log("[CTR] listening on 8080"));
+    if (url.pathname === '/status') {
+      const jobId = url.searchParams.get('jobId');
+      // Unknown jobId → "unknown" so the DO knows to (re)send /start (it may have
+      // booted fresh, or slept and lost this job from the Map).
+      const state = jobs.get(jobId) ?? { status: 'unknown' };
+      res.writeHead(200, { 'content-type': 'application/json' }).end(JSON.stringify(state));
+      return;
+    }
+    res.writeHead(404).end();
+  })
+  .listen(8080, () => console.log('[CTR] listening on 8080'));
 
 async function runJob(job) {
   // ... run ffmpeg, etc. (can take many minutes) ...
   // If you need Higgsfield data, call YOUR app (NOT fnf directly) with the token:
   //   await fetch(`${job.appBaseUrl}/api/whatever`,
   //     { headers: { Authorization: `Bearer ${job.containerToken}` } });
-  jobs.set(job.jobId, { ...jobs.get(job.jobId), status: "done", progress: 100,
-                        outputKey: `jobs/${job.jobId}/out.mp4` });
+  jobs.set(job.jobId, {
+    ...jobs.get(job.jobId),
+    status: 'done',
+    progress: 100,
+    outputKey: `jobs/${job.jobId}/out.mp4`,
+  });
 }
 ```
 
@@ -121,49 +133,55 @@ the kickoff REQUEST, and make `tick` a pure **monitor** that touches the contain
 only once it's actually running.
 
 ```ts
-import { Container } from "@cloudflare/containers";
-import { bindings } from "./lib/bindings.server";
+import { Container } from '@cloudflare/containers';
+import { bindings } from './lib/bindings.server';
 
 const MAX_JOB_MS = 3 * 60 * 60 * 1000; // 3h hard deadline (crash/hang backstop)
-const BOOT_TIMEOUT_MS = 120_000;       // PATIENT cold-boot budget (background)
-const POLL_TIMEOUT_MS = 6_000;         // fast health-check ONCE the container is up
+const BOOT_TIMEOUT_MS = 120_000; // PATIENT cold-boot budget (background)
+const POLL_TIMEOUT_MS = 6_000; // fast health-check ONCE the container is up
 
 export class AppContainer extends Container {
-  defaultPort = 8080;  // must match the manifest port + the container server
-  sleepAfter = "5m";   // idle shutdown; an ACTIVE job renews this (below)
+  defaultPort = 8080; // must match the manifest port + the container server
+  sleepAfter = '5m'; // idle shutdown; an ACTIVE job renews this (below)
 
   private booting = false; // one boot in flight at a time (shared across jobs)
 
   // ctx.waitUntil — the Container base doesn't surface ctx, so cast.
-  private bg(p: Promise<unknown>) { (this as any).ctx.waitUntil(p); }
+  private bg(p: Promise<unknown>) {
+    (this as any).ctx.waitUntil(p);
+  }
 
   // Is the container process up? A PURE read of the raw flag — it never triggers
   // a start (unlike containerFetch, which auto-starts and, if aborted mid-boot,
   // yields "Failed to start container: request aborted").
-  private running(): boolean { return Boolean((this as any).ctx?.container?.running); }
+  private running(): boolean {
+    return Boolean((this as any).ctx?.container?.running);
+  }
 
   // Boot PATIENTLY and deliver POST /start. MUST run via this.bg(...) — never
   // awaited in an alarm — so the long cold boot blocks nothing AND is never
   // aborted. A SHORT timeout here is the #1 way to get stuck at "starting".
   private async bootAndStart(job: any) {
     try {
-      await this.containerFetch("http://c/start", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
+      await this.containerFetch('http://c/start', {
+        method: 'POST',
+        headers: { 'content-type': 'application/json' },
         body: JSON.stringify(job),
         signal: AbortSignal.timeout(BOOT_TIMEOUT_MS), // generous, NOT 6s
       });
-    } catch (e) { console.log(`[DO] bootAndStart ${job.jobId} THREW ${e}`); }
+    } catch (e) {
+      console.log(`[DO] bootAndStart ${job.jobId} THREW ${e}`);
+    }
   }
 
   // Kickoff hands the full job here. Boot in the background; start the monitor.
   override async fetch(req: Request): Promise<Response> {
     const url = new URL(req.url);
-    if (req.method === "POST" && url.pathname === "/__keepalive/start") {
+    if (req.method === 'POST' && url.pathname === '/__keepalive/start') {
       const job = await req.json();
       this.booting = true;
       this.bg(this.bootAndStart(job).finally(() => (this.booting = false)));
-      this.schedule(1, "tick", { job, startedAt: Date.now() }); // monitor loop
+      this.schedule(1, 'tick', { job, startedAt: Date.now() }); // monitor loop
       return Response.json({ ok: true });
     }
     return super.fetch(req); // your normal SSR / routes
@@ -175,55 +193,82 @@ export class AppContainer extends Container {
     const env = bindings();
     const { jobId } = p.job;
 
-    if (Date.now() - p.startedAt > MAX_JOB_MS) {       // crash/hang backstop
-      await env.DB?.prepare("UPDATE jobs SET status='timed_out' WHERE id=? AND status!='done'").bind(jobId).run();
-      await this.stopIfIdle();                         // do NOT destroy() — siblings share this container
+    if (Date.now() - p.startedAt > MAX_JOB_MS) {
+      // crash/hang backstop
+      await env.DB?.prepare("UPDATE jobs SET status='timed_out' WHERE id=? AND status!='done'")
+        .bind(jobId)
+        .run();
+      await this.stopIfIdle(); // do NOT destroy() — siblings share this container
       return;
     }
     // Already finished? stop looping (a stale tick must not pin the container).
-    const row = await env.DB?.prepare("SELECT status FROM jobs WHERE id=?").bind(jobId).first<{ status: string }>();
-    if (!row || ["done", "error", "timed_out"].includes(row.status)) { await this.stopIfIdle(); return; }
+    const row = await env.DB?.prepare('SELECT status FROM jobs WHERE id=?')
+      .bind(jobId)
+      .first<{ status: string }>();
+    if (!row || ['done', 'error', 'timed_out'].includes(row.status)) {
+      await this.stopIfIdle();
+      return;
+    }
 
-    this.renewActivityTimeout();                       // an active job keeps it alive
+    this.renewActivityTimeout(); // an active job keeps it alive
 
     // Not up yet → kick ONE patient background boot + re-arm. NEVER poll a
     // not-running container: containerFetch would auto-start it and this poll's
     // timeout would abort the cold boot.
     if (!this.running()) {
-      if (!this.booting) { this.booting = true; this.bg(this.bootAndStart(p.job).finally(() => (this.booting = false))); }
-      this.schedule(3, "tick", p);
+      if (!this.booting) {
+        this.booting = true;
+        this.bg(this.bootAndStart(p.job).finally(() => (this.booting = false)));
+      }
+      this.schedule(3, 'tick', p);
       return;
     }
 
     // Up → poll THIS job's status (fast; the port is open).
     let s: any = null;
     try {
-      const r = await this.containerFetch(`http://c/status?jobId=${jobId}`, { signal: AbortSignal.timeout(POLL_TIMEOUT_MS) });
+      const r = await this.containerFetch(`http://c/status?jobId=${jobId}`, {
+        signal: AbortSignal.timeout(POLL_TIMEOUT_MS),
+      });
       const body = await r.text();
-      if (r.ok && body.trimStart().startsWith("{")) s = JSON.parse(body);
+      if (r.ok && body.trimStart().startsWith('{')) s = JSON.parse(body);
       else console.log(`[DO] status non-json http=${r.status} ${body.slice(0, 200)}`); // surfaces runtime errors verbatim
-    } catch (e) { console.log(`[DO] status unreachable ${e}`); }
+    } catch (e) {
+      console.log(`[DO] status unreachable ${e}`);
+    }
 
-    if (!s) { this.schedule(3, "tick", p); return; }   // booting/race → retry soon
+    if (!s) {
+      this.schedule(3, 'tick', p);
+      return;
+    } // booting/race → retry soon
 
-    if (s.status === "unknown") {                      // up but lost this job → re-send /start
+    if (s.status === 'unknown') {
+      // up but lost this job → re-send /start
       this.bg(this.bootAndStart(p.job));
-      this.schedule(3, "tick", p);
+      this.schedule(3, 'tick', p);
       return;
     }
 
     // Mirror progress to D1; finish on done/error.
-    await env.DB?.prepare("UPDATE jobs SET status=?, output=COALESCE(?, output) WHERE id=? AND status!='done'")
-      .bind(s.status, s.outputKey ?? null, jobId).run();
-    if (s.status === "done" || s.status === "error") { await this.stopIfIdle(); return; }
-    this.schedule(5, "tick", p);                       // re-arm (~5s)
+    await env.DB?.prepare(
+      "UPDATE jobs SET status=?, output=COALESCE(?, output) WHERE id=? AND status!='done'",
+    )
+      .bind(s.status, s.outputKey ?? null, jobId)
+      .run();
+    if (s.status === 'done' || s.status === 'error') {
+      await this.stopIfIdle();
+      return;
+    }
+    this.schedule(5, 'tick', p); // re-arm (~5s)
   }
 
   // Stop the SHARED container ONLY when no job is still active (stopping it
   // mid-job would kill siblings). D1 is the source of truth.
   private async stopIfIdle() {
     const env = bindings();
-    const row = await env.DB?.prepare("SELECT COUNT(*) AS n FROM jobs WHERE status IN ('queued','running')").first<{ n: number }>();
+    const row = await env.DB?.prepare(
+      "SELECT COUNT(*) AS n FROM jobs WHERE status IN ('queued','running')",
+    ).first<{ n: number }>();
     if (!row || row.n === 0) await this.stop().catch(() => {});
   }
 }
@@ -256,20 +301,23 @@ const jobId = crypto.randomUUID();
 await env.DB.prepare("INSERT INTO jobs (id, status) VALUES (?, 'running')").bind(jobId).run();
 
 // ONE shared container for the whole app → route by a STABLE name, not jobId.
-const stub = env.CONTAINER.getByName("app");
-await stub.fetch(new Request("https://do/__keepalive/start", {   // the DO route, not the container
-  method: "POST",
-  body: JSON.stringify({
-    jobId,
-    containerToken,                                  // from x-hf-container-token (see §5)
-    appBaseUrl: new URL(request.url).origin,
-    /* ...your job spec... */
+const stub = env.CONTAINER.getByName('app');
+await stub.fetch(
+  new Request('https://do/__keepalive/start', {
+    // the DO route, not the container
+    method: 'POST',
+    body: JSON.stringify({
+      jobId,
+      containerToken, // from x-hf-container-token (see §5)
+      appBaseUrl: new URL(request.url).origin,
+      /* ...your job spec... */
+    }),
   }),
-}));
+);
 return Response.json({ jobId });
 
 // GET /api/jobs/:id — cheap status the browser polls
-const row = await env.DB.prepare("SELECT status, output FROM jobs WHERE id=?").bind(id).first();
+const row = await env.DB.prepare('SELECT status, output FROM jobs WHERE id=?').bind(id).first();
 return Response.json(row);
 ```
 
@@ -281,8 +329,12 @@ Instead it calls **your website's own API** as the viewer, using a short-lived
 
 1. **Browser, at kickoff** — mint a token (same-origin; the platform handles it):
    ```js
-   const { token } = await fetch("/__auth/container-token", { method: "POST" }).then(r => r.json());
-   await fetch("/api/jobs", { method: "POST", body: form, headers: { "x-hf-container-token": token } });
+   const { token } = await fetch('/__auth/container-token', { method: 'POST' }).then(r => r.json());
+   await fetch('/api/jobs', {
+     method: 'POST',
+     body: form,
+     headers: { 'x-hf-container-token': token },
+   });
    ```
 2. **Your website** reads `x-hf-container-token` and passes it to the container at
    `/start` (as `containerToken` above).
@@ -318,8 +370,8 @@ container never holds a real Higgsfield/Cloudflare credential.
 - **Cold-boot abort (#1 cause of "stuck at starting")** — the first
   `containerFetch` triggers the cold boot and waits for the port; a short
   timeout/abort cancels the boot → `Failed to start container: Container request
-  aborted`. Boot **patiently in the background** (`ctx.waitUntil`, generous
-  timeout); only the *monitor* polls (with a short timeout) once the container is
+aborted`. Boot **patiently in the background** (`ctx.waitUntil`, generous
+  timeout); only the _monitor_ polls (with a short timeout) once the container is
   `running`.
 - **Don't block the alarm on the boot** — a `tick` that awaits a cold boot is
   killed (`exceededWallTime`). Kick the boot via `ctx.waitUntil` and re-arm.

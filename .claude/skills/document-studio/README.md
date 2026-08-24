@@ -5,8 +5,9 @@ Create and update professional HTML documents with consistent NGM branding, voic
 ## What It Does
 
 Document Studio generates polished, branded documents for Next Generation Medicine:
+
 - **Proposals** — Client-specific proposals from meeting transcripts
-- **Flyers** — 1-2 page print-ready marketing materials  
+- **Flyers** — 1-2 page print-ready marketing materials
 - **Sponsor Packets** — Multi-page event sponsorship materials
 - **One-Pagers** — Single-page program overviews
 
@@ -23,6 +24,7 @@ Create a proposal for [Client Name]. Here's the transcript from our meeting:
 ```
 
 The agent will:
+
 1. Extract client needs and pain points from the conversation
 2. Match your solution to their specific challenges
 3. Recommend appropriate pricing
@@ -51,30 +53,32 @@ Update the NGM Summit sponsor packet - change the date to March 2026 and add pri
 
 ### Reference Files
 
-| File | Purpose |
-|------|---------|
-| `SKILL.md` | Core instructions and workflows |
+| File                 | Purpose                                     |
+| -------------------- | ------------------------------------------- |
+| `SKILL.md`           | Core instructions and workflows             |
 | `voice-and-style.md` | Voice guidelines, tone, language dos/don'ts |
-| `ngm-programs.md` | NGM programs, pricing, credentials |
-| `design-system.md` | Colors, typography, CSS components |
+| `ngm-programs.md`    | NGM programs, pricing, credentials          |
+| `design-system.md`   | Colors, typography, CSS components          |
 
 ### Templates
 
-| Template | Use Case |
-|----------|----------|
-| `proposal-template.html` | Client proposals |
-| `flyer-template.html` | Marketing flyers (print-ready) |
-| `sponsor-packet-template.html` | Event sponsorship packets |
+| Template                       | Use Case                       |
+| ------------------------------ | ------------------------------ |
+| `proposal-template.html`       | Client proposals               |
+| `flyer-template.html`          | Marketing flyers (print-ready) |
+| `sponsor-packet-template.html` | Event sponsorship packets      |
 
 ## Voice & Style Summary
 
 **Be:**
+
 - Confident (not salesy)
 - Specific (not vague)
 - Outcome-focused (not feature-focused)
 - Personable (not corporate)
 
 **Avoid:**
+
 - Buzzwords ("revolutionary", "cutting-edge")
 - Vague superlatives ("best-in-class", "world-class")
 - Salesy urgency ("Act now!")
@@ -89,30 +93,35 @@ Update the NGM Summit sponsor packet - change the date to March 2026 and add pri
 ## NGM Programs Quick Reference
 
 ### Longevity Intelligence Platform (LIP)
+
 - 50,000+ studies synthesized
 - AI lab report generator (5 min vs 45 min)
 - 150+ educational modules
 - Business knowledge advisor
 
 ### NGM Community
+
 - Engaged private practitioner community
 - Weekly live sessions
 - Case feedback
 - Expert network
 
 ### NGM Commons
+
 - Vendor intelligence platform
 - Research-driven profiles
 - AI-native structure
 - Partner: $5,000/year | Sponsor: $12,500/year
 
 ### NGM Summit
+
 - Japan 2026 (October 15-16)
 - Nakanoshima Qross, Osaka
 - ~100 invitation-only attendees
 - Tiers: $1,000 - $20,000+
 
 ### Consulting
+
 - Strategy sessions: $2,500 - $5,000
 - Monthly advisory: $5,000 - $15,000/mo
 - Fractional CMO: $10,000 - $25,000/mo
@@ -132,17 +141,20 @@ content/docs/
 ## Design System Highlights
 
 ### Colors
+
 - **Gold accent**: `#C49A6C` (use sparingly)
 - **Ink-900**: `#302C27` (headings)
 - **Ink-700**: `#4A4540` (body text)
 - **Paper-alt**: `#F5F2EC` (backgrounds)
 
 ### Typography
+
 - **Headings**: Cormorant Garamond (serif)
 - **Body**: Inter (sans-serif)
 - **Labels**: Inter, uppercase, letter-spacing 0.08em
 
 ### Key Components
+
 - Section numbers (black square with white number)
 - Highlight boxes (gold left border)
 - Tier cards (featured tier in dark with gold border)
@@ -159,6 +171,7 @@ content/docs/
 ## Examples
 
 ### Proposal from transcript
+
 ```
 Create a consulting proposal for Dr. Sarah Chen at Longevity Labs based on our call yesterday. She's looking for help launching a longevity program at her functional medicine practice. Here's the transcript:
 
@@ -166,11 +179,13 @@ Create a consulting proposal for Dr. Sarah Chen at Longevity Labs based on our c
 ```
 
 ### Flyer for conference
+
 ```
 Create a 2-page print flyer for NGM Commons to hand out at the A4M conference. Focus on the vendor partnership benefits and include the QR code for sign-up.
 ```
 
 ### Update sponsor packet
+
 ```
 Update the Vanguard Summit sponsor packet:
 1. Change event date to March 15-16, 2026
@@ -179,7 +194,7 @@ Update the Vanguard Summit sponsor packet:
 ```
 
 ### Adapt existing proposal
+
 ```
 Take the Trellis proposal and adapt it for MedTech Labs. They're also building a clinical platform but focused on geriatrics rather than pregnancy. Keep the same structure and pricing approach.
 ```
-

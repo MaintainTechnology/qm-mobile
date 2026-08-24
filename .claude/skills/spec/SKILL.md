@@ -24,8 +24,8 @@ agent) could build against without having to guess what was meant.
 
 The deliverable is the spec — not code. While running this skill, do not write
 implementation code, scaffold a project, create source files, or start the
-build. The whole point is to think clearly about *what* to build before spending
-effort on *how*. If the user starts pushing toward implementation mid-interview,
+build. The whole point is to think clearly about _what_ to build before spending
+effort on _how_. If the user starts pushing toward implementation mid-interview,
 finish (or at least save) the spec first, then let them kick off the build as a
 separate, explicit request.
 
@@ -93,42 +93,53 @@ user confirms.
 # <Feature name> — Spec
 
 ## Objective
+
 What we're building and the problem it solves, in 2-4 sentences. Include who
 it's for. Someone reading only this section should understand the point.
 
 ## Context / background
+
 Relevant existing systems, prior decisions, or domain facts that shape the
 build. (Omit if there's nothing material.)
 
 ## Requirements
+
 The exact, must-have behaviors, as a numbered list. Each item specific and
 testable enough that two different builders would produce the same thing.
+
 1. ...
 2. ...
 
 ## Non-goals
+
 What is explicitly out of scope for this version, so no one builds it by
 mistake.
 
 ## Constraints
+
 Tech stack, platforms, integrations, data, performance budgets, timeline,
 compliance — whatever bounds the solution.
 
 ## Edge cases to handle
+
 Concrete scenarios plus the expected handling. Format each as
 "situation → expected behavior".
+
 - Empty input → ...
 - Duplicate request → ...
 - Upstream timeout → ...
 
 ## Definition of done
+
 A checklist someone could verify the finished build against. Each item must be
 objectively checkable (a behavior to observe, a test that passes, a metric to
 measure) — not a vague aspiration.
+
 - [ ] ...
 - [ ] ...
 
 ## Open questions
+
 Anything still unresolved that needs an answer before or during the build.
 (Omit if none.)
 ```

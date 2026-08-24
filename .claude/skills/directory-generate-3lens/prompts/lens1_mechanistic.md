@@ -24,6 +24,7 @@ Before generating mechanistic analysis from scratch, consult the KBV2 dossier's 
 3. **`diagram_elements`** — Suggested elements for the SVG pathway diagram based on the network structure discovered during KBV2 review.
 
 **The KBV2 dossier also provides:**
+
 - Cross-document connections showing how pathways interrelate
 - Recurring themes that should inform your narrative structure
 - Specific dosing and implementation patterns from intervention files
@@ -39,25 +40,28 @@ Write: "Butyrate is the obligate primary fuel for colonocyte mitochondrial beta-
 
 Classify the product into one of these categories:
 
-| Category | Description | Examples |
-|----------|-------------|----------|
-| `biological` | Interacts with biological systems (supplements, peptides, drugs) | Metformin, NAD+ precursors, Rapamycin |
-| `technological` | Uses technology for measurement or intervention | CGMs, wearables, diagnostic tests |
-| `service` | Delivers care or expertise | Telehealth platforms, longevity clinics |
-| `hybrid` | Combines multiple categories | AI-powered diagnostics, smart supplements |
+| Category        | Description                                                      | Examples                                  |
+| --------------- | ---------------------------------------------------------------- | ----------------------------------------- |
+| `biological`    | Interacts with biological systems (supplements, peptides, drugs) | Metformin, NAD+ precursors, Rapamycin     |
+| `technological` | Uses technology for measurement or intervention                  | CGMs, wearables, diagnostic tests         |
+| `service`       | Delivers care or expertise                                       | Telehealth platforms, longevity clinics   |
+| `hybrid`        | Combines multiple categories                                     | AI-powered diagnostics, smart supplements |
 
 ### Step 2: Identify Primary Targets
 
 For **biological** products:
+
 - Identify molecular targets (receptors, enzymes, transporters)
 - Use HGNC gene symbols where applicable (e.g., MTOR, AMPK/PRKAA1)
 - Note direct vs. indirect effects
 
 For **technological** products:
+
 - Identify what is being measured or modulated
 - Note the sensing mechanism or intervention pathway
 
 For **service** products:
+
 - Identify the core value delivery mechanism
 - Note what expertise or process is being provided
 
@@ -70,6 +74,7 @@ TRIGGER → PRIMARY EFFECT → SECONDARY EFFECTS → DOWNSTREAM OUTCOMES
 ```
 
 For biological products, map:
+
 - Upstream triggers (what activates the pathway)
 - Core signaling nodes
 - Downstream effectors
@@ -82,6 +87,7 @@ Include pathway crosstalk where relevant (e.g., AMPK ←→ mTOR).
 Create an SVG diagram illustrating the mechanism. Follow these specifications:
 
 **Technical Requirements:**
+
 - ViewBox: `0 0 800 600` (or appropriate for content)
 - Minimum 40px padding on all sides
 - Text must not overflow containers
@@ -93,6 +99,7 @@ Create an SVG diagram illustrating the mechanism. Follow these specifications:
   - Outcomes: `#8b5cf6` (purple)
 
 **Content Requirements:**
+
 - Label all nodes clearly
 - Show direction of effect (activation vs. inhibition)
 - Include the product's point of intervention
@@ -101,6 +108,7 @@ Create an SVG diagram illustrating the mechanism. Follow these specifications:
 ### Step 5: Create Educational Analogies
 
 Generate 1-2 memorable analogies that help explain the mechanism to a clinician. Good analogies:
+
 - Connect to familiar concepts
 - Illuminate non-obvious aspects
 - Are accurate (don't oversimplify to the point of incorrectness)
@@ -129,10 +137,7 @@ Return a JSON object with this structure:
   ],
   "pathway_map": {
     "trigger": "Oral administration → gut absorption → hepatic uptake",
-    "primary_effects": [
-      "Complex I inhibition → ↑AMP/ATP ratio",
-      "AMPK activation"
-    ],
+    "primary_effects": ["Complex I inhibition → ↑AMP/ATP ratio", "AMPK activation"],
     "secondary_effects": [
       "mTORC1 inhibition",
       "Enhanced autophagy",

@@ -2,7 +2,7 @@ const VALID_SCOPES = new Set(['route', 'file', 'account']);
 
 export class CandidateContractError extends Error {
   constructor(errors) {
-    super(`gate candidate contract failed:\n${errors.map((e) => `- ${e}`).join('\n')}`);
+    super(`gate candidate contract failed:\n${errors.map(e => `- ${e}`).join('\n')}`);
     this.name = 'CandidateContractError';
     this.errors = errors;
   }
@@ -31,17 +31,20 @@ export function validateCandidate(candidate, ctx = {}) {
   if (!VALID_SCOPES.has(candidate.scope)) {
     errors.push(`${label}: scope must be one of route, file, account`);
   }
-  if (!Number.isFinite(candidate.priority)) errors.push(`${label}: priority must be a finite number`);
-  if (!Number.isFinite(candidate.confidence)) errors.push(`${label}: confidence must be a finite number`);
+  if (!Number.isFinite(candidate.priority))
+    errors.push(`${label}: priority must be a finite number`);
+  if (!Number.isFinite(candidate.confidence))
+    errors.push(`${label}: confidence must be a finite number`);
   if (Array.isArray(candidate.files)) {
-    if (!candidate.files.every((f) => typeof f === 'string' && f.length > 0)) {
+    if (!candidate.files.every(f => typeof f === 'string' && f.length > 0)) {
       errors.push(`${label}: files must contain only non-empty strings`);
     }
   } else {
     errors.push(`${label}: files must be an array`);
   }
   if (!nonEmptyString(candidate.reason)) errors.push(`${label}: reason must be a non-empty string`);
-  if (!nonEmptyString(candidate.question)) errors.push(`${label}: question must be a non-empty string`);
+  if (!nonEmptyString(candidate.question))
+    errors.push(`${label}: question must be a non-empty string`);
 
   if (candidate.scope === 'route') {
     const hasRoute = nonEmptyString(candidate.route);

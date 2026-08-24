@@ -1,11 +1,12 @@
 # GAME CREATION SYSTEM
+
 ### Plan → Build → Deliver — the compressed operating core
 
 > **Skill integration (read first, then apply the system below):**
 >
 > - **Read order: this file is the FIRST reference of any game-creation run** — open it before all other references and before any code, and **read it whole, top to bottom, in one pass** — never by sections, never partially. The closing reference is `build-game.md`: read last of all, after the plan and the asset references, but strictly before generating any game code.
 > - **One pipeline, one speed — and it is the floor.** Every request runs the same lean pipeline; there are no heavier or lighter modes. Feeling that it is overkill for the request never waives the plan phase (§§1–5), the STYLE FORMULA or the asset manifest; cutting a step needs the user's explicit confirmation, and a brief referencing an existing game ("like X") waives nothing — the reference only pre-fills answers. Lean means: gates and the plan are resolved **in reasoning**, not written — the only planning file is `design/assets.csv`.
-> - **Three phases, merged work inside each.** PLAN (think §§1–5 through, write `assets.csv`, derive the STYLE FORMULA; `multiplayer.md` when Players ≠ solo) → BUILD (fire **all** asset generation jobs, then write the game code *while they run*, wire assets in as they land) → DELIVER (publish, hand over the URL). Inside a phase, parallelize what is genuinely independent (asset jobs run while game code is written; independent generations submit together) — and keep sequential what feeds on a prior result; don't force parallelism onto dependent steps. The phases themselves never interleave — no game code before PLAN closes. Post **1–3 plain sentences in natural language after each phase** (not after every internal step); never expose pipeline machinery — no phases/gates/modes/§-numbers, no checkmarks. Blocking points: STYLE FORMULA approval (only when the style is not explicit in the brief) and any cutting of pipeline steps.
+> - **Three phases, merged work inside each.** PLAN (think §§1–5 through, write `assets.csv`, derive the STYLE FORMULA; `multiplayer.md` when Players ≠ solo) → BUILD (fire **all** asset generation jobs, then write the game code _while they run_, wire assets in as they land) → DELIVER (publish, hand over the URL). Inside a phase, parallelize what is genuinely independent (asset jobs run while game code is written; independent generations submit together) — and keep sequential what feeds on a prior result; don't force parallelism onto dependent steps. The phases themselves never interleave — no game code before PLAN closes. Post **1–3 plain sentences in natural language after each phase** (not after every internal step); never expose pipeline machinery — no phases/gates/modes/§-numbers, no checkmarks. Blocking points: STYLE FORMULA approval (only when the style is not explicit in the brief) and any cutting of pipeline steps.
 > - **Asset manifest — the only written planning artifact, mandatory always**: planning emits `design/assets.csv` (in the game project under `design/` — it ships with the game) listing every visual/audio asset the build needs. Columns: `id`, `role` (how the build consumes it), `type`, `description`, `size/ratio`, `style line ref`, `source` (`generate` | `reference_media[i]`). It is the contract between asset generation and assembly.
 
 The system: §0 execution → §1 profile → §2 laws → §§3–5 design → §§6–8 implementation → §§9–11 tuning → §12 determinism & debugging → §13 limits. The engine of all of it is the **iterative loop**: nothing is designed until thought through against its gate.
@@ -22,11 +23,11 @@ The system: §0 execution → §1 profile → §2 laws → §§3–5 design → 
 6. **Numbers before code.** Any numeric criterion (budget, window, limit) is fixed before building the thing it judges, and never softened in the same iteration that failed against it. The canonical numeric defaults live in `build-game.md`.
 7. **Code permission is bound to phases** — no game code until PLAN closes (its sections thought through, `assets.csv` written, FORMULA derived). A one-paragraph "plan" followed by code is a failed run.
 
-| Phase | Code |
-|---|---|
-| PLAN (§§1–5) | ❌ none |
+| Phase         | Code                                                                    |
+| ------------- | ----------------------------------------------------------------------- |
+| PLAN (§§1–5)  | ❌ none                                                                 |
 | BUILD (§§6–8) | ✅ game code, from the `build-game.md` skeletons; §§9–11 as data/config |
-| DELIVER | ❌ publish only |
+| DELIVER       | ❌ publish only                                                         |
 
 ---
 
@@ -34,16 +35,16 @@ The system: §0 execution → §1 profile → §2 laws → §§3–5 design → 
 
 Think through a point on every axis — the profile decides the shape every later section takes:
 
-| Axis | Spectrum |
-|---|---|
-| **Time** | real-time ↔ turn-based ↔ pause-at-will ↔ no time |
-| **Space** | continuous 2D/3D ↔ discrete ↔ abstract ↔ absent |
-| **Agency** | one hero ↔ squad ↔ disembodied hand |
-| **Conflict** | vs system ↔ vs players ↔ vs self ↔ none (then what holds attention instead?) |
-| **Content** | authored ↔ procedural ↔ emergent ↔ player-created |
-| **Outcome** | win/lose ↔ endless ↔ player-set goals ↔ none |
-| **Players** | solo ↔ co-op ↔ versus ↔ massive (not solo → `multiplayer.md` is mandatory) |
-| **Session** | minutes ↔ hours ↔ "once a day" |
+| Axis                  | Spectrum                                                                                                                                     |
+| --------------------- | -------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Time**              | real-time ↔ turn-based ↔ pause-at-will ↔ no time                                                                                             |
+| **Space**             | continuous 2D/3D ↔ discrete ↔ abstract ↔ absent                                                                                              |
+| **Agency**            | one hero ↔ squad ↔ disembodied hand                                                                                                          |
+| **Conflict**          | vs system ↔ vs players ↔ vs self ↔ none (then what holds attention instead?)                                                                 |
+| **Content**           | authored ↔ procedural ↔ emergent ↔ player-created                                                                                            |
+| **Outcome**           | win/lose ↔ endless ↔ player-set goals ↔ none                                                                                                 |
+| **Players**           | solo ↔ co-op ↔ versus ↔ massive (not solo → `multiplayer.md` is mandatory)                                                                   |
+| **Session**           | minutes ↔ hours ↔ "once a day"                                                                                                               |
 | **Engagement source** | execution ↔ calculation ↔ discovery ↔ expression ↔ story ↔ social ↔ accumulation — pick 1–2 primary; rewards (§5) and balance (§9) feed them |
 
 **Delivery context** (fixed here, never retrofitted): target platforms — default **desktop + mobile + gamepad**; every verb performable by every declared input method, no hover-only interactions when touch is declared, keyboard bound to **physical key codes, never typed letters**; shipping languages — all player-visible strings external from day one. Performance budgets target the **weakest** declared platform.
@@ -53,7 +54,7 @@ Think through a point on every axis — the profile decides the shape every late
 ## 2. LAWS
 
 - **L1 — Experience first.** Design the experience, not the artifact; any convention may break if the experience demands it. Every later dispute resolves against the experience formula (§3.1).
-- **L2 — Meaningful interaction.** Every player action must be *discernible* (visible effect now) and *integrated* (echo later). Test per mechanic: action → visible effect → where it resurfaces. An empty slot = a dead mechanic.
+- **L2 — Meaningful interaction.** Every player action must be _discernible_ (visible effect now) and _integrated_ (echo later). Test per mechanic: action → visible effect → where it resurfaces. An empty slot = a dead mechanic.
 - **L3 — Mastery.** Interest is pattern mastery: **one new pattern at a time**, the next after the previous one's exam (§7.3); design the sequence of mastery, not the volume of content; grind is a deliberate recorded choice or a hole.
 - **L4 — Undecided outcome on every horizon** (turn, fight, session). Pick 2–3 uncertainty sources tied to actual mechanics (execution, randomness, hidden info, depth of calculation, another mind, anticipation); randomness lands **before** decisions, not after; when a source runs dry (pattern learned, meta solved), another must already be active — or the game ends there.
 
@@ -85,7 +86,7 @@ Think through a point on every axis — the profile decides the shape every late
 5. **Peaks**: each period ends in a combined exam of the patterns it taught, with escalation.
 6. **Rewards** feed the declared engagement source (§1); the strongest reward is a **new verb**; big rewards sit on interest-curve peaks.
 7. **Interface**: every element serves a player decision — otherwise remove it or hide it until needed.
-8. **Economy**: every resource has sources *and* sinks.
+8. **Economy**: every resource has sources _and_ sinks.
 9. **Delivery of mechanics**: one new pattern at a time (L3), the next after the previous one's exam.
 10. **Game entry**: a short, counted path from launch to the first meaningful action; on return, the first screen shows the current goal and next step; controls learnable on demand at any moment; accessibility options reachable before play starts.
 
@@ -122,7 +123,7 @@ Every action gets an immediate acknowledgment (long operations: instant receipt 
 - **9.1 Options**: priced options live on one cost curve — above it = dominant, below = junk; deviations only deliberate. Keep at least one non-transitive structure (A>B>C>A) so the game can't be "solved". Asymmetric sides: equal expected strength, different style.
 - **9.2** Perceived difficulty = the gap between the player-power curve and the challenge curve — steer the gap; the next progression step costs more than its reward returns (soft slowdown instead of a wall).
 - **9.3 Economy**: inflation (sources outrunning sinks) kills every price — fix sinks, not prices.
-- **9.4 Randomness**: tune expected value *and* variance separately; streaks read as cheating — soften them (pity counters, draw-from-deck) and re-count the odds after softening; design the extreme tails on purpose.
+- **9.4 Randomness**: tune expected value _and_ variance separately; streaks read as cheating — soften them (pity counters, draw-from-deck) and re-count the odds after softening; design the extreme tails on purpose.
 - **9.5** All balance numbers live in data, tuned one change at a time (§0.6).
 
 ---
@@ -130,14 +131,14 @@ Every action gets an immediate acknowledgment (long operations: instant receipt 
 ## 10. PLAYER'S HEAD
 
 - **10.1 Three limiters**: perception is subjective → critical signals use several channels at once and no two critical signals collide (including under colorblindness); attention is a bottleneck → nothing instructional under load, one message at its moment of need; memory decays → the game remembers for the player: current goal and next step visible at any return.
-- **10.2** Every system state observable; every refusal explains *why* and *how to lift it*; what looks interactive is interactive (and vice versa); the cost of an error is repeating the interesting part, not the boring one; motivation needs all three: visible growth, real choices, a world that responds.
+- **10.2** Every system state observable; every refusal explains _why_ and _how to lift it_; what looks interactive is interactive (and vice versa); the cost of an error is repeating the interesting part, not the boring one; motivation needs all three: visible growth, real choices, a world that responds.
 - **10.3 Accessibility & localization are data from day one**: remappable bindings (physical key codes + gamepad buttons; a binding per declared method for every command); options that actually apply (text scale, shake/flash toggles, contrast); all player-visible strings external — switching language is a data change, not a code change.
 
 ---
 
 ## 11. NARRATIVE (when the profile has story)
 
-The hero's goal = the player's goal — divergence only as a deliberate, recorded device. Build on state variables, not scene-branching trees. Every significant choice observably fires later (L2) — a choice with no consequence is decoration. Deliver up the hierarchy: the player *did it* > saw it in the world > overheard it > read it.
+The hero's goal = the player's goal — divergence only as a deliberate, recorded device. Build on state variables, not scene-branching trees. Every significant choice observably fires later (L2) — a choice with no consequence is decoration. Deliver up the hierarchy: the player _did it_ > saw it in the world > overheard it > read it.
 
 ---
 

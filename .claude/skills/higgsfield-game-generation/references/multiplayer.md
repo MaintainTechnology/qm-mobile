@@ -40,13 +40,13 @@ logic runs inside.
 
 ## 2 — Two tiers: rules module vs custom server
 
-| | **`logic.js` — game rules (DEFAULT)** | **`server.js` — custom server** |
-|---|---|---|
-| Fits | turn-based, simultaneous-reveal: boards, cards, words, quizzes, party games | continuous movement, tick loops, FPS/.io-style, custom protocols |
-| You write | six pure functions over JSON state | a full `GameServer` class with its own protocol |
-| Plumbing | platform kernel: rooms, seats, join/action/reset protocol, reconnects, persistence | you own the protocol; platform provides sockets + sharding |
-| Idle cost | ~nothing (rooms hibernate between actions) | always-on while occupied |
-| Timers | forbidden (statically rejected) | allowed — start lazily, stop when empty |
+|           | **`logic.js` — game rules (DEFAULT)**                                              | **`server.js` — custom server**                                  |
+| --------- | ---------------------------------------------------------------------------------- | ---------------------------------------------------------------- |
+| Fits      | turn-based, simultaneous-reveal: boards, cards, words, quizzes, party games        | continuous movement, tick loops, FPS/.io-style, custom protocols |
+| You write | six pure functions over JSON state                                                 | a full `GameServer` class with its own protocol                  |
+| Plumbing  | platform kernel: rooms, seats, join/action/reset protocol, reconnects, persistence | you own the protocol; platform provides sockets + sharding       |
+| Idle cost | ~nothing (rooms hibernate between actions)                                         | always-on while occupied                                         |
+| Timers    | forbidden (statically rejected)                                                    | allowed — start lazily, stop when empty                          |
 
 Rule of thumb: **if nothing happens while players think, use `logic.js`.** If the world moves
 on its own, use `server.js`.

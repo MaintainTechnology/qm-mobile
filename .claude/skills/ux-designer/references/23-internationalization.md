@@ -1,6 +1,6 @@
 # Internationalization & Localization
 
-Internationalization (**i18n**) is designing and building a product so it *can* be
+Internationalization (**i18n**) is designing and building a product so it _can_ be
 adapted to different languages, regions, and cultures without re-engineering.
 Localization (**l10n**) is the adaptation itself—translating strings, swapping
 formats, adjusting layout. Get i18n wrong up front and every locale becomes a
@@ -8,14 +8,14 @@ rewrite; get it right and adding a language is a content task, not a code task.
 
 > Rule of thumb: assume your UI will run right-to-left, in a language whose words
 > are 40% longer than English, with dates and numbers formatted by the user's
-> locale—*before* you have a single translation.
+> locale—_before_ you have a single translation.
 
 ---
 
 ## RTL & Bidirectional Layout
 
 Arabic, Hebrew, Persian, and Urdu read right-to-left (RTL). RTL is not "flip the
-CSS"—it's a directional mirror of the *layout*, while some content stays unchanged.
+CSS"—it's a directional mirror of the _layout_, while some content stays unchanged.
 
 ### Use logical CSS properties, not physical ones
 
@@ -24,30 +24,34 @@ Logical properties resolve against the document/element direction automatically.
 
 ```css
 /* ❌ Physical — breaks in RTL */
-.card { margin-left: 16px; text-align: left; border-left: 2px solid; }
+.card {
+  margin-left: 16px;
+  text-align: left;
+  border-left: 2px solid;
+}
 
 /* ✅ Logical — mirrors automatically with dir="rtl" */
 .card {
   margin-inline-start: 16px;
   text-align: start;
   border-inline-start: 2px solid;
-  padding-inline: 12px;      /* start + end */
-  inset-inline-start: 0;     /* replaces left/right for positioning */
+  padding-inline: 12px; /* start + end */
+  inset-inline-start: 0; /* replaces left/right for positioning */
 }
 ```
 
-| Physical | Logical equivalent |
-|----------|-------------------|
-| `margin-left` / `margin-right` | `margin-inline-start` / `margin-inline-end` |
+| Physical                         | Logical equivalent                            |
+| -------------------------------- | --------------------------------------------- |
+| `margin-left` / `margin-right`   | `margin-inline-start` / `margin-inline-end`   |
 | `padding-left` / `padding-right` | `padding-inline-start` / `padding-inline-end` |
-| `left` / `right` | `inset-inline-start` / `inset-inline-end` |
-| `text-align: left` | `text-align: start` |
-| `border-left` | `border-inline-start` |
+| `left` / `right`                 | `inset-inline-start` / `inset-inline-end`     |
+| `text-align: left`               | `text-align: start`                           |
+| `border-left`                    | `border-inline-start`                         |
 
 ### Set direction at the root, let it cascade
 
 ```html
-<html lang="ar" dir="rtl">
+<html lang="ar" dir="rtl"></html>
 ```
 
 Use `dir="auto"` on user-generated content fields so a single input handles either
@@ -58,11 +62,13 @@ and isolate embedded runs with `<bdi>` or CSS `unicode-bidi: isolate`.
 ### Mirror these — but not those
 
 **Mirror** (they imply direction of reading/progress):
+
 - Layout: navigation, sidebars, alignment, the whole grid
 - Directional icons: back/forward arrows, chevrons, breadcrumb separators
 - Progress bars, sliders, carousels, "next step" affordances
 
 **Do NOT mirror** (direction is intrinsic, not reading-relative):
+
 - Logos and brand marks
 - Media playback controls (play ▶ still points "forward in time", not in reading direction)
 - Clocks, musical notation, and most diagrams
@@ -71,7 +77,9 @@ and isolate embedded runs with `<bdi>` or CSS `unicode-bidi: isolate`.
 
 ```css
 /* Mirror a directional icon only */
-[dir="rtl"] .icon-chevron { transform: scaleX(-1); }
+[dir='rtl'] .icon-chevron {
+  transform: scaleX(-1);
+}
 /* Logo and play button: leave alone */
 ```
 
@@ -106,12 +114,12 @@ than English; short strings can expand far more.
 ### IBM's rule of thumb for expansion
 
 | English length | Expect up to |
-|----------------|-------------|
-| ≤ 10 chars | +100–200% |
-| 11–20 chars | +80–100% |
-| 21–30 chars | +60–80% |
-| 31–50 chars | +40% |
-| > 50 chars | +30% |
+| -------------- | ------------ |
+| ≤ 10 chars     | +100–200%    |
+| 11–20 chars    | +80–100%     |
+| 21–30 chars    | +60–80%      |
+| 31–50 chars    | +40%         |
+| > 50 chars     | +30%         |
 
 ### Design for it
 
@@ -120,7 +128,7 @@ than English; short strings can expand far more.
 - **Test with pseudo-localization** early: replace `Settings` with
   `[Ŝéttîng§ ──────]` to surface overflow and hard-coded strings before real
   translation exists.
-- **CJK contracts**—Chinese/Japanese/Korean are often *shorter and taller*; don't
+- **CJK contracts**—Chinese/Japanese/Korean are often _shorter and taller_; don't
   assume single-line height either.
 
 ### Never concatenate translated fragments
@@ -129,7 +137,7 @@ Word order differs across languages, so string-gluing produces nonsense.
 
 ```js
 // ❌ Grammatically broken in most languages
-const msg = "You have " + count + " new " + itemType + " messages";
+const msg = 'You have ' + count + ' new ' + itemType + ' messages';
 
 // ✅ One translatable message with named placeholders + ICU plurals
 t('inbox.summary', { count, itemType });
@@ -200,25 +208,24 @@ new Intl.NumberFormat('de-DE').format(1234567.89); // "1.234.567,89"
 new Intl.NumberFormat('en-US').format(1234567.89); // "1,234,567.89"
 
 // Currency — symbol, placement, and spacing are locale-specific
-new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' })
-  .format(99.5); // "99,50 €"
+new Intl.NumberFormat('de-DE', { style: 'currency', currency: 'EUR' }).format(99.5); // "99,50 €"
 
 // Units, relative time, lists
 new Intl.NumberFormat('en', { style: 'unit', unit: 'kilometer' }).format(5);
 new Intl.RelativeTimeFormat('en').format(-1, 'day'); // "1 day ago"
-new Intl.ListFormat('en').format(['a','b','c']); // "a, b, and c"
+new Intl.ListFormat('en').format(['a', 'b', 'c']); // "a, b, and c"
 ```
 
 ### Beyond format strings
 
-| Concern | Watch out for |
-|---------|---------------|
-| **Name order** | Many cultures put family name first (China, Japan, Korea, Hungary). Don't label fields "First / Last"—use "Given / Family" and don't force a split. |
-| **Address format** | Field order, postal-code position, and required fields differ; some countries have no postal codes or states. Use a flexible/freeform model. |
-| **Calendars & weeks** | Week may start Sunday, Monday, or Saturday; non-Gregorian calendars exist (Islamic, Hebrew, Japanese eras). |
-| **Time zones** | Store UTC, display in the user's zone; show the zone for events. |
-| **Phone numbers** | Vary in length and grouping; validate per-region (libphonenumber), not with one regex. |
-| **Measurement units** | Metric vs. imperial; convert, don't just relabel. |
+| Concern               | Watch out for                                                                                                                                       |
+| --------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Name order**        | Many cultures put family name first (China, Japan, Korea, Hungary). Don't label fields "First / Last"—use "Given / Family" and don't force a split. |
+| **Address format**    | Field order, postal-code position, and required fields differ; some countries have no postal codes or states. Use a flexible/freeform model.        |
+| **Calendars & weeks** | Week may start Sunday, Monday, or Saturday; non-Gregorian calendars exist (Islamic, Hebrew, Japanese eras).                                         |
+| **Time zones**        | Store UTC, display in the user's zone; show the zone for events.                                                                                    |
+| **Phone numbers**     | Vary in length and grouping; validate per-region (libphonenumber), not with one regex.                                                              |
+| **Measurement units** | Metric vs. imperial; convert, don't just relabel.                                                                                                   |
 
 ### Forms that survive every locale
 

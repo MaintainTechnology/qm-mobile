@@ -36,15 +36,13 @@ function useQuoteActionMutation<TBody extends { quoteId: string }>(path: (vars: 
   return useApiMutation<TBody, ActionResult>(path, ActionResultSchema, {
     timeoutMs: 45000,
     invalidates: [TENANT_ME_KEY],
-    onMutate: async (vars) => {
+    onMutate: async vars => {
       await queryClient.cancelQueries({ queryKey: TENANT_ME_KEY });
       const snapshot = queryClient.getQueryData<TenantMe>(TENANT_ME_KEY);
       if (snapshot) {
         queryClient.setQueryData<TenantMe>(TENANT_ME_KEY, {
           ...snapshot,
-          quotes: snapshot.quotes.map((q) =>
-            q.id === vars.quoteId ? { ...q, status: 'sent' } : q,
-          ),
+          quotes: snapshot.quotes.map(q => (q.id === vars.quoteId ? { ...q, status: 'sent' } : q)),
         });
       }
       return { snapshot } satisfies OptimisticCtx;
@@ -58,14 +56,14 @@ function useQuoteActionMutation<TBody extends { quoteId: string }>(path: (vars: 
 
 /** POST /api/quote/[id]/approve — no request body; the route ignores it. */
 export function useApproveQuote() {
-  return useQuoteActionMutation<{ quoteId: string }>((vars) => `/api/quote/${vars.quoteId}/approve`);
+  return useQuoteActionMutation<{ quoteId: string }>(vars => `/api/quote/${vars.quoteId}/approve`);
 }
 
 /** POST /api/quote/[id]/send — `{ channel, to? }`. Mobile always sends SMS to the on-file
  *  contact (channel choice + manual recipient entry stays a web-only affordance this round). */
 export function useSendQuote() {
   return useQuoteActionMutation<{ quoteId: string; channel: 'sms' }>(
-    (vars) => `/api/quote/${vars.quoteId}/send`,
+    vars => `/api/quote/${vars.quoteId}/send`,
   );
 }
 

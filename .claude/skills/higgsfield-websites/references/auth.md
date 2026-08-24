@@ -16,12 +16,12 @@ contract to the website.
 
 Endpoints:
 
-| Purpose | Endpoint | Caller |
-|---|---|---|
-| Current user profile | `GET https://fnf.internal/user` | server only |
-| Browser-safe user proxy | `GET /api/user` | frontend/browser |
-| Start login | `GET /__auth/login?return=<path>` | browser navigation |
-| Start logout | `GET /__auth/logout?return=<path>` | browser navigation |
+| Purpose                 | Endpoint                           | Caller             |
+| ----------------------- | ---------------------------------- | ------------------ |
+| Current user profile    | `GET https://fnf.internal/user`    | server only        |
+| Browser-safe user proxy | `GET /api/user`                    | frontend/browser   |
+| Start login             | `GET /__auth/login?return=<path>`  | browser navigation |
+| Start logout            | `GET /__auth/logout?return=<path>` | browser navigation |
 
 `GET https://fnf.internal/user` returns the current user's profile JSON and
 returns `401` when the visitor is not signed in.
@@ -34,11 +34,11 @@ endpoint browser components should fetch.
 
 There are two different auth concepts. Pick intentionally:
 
-| Website need | Auth mode | Required behavior |
-|---|---|---|
-| Higgsfield SDK/model generation, media upload, profile, workspace, credits, feed/history | Higgsfield platform auth | Use `/api/user`, `/__auth/login`, `/__auth/logout`, and server-side `https://fnf.internal` guards |
-| The generated website's own product accounts, for example todos, notes, CRM records, dashboards, memberships | In-app auth | Build app-local auth/session/storage. Do not call `fnf.internal/user` unless the website also uses Higgsfield SDK features |
-| Both generation and product accounts | Both, kept separate | Gate SDK routes with Higgsfield auth and product data with in-app auth. Label UI clearly and never mix identities |
+| Website need                                                                                                 | Auth mode                | Required behavior                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------ | ------------------------ | -------------------------------------------------------------------------------------------------------------------------- |
+| Higgsfield SDK/model generation, media upload, profile, workspace, credits, feed/history                     | Higgsfield platform auth | Use `/api/user`, `/__auth/login`, `/__auth/logout`, and server-side `https://fnf.internal` guards                          |
+| The generated website's own product accounts, for example todos, notes, CRM records, dashboards, memberships | In-app auth              | Build app-local auth/session/storage. Do not call `fnf.internal/user` unless the website also uses Higgsfield SDK features |
+| Both generation and product accounts                                                                         | Both, kept separate      | Gate SDK routes with Higgsfield auth and product data with in-app auth. Label UI clearly and never mix identities          |
 
 If the prompt mentions Higgsfield, SDK, model generation, Nano Banana, Seedance,
 image/video generation, media upload, credits, workspaces, or generation history,
@@ -55,14 +55,14 @@ Create a TanStack Start server route, not a separate Hono/Express API:
 
 ```ts
 // app/src/routes/api/user.ts
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/api/user')({
   server: {
     handlers: {
       GET: async () => {
-        const upstream = await fetch('https://fnf.internal/user')
-        const body = await upstream.text()
+        const upstream = await fetch('https://fnf.internal/user');
+        const body = await upstream.text();
 
         return new Response(body, {
           status: upstream.status,
@@ -70,11 +70,11 @@ export const Route = createFileRoute('/api/user')({
             'content-type': upstream.headers.get('content-type') ?? 'application/json',
             'cache-control': 'no-store',
           },
-        })
+        });
       },
     },
   },
-})
+});
 ```
 
 Notes:
@@ -93,12 +93,10 @@ Use `/api/user` from loaders, queries, or components:
 
 ```ts
 export async function fetchCurrentUser() {
-  const response = await fetch('/api/user', { credentials: 'include' })
-  if (response.status === 401)
-    return null
-  if (!response.ok)
-    throw new Error('Failed to load user')
-  return response.json()
+  const response = await fetch('/api/user', { credentials: 'include' });
+  if (response.status === 401) return null;
+  if (!response.ok) throw new Error('Failed to load user');
+  return response.json();
 }
 ```
 
@@ -111,7 +109,7 @@ Login is browser navigation, not an SDK call:
 
 ```ts
 function login(returnPath = window.location.pathname + window.location.search) {
-  window.location.href = `/__auth/login?return=${encodeURIComponent(returnPath)}`
+  window.location.href = `/__auth/login?return=${encodeURIComponent(returnPath)}`;
 }
 ```
 
@@ -129,7 +127,7 @@ Logout is also browser navigation:
 
 ```ts
 function logout(returnPath = '/') {
-  window.location.href = `/__auth/logout?return=${encodeURIComponent(returnPath)}`
+  window.location.href = `/__auth/logout?return=${encodeURIComponent(returnPath)}`;
 }
 ```
 
@@ -156,39 +154,32 @@ temporary Blob URL instead. This is a browser-only helper: call it from an event
 handler, never during SSR or module initialization.
 
 ```ts
-export async function downloadAuthenticatedFile(
-  url: string,
-  filename: string,
-): Promise<void> {
-  const downloadUrl = new URL(url, window.location.href)
-  if (
-    downloadUrl.origin !== window.location.origin
-    || !downloadUrl.pathname.startsWith('/api/')
-  ) {
-    throw new Error('Authenticated downloads require an app-local /api/... URL')
+export async function downloadAuthenticatedFile(url: string, filename: string): Promise<void> {
+  const downloadUrl = new URL(url, window.location.href);
+  if (downloadUrl.origin !== window.location.origin || !downloadUrl.pathname.startsWith('/api/')) {
+    throw new Error('Authenticated downloads require an app-local /api/... URL');
   }
 
   const response = await fetch(downloadUrl, {
     credentials: 'include',
-  })
+  });
 
   if (!response.ok) {
-    throw new Error(`Download failed (${response.status})`)
+    throw new Error(`Download failed (${response.status})`);
   }
 
-  const blobUrl = URL.createObjectURL(await response.blob())
-  const anchor = document.createElement('a')
+  const blobUrl = URL.createObjectURL(await response.blob());
+  const anchor = document.createElement('a');
 
   try {
-    anchor.href = blobUrl
-    anchor.download = filename
-    anchor.style.display = 'none'
-    document.body.appendChild(anchor)
-    anchor.click()
-  }
-  finally {
-    anchor.remove()
-    window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0)
+    anchor.href = blobUrl;
+    anchor.download = filename;
+    anchor.style.display = 'none';
+    document.body.appendChild(anchor);
+    anchor.click();
+  } finally {
+    anchor.remove();
+    window.setTimeout(() => URL.revokeObjectURL(blobUrl), 0);
   }
 }
 ```
@@ -198,11 +189,7 @@ must catch and surface download errors through designed inline feedback or a
 toast.
 
 ```tsx
-<Button
-  type="button"
-  disabled={isDownloading}
-  onClick={handleDownload}
->
+<Button type="button" disabled={isDownloading} onClick={handleDownload}>
   {isDownloading ? 'Downloading…' : 'Download'}
 </Button>
 ```
@@ -302,15 +289,15 @@ Use a small server-only helper for SDK server functions:
 ```ts
 // app/src/lib/auth.server.ts
 export async function requireCurrentUser() {
-  const response = await fetch('https://fnf.internal/user')
-  const body = await response.json().catch(() => null)
+  const response = await fetch('https://fnf.internal/user');
+  const body = await response.json().catch(() => null);
 
   if (response.status === 401) {
     return {
       ok: false as const,
       status: 401,
       body,
-    }
+    };
   }
 
   if (!response.ok) {
@@ -318,25 +305,25 @@ export async function requireCurrentUser() {
       ok: false as const,
       status: response.status,
       body,
-    }
+    };
   }
 
   return {
     ok: true as const,
     user: body,
-  }
+  };
 }
 ```
 
 Then guard SDK operations:
 
 ```ts
-const auth = await requireCurrentUser()
+const auth = await requireCurrentUser();
 if (!auth.ok) {
   return new Response(JSON.stringify(auth.body), {
     status: auth.status,
     headers: { 'content-type': 'application/json' },
-  })
+  });
 }
 
 // Safe to create SDK adapter/client and submit/read user-owned data here.
@@ -353,7 +340,7 @@ waitlists and landing pages should use custom sign-in chrome per
 `references/design-taste-frontend.md` instead of Quanta buttons.
 
 ```tsx
-import { Button } from '@higgsfield/quanta/button'
+import { Button } from '@higgsfield/quanta/button';
 
 function SignInRequired() {
   return (
@@ -366,8 +353,8 @@ function SignInRequired() {
         <div>
           <Button
             onClick={() => {
-              const returnPath = window.location.pathname + window.location.search
-              window.location.href = `/__auth/login?return=${encodeURIComponent(returnPath)}`
+              const returnPath = window.location.pathname + window.location.search;
+              window.location.href = `/__auth/login?return=${encodeURIComponent(returnPath)}`;
             }}
           >
             Sign in
@@ -375,7 +362,7 @@ function SignInRequired() {
         </div>
       </div>
     </div>
-  )
+  );
 }
 ```
 
@@ -385,32 +372,32 @@ buttons, workspace switchers, or job feeds as usable controls while signed out.
 ## Anti-Patterns
 
 ```ts
-await fetch('https://fnf.internal/user') // bad in browser code
-await fetch('/api/user')                 // good in browser code
+await fetch('https://fnf.internal/user'); // bad in browser code
+await fetch('/api/user'); // good in browser code
 ```
 
 ```ts
 fetch('https://fnf.internal/user', {
   headers: { Authorization: `Bearer ${token}` },
-}) // bad; platform attaches identity automatically
+}); // bad; platform attaches identity automatically
 ```
 
 ```ts
-window.location.href = '/login' // bad; not the platform auth route
-window.location.href = '/__auth/login?return=%2Fdashboard' // good
+window.location.href = '/login'; // bad; not the platform auth route
+window.location.href = '/__auth/login?return=%2Fdashboard'; // good
 ```
 
 ```ts
 // bad: anonymous generation surface
-await jobs.submit(input)
+await jobs.submit(input);
 
 // good: server-side auth gate first
-const auth = await requireCurrentUser()
+const auth = await requireCurrentUser();
 if (!auth.ok) {
   return new Response(JSON.stringify(auth.body), {
     status: auth.status,
     headers: { 'content-type': 'application/json' },
-  })
+  });
 }
-await jobs.submit(input)
+await jobs.submit(input);
 ```

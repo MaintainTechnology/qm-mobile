@@ -12,6 +12,7 @@ Expert UI/UX design skill that helps create unique, accessible, and thoughtfully
 ## Core Philosophy
 
 **CRITICAL: Design Decision Protocol**
+
 - **ALWAYS ASK** before making any design decisions (colors, fonts, sizes, layouts)
 - Never implement design changes until explicitly instructed
 - The guidelines below are practical guidance for when design decisions are approved
@@ -22,12 +23,14 @@ Expert UI/UX design skill that helps create unique, accessible, and thoughtfully
 ### Stand Out From Generic Patterns
 
 **Avoid Generic Training Dataset Patterns:**
+
 - Don't default to "Claude style" designs (excessive bauhaus, liquid glass, apple-like)
 - Don't use generic SaaS aesthetics that look machine-generated
 - Don't rely only on solid colors - suggest photography, patterns, textures
 - Think beyond typical patterns - you can step off the written path
 
 **Draw Inspiration From:**
+
 - Modern landing pages (Perplexity, Comet Browser, Dia Browser)
 - Framer templates and their innovative approaches
 - Leading brand design studios
@@ -35,6 +38,7 @@ Expert UI/UX design skill that helps create unique, accessible, and thoughtfully
 - Beautiful background animations (CSS, SVG) - slow, looping, subtle
 
 **Visual Interest Strategies:**
+
 - Unique color pairs that aren't typical
 - Animation effects that feel fresh
 - Background patterns that add depth without distraction
@@ -83,23 +87,27 @@ Expert UI/UX design skill that helps create unique, accessible, and thoughtfully
 ### What This Means in Practice
 
 **Color Usage:**
+
 - Base palette: 4-5 neutral shades (backgrounds, borders, text)
 - Accent palette: 1-3 bold colors (CTAs, status, emphasis)
 - Neutrals are slightly desaturated, warm or cool based on brand intent
 - Accents are saturated enough to create clear contrast
 
 **Typography:**
+
 - Headlines: Emotional, attention-grabbing (personality over pure legibility)
 - Body/UI: Functional, highly legible (clarity over expression)
 - 2-3 typefaces maximum
 - Clear mathematical scale (e.g., 1.25x between sizes)
 
 **Animation:**
+
 - Purposeful: Guides attention, establishes relationships, provides feedback
 - Subtle: Felt rather than seen (100-300ms for most interactions)
 - Physics-informed: Natural easing, appropriate mass/momentum
 
 **Spacing:**
+
 - Generous negative space creates clarity and breathing room
 - Mathematical relationships (e.g., 4px base, 8/16/24/32/48px scale)
 - Consistent application creates visual rhythm
@@ -142,6 +150,7 @@ Every interface needs two color roles:
    - Use saturated colors for clear contrast against neutrals
 
 **Palette Structure Example:**
+
 ```
 Neutrals: slate-50, slate-100, slate-300, slate-700, slate-900
 Accents: teal-500 (primary), amber-500 (warning), red-500 (error)
@@ -162,19 +171,23 @@ Accents: teal-500 (primary), amber-500 (warning), red-500 (error)
 **Color Relationships:**
 
 Choose warm or cool intentionally based on brand:
+
 - **Warm greys** (beige/brown undertones): Organic, approachable, trustworthy
 - **Cool greys** (blue undertones): Modern, tech-forward, professional
 
 Accent colors should have clear contrast with both:
+
 - Light backgrounds (for buttons on white)
 - Dark text (if used as backgrounds for white text)
 
 **Intentional Color Usage:**
+
 - Every color must serve a purpose (hierarchy, function, status, or action)
 - Avoid decorative colors that don't communicate meaning
 - Maintain consistency: same color = same meaning throughout
 
 **Accessibility:**
+
 - Ensure sufficient contrast for color-blind users
 - Follow WCAG 2.1 AA: minimum 4.5:1 for normal text, 3:1 for large text
 - Don't rely on color alone to convey information (add icons or labels)
@@ -182,6 +195,7 @@ Accent colors should have clear contrast with both:
 **Unique Color Strategy:**
 
 To stand out from generic patterns:
+
 - Avoid default SaaS blue (#3B82F6) unless it fits your brand
 - Consider unexpected neutrals: warm greys, soft off-whites, deep charcoals
 - Pair neutrals with distinctive accents: terracotta + charcoal, sage + navy, coral + slate
@@ -194,21 +208,25 @@ To stand out from generic patterns:
 Typography is a primary design element that conveys personality and hierarchy.
 
 **Functional vs Emotional Typography:**
+
 - **Headlines/Display**: Prioritize emotion, personality, attention (legibility secondary)
 - **Body Text**: Prioritize legibility, reading comfort, accessibility
 - **UI/Labels**: Prioritize clarity, scannability, consistency
 
 **Font Selection:**
+
 - Use 2-3 typefaces maximum
 - Limit to 3 weights per typeface (e.g., Regular 400, Medium 500, Bold 700)
 - Prefer variable fonts for fine-tuned control and performance
 
 **Font Version Usage:**
+
 - **Display version**: Headlines and hero text only
 - **Text version**: Paragraphs and long-form content
 - **Caption/Micro**: Small UI labels (1-2 lines, non-critical info)
 
 **Recommended Sources:**
+
 - Google Fonts for web (free, well-optimized, reliable)
 - System fonts for performance-critical apps (-apple-system, BlinkMacSystemFont, Segoe UI)
 - Choose fonts that serve your brand's purpose (not "trending" lists)
@@ -216,6 +234,7 @@ Typography is a primary design element that conveys personality and hierarchy.
 **Typographic Scale:**
 
 Use mathematical relationships for size hierarchy:
+
 - **Ratio**: Major third (1.25x) for moderate contrast, Perfect fourth (1.333x) for dramatic
 - **Base size**: 16px (1rem) for body text
 - **Example scale (1.25x)**:
@@ -232,11 +251,13 @@ Use mathematical relationships for size hierarchy:
   ```
 
 **Typographic Hierarchy:**
+
 - Create clear visual distinction between levels
 - Headlines, subheadings, body, captions should each have distinct size/weight
 - Use combination of size, weight, and color for hierarchy
 
 **Spacing & Readability:**
+
 - **Line height**: 1.5x font size for body text (e.g., 16px text = 24px line-height)
 - **Line length**: 45-75 characters optimal for readability (60-70 ideal)
 - **Paragraph spacing**: 1-1.5em between paragraphs
@@ -249,11 +270,13 @@ Use mathematical relationships for size hierarchy:
 **Font Pairing Logic:**
 
 When using multiple typefaces, create contrast through:
+
 - **Category contrast**: Serif + Sans-serif (classic, clear distinction)
 - **Weight contrast**: Light + Bold (dynamic, energetic)
 - **Personality contrast**: Geometric + Humanist (modern + warm)
 
 Examples:
+
 - Serif headlines + Sans body (editorial, trustworthy)
 - Display headlines + System body (distinctive + efficient)
 - Bold sans headlines + Light sans body (modern, clean)
@@ -261,6 +284,7 @@ Examples:
 **UI Typography:**
 
 Specific guidance for interface elements:
+
 - **Button text**: Semi-Bold (600), 14-16px, consistent casing (all-caps OR title case)
 - **Form labels**: Regular (400), 14px, positioned above input
 - **Form input text**: Regular (400), 16px minimum (prevents iOS zoom on focus)
@@ -270,6 +294,7 @@ Specific guidance for interface elements:
 **Responsive Typography:**
 
 Scale type sizes across breakpoints:
+
 ```tsx
 // Example with Tailwind
 <h1 className="text-3xl md:text-4xl lg:text-5xl">
@@ -288,23 +313,27 @@ Reduce hierarchy levels on small screens (fewer distinct sizes)
 ### Layout & Spatial Design
 
 **Compositional Balance:**
+
 - Every screen should feel balanced
 - Pay attention to visual weight and negative space
 - Use generous negative space to focus attention
 - Add sufficient margins and paddings for professional, spacious look
 
 **Grid Discipline:**
+
 - Maintain consistent underlying grid system
 - Create sense of order while allowing meaningful exceptions
 - Use grid/flex wrappers with `gap` for spacing
 - Prioritize wrappers over direct margins/padding on children
 
 **Spatial Relationships:**
+
 - Group related elements through proximity, alignment, and shared attributes
 - Use size, color, and spacing to highlight important elements
 - Guide user focus through visual hierarchy
 
 **Attention Guidance:**
+
 - Design interfaces that guide user attention effectively
 - Avoid cluttered interfaces where elements compete
 - Create clear paths through the content
@@ -316,6 +345,7 @@ Reduce hierarchy levels on small screens (fewer distinct sizes)
 **Purposeful Animation:**
 
 Every animation must serve a functional purpose:
+
 - **Orient users**: Smooth transitions during navigation changes
 - **Establish relationships**: Show how elements connect (expand from source, slide between states)
 - **Provide feedback**: Confirm interactions (button press, form submission)
@@ -324,6 +354,7 @@ Every animation must serve a functional purpose:
 **Animation & Gestalt Principles:**
 
 Motion should reinforce visual relationships:
+
 - **Proximity**: Elements near each other move together (grouped cards animating)
 - **Similarity**: Similar elements animate similarly (all buttons have same hover timing)
 - **Continuity**: Movement follows natural paths (smooth curves, not jumpy angles)
@@ -332,6 +363,7 @@ Motion should reinforce visual relationships:
 **Natural Physics:**
 
 Animations should feel organic, not mechanical:
+
 - **Easing**: Use ease-out for entrances (fast start, slow end)
 - **Easing**: Use ease-in for exits (slow start, fast end)
 - **Easing**: Use ease-in-out for transitions (smooth both ends)
@@ -339,6 +371,7 @@ Animations should feel organic, not mechanical:
 - Apply appropriate mass/momentum (lightweight UI vs weighty modals)
 
 **Subtle Restraint:**
+
 - Animations should be felt rather than seen
 - Don't delay user actions unnecessarily (keep under 300ms for interactive feedback)
 - Never block critical actions with decorative animations
@@ -354,6 +387,7 @@ Animations should feel organic, not mechanical:
 **Physics Profiles:**
 
 Define consistent durations for element types:
+
 - **Lightweight** (icons, small UI): 150ms
 - **Standard** (cards, panels): 300ms
 - **Weighty** (modals, page transitions): 500ms
@@ -366,12 +400,14 @@ Define consistent durations for element types:
 - Test on low-end devices (60fps on powerful hardware ≠ 60fps on mobile)
 
 **Implementation:**
+
 - Use `framer-motion` sparingly and purposefully
 - Prefer CSS animations over JavaScript when possible (better performance)
 - Use CSS transitions for simple hover/focus states
 - Implement `@media (prefers-reduced-motion: reduce)` to disable/reduce animations
 
 **Example:**
+
 ```tsx
 // Simple hover transition
 <button className="
@@ -496,6 +532,7 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
    - Functional depth: Layers of content (modals, sheets) use positioning, not visual depth
 
 **Navigation:**
+
 - Clear structure with intuitive navigation menus
 - Implement breadcrumbs for deep hierarchies (more than 2 levels)
 - Use standard UI patterns to reduce learning curve (hamburger menu, tab bars)
@@ -507,59 +544,70 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 ### Component Library & Tools
 
 **Component Library:**
+
 - Strongly prefer shadcn components (v4, pre-installed in `@/components/ui`)
 - Import individually: `import { Button } from "@/components/ui/button";`
 - Use over plain HTML elements (`<Button>` over `<button>`)
 - Avoid creating custom components with names that clash with shadcn
 
 **Styling Engine:**
+
 - Use Tailwind utility classes exclusively
 - Adhere to theme variables in `index.css` via CSS custom properties
 - Map variables in `@theme` (see `tailwind.config.js`)
 - Use inline styles or CSS modules only when absolutely necessary
 
 **Icons:**
+
 - Use `@phosphor-icons/react` for buttons and inputs
 - Example: `import { Plus } from "@phosphor-icons/react"; <Plus />`
 - Use color for plain icon buttons
 - Don't override default `size` or `weight` unless requested
 
 **Notifications:**
+
 - Use `sonner` for toasts
 - Example: `import { toast } from 'sonner'`
 
 **Loading States:**
+
 - Always add loading states, spinners, placeholder animations
 - Use skeletons until content renders
 
 ### Layout Implementation
 
 **Spacing Strategy:**
+
 - Use grid/flex wrappers with `gap` for spacing
 - Prioritize wrappers over direct margins/padding on children
 - Nest wrappers as needed for complex layouts
 
 **Conditional Styling:**
+
 - Use ternary operators or clsx/classnames utilities
 - Example: `className={clsx('base-class', { 'active-class': isActive })}`
 
 ### Responsive Design
 
 **Fluid Layouts:**
+
 - Use relative units (%, em, rem) instead of fixed pixels
 - Implement CSS Grid and Flexbox for flexible layouts
 - Design mobile-first, then scale up
 
 **Media Queries:**
+
 - Use breakpoints based on content needs, not specific devices
 - Test across range of devices and orientations
 
 **Touch Targets:**
+
 - Minimum 44x44 pixels for interactive elements
 - Provide adequate spacing between touch targets
 - Consider hover states for desktop, focus states for touch/keyboard
 
 **Performance:**
+
 - Optimize assets for mobile networks
 - Use CSS animations over JavaScript
 - Implement lazy loading for images and videos
@@ -567,6 +615,7 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 ## Accessibility Standards
 
 **Core Requirements:**
+
 - Follow WCAG 2.1 AA guidelines
 - Ensure keyboard navigability for all interactive elements
 - Minimum touch target size: 44×44px
@@ -574,6 +623,7 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 - Provide alternative text for images and non-text content
 
 **Implementation Details:**
+
 - Use descriptive variable and function names
 - Event functions: prefix with "handle" (handleClick, handleKeyDown)
 - Add accessibility attributes:
@@ -610,18 +660,21 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 ### Testing Checklist
 
 **Visual Testing:**
+
 - Use playwright MCP when available for automated testing
 - Check responsive behavior at common breakpoints
 - Verify touch targets on mobile
 - Test with different content lengths (short, long, edge cases)
 
 **Accessibility Testing:**
+
 - Test keyboard navigation
 - Verify screen reader compatibility
 - Check color contrast ratios
 - Ensure focus states are visible
 
 **Cross-Device Testing:**
+
 - Test on actual devices, not just emulators
 - Check different browsers (Chrome, Firefox, Safari)
 - Verify touch interactions on mobile
@@ -632,6 +685,7 @@ For detailed motion specs, see MOTION-SPEC.md (easing curves, duration tables, s
 ### Example 1: Designing a Button
 
 **Initial Question to Ask:**
+
 ```
 Before I implement this button, I have a few design questions:
 1. What's the primary action you want to emphasize?
@@ -640,21 +694,21 @@ Before I implement this button, I have a few design questions:
 ```
 
 **After Getting Approval, Implementation:**
-```tsx
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "@phosphor-icons/react";
 
-<Button
-  className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg transition-colors duration-200"
->
+```tsx
+import { Button } from '@/components/ui/button';
+import { ArrowRight } from '@phosphor-icons/react';
+
+<Button className="bg-slate-800 hover:bg-slate-700 text-white px-6 py-3 rounded-lg transition-colors duration-200">
   Get Started
   <ArrowRight className="ml-2" />
-</Button>
+</Button>;
 ```
 
 ### Example 2: Typography Hierarchy
 
 **Question First:**
+
 ```
 For this content hierarchy, I'm thinking:
 - Headline: Large, bold, attention-grabbing
@@ -665,14 +719,11 @@ Should we go bold and contemporary, or subtle and refined?
 ```
 
 **Implementation After Approval:**
+
 ```tsx
 <div className="space-y-4">
-  <h1 className="text-5xl font-bold tracking-tight text-slate-900">
-    Headline Here
-  </h1>
-  <h2 className="text-2xl text-slate-600">
-    Supporting subheading
-  </h2>
+  <h1 className="text-5xl font-bold tracking-tight text-slate-900">Headline Here</h1>
+  <h2 className="text-2xl text-slate-600">Supporting subheading</h2>
   <p className="text-base leading-relaxed text-slate-700">
     Body text optimized for readability with proper line height.
   </p>
@@ -682,6 +733,7 @@ Should we go bold and contemporary, or subtle and refined?
 ### Example 3: Unique Color Palette Suggestion
 
 **Presenting Options:**
+
 ```
 I'd like to suggest three color directions that break from typical SaaS patterns:
 
@@ -706,6 +758,7 @@ Which direction feels right for your brand?
 ## Common Patterns to Avoid
 
 ❌ **Don't:**
+
 - Use generic SaaS blue (#3B82F6) without considering alternatives
 - Default to shadows and gradients for depth
 - Copy Apple's design language
@@ -716,6 +769,7 @@ Which direction feels right for your brand?
 - Create cluttered interfaces with competing elements
 
 ✅ **Do:**
+
 - Ask before making design decisions
 - Suggest unique, contextually appropriate color pairs
 - Use flat, minimal design
@@ -732,6 +786,7 @@ Which direction feels right for your brand?
 ## References
 
 For additional context, see:
+
 - WCAG 2.1 Guidelines: https://www.w3.org/WAI/WCAG21/quickref/
 - Google Fonts: https://fonts.google.com/
 - Tailwind CSS Docs: https://tailwindcss.com/docs

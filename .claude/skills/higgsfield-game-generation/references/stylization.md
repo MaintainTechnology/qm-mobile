@@ -33,13 +33,13 @@ pipeline's state (e.g. `gdd.json.style_formula`).
 
 Concatenate five blocks, in order:
 
-| # | Block | Pins down | Example |
-|---|---|---|---|
-| 1 | Rendering style | what it's "drawn with" | `flat vector cartoon with soft gradients` / `chunky pixel art, 32x32 grid feel` / `soft hand-painted gouache` |
-| 2 | Shape & line language | silhouettes and outlines | `rounded blobby shapes with thick dark-plum outlines` |
-| 3 | Palette **by role** | readability, not uniformity | `environment in deep violet stone with charcoal shadows, hero in warm coral-cream tones contrasting the surroundings, hazards and pickups marked with acid-green glow` |
-| 4 | Light & mood | one clause | `moody but playful underground atmosphere, flat ambient light` |
-| 5 | Game-readability | contrast + **perspective word** | `high contrast between game elements and backgrounds, clean readable silhouettes, consistent side-view perspective across all assets` |
+| #   | Block                 | Pins down                       | Example                                                                                                                                                                |
+| --- | --------------------- | ------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 1   | Rendering style       | what it's "drawn with"          | `flat vector cartoon with soft gradients` / `chunky pixel art, 32x32 grid feel` / `soft hand-painted gouache`                                                          |
+| 2   | Shape & line language | silhouettes and outlines        | `rounded blobby shapes with thick dark-plum outlines`                                                                                                                  |
+| 3   | Palette **by role**   | readability, not uniformity     | `environment in deep violet stone with charcoal shadows, hero in warm coral-cream tones contrasting the surroundings, hazards and pickups marked with acid-green glow` |
+| 4   | Light & mood          | one clause                      | `moody but playful underground atmosphere, flat ambient light`                                                                                                         |
+| 5   | Game-readability      | contrast + **perspective word** | `high contrast between game elements and backgrounds, clean readable silhouettes, consistent side-view perspective across all assets`                                  |
 
 Rules:
 
@@ -51,7 +51,7 @@ Rules:
   readability.
 - **The perspective word in block 5 must match the genre**: platformer /
   runner → `side-view`; top-down → `top-down`; puzzle / clicker → `flat
-  frontal`. A top-down game with a side-view hero sprite is the most common
+frontal`. A top-down game with a side-view hero sprite is the most common
   cross-asset failure; the formula is where it is prevented. (3D pipelines:
   see section 8 — the perspective word is replaced, not reused.)
 - If the user supplied a style reference image, describe ITS rendering style
@@ -83,13 +83,13 @@ maintain two competing style strings.
 
 Consumers and their obligations:
 
-| Consumer | Obligation |
-|---|---|
-| Static asset generation (sprites, tiles, backgrounds, UI) | formula verbatim in every prompt (assembly in section 4) |
+| Consumer                                                         | Obligation                                                                                                                                                              |
+| ---------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static asset generation (sprites, tiles, backgrounds, UI)        | formula verbatim in every prompt (assembly in section 4)                                                                                                                |
 | Character animation (sprite-sheet generation from a base sprite) | formula verbatim in sheet prompts; the animation view parameter MUST match the formula's perspective word (`side-view` → sidescroller view, `top-down` → top-down view) |
-| Environment textures | formula verbatim + seamless suffix (section 4) |
-| 3D (image-to-3D, e.g. Meshy/Tripo) | formula verbatim in concept/reference image prompts; formula (or token if limited) in `texture_prompt`; style fixes via retexture, not mesh regeneration (section 8) |
-| Level/map presentation sheets | formula or token in the sheet prompt so map icons match the asset kit |
+| Environment textures                                             | formula verbatim + seamless suffix (section 4)                                                                                                                          |
+| 3D (image-to-3D, e.g. Meshy/Tripo)                               | formula verbatim in concept/reference image prompts; formula (or token if limited) in `texture_prompt`; style fixes via retexture, not mesh regeneration (section 8)    |
+| Level/map presentation sheets                                    | formula or token in the sheet prompt so map icons match the asset kit                                                                                                   |
 
 ## 4. Prompt assembly for 2D assets
 
@@ -105,22 +105,27 @@ The asset description is a stable 3-4 word shorthand from the design doc
 ### Kind templates and suffixes
 
 **sprite** (characters, objects — needs transparency)
+
 - template: `game sprite of <description>, single character/object, full body visible, centered,`
 - suffix: `, on a solid uniform bright <KEY COLOR> background, no shadows cast on the background, no ground plane, nothing cropped at the edges`
 
 **tile** (repeating surfaces)
+
 - template: `seamless tileable game texture tile of <description>, uniform pattern density,`
 - suffix: `, perfectly seamless edges that wrap horizontally and vertically, no border, no vignette, flat even lighting, no single focal object`
 
 **background** (full-frame)
+
 - template: `game background of <description>, wide establishing view,`
 - suffix: `, no characters, no UI elements, slightly muted detail so foreground game elements stay readable, soft depth layering`
 
 **texture** (3D surface)
+
 - template: `seamless tileable surface texture of <description>,`
 - suffix: `, perfectly seamless edges, flat even lighting, no perspective, no objects, photographed-flat appearance`
 
 **ui** (buttons, icons — needs transparency)
+
 - template: `game UI element: <description>, single element, centered,`
 - suffix: `, on a solid uniform bright <KEY COLOR> background, crisp edges, no drop shadow outside the element`
 
@@ -146,12 +151,12 @@ corners, so corner flood-fill alone misses it).
 
 ## 6. Models and volumes
 
-| What | Model | Params | Volume per game |
-|---|---|---|---|
-| Sprites, tiles, backgrounds, textures | `nano_banana_2` | resolution `1k`; AR `1:1` (sprite/tile/texture/ui), `16:9` (background) | ≤10 assets, `count: 1` each, all submitted in parallel |
-| UI elements | `gpt_image_2` | `high` / `1k`, AR `1:1` | 0–1 |
-| Character animation sheets | `gpt_image_2` (5×5 grid in one image) | AR `1:1` | 2–3 sheets max, hero only |
-| 3D concept/reference images | `gpt_image_2` or `nano_banana_2` | `1k`, AR `1:1` | one per 3D prop |
+| What                                  | Model                                 | Params                                                                  | Volume per game                                        |
+| ------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- | ------------------------------------------------------ |
+| Sprites, tiles, backgrounds, textures | `nano_banana_2`                       | resolution `1k`; AR `1:1` (sprite/tile/texture/ui), `16:9` (background) | ≤10 assets, `count: 1` each, all submitted in parallel |
+| UI elements                           | `gpt_image_2`                         | `high` / `1k`, AR `1:1`                                                 | 0–1                                                    |
+| Character animation sheets            | `gpt_image_2` (5×5 grid in one image) | AR `1:1`                                                                | 2–3 sheets max, hero only                              |
+| 3D concept/reference images           | `gpt_image_2` or `nano_banana_2`      | `1k`, AR `1:1`                                                          | one per 3D prop                                        |
 
 - One primary generator (`nano_banana_2`) across asset kinds is itself a
   cohesion win — don't spread kinds across models without a reason.
@@ -188,14 +193,14 @@ corners, so corner flood-fill alone misses it).
 
 3D consumes the same formula but through different mechanics:
 
-| Aspect | 2D | 3D (image-to-3D, e.g. Meshy) |
-|---|---|---|
-| Style carrier | formula in every asset prompt | formula in the CONCEPT IMAGE prompt; formula/token in `texture_prompt` |
-| Background for subject shots | solid key color (magenta/green) for keying | **pure flat white, no shadow, no ground** — shadows and clutter are the top cause of bad mesh reconstruction; keying is irrelevant, the mesh replaces it |
-| Perspective word | `side-view` / `top-down` / `flat frontal` everywhere | replaced by `three-quarter isometric view` on concept images (shows top + two sides — maximum shape information for reconstruction); in-game camera is free |
-| Style drift fix | regenerate the asset (budget: 2) | **retexture the same mesh** (`retexture` API with the style string) — never regenerate a well-shaped mesh for color reasons |
-| Extra style surface | — | engine lighting: light color, fog and ambient intensity must be derived from formula blocks 3-4, or a perfectly styled texture set still reads off-style in-game |
-| Geometry style | — | add a geometry clause to 3D concept prompts when the formula implies it (`low-poly faceted`, `smooth rounded blobby`); polycount tiers: ~8000 hero/interactive props, ~3000 + lowpoly for small decoration |
+| Aspect                       | 2D                                                   | 3D (image-to-3D, e.g. Meshy)                                                                                                                                                                               |
+| ---------------------------- | ---------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Style carrier                | formula in every asset prompt                        | formula in the CONCEPT IMAGE prompt; formula/token in `texture_prompt`                                                                                                                                     |
+| Background for subject shots | solid key color (magenta/green) for keying           | **pure flat white, no shadow, no ground** — shadows and clutter are the top cause of bad mesh reconstruction; keying is irrelevant, the mesh replaces it                                                   |
+| Perspective word             | `side-view` / `top-down` / `flat frontal` everywhere | replaced by `three-quarter isometric view` on concept images (shows top + two sides — maximum shape information for reconstruction); in-game camera is free                                                |
+| Style drift fix              | regenerate the asset (budget: 2)                     | **retexture the same mesh** (`retexture` API with the style string) — never regenerate a well-shaped mesh for color reasons                                                                                |
+| Extra style surface          | —                                                    | engine lighting: light color, fog and ambient intensity must be derived from formula blocks 3-4, or a perfectly styled texture set still reads off-style in-game                                           |
+| Geometry style               | —                                                    | add a geometry clause to 3D concept prompts when the formula implies it (`low-poly faceted`, `smooth rounded blobby`); polycount tiers: ~8000 hero/interactive props, ~3000 + lowpoly for small decoration |
 
 **Full style change in 3D** (user asks to restyle the whole game): new
 formula → **re-approval gate** (never skip it) → regenerate textures →

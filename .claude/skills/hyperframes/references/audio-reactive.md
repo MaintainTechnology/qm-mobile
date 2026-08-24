@@ -53,7 +53,7 @@ for (var f = 0; f < AUDIO_DATA.totalFrames; f++) {
 }
 
 // ❌ Wrong — single tween, doesn't react to audio
-gsap.to(".el", { scale: 1.2, duration: totalDuration });
+gsap.to('.el', { scale: 1.2, duration: totalDuration });
 ```
 
 Without per-frame sampling, the composition doesn't actually react to audio.

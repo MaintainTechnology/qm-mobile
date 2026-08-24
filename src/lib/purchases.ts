@@ -13,7 +13,7 @@
  *   EXPO_PUBLIC_REVENUECAT_ANDROID_KEY  goog_…  Play builds
  *   EXPO_PUBLIC_REVENUECAT_TEST_KEY     test_…  Expo Go only — see below
  */
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/expo';
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query';
 import Constants from 'expo-constants';
 import { useCallback, useEffect } from 'react';

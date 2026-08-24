@@ -6,12 +6,13 @@ AI-powered interfaces are now mainstream but have unique UX challenges. This ref
 
 ## AI as a Respectful Copilot, Not an Autopilot
 
-The defining 2026 framing (NN/g *State of UX 2026* and broad trend consensus): the
+The defining 2026 framing (NN/g _State of UX 2026_ and broad trend consensus): the
 best AI features are a **respectful copilot**—present and helpful, but optional and
 under user control—rather than an **autopilot** that hijacks the flow. As raw UI
-becomes a commodity, the differentiator is judgment about *when not to act*.
+becomes a commodity, the differentiator is judgment about _when not to act_.
 
 **What "respectful copilot" looks like:**
+
 - **Optional, not forced** — AI is offered (a sidebar, overlay, collapsible panel,
   inline suggestion), never shoved into the critical path. The user can ignore it
   and still complete the task the normal way.
@@ -33,7 +34,7 @@ Acts, then maybe tells you     Proposes, you confirm, then it acts
 ```
 
 Apply this lens to every pattern below: chat, copilots, and agents should all
-default to *offered and reversible*, never *imposed and silent*.
+default to _offered and reversible_, never _imposed and silent_.
 
 ---
 
@@ -81,6 +82,7 @@ AI is typing...
 ```
 
 **Key timings:**
+
 - First token should appear within 500ms-1s (perceived responsiveness)
 - Show typing indicator immediately on send
 - Skeleton/placeholder for structured outputs (tables, code blocks)
@@ -102,11 +104,7 @@ AI is typing...
 ```html
 <!-- Expandable textarea that grows with content -->
 <div class="prompt-input">
-  <textarea
-    placeholder="Ask anything..."
-    rows="1"
-    aria-label="Message input"
-  ></textarea>
+  <textarea placeholder="Ask anything..." rows="1" aria-label="Message input"></textarea>
   <div class="input-actions">
     <button aria-label="Attach file">📎</button>
     <button aria-label="Send message" disabled>→</button>
@@ -115,6 +113,7 @@ AI is typing...
 ```
 
 **Best practices:**
+
 - Auto-expanding textarea (start 1 row, grow to ~6, then scroll)
 - Send on Enter, Shift+Enter for newline (document this with a tooltip)
 - Enable send button only when input is non-empty
@@ -172,6 +171,7 @@ Low confidence:
 ```
 
 **Pattern options:**
+
 - Textual hedging ("I believe", "Based on...", "I'm not sure")
 - Visual indicators (confidence bars, color-coded borders)
 - Explicit disclaimers for uncertain outputs
@@ -270,6 +270,7 @@ Full manual ←────────────────────→ F
 ```
 
 **Best practices:**
+
 - Default to "suggest" mode for destructive or irreversible actions
 - Allow users to configure automation level per action type
 - Show clear diff/preview before applying changes
@@ -327,6 +328,7 @@ Code query   → Syntax-highlighted block with copy button
 ```
 
 **Ghost text / inline completion:**
+
 - Show suggestion as dimmed/ghost text at cursor position
 - Tab to accept, Esc to dismiss, keep typing to refine
 - Accept word-by-word with Ctrl+Right (partial accept)
@@ -454,16 +456,16 @@ Code query   → Syntax-highlighted block with copy button
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Time to first token | < 1s | Perceived responsiveness |
-| Streaming speed | 30-80 tokens/s | Natural reading pace |
-| Suggestion acceptance rate | 25-35% | Copilot usefulness |
-| Response rating (thumbs up) | > 80% | Quality benchmark |
-| Regeneration rate | < 15% | First-response quality |
-| Task completion (agents) | > 90% | Reliability |
-| Hallucination rate | < 5% | Factual accuracy |
-| Human override rate | Track trend | Automation calibration |
+| Metric                      | Target         | Context                  |
+| --------------------------- | -------------- | ------------------------ |
+| Time to first token         | < 1s           | Perceived responsiveness |
+| Streaming speed             | 30-80 tokens/s | Natural reading pace     |
+| Suggestion acceptance rate  | 25-35%         | Copilot usefulness       |
+| Response rating (thumbs up) | > 80%          | Quality benchmark        |
+| Regeneration rate           | < 15%          | First-response quality   |
+| Task completion (agents)    | > 90%          | Reliability              |
+| Hallucination rate          | < 5%           | Factual accuracy         |
+| Human override rate         | Track trend    | Automation calibration   |
 
 ---
 

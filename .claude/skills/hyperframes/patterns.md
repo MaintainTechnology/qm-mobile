@@ -23,11 +23,11 @@ Animate a wrapper div for position/size. The video fills the wrapper. The wrappe
 
 ```js
 tl.to(
-  "#pip-frame",
+  '#pip-frame',
   { top: 700, left: 1360, width: 500, height: 280, borderRadius: 16, duration: 1 },
   10,
 );
-tl.to("#pip-frame", { left: 40, duration: 0.6 }, 30);
+tl.to('#pip-frame', { left: 40, duration: 0.6 }, 30);
 ```
 
 ## Title Card with Fade
@@ -45,8 +45,8 @@ tl.to("#pip-frame", { left: 40, duration: 0.6 }, 30);
 ```
 
 ```js
-tl.to("#title-card h1", { opacity: 1, duration: 0.6 }, 0.3);
-tl.to("#title-card", { opacity: 0, duration: 0.5 }, 4);
+tl.to('#title-card h1', { opacity: 1, duration: 0.6 }, 0.3);
+tl.to('#title-card', { opacity: 0, duration: 0.5 }, 4);
 ```
 
 ## Slide Show with Section Headers
@@ -112,7 +112,7 @@ Use separate elements on the same track, each with its own time range. Slides au
   <script>
     // Just register the timeline — framework auto-nests sub-compositions
     const tl = gsap.timeline({ paused: true });
-    window.__timelines["my-video"] = tl;
+    window.__timelines['my-video'] = tl;
   </script>
 </div>
 ```

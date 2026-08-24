@@ -7,15 +7,18 @@ Emotional design goes beyond usability to create meaningful, trustworthy, and de
 ## Don Norman's Three Levels of Design
 
 ### 1. Visceral Level — "I want it"
+
 The immediate, instinctive reaction to appearance before any interaction.
 
 **Design for first impressions:**
+
 - Clean, polished visual design creates instant credibility
 - Color, imagery, and typography set emotional tone
 - Animation and motion create sense of quality
 - Professional aesthetic increases perceived trustworthiness
 
 **Implementation:**
+
 ```
 First 50ms: User forms aesthetic impression
 First 3s:   User decides to stay or leave
@@ -30,15 +33,18 @@ Priority:
 ```
 
 ### 2. Behavioral Level — "I can use it"
+
 The experience of using the product — functionality, usability, and feel.
 
 **Design for confidence:**
+
 - Predictable, responsive interactions build trust
 - Clear feedback on every action
 - Forgiving design that handles mistakes gracefully
 - Performance that matches expectations
 
 **Implementation:**
+
 ```
 Every interaction should feel:
   ✅ Responsive  — Feedback within 100ms
@@ -49,15 +55,18 @@ Every interaction should feel:
 ```
 
 ### 3. Reflective Level — "I love it"
+
 The conscious assessment — does this product reflect my identity and values?
 
 **Design for meaning:**
+
 - Brand storytelling through design decisions
 - Personalization that feels thoughtful, not creepy
 - Social proof and community belonging
 - Sustainable and ethical design choices
 
 **Implementation:**
+
 ```
 Reflective design elements:
   - "About" pages that share mission and values
@@ -73,13 +82,13 @@ Reflective design elements:
 
 ### Trust Signals by Context
 
-| Context | Trust Signals |
-|---------|--------------|
-| **E-commerce** | Secure checkout badge, return policy, real reviews, price guarantee |
-| **SaaS** | Uptime status, security certifications, data location, customer logos |
-| **Healthcare** | Credentials display, HIPAA badge, privacy assurance, medical review |
-| **Financial** | Encryption indicators, regulatory compliance, insurance/FDIC badges |
-| **Social** | Verification badges, community guidelines, moderation transparency |
+| Context        | Trust Signals                                                         |
+| -------------- | --------------------------------------------------------------------- |
+| **E-commerce** | Secure checkout badge, return policy, real reviews, price guarantee   |
+| **SaaS**       | Uptime status, security certifications, data location, customer logos |
+| **Healthcare** | Credentials display, HIPAA badge, privacy assurance, medical review   |
+| **Financial**  | Encryption indicators, regulatory compliance, insurance/FDIC badges   |
+| **Social**     | Verification badges, community guidelines, moderation transparency    |
 
 ### Social Proof Patterns
 
@@ -116,6 +125,7 @@ Reviews:
 ```
 
 **Best practices:**
+
 - Use real names, photos, and company names (not "User123")
 - Show negative reviews too — 4.8 stars is more credible than 5.0
 - Include specific details ("saved 40% on costs" > "great product")
@@ -232,6 +242,7 @@ Sound design:          Optional, subtle interaction sounds
 ```
 
 **Principles:**
+
 - Never blame the user ("you failed", "invalid", "wrong")
 - Explain what happened in plain language
 - Suggest a clear next step
@@ -290,14 +301,15 @@ Sound design:          Optional, subtle interaction sounds
 
 ### Voice Consistency
 
-| Brand Trait | UI Voice Examples |
-|-------------|-------------------|
-| **Professional** | "Your report is ready for download." |
-| **Friendly** | "All done! Your report is ready." |
-| **Playful** | "Ta-da! Fresh report, hot off the press." |
-| **Technical** | "Report generated. 42 pages, 3.2MB." |
+| Brand Trait      | UI Voice Examples                         |
+| ---------------- | ----------------------------------------- |
+| **Professional** | "Your report is ready for download."      |
+| **Friendly**     | "All done! Your report is ready."         |
+| **Playful**      | "Ta-da! Fresh report, hot off the press." |
+| **Technical**    | "Report generated. 42 pages, 3.2MB."      |
 
 **Voice should be consistent across:**
+
 - Button labels and CTAs
 - Error messages and empty states
 - Onboarding copy and tooltips
@@ -331,15 +343,15 @@ Usage:
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Net Promoter Score (NPS) | > 50 | User sentiment |
-| Customer satisfaction (CSAT) | > 4.2/5 | Post-interaction rating |
-| Trust score | > 80% | Survey: "I trust this product" |
-| Error recovery rate | > 85% | Users who recover from errors |
-| Brand recognition | Track | Consistent design = recall |
-| Return visitor rate | > 40% | Users who come back voluntarily |
-| Support ticket rate | < 2% | Low = fewer frustrations |
+| Metric                       | Target  | Context                         |
+| ---------------------------- | ------- | ------------------------------- |
+| Net Promoter Score (NPS)     | > 50    | User sentiment                  |
+| Customer satisfaction (CSAT) | > 4.2/5 | Post-interaction rating         |
+| Trust score                  | > 80%   | Survey: "I trust this product"  |
+| Error recovery rate          | > 85%   | Users who recover from errors   |
+| Brand recognition            | Track   | Consistent design = recall      |
+| Return visitor rate          | > 40%   | Users who come back voluntarily |
+| Support ticket rate          | < 2%    | Low = fewer frustrations        |
 
 ---
 

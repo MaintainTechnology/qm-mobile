@@ -3,12 +3,7 @@ import { dirname, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { gates } from './gates/index.mjs';
 import { SCANNER_GATES } from './gates/scanner-driven.mjs';
-import {
-  loadLibrary,
-  lookupSkillRule,
-  lookupUrl,
-  matchesFrameworkVersion,
-} from './citations.mjs';
+import { loadLibrary, lookupSkillRule, lookupUrl, matchesFrameworkVersion } from './citations.mjs';
 
 const HERE = dirname(fileURLToPath(import.meta.url));
 const TOPICS_DIR = join(HERE, '..', 'references', 'support-topics');
@@ -18,10 +13,8 @@ export const SUPPORT_TOPIC_TOTAL_CHAR_LIMIT = 2400;
 const DEFAULT_MAX_BRIEF_CHARS = 900;
 
 export const KNOWN_CANDIDATE_KINDS = new Set([
-  ...gates
-    .map((g) => g.metadata?.id)
-    .filter((id) => id && id !== 'scanner-driven'),
-  ...SCANNER_GATES.map((g) => g.id),
+  ...gates.map(g => g.metadata?.id).filter(id => id && id !== 'scanner-driven'),
+  ...SCANNER_GATES.map(g => g.id),
 ]);
 
 export async function supportTopicSubset({
@@ -42,19 +35,19 @@ export async function supportTopicSubset({
   let usedChars = 0;
 
   const sorted = candidates
-    .filter((t) => t.status === 'active')
-    .filter((t) => matchesCandidateKind(t, candidate?.kind))
-    .filter((t) => matchesFrameworks(t.frameworks, fw, fwVersion))
-    .filter((t) => matchesOptionalList(t.profiles, profile))
-    .filter((t) => matchesOptionalList(t.frameworkPlaybooks, frameworkPlaybookId))
-    .filter((t) => matchesRouter(t.routers, stack))
-    .filter((t) => matchesCandidateMetrics(t.metrics, candidate))
-    .filter((t) => matchesCandidateRoutePatterns(t.routePatterns, candidate))
-    .filter((t) => matchesScannerPatterns(t.scannerPatterns, candidate))
+    .filter(t => t.status === 'active')
+    .filter(t => matchesCandidateKind(t, candidate?.kind))
+    .filter(t => matchesFrameworks(t.frameworks, fw, fwVersion))
+    .filter(t => matchesOptionalList(t.profiles, profile))
+    .filter(t => matchesOptionalList(t.frameworkPlaybooks, frameworkPlaybookId))
+    .filter(t => matchesRouter(t.routers, stack))
+    .filter(t => matchesCandidateMetrics(t.metrics, candidate))
+    .filter(t => matchesCandidateRoutePatterns(t.routePatterns, candidate))
+    .filter(t => matchesScannerPatterns(t.scannerPatterns, candidate))
     .sort((a, b) => b.priority - a.priority || a.id.localeCompare(b.id));
 
   for (const topic of sorted) {
-    if (!await topicCitationsApply(topic, candidate?.kind, fw, fwVersion)) continue;
+    if (!(await topicCitationsApply(topic, candidate?.kind, fw, fwVersion))) continue;
     if (selected.length >= maxTopics) break;
     const renderedChars = topic.title.length + topic.body.length + topic.id.length + 20;
     if (selected.length > 0 && usedChars + renderedChars > maxChars) continue;
@@ -90,7 +83,7 @@ export async function validateSupportTopics() {
   const errors = [];
   const seen = new Set();
   for (const topic of topics) {
-    errors.push(...await validateSupportTopic(topic));
+    errors.push(...(await validateSupportTopic(topic)));
     if (seen.has(topic.id)) errors.push(`${topic.path}: duplicate topic id "${topic.id}"`);
     seen.add(topic.id);
   }
@@ -102,7 +95,9 @@ export function renderSupportTopics(topics = []) {
   const lines = [];
   lines.push('## Support topics (investigation guardrails)');
   lines.push('');
-  lines.push('These are deterministic, candidate-scoped hints selected from `references/support-topics/`. They do not create recommendations. Use them only to decide what evidence to check, what to rule out, and when to abstain.');
+  lines.push(
+    'These are deterministic, candidate-scoped hints selected from `references/support-topics/`. They do not create recommendations. Use them only to decide what evidence to check, what to rule out, and when to abstain.',
+  );
   lines.push('');
   for (const topic of topics) {
     lines.push(`### ${topic.title} (\`${topic.id}\`)`);
@@ -204,7 +199,11 @@ async function validateSupportTopic(topic) {
     errors.push(`${label}: status must be active, draft, or deprecated`);
   }
   if (!Number.isFinite(topic.priority)) errors.push(`${label}: priority must be a number`);
-  if (!Number.isFinite(topic.maxBriefChars) || topic.maxBriefChars < 200 || topic.maxBriefChars > 1400) {
+  if (
+    !Number.isFinite(topic.maxBriefChars) ||
+    topic.maxBriefChars < 200 ||
+    topic.maxBriefChars > 1400
+  ) {
     errors.push(`${label}: maxBriefChars must be between 200 and 1400`);
   }
   if (!nonEmptyArray(topic.candidateKinds)) {
@@ -229,7 +228,7 @@ async function validateSupportTopic(topic) {
     errors.push(`${label}: citations must be a non-empty array`);
   } else {
     for (const citation of topic.citations) {
-      if (!await knownCitation(citation)) {
+      if (!(await knownCitation(citation))) {
         errors.push(`${label}: unknown citation "${citation}"`);
       }
     }
@@ -250,7 +249,9 @@ async function validateSupportTopic(topic) {
     if (!topic.body.includes(heading)) errors.push(`${label}: missing heading "${heading}"`);
   }
   if (topic.body.length > topic.maxBriefChars) {
-    errors.push(`${label}: body length ${topic.body.length} exceeds maxBriefChars ${topic.maxBriefChars}`);
+    errors.push(
+      `${label}: body length ${topic.body.length} exceeds maxBriefChars ${topic.maxBriefChars}`,
+    );
   }
   if (/https?:\/\//.test(topic.body)) {
     errors.push(`${label}: put URLs in frontmatter citations, not body text`);
@@ -267,8 +268,8 @@ function matchesCandidateKind(topic, candidateKind) {
 }
 
 function matchesFrameworks(frameworks, framework, version) {
-  return frameworks.some((pattern) =>
-    pattern === '*' || matchesFrameworkVersion(pattern, framework, version)
+  return frameworks.some(
+    pattern => pattern === '*' || matchesFrameworkVersion(pattern, framework, version),
   );
 }
 
@@ -280,18 +281,21 @@ function matchesOptionalList(values, actual) {
 function matchesRouter(routers, stack) {
   if (!Array.isArray(routers) || routers.length === 0) return true;
   if (routers.includes('*')) return true;
-  return (routers.includes('app') && stack?.hasAppRouter)
-    || (routers.includes('pages') && stack?.hasPagesRouter);
+  return (
+    (routers.includes('app') && stack?.hasAppRouter) ||
+    (routers.includes('pages') && stack?.hasPagesRouter)
+  );
 }
 
 function matchesCandidateMetrics(metrics, candidate) {
   if (!Array.isArray(metrics) || metrics.length === 0) return true;
   if (metrics.includes('*')) return true;
-  const observed = new Set([
-    candidate?.evidence?.metric,
-    ...(candidate?.evidence?.issues ?? []).map((i) => i?.metric),
-  ].filter(Boolean).map((m) => String(m).toUpperCase()));
-  return metrics.some((m) => observed.has(String(m).toUpperCase()));
+  const observed = new Set(
+    [candidate?.evidence?.metric, ...(candidate?.evidence?.issues ?? []).map(i => i?.metric)]
+      .filter(Boolean)
+      .map(m => String(m).toUpperCase()),
+  );
+  return metrics.some(m => observed.has(String(m).toUpperCase()));
 }
 
 function matchesCandidateRoutePatterns(patterns, candidate) {
@@ -299,51 +303,57 @@ function matchesCandidateRoutePatterns(patterns, candidate) {
   if (patterns.includes('*')) return true;
   const route = candidate?.route ?? candidate?.path;
   if (typeof route !== 'string' || route.length === 0) return false;
-  return patterns.some((p) => new RegExp(p).test(route));
+  return patterns.some(p => new RegExp(p).test(route));
 }
 
 function matchesScannerPatterns(patterns, candidate) {
   if (!Array.isArray(patterns) || patterns.length === 0) return true;
-  const observed = new Set([
-    ...(candidate?.evidence?.patterns ?? []),
-    ...(candidate?.evidence?.deepDive?.patterns ?? []),
-  ].filter(Boolean));
+  const observed = new Set(
+    [
+      ...(candidate?.evidence?.patterns ?? []),
+      ...(candidate?.evidence?.deepDive?.patterns ?? []),
+    ].filter(Boolean),
+  );
   if (observed.size === 0) return false;
-  return patterns.some((p) => observed.has(p));
+  return patterns.some(p => observed.has(p));
 }
 
 function topicCitationsApply(topic, candidateKind, framework, version) {
   if (!candidateKind) return false;
-  return topic.citations.every((citation) =>
-    citationApplies(citation, candidateKind, framework, version)
+  return topic.citations.every(citation =>
+    citationApplies(citation, candidateKind, framework, version),
   );
 }
 
 async function citationApplies(citation, candidateKind, framework, version) {
   const lib = await loadLibrary();
-  const rule = lib.ruleSkillRefs.find((r) => `${r.skill}:${r.rule}` === citation);
+  const rule = lib.ruleSkillRefs.find(r => `${r.skill}:${r.rule}` === citation);
   if (rule) {
-    return rule.applicableFrameworks.includes('*')
-      || rule.applicableFrameworks.some((p) => matchesFrameworkVersion(p, framework, version));
+    return (
+      rule.applicableFrameworks.includes('*') ||
+      rule.applicableFrameworks.some(p => matchesFrameworkVersion(p, framework, version))
+    );
   }
 
-  const url = lib.urls.find((u) => u.url === citation);
+  const url = lib.urls.find(u => u.url === citation);
   if (!url) return false;
-  const kindOk = !Array.isArray(url.appliesTo)
-    || url.appliesTo.length === 0
-    || url.appliesTo.includes(candidateKind);
-  const versionOk = url.applicableFrameworks.includes('*')
-    || url.applicableFrameworks.some((p) => matchesFrameworkVersion(p, framework, version));
+  const kindOk =
+    !Array.isArray(url.appliesTo) ||
+    url.appliesTo.length === 0 ||
+    url.appliesTo.includes(candidateKind);
+  const versionOk =
+    url.applicableFrameworks.includes('*') ||
+    url.applicableFrameworks.some(p => matchesFrameworkVersion(p, framework, version));
   return kindOk && versionOk;
 }
 
 async function knownCitation(citation) {
-  return Boolean(await lookupUrl(citation) || await lookupSkillRule(citation));
+  return Boolean((await lookupUrl(citation)) || (await lookupSkillRule(citation)));
 }
 
 function toStringArray(value) {
   if (!Array.isArray(value)) return [];
-  return value.filter((v) => typeof v === 'string' && v.length > 0);
+  return value.filter(v => typeof v === 'string' && v.length > 0);
 }
 
 function nonEmptyArray(value) {

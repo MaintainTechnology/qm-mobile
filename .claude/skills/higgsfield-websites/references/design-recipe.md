@@ -38,15 +38,15 @@ rule here exists because the default LLM output violates it.
   accent (`#ff5c1a #ff6b35 #e8590c #f97316 #ea580c #d9480f` on `#0a0a0a`-family
   grounds — the single most common AI reach for "bold/technical"), (2)
   near-black + neon cyan/blue/green accent (`#00e5ff #22d3ee #00ff88 #4ade80
-  #3b82f6`-glow on dark), (3) the beige+brass family below, (4) AI
+#3b82f6`-glow on dark), (3) the beige+brass family below, (4) AI
   purple/violet glow (`#8b5cf6 #a855f7 #7c3aed` gradients), (5) whatever
   palette family your PREVIOUS build in this chat used — consecutive builds
   must not share a palette family.
 - **Premium-consumer palette ban:** for cookware/wellness/artisan/luxury/DTC
   briefs, the beige-cream + brass/clay/oxblood + espresso family is BANNED as the
   default reach. Banned default hexes: backgrounds `#f5f1ea #f7f5f1 #fbf8f1
-  #efeae0 #ece6db #faf7f1 #e8dfcb`; accents `#b08947 #b6553a #9a2436 #9c6e2a
-  #bc7c3a #7d5621`; text `#1a1714 #1a1814 #1b1814`. Rotate instead: Cold Luxury
+#efeae0 #ece6db #faf7f1 #e8dfcb`; accents `#b08947 #b6553a #9a2436 #9c6e2a
+#bc7c3a #7d5621`; text `#1a1714 #1a1814 #1b1814`. Rotate instead: Cold Luxury
   (silver/chrome/smoke), Forest (deep green + bone + amber), Black & Tan, Cobalt +
   Cream, Terracotta + Slate, Olive + Brick + Paper, or monochrome + one saturated
   pop. Beige+brass is allowed only when the brief literally names those colors.
@@ -108,7 +108,7 @@ rule here exists because the default LLM output violates it.
 - No filler verbs (Elevate / Seamless / Unleash / Next-Gen / Revolutionize), no
   startup-slop names (Acme, Nexus, SmartFlow), no "Jane Doe" testimonials, no
   fake-precise invented MARKETING stats (`92% faster`, `4.1× ROI`, `10k+
-  teams`) unless labeled mock. Carve-out: invented PRODUCT FACTS (prices,
+teams`) unless labeled mock. Carve-out: invented PRODUCT FACTS (prices,
   spec values, batch counts, dimensions) are required content for a
   fictional-brand brochure — keep them plausible and internally consistent;
   the ban targets performance/social-proof claims, not catalog data. No

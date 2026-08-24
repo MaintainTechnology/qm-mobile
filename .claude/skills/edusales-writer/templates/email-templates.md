@@ -113,6 +113,7 @@ Want to see how it works?
 ### 5-Email Nurture Sequence
 
 **Email 1: The Welcome / Origin Story**
+
 ```
 Subject: Welcome (and a quick story)
 Preview: Why I started [PRODUCT/COMPANY]
@@ -143,6 +144,7 @@ Talk soon,
 ```
 
 **Email 2: The Problem Agitation**
+
 ```
 Subject: The real reason [THEY'RE NOT GETTING RESULTS]
 Preview: It's not what you think
@@ -174,6 +176,7 @@ P.S. - Quick question: What's your biggest struggle with [TOPIC]? Hit reply - I 
 ```
 
 **Email 3: The Framework/Education**
+
 ```
 Subject: The [NAME] Framework for [RESULT]
 Preview: [NUMBER] steps that actually work
@@ -213,6 +216,7 @@ Tomorrow: real results from real people using this exact approach.
 ```
 
 **Email 4: The Social Proof**
+
 ```
 Subject: "[TESTIMONIAL QUOTE]"
 Preview: [PERSON/NUMBER] people are already seeing results
@@ -245,6 +249,7 @@ If you've been on the fence, tomorrow's email is for you.
 ```
 
 **Email 5: The Close**
+
 ```
 Subject: [URGENCY ELEMENT - last chance, doors closing, etc.]
 Preview: [WHAT'S AT STAKE]
@@ -282,27 +287,32 @@ P.S. - [FINAL PUSH - bonus, guarantee, or FOMO element]
 ## Subject Line Swipe File
 
 **Curiosity:**
+
 - "The one thing I'd do differently..."
 - "I was wrong about [TOPIC]"
 - "This changed everything"
 - "Stop doing this immediately"
 
 **Benefit-Driven:**
+
 - "How to [RESULT] in [TIMEFRAME]"
 - "[NUMBER] [RESULTS] without [PAIN]"
 - "The fastest way to [OUTCOME]"
 
 **Story-Based:**
+
 - "[NAME]'s story: [INTRIGUING DETAIL]"
 - "What happened when I [DID THING]"
 - "I almost [GAVE UP/FAILED]"
 
 **Personal:**
+
 - "Quick question for you"
 - "Can I be honest?"
 - "I need to tell you something"
 
 **FOMO:**
+
 - "[TIMEFRAME] left"
 - "Last chance: [OFFER]"
 - "I'm closing this tomorrow"

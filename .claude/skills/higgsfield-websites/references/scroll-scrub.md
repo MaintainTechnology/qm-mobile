@@ -74,7 +74,7 @@ Use the Higgsfield CLI already used by the website flow:
    name concrete scene props, request no text/logos/watermarks, and keep the
    focal point centered.
 3. Poll with `higgsfield generate wait <job_id>` / `higgsfield generate get
-   <job_id>` because their outputs are downstream inputs. Keep the approved
+<job_id>` because their outputs are downstream inputs. Keep the approved
    full-size source stills in scratch space. They are generation inputs/art
    direction, not runtime posters; deployed posters come from the exact encoded
    clips below.

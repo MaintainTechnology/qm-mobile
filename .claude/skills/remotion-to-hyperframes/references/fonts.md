@@ -8,8 +8,8 @@ showed this costs ~0.025 mean SSIM at the noise floor.
 ## Pattern: `@remotion/google-fonts/<Family>`
 
 ```tsx
-import { loadFont } from "@remotion/google-fonts/Inter";
-loadFont("normal", { weights: ["400", "800"] });
+import { loadFont } from '@remotion/google-fonts/Inter';
+loadFont('normal', { weights: ['400', '800'] });
 ```
 
 Translate to a `<link>` tag in `<head>`:
@@ -37,9 +37,9 @@ you don't pay a network round-trip per render.
 ## Pattern: local fonts via `@font-face`
 
 ```tsx
-import { Font } from "remotion";
+import { Font } from 'remotion';
 
-Font.loadFont("/MyFont.woff2", "MyFont");
+Font.loadFont('/MyFont.woff2', 'MyFont');
 ```
 
 Translate to a `@font-face` rule:
@@ -47,8 +47,8 @@ Translate to a `@font-face` rule:
 ```html
 <style>
   @font-face {
-    font-family: "MyFont";
-    src: url("assets/MyFont.woff2") format("woff2");
+    font-family: 'MyFont';
+    src: url('assets/MyFont.woff2') format('woff2');
     font-weight: 400;
     font-style: normal;
   }
@@ -60,7 +60,7 @@ Copy the font file into `hf-src/assets/` next to the HTML.
 ## Pattern: system font fallback (no font load)
 
 ```tsx
-<div style={{ fontFamily: "Helvetica, Arial, sans-serif" }}>...</div>
+<div style={{ fontFamily: 'Helvetica, Arial, sans-serif' }}>...</div>
 ```
 
 Same string in HF — but be aware: on Linux without a real Helvetica
@@ -91,7 +91,7 @@ on `@font-face` readiness via the Frame Adapter pattern — the
 When Remotion loads multiple weights:
 
 ```tsx
-loadFont("normal", { weights: ["400", "500", "700", "800"] });
+loadFont('normal', { weights: ['400', '500', '700', '800'] });
 ```
 
 Inline all weights in the Google Fonts URL:

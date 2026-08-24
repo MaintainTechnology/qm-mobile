@@ -14,6 +14,7 @@ You are a visual quality assurance agent. Your job is to systematically inspect 
 > The FIRST thing to check on EVERY page/slide is: **Are there any error states visible?**
 >
 > Error states are rendered with obvious visual indicators:
+>
 > - **Red dashed borders** around diagram containers
 > - **"MISSING IMAGE"** or **"MISSING DATA"** text
 > - **Warning icons** (red exclamation marks)
@@ -26,6 +27,7 @@ You are a visual quality assurance agent. Your job is to systematically inspect 
 ## Prerequisites
 
 This skill requires the Claude Code Chrome extension. Ensure:
+
 - Chrome browser is open
 - Claude in Chrome extension (v1.0.36+) is installed
 - Claude Code was started with `claude --chrome` or Chrome is enabled by default
@@ -35,18 +37,21 @@ This skill requires the Claude Code Chrome extension. Ensure:
 Reference: https://code.claude.com/docs/en/chrome
 
 **If the browser becomes unresponsive:**
+
 1. Create a new tab using `tabs_create_mcp` and navigate there instead
 2. Modal dialogs (alerts, confirms, prompts) block all browser events - user must dismiss manually
 3. Run `/chrome` command and select "Reconnect extension" to re-establish connection
 4. If persistent issues, restart both Claude Code and Chrome
 
 **Navigation tips:**
+
 - Use `javascript_tool` with `location.href = 'url'` as a reliable fallback for navigation
 - Always use `http://` not `https://` for localhost URLs
 - Wait 2-3 seconds after navigation before taking screenshots
 - If debugger detaches, get fresh `tabs_context_mcp` before continuing
 
 **Best practices:**
+
 - Chrome integration requires a visible browser window (no headless mode)
 - Claude shares browser login state - can access authenticated pages
 - Filter console output with patterns to avoid verbose logs
@@ -57,12 +62,14 @@ Reference: https://code.claude.com/docs/en/chrome
 ### Step 1: Understand the Inspection Target
 
 The user will specify what to inspect. Common patterns:
+
 - **Single lecture**: "Inspect lecture 1 of dr-abid-husain's new-biology-vascular course"
 - **All lectures in a course**: "Inspect all lectures in dr-abid-husain/systems-cardiology"
 - **Specific page**: "Inspect /preview/courses"
 - **Component focus**: "Focus on diagrams in lecture 3"
 
 Parse the request and identify:
+
 - The URL(s) to inspect
 - Any specific focus areas (diagrams, tables, callouts, etc.)
 - Whether to do a full inspection or targeted check
@@ -74,6 +81,7 @@ Parse the request and identify:
 Use the Chrome extension's MCP tools to:
 
 1. **Navigate to the URL**
+
    ```
    Use browser navigation to open: http://localhost:3000/preview/courses/{physician}/{course}-{N}
    ```
@@ -98,6 +106,7 @@ Use the Chrome extension's MCP tools to:
 7. **Test responsive layouts** by resizing the browser window
 
 **Why browser inspection is mandatory:**
+
 - Unknown diagram types only error at runtime
 - SVG clipping issues only visible when rendered
 - Image loading failures only detectable in browser
@@ -110,6 +119,7 @@ Use the Chrome extension's MCP tools to:
 Perform a comprehensive visual audit using this checklist:
 
 #### A. Page Structure & Layout
+
 - [ ] Page loads without errors (check console)
 - [ ] Navigation bar renders correctly (gold background, preview badge)
 - [ ] Physician context bar shows (avatar, name, credentials, course title)
@@ -117,6 +127,7 @@ Perform a comprehensive visual audit using this checklist:
 - [ ] Responsive padding works (narrower on mobile)
 
 #### B. Header Section
+
 - [ ] Module label visible (gold, uppercase, proper letter-spacing)
 - [ ] Title renders in Cormorant Garamond serif font
 - [ ] Title is not truncated or overflowing
@@ -125,13 +136,16 @@ Perform a comprehensive visual audit using this checklist:
 - [ ] Description text is readable
 
 #### C. Slide Content
+
 For each slide, check:
+
 - [ ] Slide title renders properly (Cormorant Garamond font, proper size)
 - [ ] Progress bar shows correct position
 - [ ] Slide navigation dots are clickable and indicate current slide
 - [ ] Previous/Next buttons enable/disable correctly
 
 #### D. Content Blocks
+
 - [ ] **Paragraphs**: Text is readable, proper line-height (1.7), ink700 color
 - [ ] **Bullets**: Gold dots visible, proper indentation
 - [ ] **Numbered lists**: Numbers in ink900 boxes, proper spacing
@@ -147,6 +161,7 @@ For each slide, check:
 > Before checking diagram quality, FIRST scan for obvious error states. These indicate fundamental problems that must be fixed immediately:
 >
 > **Visual Error Indicators to Look For:**
+>
 > - 🔴 **Red dashed borders** - Component is showing an error state (e.g., missing image)
 > - 🔴 **"MISSING IMAGE" text** - Annotation diagram has invalid baseImage
 > - 🔴 **"[Image: ...]" placeholder text** - Image reference is a placeholder string, not a path
@@ -157,6 +172,7 @@ For each slide, check:
 > **If you see ANY of these, it's a CRITICAL issue that MUST be fixed before continuing.**
 
 **General diagram checks**:
+
 - [ ] **NO error states visible** (red borders, "MISSING" text, blank areas)
 - [ ] Diagram renders (not blank or error)
 - [ ] Colors match palette (red, orange, yellow, green, blue, purple, gray, ink, gold)
@@ -165,41 +181,44 @@ For each slide, check:
 
 **Type-specific checks**:
 
-| Diagram Type | Key Checks |
-|--------------|------------|
-| `hierarchy` | Connector lines visible, proper node spacing, children properly nested |
-| `network` | Node labels ≤10 chars inside circle, >10 chars below; edges don't overlap badly |
-| `quadrant` | WHITE text on colored quadrants, items stay within bounds |
-| `pathway` | Arrows visible, step labels readable, vertical/horizontal layout correct |
-| `timeline` | Points evenly spaced, dates/labels readable |
-| `flowchart` | Decision nodes clear, yes/no paths labeled |
-| `comparison` | Two columns visible, items aligned |
-| `cycle` | Circular flow clear, arrows show direction |
-| `process` | Steps numbered, linear flow clear |
-| `matrix` | Grid lines visible, headers on both axes |
-| `spectrum` | Gradient visible, endpoints labeled |
-| `venn` | Circles overlap correctly, labels in right zones |
-| `gauge` | Needle/indicator visible, scale readable |
-| `funnel` | Stages properly sized, labels visible |
-| `stack` | Layers clearly separated, labels readable |
-| `beforeAfter` | Two states clearly distinguished |
-| `doseResponse` | Curve visible, axes labeled |
-| `anatomyMap` | Body regions correctly highlighted |
-| `sankey` | Flows visible, quantities readable |
-| `annotation` | Labels point to correct regions |
+| Diagram Type   | Key Checks                                                                      |
+| -------------- | ------------------------------------------------------------------------------- |
+| `hierarchy`    | Connector lines visible, proper node spacing, children properly nested          |
+| `network`      | Node labels ≤10 chars inside circle, >10 chars below; edges don't overlap badly |
+| `quadrant`     | WHITE text on colored quadrants, items stay within bounds                       |
+| `pathway`      | Arrows visible, step labels readable, vertical/horizontal layout correct        |
+| `timeline`     | Points evenly spaced, dates/labels readable                                     |
+| `flowchart`    | Decision nodes clear, yes/no paths labeled                                      |
+| `comparison`   | Two columns visible, items aligned                                              |
+| `cycle`        | Circular flow clear, arrows show direction                                      |
+| `process`      | Steps numbered, linear flow clear                                               |
+| `matrix`       | Grid lines visible, headers on both axes                                        |
+| `spectrum`     | Gradient visible, endpoints labeled                                             |
+| `venn`         | Circles overlap correctly, labels in right zones                                |
+| `gauge`        | Needle/indicator visible, scale readable                                        |
+| `funnel`       | Stages properly sized, labels visible                                           |
+| `stack`        | Layers clearly separated, labels readable                                       |
+| `beforeAfter`  | Two states clearly distinguished                                                |
+| `doseResponse` | Curve visible, axes labeled                                                     |
+| `anatomyMap`   | Body regions correctly highlighted                                              |
+| `sankey`       | Flows visible, quantities readable                                              |
+| `annotation`   | Labels point to correct regions                                                 |
 
 #### F. Callouts
+
 - [ ] Icon visible (Rx, checkmark, lightbulb, warning, star)
 - [ ] Left border color correct (ink900 for clinical, gold for takeaway, etc.)
 - [ ] Text readable against paperAlt background
 - [ ] Title/label prominent
 
 #### G. Video Embed (if present)
+
 - [ ] Video container has proper aspect ratio
 - [ ] Player controls visible
 - [ ] No black bars or cropping issues
 
 #### H. References Section
+
 - [ ] References listed at bottom
 - [ ] Proper formatting and numbering
 - [ ] Links work (if applicable)
@@ -213,6 +232,7 @@ Resize the browser window to test responsive behavior:
 3. **Mobile (375px)**: Single column, touch-friendly spacing
 
 Use browser tools to resize window and verify:
+
 - Text doesn't overflow containers
 - Diagrams scale or simplify appropriately
 - Navigation remains usable
@@ -221,6 +241,7 @@ Use browser tools to resize window and verify:
 ### Step 5: Document Issues
 
 For each issue found, record:
+
 - **Location**: Which slide, which element
 - **Issue type**: Readability, overflow, missing element, color, alignment
 - **Severity**: Critical (broken), Major (hard to use), Minor (polish)
@@ -270,6 +291,7 @@ Based on your findings:
    - Include both the problem and the preventive measure added
 
 **Example Preventive Fix Pattern:**
+
 ```typescript
 // Before: Silent failure or broken display
 {node.label}
@@ -290,6 +312,7 @@ Based on your findings:
 ### Step 7: Final Report
 
 Provide a summary:
+
 ```
 ## Visual Polish Report: {Lecture/Page Name}
 
@@ -312,6 +335,7 @@ Provide a summary:
 ## Design System Reference
 
 ### Colors (use these exact values)
+
 ```
 paper: #FFFFFF (backgrounds)
 paperAlt: #F5F2EC (subtle backgrounds)
@@ -325,16 +349,19 @@ vermillion: #C07050 (errors/warnings)
 ```
 
 ### Diagram Colors
+
 ```
 red, orange, yellow, green, blue, purple, gray, ink, gold
 ```
 
 ### Typography
+
 - **Headings**: Cormorant Garamond (serif)
 - **Body**: Inter (sans-serif)
 - **Data/Code**: Monospace
 
 ### Spacing Scale
+
 ```
 space-1: 8px
 space-2: 12px
@@ -348,56 +375,68 @@ space-7: 96px
 ## Common Issues & Quick Fixes
 
 ### Network Diagram Labels Too Long
+
 **Problem**: Node labels overflow circle
 **Fix**: In JSON, shorten label to ≤10 characters, or the component will auto-place longer labels below
 **Prevention**: Component places labels >10 chars below the node automatically. Validation warns at render time.
 
 ### Cycle Diagram Labels Truncated
+
 **Problem**: Labels were aggressively truncated to 10 chars (e.g., "Mitochondrial Stress" → "Mitochond...")
 **Fix**: Labels >12 chars now display below the circle instead of being truncated
 **Prevention**: Component adapted to show full labels (similar to NetworkDiagram pattern). Validation warns for long labels.
 
 ### Quadrant Text Not Visible
+
 **Problem**: Text was white (`ui.paper`) on a nearly transparent colored background (8% opacity)
 **Fix**: Changed item text color to `ink700` for proper contrast
 **Prevention**: Validation utility warns about light-on-light color combinations
 
 ### Hierarchy Connector Lines Missing
+
 **Problem**: Parent-child relationships unclear
 **Fix**: Check HierarchyDiagram.tsx for SVG line rendering
 
 ### Table Overflow
+
 **Problem**: Wide tables cause horizontal scroll
 **Fix**: Consider breaking into multiple tables or using abbreviated headers
 **Prevention**: Validation utility warns when tables have >5 columns
 
 ### Callout Icon Missing
+
 **Problem**: Left side of callout is blank
 **Fix**: Ensure callout type is valid (clinicalNote, keyTakeaway, evidence, warning, proTip)
 
 ### Annotation Diagram Shows Error State (CRITICAL)
+
 **Problem**: baseImage is a text reference (e.g., "vessel-cross-section") instead of actual image path
 **Visual indicator**: Red dashed border box with "MISSING IMAGE" text and warning icon
 **Fix**: Either:
+
 1. Provide a valid image path (e.g., `/images/diagrams/vessel-cross-section.png`)
 2. Provide a URL (e.g., `https://example.com/image.png`)
 3. Convert to a different diagram type that doesn't require an image (e.g., `hierarchy`, `network`)
-**Prevention**:
+   **Prevention**:
+
 - Component now shows obvious red error state instead of subtle gray placeholder
 - Validation logs ERROR (not warning) to console with actionable guidance
 - Visual inspection should immediately flag red borders as CRITICAL issues
 
 ### Flowchart Labels Too Long
+
 **Problem**: Decision node labels get truncated
 **Fix**: Component truncates at 20 chars for decisions, 22 for actions
 **Prevention**: Validation warns when labels approach these limits
 
 ### Unknown Diagram Type Error
+
 **Problem**: JSON uses an unsupported diagram type (e.g., "pyramid") causing render failure
 **Fix**: Convert to a supported type (stack, hierarchy, etc.)
 **Prevention**: Validation now logs ERROR for unsupported types. Supported types: pathway, comparison, beforeAfter, matrix, process, cycle, timeline, hierarchy, flowchart, venn, spectrum, network, doseResponse, anatomyMap, gauge, funnel, stack, quadrant, sankey, annotation
 
 ### SVG Content Cut Off
+
 **Problem**: Labels placed outside SVG viewBox are clipped (e.g., long labels below nodes in cycle diagrams)
 **Fix**: Expand viewBox dimensions to accommodate all content
 **Prevention**: When adapting layouts (placing labels outside shapes), always update the SVG viewBox accordingly

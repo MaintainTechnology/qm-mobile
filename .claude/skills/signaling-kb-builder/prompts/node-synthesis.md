@@ -64,6 +64,7 @@ OUTPUT: Complete JSON node (no markdown, no explanation)
 ## Example: Intervention Node Synthesis
 
 **Input:**
+
 ```
 EXISTING NODE:
 {
@@ -149,6 +150,7 @@ CHANGES TO APPLY:
 ```
 
 **Output:**
+
 ```json
 {
   "intervention_id": "rapamycin",
@@ -232,29 +234,37 @@ CHANGES TO APPLY:
 ## ID Generation Rules
 
 ### Protocol IDs
+
 Format: `{indication}-{key_detail}-{3_digit_sequence}`
 Examples:
+
 - `longevity-weekly-5mg`
 - `transplant-daily-2mg`
 - `cancer-adjuvant-001`
 
 ### Claim IDs
+
 Format: `{intervention_abbrev}_{target}_{3_digit_sequence}`
 Examples:
+
 - `rapa_mtorc1_001`
 - `met_ampk_002`
 - `ta1_immune_001`
 
 ### Conflict IDs
+
 Format: `conflict_{topic_abbrev}_{nature}_{3_digit_sequence}`
 Examples:
+
 - `conflict_rapa_dose_numeric_001`
 - `conflict_igf1_range_longevity_001`
 - `conflict_pgc1a_effect_temporal_001`
 
 ### Pattern IDs (Biomarkers)
+
 Format: `{biomarker}-{state_description}`
 Examples:
+
 - `low-igf1-with-insulin-resistance`
 - `elevated-homocysteine-low-b12`
 - `high-homa-ir-normal-fasting-glucose`
@@ -290,6 +300,7 @@ If synthesis fails:
 ## Output Format
 
 Output MUST be:
+
 - Valid JSON
 - No markdown code fences
 - No explanatory text

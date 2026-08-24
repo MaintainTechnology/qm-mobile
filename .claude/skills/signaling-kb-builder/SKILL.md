@@ -16,12 +16,12 @@ Transform lecture transcripts into an entity-centric knowledge graph optimized f
 
 The existing VectorShift knowledge base stores lecture analyses as document chunks. When queried:
 
-| Query Type | Current Behavior | Desired Behavior |
-|------------|------------------|------------------|
-| "rapamycin dosing" | Returns chunks mentioning mTOR (wrong compound) | Returns all rapamycin dosing protocols |
-| "low IGF-1 with insulin resistance" | Returns how to RAISE IGF-1 | Returns diagnostic INTERPRETATION |
-| "thymosin alpha-1 dosing" | Returns unrelated peptides (TB-500, BPC-157) | Returns TA1 protocols (content exists!) |
-| "AMPK autophagy" | Works well (vocabulary matches) | Works well |
+| Query Type                          | Current Behavior                                | Desired Behavior                        |
+| ----------------------------------- | ----------------------------------------------- | --------------------------------------- |
+| "rapamycin dosing"                  | Returns chunks mentioning mTOR (wrong compound) | Returns all rapamycin dosing protocols  |
+| "low IGF-1 with insulin resistance" | Returns how to RAISE IGF-1                      | Returns diagnostic INTERPRETATION       |
+| "thymosin alpha-1 dosing"           | Returns unrelated peptides (TB-500, BPC-157)    | Returns TA1 protocols (content exists!) |
+| "AMPK autophagy"                    | Works well (vocabulary matches)                 | Works well                              |
 
 **Root cause:** Semantic search matches entity mentions but doesn't understand clinical query intent. Document-centric chunking scatters related information.
 
@@ -54,6 +54,7 @@ AFTER:  Lectures → Extract → Entity Nodes → Intent-Classified Query
 ```
 
 **Key principles:**
+
 - **Claude Opus 4.5** for structured fact extraction (all 4 entity types)
 - **Claude Opus 4.5** for semantic entity resolution (alias detection)
 - **Claude Haiku 4.5** for intelligent merging (semantic deduplication)
@@ -150,7 +151,7 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
   "aliases": ["sirolimus", "Rapamune"],
   "category": "small_molecule",
   "primary_pathways": ["axis-1-nutrient-sensing/mtor-signaling"],
-  
+
   "dosing_protocols": [
     {
       "protocol_id": "longevity-weekly",
@@ -171,7 +172,7 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
       "confidence": "moderate"
     }
   ],
-  
+
   "mechanism_claims": [
     {
       "claim_id": "rapa_mtorc1_001",
@@ -183,16 +184,16 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
       "confidence": "high"
     }
   ],
-  
+
   "regulatory_status": {
     "fda": "Approved (transplant), off-label (longevity)",
     "wada": "Not prohibited",
     "notes": "Prescription required"
   },
-  
+
   "contraindications": ["active infection", "wound healing"],
   "monitoring": ["lipid panel", "CBC", "glucose"],
-  
+
   "conflicts": []
 }
 ```
@@ -205,13 +206,13 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
   "axis": 1,
   "axis_name": "Nutrient Sensing & Energetics",
   "shift_domain": "S",
-  
+
   "description": "Master regulator of cell growth integrating nutrient and energy signals",
-  
+
   "core_nodes": ["MTOR", "RPTOR", "RICTOR", "EIF4EBP1", "RPS6KB1"],
   "upstream_triggers": ["amino_acids", "insulin", "growth_factors", "energy_status"],
   "downstream_effects": ["protein_synthesis", "autophagy_inhibition", "lipid_synthesis"],
-  
+
   "crosstalk": [
     {
       "target_pathway": "axis-2-proteostasis/autophagy",
@@ -219,17 +220,17 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
       "mechanism": "mTORC1 phosphorylates ULK1, inhibiting autophagy initiation"
     }
   ],
-  
+
   "interventions_targeting": [
-    {"intervention_id": "rapamycin", "effect": "inhibit", "specificity": "mTORC1 selective"},
-    {"intervention_id": "metformin", "effect": "indirect_inhibit", "via": "AMPK activation"}
+    { "intervention_id": "rapamycin", "effect": "inhibit", "specificity": "mTORC1 selective" },
+    { "intervention_id": "metformin", "effect": "indirect_inhibit", "via": "AMPK activation" }
   ],
-  
+
   "biomarker_relevance": [
-    {"biomarker": "igf1", "relationship": "upstream_activator"},
-    {"biomarker": "p70s6k_phospho", "relationship": "activity_marker"}
+    { "biomarker": "igf1", "relationship": "upstream_activator" },
+    { "biomarker": "p70s6k_phospho", "relationship": "activity_marker" }
   ],
-  
+
   "source_type": "expert_lecture"
 }
 ```
@@ -240,12 +241,12 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
 {
   "biomarker_id": "igf1",
   "full_name": "Insulin-like Growth Factor 1",
-  "reference_range": {"low": 100, "high": 300, "unit": "ng/mL"},
-  
+  "reference_range": { "low": 100, "high": 300, "unit": "ng/mL" },
+
   "interpretation_patterns": [
     {
       "pattern_id": "low-igf1-with-insulin-resistance",
-      "biomarker_state": {"igf1": "low", "homa_ir": "elevated"},
+      "biomarker_state": { "igf1": "low", "homa_ir": "elevated" },
       "interpretation": "Suggests GH resistance or hepatic dysfunction rather than simple GH deficiency. Liver may not respond to GH due to insulin resistance.",
       "differential": ["hepatic_insulin_resistance", "gh_resistance", "malnutrition"],
       "clinical_implications": "Address insulin resistance before considering GH therapy",
@@ -255,25 +256,30 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
       "confidence": "moderate"
     }
   ],
-  
+
   "optimal_ranges_by_context": [
     {
       "range_id": "longevity_40_60",
-      "optimal": {"low": 150, "high": 250},
+      "optimal": { "low": 150, "high": 250 },
       "context": "Longevity optimization, adults 40-60",
       "rationale": "Below 150 suggests GH deficiency, above 250 may accelerate aging",
       "source_type": "expert_lecture",
       "confidence": "moderate"
     }
   ],
-  
+
   "interventions_affecting": [
-    {"intervention_id": "growth_hormone", "effect": "increase", "magnitude": "significant"},
-    {"intervention_id": "carnitine_with_gh", "effect": "increase", "magnitude": "additive", "confidence": "low"}
+    { "intervention_id": "growth_hormone", "effect": "increase", "magnitude": "significant" },
+    {
+      "intervention_id": "carnitine_with_gh",
+      "effect": "increase",
+      "magnitude": "additive",
+      "confidence": "low"
+    }
   ],
-  
+
   "pathways_involved": ["axis-1-nutrient-sensing/igf1-axis"],
-  
+
   "range_conflicts": []
 }
 ```
@@ -288,6 +294,7 @@ cat .signaling-kb/interventions/rapamycin.json | jq .
 **Model:** Claude Sonnet (`claude-sonnet-4-20250514`)
 
 **Extraction identifies:**
+
 - Interventions (compounds, peptides, protocols)
 - Dosing information (dose, frequency, indication, context)
 - Mechanism claims (intervention → target → effect)
@@ -335,11 +342,13 @@ If ID exists, skip. If new, append to node.
 **Output:** Up to 5 peer-reviewed citations per claim
 
 **Architecture (Actual Implementation):**
+
 1. **Perplexity Deep Research** - Called for each protocol/claim with a structured query
 2. **URL Parsing** - Extracts PMIDs/PMCIDs/DOIs from returned citation URLs
 3. **Haiku Fallback** - If URL parsing fails, Claude Haiku extracts citations from prose
 
 **Per-Claim Enrichment Query:**
+
 ```
 Find peer-reviewed clinical studies on {intervention} dosing:
 - Dose: {dose}
@@ -351,6 +360,7 @@ Include mechanism of action, clinical trial data, and safety information.
 **Rate Limiting:** 2-second delay between Deep Research calls to avoid API limits.
 
 **Citation Filtering:**
+
 - Only peer-reviewed sources are included (PubMed, PMC, DOI-identified journals)
 - Web sources are filtered out
 - Deduplication by PMID/PMCID/DOI
@@ -437,12 +447,12 @@ When sources disagree, BOTH positions are preserved with full context.
 
 ### Conflict Types Detected
 
-| Type | Example | Handling |
-|------|---------|----------|
-| Directional | "inhibits" vs "activates" | Both preserved, characterized |
-| Numeric | "5mg weekly" vs "10mg weekly" | Both preserved as separate protocols |
-| Contextual | Different optimal ranges for different ages | Both preserved with context |
-| Evidence grade | "established" vs "speculative" | Both preserved, grades noted |
+| Type           | Example                                     | Handling                             |
+| -------------- | ------------------------------------------- | ------------------------------------ |
+| Directional    | "inhibits" vs "activates"                   | Both preserved, characterized        |
+| Numeric        | "5mg weekly" vs "10mg weekly"               | Both preserved as separate protocols |
+| Contextual     | Different optimal ranges for different ages | Both preserved with context          |
+| Evidence grade | "established" vs "speculative"              | Both preserved, grades noted         |
 
 ## State Management
 
@@ -490,12 +500,12 @@ Each processing run is logged:
 
 Before retrieval, queries are classified:
 
-| Intent | Example Query | Retrieval Path |
-|--------|---------------|----------------|
-| `intervention_dosing` | "rapamycin dosing longevity" | `interventions/{id}.json` → `dosing_protocols` |
+| Intent                     | Example Query                  | Retrieval Path                                     |
+| -------------------------- | ------------------------------ | -------------------------------------------------- |
+| `intervention_dosing`      | "rapamycin dosing longevity"   | `interventions/{id}.json` → `dosing_protocols`     |
 | `biomarker_interpretation` | "low IGF-1 insulin resistance" | `biomarkers/{id}.json` → `interpretation_patterns` |
-| `mechanism` | "AMPK autophagy mitochondria" | `pathways/` → traverse crosstalk |
-| `regulatory` | "BPC-157 FDA status" | `interventions/{id}.json` → `regulatory_status` |
+| `mechanism`                | "AMPK autophagy mitochondria"  | `pathways/` → traverse crosstalk                   |
+| `regulatory`               | "BPC-157 FDA status"           | `interventions/{id}.json` → `regulatory_status`    |
 
 ### Query Processing
 
@@ -538,6 +548,7 @@ The skill can export nodes for VectorShift upload:
 ```
 
 This produces documents optimized for semantic search:
+
 - Each intervention as a document with intervention-specific embedding
 - Each pathway as a document with pathway-specific embedding
 - Metadata fields for filtering (category, axis, confidence)
@@ -563,6 +574,7 @@ Reranking: By confidence score
 **Current approach:** Slugify intervention names for file-based storage. Simple and fast.
 
 **Trade-off:** Synonyms like "sirolimus" and "rapamycin" create separate files. This is acceptable because:
+
 1. Transcripts typically use consistent naming
 2. Aliases are stored in each node for future consolidation
 3. Keeps processing simple and fast
@@ -587,21 +599,21 @@ The processing script tracks API costs in real-time:
 
 ### API Pricing (as of Jan 2026)
 
-| API | Cost |
-|-----|------|
-| Claude Sonnet (input) | $3.00/1M tokens |
-| Claude Sonnet (output) | $15.00/1M tokens |
-| Claude Haiku (input) | $0.25/1M tokens |
-| Claude Haiku (output) | $1.25/1M tokens |
+| API                          | Cost                 |
+| ---------------------------- | -------------------- |
+| Claude Sonnet (input)        | $3.00/1M tokens      |
+| Claude Sonnet (output)       | $15.00/1M tokens     |
+| Claude Haiku (input)         | $0.25/1M tokens      |
+| Claude Haiku (output)        | $1.25/1M tokens      |
 | **Perplexity Deep Research** | **$5.00/request** ⚠️ |
 
 ### Typical Costs
 
-| Operation | Cost |
-|-----------|------|
-| Single transcript (6-10 interventions) | **~$25-$50** |
-| Full SSRP batch (8 transcripts) | **~$200-$400** |
-| Per Deep Research call | **$5.00** |
+| Operation                              | Cost           |
+| -------------------------------------- | -------------- |
+| Single transcript (6-10 interventions) | **~$25-$50**   |
+| Full SSRP batch (8 transcripts)        | **~$200-$400** |
+| Per Deep Research call                 | **$5.00**      |
 
 **⚠️ WARNING:** Deep Research is expensive. Consider using `sonar-pro` (~$0.005/request) for less critical enrichment.
 
@@ -646,24 +658,24 @@ After each batch run, a cost report is saved to `.signaling-kb/cost-report.json`
 
 ## Related Skills
 
-| Skill | Relationship |
-|-------|--------------|
-| `signaling-kb-batched` | Primary extraction skill (this is the reference implementation) |
-| `lecture-gen-iterative` | Uses KB for research during lecture generation |
-| `process-ngm-lectures` | Produces the transcript analyses this skill consumes |
-| `physician-feedback-agent` | Could use KB for evidence lookup |
+| Skill                      | Relationship                                                    |
+| -------------------------- | --------------------------------------------------------------- |
+| `signaling-kb-batched`     | Primary extraction skill (this is the reference implementation) |
+| `lecture-gen-iterative`    | Uses KB for research during lecture generation                  |
+| `process-ngm-lectures`     | Produces the transcript analyses this skill consumes            |
+| `physician-feedback-agent` | Could use KB for evidence lookup                                |
 
 ## Changelog
 
-| Version | Date | Changes |
-|---------|------|---------|
-| 1.0.0 | 2026-01-29 | Full 4-entity extraction with LLM merge (Haiku 4.5), semantic dedup (Opus 4.5), 64k tokens, 224 transcripts |
-| 0.5.0 | 2026-01-28 | Added pathways, biomarkers, conflicts extraction |
-| 0.4.0 | 2026-01-27 | Upgraded to Claude Haiku 4.5 for merge operations |
-| 0.3.0 | 2026-01-22 | Full batch processing of SSRP transcripts (8 total), 49 interventions created |
-| 0.2.1 | 2026-01-22 | Bug fix: contraindications/monitoring string-to-array handling |
-| 0.2.0 | 2026-01-21 | Added Deep Research enrichment, cost tracking, batch processing scripts |
-| 0.1.0 | 2025-01-16 | Initial architecture design |
+| Version | Date       | Changes                                                                                                     |
+| ------- | ---------- | ----------------------------------------------------------------------------------------------------------- |
+| 1.0.0   | 2026-01-29 | Full 4-entity extraction with LLM merge (Haiku 4.5), semantic dedup (Opus 4.5), 64k tokens, 224 transcripts |
+| 0.5.0   | 2026-01-28 | Added pathways, biomarkers, conflicts extraction                                                            |
+| 0.4.0   | 2026-01-27 | Upgraded to Claude Haiku 4.5 for merge operations                                                           |
+| 0.3.0   | 2026-01-22 | Full batch processing of SSRP transcripts (8 total), 49 interventions created                               |
+| 0.2.1   | 2026-01-22 | Bug fix: contraindications/monitoring string-to-array handling                                              |
+| 0.2.0   | 2026-01-21 | Added Deep Research enrichment, cost tracking, batch processing scripts                                     |
+| 0.1.0   | 2025-01-16 | Initial architecture design                                                                                 |
 
 ## Batch Processing Scripts
 

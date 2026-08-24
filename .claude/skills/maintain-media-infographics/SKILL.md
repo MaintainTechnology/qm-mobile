@@ -48,14 +48,14 @@ A strong carousel usually runs **stat → list → steps → quote → cta** —
 down, show the sequence, prove it with a real voice, then ask for the action. Use the panel that
 actually fits the idea; don't force all five.
 
-| Panel | Use it for | Key fields |
-|-------|-----------|------------|
-| `stat` | a hard-number hook / single metric | `value`, `unit`, `label`, `support`, `kicker?` |
-| `list` | a breakdown in bordered cards (2–4) | `title`, `items:[{icon?, title, text?}]` |
-| `steps` | a real ordered sequence | `title`, `steps:[{title, text?}]` |
-| `quote` | a REAL testimonial | `quote`, `name`, `role?` |
-| `cta` | the closing call to action | `headline`, `sub?`, `action?`, `url?` |
-| `cover` | an opening title / hero slide | `headline`, `sub?`, `kicker?`, `bg?` |
+| Panel   | Use it for                          | Key fields                                     |
+| ------- | ----------------------------------- | ---------------------------------------------- |
+| `stat`  | a hard-number hook / single metric  | `value`, `unit`, `label`, `support`, `kicker?` |
+| `list`  | a breakdown in bordered cards (2–4) | `title`, `items:[{icon?, title, text?}]`       |
+| `steps` | a real ordered sequence             | `title`, `steps:[{title, text?}]`              |
+| `quote` | a REAL testimonial                  | `quote`, `name`, `role?`                       |
+| `cta`   | the closing call to action          | `headline`, `sub?`, `action?`, `url?`          |
+| `cover` | an opening title / hero slide       | `headline`, `sub?`, `kicker?`, `bg?`           |
 
 Every panel also accepts optional `footer` (defaults to `maintainmedia.com`), `logo` (`"dark"`
 default, or `"light"` for light backgrounds), and **`bg`** — a real brand background graphic behind
@@ -66,19 +66,51 @@ scrim is added automatically). Use `bg` sparingly — it shines on a `cover`, le
 
 ```json
 [
-  { "type": "stat", "kicker": "The problem", "value": "40", "unit": "%",
+  {
+    "type": "stat",
+    "kicker": "The problem",
+    "value": "40",
+    "unit": "%",
     "label": "of marketing time is lost re-making the same graphic",
-    "support": "Every post rebuilt from scratch is time not spent on the message." },
-  { "type": "list", "title": "One system, every asset", "items": [
-    { "icon": "target", "title": "On-brand by default", "text": "Real logo, real purple, real fonts, every time." },
-    { "icon": "chart", "title": "Built from your numbers", "text": "Cards straight from the data you give it." } ] },
-  { "type": "steps", "title": "How it works", "steps": [
-    { "title": "Write the copy", "text": "Headlines, numbers, and a real quote." },
-    { "title": "Render the deck", "text": "The engine styles every panel to spec." } ] },
-  { "type": "quote", "quote": "It finally all looks like the same company.",
-    "name": "Jordan Lee", "role": "Head of Growth, Acme" },
-  { "type": "cta", "headline": "Make it look like Maintain Media.",
-    "sub": "Give it the copy. It handles the design.", "action": "Start a carousel", "url": "maintainmedia.com" }
+    "support": "Every post rebuilt from scratch is time not spent on the message."
+  },
+  {
+    "type": "list",
+    "title": "One system, every asset",
+    "items": [
+      {
+        "icon": "target",
+        "title": "On-brand by default",
+        "text": "Real logo, real purple, real fonts, every time."
+      },
+      {
+        "icon": "chart",
+        "title": "Built from your numbers",
+        "text": "Cards straight from the data you give it."
+      }
+    ]
+  },
+  {
+    "type": "steps",
+    "title": "How it works",
+    "steps": [
+      { "title": "Write the copy", "text": "Headlines, numbers, and a real quote." },
+      { "title": "Render the deck", "text": "The engine styles every panel to spec." }
+    ]
+  },
+  {
+    "type": "quote",
+    "quote": "It finally all looks like the same company.",
+    "name": "Jordan Lee",
+    "role": "Head of Growth, Acme"
+  },
+  {
+    "type": "cta",
+    "headline": "Make it look like Maintain Media.",
+    "sub": "Give it the copy. It handles the design.",
+    "action": "Start a carousel",
+    "url": "maintainmedia.com"
+  }
 ]
 ```
 

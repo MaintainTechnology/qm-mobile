@@ -36,11 +36,11 @@ a colour, font, logo, or icon.
 
 **Core tokens (source of truth — hex is canonical):**
 
-| Token | Value | Use |
-|-------|-------|-----|
-| Purple | `#a04dff` | Primary accent, logo mark, key emphasis, CTAs |
-| Dark | `#08282d` | Deep backgrounds, text on light |
-| White | `#ffffff` | Text on dark, negative space |
+| Token    | Value               | Use                                            |
+| -------- | ------------------- | ---------------------------------------------- |
+| Purple   | `#a04dff`           | Primary accent, logo mark, key emphasis, CTAs  |
+| Dark     | `#08282d`           | Deep backgrounds, text on light                |
+| White    | `#ffffff`           | Text on dark, negative space                   |
 | Gradient | `#a04dff → #08282d` | Signature hero atmosphere (radial or vertical) |
 
 **Real assets to reference (relative to repo root):**
@@ -89,16 +89,16 @@ this repo) — no invented facts, metrics, or quotes.
 
 **Platform dimensions (confirm with the user if unusual):**
 
-| Deliverable | Size (px) | Ratio | Format |
-|-------------|-----------|-------|--------|
-| Instagram post (portrait) | 1080 × 1350 | 4:5 | PNG |
-| Instagram post (square) | 1080 × 1080 | 1:1 | PNG |
-| Instagram story / reel cover | 1080 × 1920 | 9:16 | PNG |
-| LinkedIn carousel page | 1080 × 1350 | 4:5 | PDF (multi-page) |
-| LinkedIn single image | 1200 × 1500 or 1200 × 627 | 4:5 / 1.91:1 | PNG |
-| Stat / testimonial card | 1080 × 1080 or 1200 × 1200 | 1:1 | PNG |
-| PDF infographic (print) | 2480 × 3508 (A4 @300dpi) | 1:√2 | PDF |
-| One-pager / doc | A4 / Letter | — | PDF |
+| Deliverable                  | Size (px)                  | Ratio        | Format           |
+| ---------------------------- | -------------------------- | ------------ | ---------------- |
+| Instagram post (portrait)    | 1080 × 1350                | 4:5          | PNG              |
+| Instagram post (square)      | 1080 × 1080                | 1:1          | PNG              |
+| Instagram story / reel cover | 1080 × 1920                | 9:16         | PNG              |
+| LinkedIn carousel page       | 1080 × 1350                | 4:5          | PDF (multi-page) |
+| LinkedIn single image        | 1200 × 1500 or 1200 × 627  | 4:5 / 1.91:1 | PNG              |
+| Stat / testimonial card      | 1080 × 1080 or 1200 × 1200 | 1:1          | PNG              |
+| PDF infographic (print)      | 2480 × 3508 (A4 @300dpi)   | 1:√2         | PDF              |
+| One-pager / doc              | A4 / Letter                | —            | PDF              |
 
 Design at the real target resolution (or 2× and downscale) so exports are crisp.
 

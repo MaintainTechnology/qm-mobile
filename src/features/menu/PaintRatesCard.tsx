@@ -13,15 +13,13 @@ const MAX_PAINT_RATE_DOLLARS = 200;
 const MAX_CALL_OUT_DOLLARS = 5000;
 
 const FIELDS: OverlayField[] = [
-  ...PAINT_SCOPES.map(
-    ([key, label, unit]): OverlayField => ({
-      key,
-      label,
-      suffix: `/ ${unit}`,
-      bound: { positive: true, maxDollars: MAX_PAINT_RATE_DOLLARS, required: false },
-      mapKey: 'rate_per_unit',
-    }),
-  ),
+  ...PAINT_SCOPES.map(([key, label, unit]): OverlayField => ({
+    key,
+    label,
+    suffix: `/ ${unit}`,
+    bound: { positive: true, maxDollars: MAX_PAINT_RATE_DOLLARS, required: false },
+    mapKey: 'rate_per_unit',
+  })),
   {
     key: 'call_out_minimum_ex_gst',
     label: 'Call-out minimum',

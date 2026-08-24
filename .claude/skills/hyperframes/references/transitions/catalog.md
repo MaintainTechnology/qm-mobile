@@ -47,7 +47,7 @@ Shader setup, WebGL init, capture, and fragment shaders are handled by `@hyperfr
         height: 1080px;
         overflow: hidden;
         background: #000;
-        font-family: "YOUR FONT", sans-serif; /* compiler embeds supported fonts automatically */
+        font-family: 'YOUR FONT', sans-serif; /* compiler embeds supported fonts automatically */
       }
       .scene {
         position: absolute;
@@ -84,7 +84,7 @@ Shader setup, WebGL init, capture, and fragment shaders are handled by `@hyperfr
       window.__timelines = window.__timelines || {};
       var tl = gsap.timeline({ paused: true });
       // Transition code here
-      window.__timelines["main"] = tl;
+      window.__timelines['main'] = tl;
     </script>
   </body>
 </html>

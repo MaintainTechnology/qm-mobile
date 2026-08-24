@@ -1,5 +1,11 @@
 import { canReply } from './chats-api';
-import { chatDisplayName, chatInitial, channelLabel, lastMessagePreview, relativeTime } from './format';
+import {
+  chatDisplayName,
+  chatInitial,
+  channelLabel,
+  lastMessagePreview,
+  relativeTime,
+} from './format';
 
 describe('relativeTime', () => {
   const now = new Date('2026-08-21T10:00:00.000Z').getTime();
@@ -40,7 +46,9 @@ describe('lastMessagePreview', () => {
 
   it('leaves inbound turns bare', () => {
     expect(
-      lastMessagePreview({ messages: [{ direction: 'inbound', body: 'Got a leak', created_at: 'x' }] }),
+      lastMessagePreview({
+        messages: [{ direction: 'inbound', body: 'Got a leak', created_at: 'x' }],
+      }),
     ).toBe('Got a leak');
   });
 

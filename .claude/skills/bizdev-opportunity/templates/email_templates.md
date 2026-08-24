@@ -7,6 +7,7 @@ Reference templates for drafting outreach emails. Each template follows the edus
 ## Template Structure
 
 Every email follows this structure:
+
 1. **Subject Line** - Under 60 chars, curiosity or value-driven
 2. **Opening Hook** - Value or relevance, never cliche
 3. **Value Bridge** - Connect their situation to your expertise
@@ -25,14 +26,14 @@ Subject: Quick thought on {pain_point_short}
 
 {First_name},
 
-After helping build Modern Age (first national longevity clinic) and advising 
-$1B+ in longevity companies, I've noticed a pattern: {observation about their 
+After helping build Modern Age (first national longevity clinic) and advising
+$1B+ in longevity companies, I've noticed a pattern: {observation about their
 situation based on signals}.
 
-Most practitioners in your position struggle with {pain_point}. The ones who 
+Most practitioners in your position struggle with {pain_point}. The ones who
 break through typically {insight/solution hint}.
 
-I put together a {specific resource} that might help. Worth 10 minutes to 
+I put together a {specific resource} that might help. Worth 10 minutes to
 see if it applies to your situation?
 
 Anant
@@ -47,11 +48,11 @@ Subject: {Mutual_connection} mentioned you
 
 {First_name},
 
-{Mutual_connection} suggested I reach out—mentioned you're {specific context 
+{Mutual_connection} suggested I reach out—mentioned you're {specific context
 from signal, e.g., "building out longevity services"}.
 
-I built the clinical infrastructure for Modern Age and now help practitioners 
-navigate exactly this transition. {One specific insight relevant to their 
+I built the clinical infrastructure for Modern Age and now help practitioners
+navigate exactly this transition. {One specific insight relevant to their
 situation}.
 
 If you're dealing with {pain_point}, might be worth a quick call.
@@ -70,11 +71,11 @@ Subject: 5 minutes → 45 minutes (lab reports)
 
 How much time did you spend on lab reports last week?
 
-Most longevity practitioners I know spend 45+ minutes per patient translating 
-labs into actionable reports. That's 15+ hours a week on something an AI can 
+Most longevity practitioners I know spend 45+ minutes per patient translating
+labs into actionable reports. That's 15+ hours a week on something an AI can
 do in 5 minutes.
 
-I built a tool that does exactly that—handles any biomarker type, customizes 
+I built a tool that does exactly that—handles any biomarker type, customizes
 to your philosophy, includes citations. 200,000+ monthly LinkedIn impressions reaching longevity clinicians, with an engaged practitioner community using it now.
 
 Want to see a sample report for one of your patients?
@@ -95,7 +96,7 @@ Subject: Following up on {topic}
 
 {First_name},
 
-Great connecting {time reference}. Your point about {their insight} stuck 
+Great connecting {time reference}. Your point about {their insight} stuck
 with me—it's exactly what I saw when {relevant experience}.
 
 Based on what you shared about {pain_point}, here's what I'd prioritize:
@@ -104,7 +105,7 @@ Based on what you shared about {pain_point}, here's what I'd prioritize:
 2. {Specific recommendation}
 3. {Specific recommendation}
 
-{Resource offer or next step}. Would {specific time/day} work for a deeper 
+{Resource offer or next step}. Would {specific time/day} work for a deeper
 dive?
 
 Anant
@@ -142,10 +143,10 @@ Subject: Thoughts on the proposal?
 
 Wanted to check in on the proposal I sent {timeframe}.
 
-A few clients had questions about {common_question}, so I added some 
+A few clients had questions about {common_question}, so I added some
 clarification: {brief answer or link to updated section}.
 
-Any questions on your end? Happy to jump on a quick call to talk through 
+Any questions on your end? Happy to jump on a quick call to talk through
 the details.
 
 Anant
@@ -164,7 +165,7 @@ Subject: Thought of you when...
 
 {First_name},
 
-Something came up that reminded me of your {pain_point from original 
+Something came up that reminded me of your {pain_point from original
 conversation}.
 
 I just {recent accomplishment/learning} and thought it might help:
@@ -187,7 +188,7 @@ Subject: Update that might help with {pain_point}
 
 A lot has changed since we last talked about {original_topic}.
 
-We just {new development}, which directly addresses {their pain_point}. 
+We just {new development}, which directly addresses {their pain_point}.
 {One specific benefit with number if possible}.
 
 Worth a fresh look? I can show you in 15 minutes.
@@ -206,7 +207,7 @@ Subject: How {similar_client} solved {pain_point}
 
 Remember when we discussed {pain_point}?
 
-Just helped {similar_client_description} work through the same thing. 
+Just helped {similar_client_description} work through the same thing.
 They went from {before_state} to {after_state} in {timeframe}.
 
 The approach might work for you too. Quick call to see if it fits?
@@ -221,11 +222,13 @@ Anant
 ### Consulting Emails
 
 **Cold Hook Options:**
+
 - "After building the first national longevity clinic..."
 - "Most practices I advise struggle with {pain_point}..."
 - "The practices that scale fastest all do one thing..."
 
 **Value Bridge:**
+
 - "I've helped {number} practices navigate this exact transition."
 - "The pattern I see with successful longevity practices..."
 - "Based on my experience scaling Modern Age..."
@@ -233,11 +236,13 @@ Anant
 ### Membership/Platform Emails
 
 **Cold Hook Options:**
+
 - "How much time did you spend on {task} last week?"
 - "Quick question: do you ever wish you could just ask about the latest {topic} research?"
 - "50,000 studies synthesized. One question away."
 
 **Value Bridge:**
+
 - "That's why practitioners across 200,000+ monthly LinkedIn impressions use the platform..."
 - "The lab report generator alone saves 10+ hours/week..."
 - "Most members say it pays for itself in the first month..."
@@ -245,11 +250,13 @@ Anant
 ### Commons Partnership Emails
 
 **Cold Hook Options:**
+
 - "When clinicians ask ChatGPT about {category}, do they find you?"
 - "Your competitors are reaching 200,000+ monthly LinkedIn impressions among longevity clinicians..."
 - "We're profiling every vendor in the space. The question is whether you control your presence."
 
 **Value Bridge:**
+
 - "Our platform puts research-backed profiles in front of clinicians actively looking..."
 - "Partners typically see their first leads within {timeframe}..."
 - "Unlike vendor marketing, our profiles are research-driven and AI-native..."
@@ -259,6 +266,7 @@ Anant
 ## Anti-Patterns to Avoid
 
 ### Never Open With:
+
 - "Hope this finds you well"
 - "Just checking in"
 - "Wanted to touch base"
@@ -267,6 +275,7 @@ Anant
 - "My name is Anant and I..."
 
 ### Never Include:
+
 - Multiple CTAs in one email
 - Feature lists without benefits
 - Vague claims ("leading", "innovative", "best")
@@ -275,6 +284,7 @@ Anant
 - Pricing in cold emails
 
 ### Never End With:
+
 - "Let me know what you think"
 - "Looking forward to hearing from you"
 - "Feel free to reach out"

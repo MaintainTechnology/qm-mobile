@@ -3,7 +3,7 @@
   "aliases": ["sirolimus", "Rapamune"],
   "category": "small_molecule",
   "primary_pathways": ["axis-1-nutrient-sensing/mtor-signaling"],
-  
+
   "dosing_protocols": [
     {
       "protocol_id": "longevity-weekly-5mg",
@@ -67,7 +67,7 @@
       "confidence": "high"
     }
   ],
-  
+
   "mechanism_claims": [
     {
       "claim_id": "rapa_mtorc1_001",
@@ -125,14 +125,14 @@
       "confidence": "low"
     }
   ],
-  
+
   "regulatory_status": {
     "fda": "Approved for transplant rejection prophylaxis; off-label for longevity",
     "wada": "Not prohibited",
     "dea": "Not scheduled",
     "notes": "Prescription required. Off-label longevity use not FDA-endorsed."
   },
-  
+
   "contraindications": [
     "Active infection",
     "Wound healing (peri-surgical period)",
@@ -140,7 +140,7 @@
     "Hypersensitivity to rapamycin/sirolimus",
     "Severe hepatic impairment"
   ],
-  
+
   "monitoring": [
     "Complete blood count (monitor for cytopenias)",
     "Lipid panel (rapamycin can elevate cholesterol/triglycerides)",
@@ -149,7 +149,7 @@
     "Liver function tests",
     "Drug levels if using for transplant"
   ],
-  
+
   "interactions": [
     {
       "interacting_with": "CYP3A4 inhibitors",
@@ -164,7 +164,7 @@
       "recommendation": "Avoid grapefruit consumption"
     }
   ],
-  
+
   "conflicts": [
     {
       "conflict_id": "conflict_rapa_dose_longevity_001",
@@ -229,7 +229,7 @@
       "created_at": "2025-01-16T14:30:00Z"
     }
   ],
-  
+
   "created_at": "2025-01-15T10:00:00Z",
   "updated_at": "2025-01-16T14:30:00Z"
 }

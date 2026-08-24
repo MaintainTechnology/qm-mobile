@@ -7,6 +7,7 @@ Companies and individuals that NGM advises or has business relationships with. C
 ## Advisory Clients
 
 ### Superpower
+
 - **Relationship:** NGM advises Superpower
 - **Content guidance:**
   - Do NOT use Superpower as a negative example or "cautionary tale"
@@ -34,6 +35,7 @@ When creating content that mentions competitors or market players:
 ## Adding New Relationships
 
 When informed of a new advisory relationship:
+
 1. Add the company to this file with guidance
 2. Search existing content for potential issues
 3. Update any published content that conflicts

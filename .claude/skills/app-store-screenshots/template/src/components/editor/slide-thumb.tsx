@@ -1,14 +1,14 @@
-"use client";
-import * as React from "react";
-import { useSortable } from "@dnd-kit/sortable";
-import { CSS } from "@dnd-kit/utilities";
-import { Copy, GripVertical, Trash2 } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { LAYOUT_LABEL } from "@/lib/constants";
-import { pickText } from "@/lib/locale";
-import type { Device, Orientation, Slide, Theme } from "@/lib/types";
-import { cn } from "@/lib/utils";
-import { DeckCanvas, SlideCanvas, getCanvas } from "./slide-canvas";
+'use client';
+import * as React from 'react';
+import { useSortable } from '@dnd-kit/sortable';
+import { CSS } from '@dnd-kit/utilities';
+import { Copy, GripVertical, Trash2 } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { LAYOUT_LABEL } from '@/lib/constants';
+import { pickText } from '@/lib/locale';
+import type { Device, Orientation, Slide, Theme } from '@/lib/types';
+import { cn } from '@/lib/utils';
+import { DeckCanvas, SlideCanvas, getCanvas } from './slide-canvas';
 
 type Props = {
   slide: Slide;
@@ -57,7 +57,9 @@ export function SlideThumb({
   const tileH = Math.max(34, Math.min(120, Math.round(THUMB_W / aspect)));
   const scale = THUMB_W / cW;
   const start = connectedCanvas ? Math.max(0, index - 1) : index;
-  const visibleSlides = connectedCanvas ? slides.slice(start, Math.min(slides.length, index + 2)) : [slide];
+  const visibleSlides = connectedCanvas
+    ? slides.slice(start, Math.min(slides.length, index + 2))
+    : [slide];
   const localIndex = index - start;
 
   const style: React.CSSProperties = {
@@ -71,8 +73,8 @@ export function SlideThumb({
       ref={setNodeRef}
       style={style}
       className={cn(
-        "group relative flex items-stretch gap-2 rounded-lg border bg-card p-1.5 transition-all hover:border-foreground/30 hover:bg-accent",
-        active && "border-primary ring-1 ring-primary",
+        'group relative flex items-stretch gap-2 rounded-lg border bg-card p-1.5 transition-all hover:border-foreground/30 hover:bg-accent',
+        active && 'border-primary ring-1 ring-primary',
       )}
     >
       <button
@@ -99,12 +101,12 @@ export function SlideThumb({
             style={{
               width: cW * visibleSlides.length,
               height: cH,
-              position: "absolute",
+              position: 'absolute',
               top: 0,
               left: -localIndex * cW * scale,
-              transformOrigin: "top left",
+              transformOrigin: 'top left',
               transform: `scale(${scale})`,
-              pointerEvents: "none",
+              pointerEvents: 'none',
             }}
           >
             {connectedCanvas ? (
@@ -138,7 +140,7 @@ export function SlideThumb({
             {`Screen ${index + 1} · ${LAYOUT_LABEL[slide.layout]}`}
           </span>
           <span className="truncate text-sm font-medium leading-tight">
-            {headline.split("\n")[0] || (
+            {headline.split('\n')[0] || (
               <em className="font-normal text-muted-foreground">Untitled</em>
             )}
           </span>

@@ -73,17 +73,17 @@ Use TanStack Start server routes for browser-safe API proxies such as
 
 ```ts
 // app/src/routes/api/user.ts
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/api/user')({
   server: {
     handlers: {
       GET: async () => {
-        return Response.json({ ok: true })
+        return Response.json({ ok: true });
       },
     },
   },
-})
+});
 ```
 
 Server routes are part of the same Worker. Do not add Hono/Express or a second
@@ -123,36 +123,36 @@ For uploads, use an app-local multipart route:
 
 ```ts
 // app/src/routes/api/media/upload.ts
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/api/media/upload')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const form = await request.formData()
-        const file = form.get('file')
+        const form = await request.formData();
+        const file = form.get('file');
         if (!(file instanceof File)) {
-          return Response.json({ ok: false, code: 'missing_file' }, { status: 400 })
+          return Response.json({ ok: false, code: 'missing_file' }, { status: 400 });
         }
 
-        const bytes = new Uint8Array(await file.arrayBuffer())
+        const bytes = new Uint8Array(await file.arrayBuffer());
         return Response.json({
           ok: true,
           contentType: file.type,
           size: bytes.byteLength,
-        })
+        });
       },
     },
   },
-})
+});
 ```
 
 Client code must use `FormData` and must not set the `content-type` header:
 
 ```ts
-const form = new FormData()
-form.append('file', file)
-await fetch('/api/media/upload', { method: 'POST', body: form })
+const form = new FormData();
+form.append('file', file);
+await fetch('/api/media/upload', { method: 'POST', body: form });
 ```
 
 For generation flows, upload first and return a small media reference/id. The
@@ -164,18 +164,18 @@ a generation proxy route must expose `POST`, not only `GET`:
 
 ```ts
 // app/src/routes/api/generate.ts
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/api/generate')({
   server: {
     handlers: {
       POST: async ({ request }) => {
-        const body = await request.json()
-        return Response.json({ ok: true, body })
+        const body = await request.json();
+        return Response.json({ ok: true, body });
       },
     },
   },
-})
+});
 ```
 
 If a generated website shows `Method Not Allowed`, first check whether the browser is

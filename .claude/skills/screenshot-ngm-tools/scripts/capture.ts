@@ -147,7 +147,9 @@ async function main() {
   if (cfg.kind === 'chat' && input) {
     const needle = input.slice(0, 50);
     await page
-      .waitForFunction((n) => (document.body.innerText || '').includes(n), needle, { timeout: 60_000 })
+      .waitForFunction(n => (document.body.innerText || '').includes(n), needle, {
+        timeout: 60_000,
+      })
       .catch(() => {
         throw new Error(
           `The submitted question never appeared on screen within 60s:\n  "${needle}…"\n` +
@@ -184,13 +186,18 @@ async function main() {
     const body = cfg.shotFrame
       ? page.frameLocator(cfg.shotFrame).locator('body')
       : page.locator('body');
-    const structure = await body.evaluate((el) =>
+    const structure = await body.evaluate(el =>
       Array.from(
-        el.querySelectorAll('h1, h2, h3, figure, section, div.figure, [class*="slide"], [class*="Slide"]'),
+        el.querySelectorAll(
+          'h1, h2, h3, figure, section, div.figure, [class*="slide"], [class*="Slide"]',
+        ),
       )
-        .map((n) => {
+        .map(n => {
           const r = n.getBoundingClientRect();
-          const cls = String((n as HTMLElement).className || '').trim().split(/\s+/).filter(Boolean);
+          const cls = String((n as HTMLElement).className || '')
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
           return {
             w: Math.round(r.width),
             h: Math.round(r.height),
@@ -199,12 +206,17 @@ async function main() {
           };
         })
         // Anything smaller than this is a label, not a capturable figure.
-        .filter((n) => n.w > 200 && n.h > 100)
-        .map((n) => `${String(n.w).padStart(5)}x${String(n.h).padEnd(5)}  ${n.sel}\n            ${n.text}`),
+        .filter(n => n.w > 200 && n.h > 100)
+        .map(
+          n =>
+            `${String(n.w).padStart(5)}x${String(n.h).padEnd(5)}  ${n.sel}\n            ${n.text}`,
+        ),
     );
     console.log(`\n  Capturable blocks in ${cfg.shotFrame ?? routePath} (${structure.length}):\n`);
     for (const line of structure) console.log(`    ${line}`);
-    console.log(`\n  Anchor \`shots\` in tools.config.ts on the TEXT above, not the class names.\n`);
+    console.log(
+      `\n  Anchor \`shots\` in tools.config.ts on the TEXT above, not the class names.\n`,
+    );
     await browser.close();
     return;
   }
@@ -226,7 +238,9 @@ async function main() {
       // Re-run per slide: React re-renders the deck on navigation, so chrome hidden once on
       // slide 1 can come back on slide 2.
       if (cfg.beforeCapture) await cfg.beforeCapture(page);
-      await target.screenshot({ path: path.join(dir, `${input}-slide-${String(i).padStart(2, '0')}.png`) });
+      await target.screenshot({
+        path: path.join(dir, `${input}-slide-${String(i).padStart(2, '0')}.png`),
+      });
       saved++;
 
       if (await nextBtn.isDisabled().catch(() => true)) break;
@@ -236,15 +250,24 @@ async function main() {
       // also means the end of the deck, which covers a Next button that never disables.
       let changed = false;
       for (let t = 0; t < 25; t++) {
-        const now = (await slide(page).innerText().catch(() => '')).trim();
-        if (now && now !== before) { changed = true; break; }
+        const now = (
+          await slide(page)
+            .innerText()
+            .catch(() => '')
+        ).trim();
+        if (now && now !== before) {
+          changed = true;
+          break;
+        }
         await page.waitForTimeout(200);
       }
       if (!changed) break;
     }
 
     console.log(`\n✓ ${saved} slides → ${dir}`);
-    console.log(`  Pick the best, then copy them into src/assets/curriculum/ under the canonical names.`);
+    console.log(
+      `  Pick the best, then copy them into src/assets/curriculum/ under the canonical names.`,
+    );
     if (!saved) throw new Error('no slides captured — nothing saved.');
     await browser.close();
     return;
@@ -294,12 +317,18 @@ async function main() {
     const box = await target.boundingBox();
     if (!box) throw new Error('captureLocator has no bounding box — nothing to clip.');
     const available = await page.evaluate(
-      (top) => Math.max(0, document.documentElement.scrollHeight - top),
+      top => Math.max(0, document.documentElement.scrollHeight - top),
       box.y,
     );
     const height = Math.min(cfg.clipHeight, available);
-    if (height < 40) throw new Error(`only ${Math.round(height)}px paintable below the anchor — nothing worth capturing.`);
-    await page.screenshot({ path: outPath, clip: { x: box.x, y: box.y, width: box.width, height } });
+    if (height < 40)
+      throw new Error(
+        `only ${Math.round(height)}px paintable below the anchor — nothing worth capturing.`,
+      );
+    await page.screenshot({
+      path: outPath,
+      clip: { x: box.x, y: box.y, width: box.width, height },
+    });
   } else if (target) {
     await target.screenshot({ path: outPath });
   } else {
@@ -310,7 +339,7 @@ async function main() {
   await browser.close();
 }
 
-main().catch((e) => {
+main().catch(e => {
   console.error(`✗ ${e?.message ?? e}`);
   process.exit(1);
 });

@@ -7,6 +7,7 @@
 ## Pipeline Controller
 
 ### Agents Orchestrator — Full Pipeline
+
 ```
 You are the Agents Orchestrator executing the NEXUS pipeline for [PROJECT NAME].
 
@@ -34,6 +35,7 @@ Available agents: See strategy/nexus-strategy.md Section 10 for full coordinatio
 ```
 
 ### Agents Orchestrator — Dev↔QA Loop
+
 ```
 You are the Agents Orchestrator managing the Dev↔QA loop for [PROJECT NAME].
 
@@ -63,6 +65,7 @@ Track and report:
 ## Engineering Division
 
 ### Frontend Developer
+
 ```
 You are Frontend Developer working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -88,6 +91,7 @@ Do NOT add features beyond the acceptance criteria.
 ```
 
 ### Backend Architect
+
 ```
 You are Backend Architect working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -114,6 +118,7 @@ Security is non-negotiable — implement defense in depth.
 ```
 
 ### AI Engineer
+
 ```
 You are AI Engineer working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -139,6 +144,7 @@ AI ethics and safety are mandatory — no shortcuts.
 ```
 
 ### DevOps Automator
+
 ```
 You are DevOps Automator working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -162,6 +168,7 @@ Reliability is the priority — 99.9% uptime target.
 ```
 
 ### Rapid Prototyper
+
 ```
 You are Rapid Prototyper working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -189,6 +196,7 @@ Build only what's needed to test the hypothesis.
 ## Design Division
 
 ### UX Architect
+
 ```
 You are UX Architect working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -216,6 +224,7 @@ Requirements:
 ```
 
 ### Brand Guardian
+
 ```
 You are Brand Guardian working within the NEXUS pipeline for [PROJECT NAME].
 
@@ -246,6 +255,7 @@ Requirements:
 ## Testing Division
 
 ### Evidence Collector — Task QA
+
 ```
 You are Evidence Collector performing QA within the NEXUS Dev↔QA loop.
 
@@ -277,6 +287,7 @@ Use the NEXUS QA Feedback Loop Protocol format.
 ```
 
 ### Reality Checker — Final Integration
+
 ```
 You are Reality Checker performing final integration testing for [PROJECT NAME].
 
@@ -304,6 +315,7 @@ Remember:
 ```
 
 ### API Tester
+
 ```
 You are API Tester validating endpoints within the NEXUS pipeline.
 
@@ -329,6 +341,7 @@ Include: curl commands for reproducibility
 ## Product Division
 
 ### Sprint Prioritizer
+
 ```
 You are Sprint Prioritizer planning the next sprint for [PROJECT NAME].
 
@@ -358,6 +371,7 @@ Rules:
 ## Support Division
 
 ### Executive Summary Generator
+
 ```
 You are Executive Summary Generator creating a [MILESTONE/PERIOD] summary for [PROJECT NAME].
 
@@ -387,15 +401,15 @@ No assumptions beyond provided data
 
 ## Quick Reference: Which Prompt for Which Situation
 
-| Situation | Primary Prompt | Support Prompts |
-|-----------|---------------|-----------------|
-| Starting a new project | Orchestrator — Full Pipeline | — |
-| Building a feature | Orchestrator — Dev↔QA Loop | Developer + Evidence Collector |
-| Fixing a bug | Backend/Frontend Developer | API Tester or Evidence Collector |
-| Running a campaign | Content Creator | Social Media Strategist + platform agents |
-| Preparing for launch | See Phase 5 Playbook | All marketing + DevOps agents |
-| Monthly reporting | Executive Summary Generator | Analytics Reporter + Finance Tracker |
-| Incident response | Infrastructure Maintainer | DevOps Automator + relevant developer |
-| Market research | Trend Researcher | Analytics Reporter |
-| Compliance audit | Legal Compliance Checker | Executive Summary Generator |
-| Performance issue | Performance Benchmarker | Infrastructure Maintainer |
+| Situation              | Primary Prompt               | Support Prompts                           |
+| ---------------------- | ---------------------------- | ----------------------------------------- |
+| Starting a new project | Orchestrator — Full Pipeline | —                                         |
+| Building a feature     | Orchestrator — Dev↔QA Loop   | Developer + Evidence Collector            |
+| Fixing a bug           | Backend/Frontend Developer   | API Tester or Evidence Collector          |
+| Running a campaign     | Content Creator              | Social Media Strategist + platform agents |
+| Preparing for launch   | See Phase 5 Playbook         | All marketing + DevOps agents             |
+| Monthly reporting      | Executive Summary Generator  | Analytics Reporter + Finance Tracker      |
+| Incident response      | Infrastructure Maintainer    | DevOps Automator + relevant developer     |
+| Market research        | Trend Researcher             | Analytics Reporter                        |
+| Compliance audit       | Legal Compliance Checker     | Executive Summary Generator               |
+| Performance issue      | Performance Benchmarker      | Infrastructure Maintainer                 |

@@ -7,6 +7,7 @@ Detailed reference for implementing responsive, mobile-first designs.
 Always start with mobile design, then progressively enhance for larger screens.
 
 **Why Mobile-First:**
+
 - Forces focus on essential content
 - Easier to scale up than scale down
 - Better performance on mobile devices
@@ -21,30 +22,35 @@ Always start with mobile design, then progressively enhance for larger screens.
 /* Base styles: 0-640px (mobile) */
 
 /* Small tablets and large phones */
-@media (min-width: 640px) { }
+@media (min-width: 640px) {
+}
 
 /* Tablets */
-@media (min-width: 768px) { }
+@media (min-width: 768px) {
+}
 
 /* Small laptops */
-@media (min-width: 1024px) { }
+@media (min-width: 1024px) {
+}
 
 /* Desktops */
-@media (min-width: 1280px) { }
+@media (min-width: 1280px) {
+}
 
 /* Large desktops */
-@media (min-width: 1536px) { }
+@media (min-width: 1536px) {
+}
 ```
 
 ### Specific Breakpoint Ranges
 
-| Range | Pixels | Target Devices | Layout Strategy |
-|-------|--------|----------------|-----------------|
-| **XS** | 0-479px | Small phones (iPhone SE, older Android) | Single column, stacked navigation, large touch targets (min 44px) |
-| **SM** | 480-767px | Large phones (iPhone 14, most modern phones) | Single column, simplified UI, bottom navigation, reduced complexity |
-| **MD** | 768-1023px | Tablets (iPad, Android tablets) | 2 columns possible, sidebar navigation, some desktop features |
-| **LG** | 1024-1439px | Small laptops, landscape tablets | Multi-column layouts, full navigation, desktop UI patterns |
-| **XL** | 1440px+ | Desktop monitors, large screens | Max-width containers, multi-panel layouts, advanced features visible |
+| Range  | Pixels      | Target Devices                               | Layout Strategy                                                      |
+| ------ | ----------- | -------------------------------------------- | -------------------------------------------------------------------- |
+| **XS** | 0-479px     | Small phones (iPhone SE, older Android)      | Single column, stacked navigation, large touch targets (min 44px)    |
+| **SM** | 480-767px   | Large phones (iPhone 14, most modern phones) | Single column, simplified UI, bottom navigation, reduced complexity  |
+| **MD** | 768-1023px  | Tablets (iPad, Android tablets)              | 2 columns possible, sidebar navigation, some desktop features        |
+| **LG** | 1024-1439px | Small laptops, landscape tablets             | Multi-column layouts, full navigation, desktop UI patterns           |
+| **XL** | 1440px+     | Desktop monitors, large screens              | Max-width containers, multi-panel layouts, advanced features visible |
 
 **Mobile Simplification Examples:**
 
@@ -59,12 +65,14 @@ Always start with mobile design, then progressively enhance for larger screens.
 ### Tailwind Responsive Classes
 
 ```tsx
-<div className="
+<div
+  className="
   w-full          // mobile: full width
   sm:w-1/2        // small: half width
   md:w-1/3        // medium: third width
   lg:w-1/4        // large: quarter width
-">
+"
+>
   Responsive width
 </div>
 ```
@@ -103,7 +111,7 @@ import Image from 'next/image';
   height={600}
   priority // for above-the-fold images
   className="w-full h-auto"
-/>
+/>;
 ```
 
 ## Responsive Typography
@@ -111,12 +119,14 @@ import Image from 'next/image';
 ### Fluid Typography with Tailwind
 
 ```tsx
-<h1 className="
+<h1
+  className="
   text-3xl      // mobile: 30px
   sm:text-4xl   // small: 36px
   md:text-5xl   // medium: 48px
   lg:text-6xl   // large: 60px
-">
+"
+>
   Responsive Headline
 </h1>
 ```
@@ -142,14 +152,16 @@ p {
 ### CSS Grid Responsive Pattern
 
 ```tsx
-<div className="
+<div
+  className="
   grid
   grid-cols-1        // mobile: 1 column
   sm:grid-cols-2     // small: 2 columns
   md:grid-cols-3     // medium: 3 columns
   lg:grid-cols-4     // large: 4 columns
   gap-4              // consistent gap
-">
+"
+>
   {items.map(item => (
     <Card key={item.id}>{item.content}</Card>
   ))}
@@ -159,13 +171,15 @@ p {
 ### Flexbox Responsive Pattern
 
 ```tsx
-<div className="
+<div
+  className="
   flex
   flex-col           // mobile: stack vertically
   md:flex-row        // medium+: horizontal layout
   gap-6
   items-center
-">
+"
+>
   <div className="w-full md:w-1/2">Content Left</div>
   <div className="w-full md:w-1/2">Content Right</div>
 </div>
@@ -177,13 +191,15 @@ p {
 
 ```tsx
 // Minimum 44x44px touch targets
-<button className="
+<button
+  className="
   min-w-[44px]
   min-h-[44px]
   px-4 py-2
   rounded-lg
   touch-manipulation // prevents 300ms tap delay
-">
+"
+>
   Tap Me
 </button>
 ```
@@ -192,12 +208,14 @@ p {
 
 ```tsx
 // Consider common mobile gestures
-<div className="
+<div
+  className="
   overflow-x-auto    // horizontal scroll
   snap-x             // snap scrolling
   snap-mandatory
   overscroll-contain // prevent bounce on mobile
-">
+"
+>
   {/* Scrollable content */}
 </div>
 ```
@@ -216,30 +234,24 @@ export function MobileNav() {
   return (
     <>
       {/* Mobile menu button */}
-      <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="md:hidden p-2"
-        aria-label="Toggle menu"
-      >
+      <button onClick={() => setIsOpen(!isOpen)} className="md:hidden p-2" aria-label="Toggle menu">
         {isOpen ? <X size={24} /> : <List size={24} />}
       </button>
 
       {/* Mobile menu overlay */}
       {isOpen && (
-        <div className="
+        <div
+          className="
           fixed inset-0 z-50 bg-white
           md:hidden
-        ">
-          <nav className="p-6 space-y-4">
-            {/* Navigation items */}
-          </nav>
+        "
+        >
+          <nav className="p-6 space-y-4">{/* Navigation items */}</nav>
         </div>
       )}
 
       {/* Desktop navigation */}
-      <nav className="hidden md:flex gap-6">
-        {/* Navigation items */}
-      </nav>
+      <nav className="hidden md:flex gap-6">{/* Navigation items */}</nav>
     </>
   );
 }
@@ -248,15 +260,15 @@ export function MobileNav() {
 ### Sticky Navigation
 
 ```tsx
-<header className="
+<header
+  className="
   sticky top-0 z-40
   bg-white/80
   backdrop-blur-md
   border-b border-slate-200
-">
-  <nav className="container mx-auto px-4 py-4">
-    {/* Navigation content */}
-  </nav>
+"
+>
+  <nav className="container mx-auto px-4 py-4">{/* Navigation content */}</nav>
 </header>
 ```
 
@@ -267,12 +279,14 @@ export function MobileNav() {
 ```tsx
 <form className="space-y-6">
   {/* Full width on mobile, side-by-side on desktop */}
-  <div className="
+  <div
+    className="
     grid
     grid-cols-1
     md:grid-cols-2
     gap-4
-  ">
+  "
+  >
     <div>
       <label htmlFor="firstName" className="block text-sm font-medium mb-1">
         First Name
@@ -350,19 +364,13 @@ export function MobileNav() {
 ```tsx
 <div>
   {/* Show only on mobile */}
-  <div className="block md:hidden">
-    Mobile content
-  </div>
+  <div className="block md:hidden">Mobile content</div>
 
   {/* Show only on tablet and up */}
-  <div className="hidden md:block">
-    Desktop content
-  </div>
+  <div className="hidden md:block">Desktop content</div>
 
   {/* Show only on desktop */}
-  <div className="hidden lg:block">
-    Large screen content
-  </div>
+  <div className="hidden lg:block">Large screen content</div>
 </div>
 ```
 
@@ -371,12 +379,7 @@ export function MobileNav() {
 ### Lazy Loading Images
 
 ```tsx
-<img
-  src="image.jpg"
-  alt="Description"
-  loading="lazy"
-  className="w-full h-auto"
-/>
+<img src="image.jpg" alt="Description" loading="lazy" className="w-full h-auto" />
 ```
 
 ### Responsive Video
@@ -411,6 +414,7 @@ export function MobileNav() {
 ### Real Device Testing
 
 **Essential devices to test:**
+
 - Small phone (iPhone SE, Android small)
 - Large phone (iPhone Pro Max, Android large)
 - Tablet (iPad, Android tablet)
@@ -435,7 +439,8 @@ await page.screenshot({ path: 'desktop.png' });
 ### Card Grid
 
 ```tsx
-<div className="
+<div
+  className="
   grid
   grid-cols-1
   sm:grid-cols-2
@@ -443,7 +448,8 @@ await page.screenshot({ path: 'desktop.png' });
   xl:grid-cols-4
   gap-6
   p-4
-">
+"
+>
   {items.map(item => (
     <article
       key={item.id}
@@ -456,12 +462,7 @@ await page.screenshot({ path: 'desktop.png' });
         transition-shadow
       "
     >
-      <img
-        src={item.image}
-        alt={item.title}
-        className="w-full h-48 object-cover"
-        loading="lazy"
-      />
+      <img src={item.image} alt={item.title} className="w-full h-48 object-cover" loading="lazy" />
       <div className="p-4">
         <h3 className="text-lg font-semibold mb-2">{item.title}</h3>
         <p className="text-slate-600">{item.description}</p>
@@ -474,68 +475,80 @@ await page.screenshot({ path: 'desktop.png' });
 ### Hero Section
 
 ```tsx
-<section className="
+<section
+  className="
   relative
   min-h-screen
   flex items-center
   px-4 sm:px-6 lg:px-8
-">
-  <div className="
+"
+>
+  <div
+    className="
     max-w-7xl mx-auto w-full
     grid grid-cols-1 lg:grid-cols-2
     gap-12
     items-center
-  ">
+  "
+  >
     <div className="space-y-6">
-      <h1 className="
+      <h1
+        className="
         text-4xl sm:text-5xl lg:text-6xl
         font-bold
         tracking-tight
-      ">
+      "
+      >
         Your Headline Here
       </h1>
-      <p className="
+      <p
+        className="
         text-lg sm:text-xl
         text-slate-600
         max-w-2xl
-      ">
+      "
+      >
         Supporting description that works across all screen sizes.
       </p>
-      <div className="
+      <div
+        className="
         flex flex-col sm:flex-row
         gap-4
-      ">
-        <button className="
+      "
+      >
+        <button
+          className="
           px-8 py-3
           bg-blue-600 text-white
           rounded-lg
           hover:bg-blue-700
           transition-colors
-        ">
+        "
+        >
           Primary Action
         </button>
-        <button className="
+        <button
+          className="
           px-8 py-3
           border-2 border-slate-300
           rounded-lg
           hover:border-slate-400
           transition-colors
-        ">
+        "
+        >
           Secondary Action
         </button>
       </div>
     </div>
-    <div className="
+    <div
+      className="
       relative
       aspect-square
       rounded-2xl
       overflow-hidden
-    ">
-      <img
-        src="hero-image.jpg"
-        alt="Hero"
-        className="w-full h-full object-cover"
-      />
+    "
+    >
+      <img src="hero-image.jpg" alt="Hero" className="w-full h-full object-cover" />
     </div>
   </div>
 </section>
@@ -582,6 +595,7 @@ await page.screenshot({ path: 'desktop.png' });
 ## Best Practices Summary
 
 ✅ **Do:**
+
 - Start with mobile design first
 - Use relative units (rem, em, %) for flexibility
 - Test on real devices, not just emulators
@@ -593,6 +607,7 @@ await page.screenshot({ path: 'desktop.png' });
 - Provide adequate spacing between interactive elements
 
 ❌ **Don't:**
+
 - Design for desktop first and scale down
 - Use fixed pixel widths for layout containers
 - Rely solely on browser DevTools for testing

@@ -46,18 +46,19 @@ immediately. No meeting, no discussion, no "let's give it another week."
 Enforcement mechanism: Automate where possible. For conditions that cannot be automated,
 the Kill Criteria Owner checks daily during the evaluation window.
 
-| # | Trigger | Detection Method | Auto-Kill? |
-|---|---------|-----------------|------------|
-| H1 | Security breach traced to this component | Security monitoring / incident report | YES — immediate rollback |
-| H2 | Production incident P1/P0 caused by this component | Incident management system | YES — immediate rollback |
-| H3 | Cost exceeds [BUDGET_CAP * 1.5] on any single day | Billing alerts | YES — auto-disable |
-| H4 | Zero usage for [30] consecutive days | Usage monitoring dashboard | YES — auto-decommission |
-| H5 | Sole maintainer departs and no volunteer within [14] days | HR / team notification | Kill Criteria Owner enforces |
-| H6 | [Project-specific catastrophic condition] | [Detection method] | [Yes/No] |
+| #   | Trigger                                                   | Detection Method                      | Auto-Kill?                   |
+| --- | --------------------------------------------------------- | ------------------------------------- | ---------------------------- |
+| H1  | Security breach traced to this component                  | Security monitoring / incident report | YES — immediate rollback     |
+| H2  | Production incident P1/P0 caused by this component        | Incident management system            | YES — immediate rollback     |
+| H3  | Cost exceeds [BUDGET_CAP * 1.5] on any single day         | Billing alerts                        | YES — auto-disable           |
+| H4  | Zero usage for [30] consecutive days                      | Usage monitoring dashboard            | YES — auto-decommission      |
+| H5  | Sole maintainer departs and no volunteer within [14] days | HR / team notification                | Kill Criteria Owner enforces |
+| H6  | [Project-specific catastrophic condition]                 | [Detection method]                    | [Yes/No]                     |
 
 ### Implementation Requirements for Hard Kills
 
 For each auto-kill trigger, implement:
+
 - **Alert**: Fires when condition approaches threshold (80% of limit)
 - **Kill switch**: Automated mechanism to disable the component
 - **Rollback plan**: Tested procedure to revert to the previous state
@@ -72,15 +73,15 @@ These must exist before the feature ships. If they do not exist, the feature doe
 These force a mandatory review meeting within 48 hours of being triggered. The default
 outcome of the review is KILL. The team must argue for continuation, not against shutdown.
 
-| # | Trigger | Threshold | Review Default |
-|---|---------|-----------|---------------|
-| R1 | Success metric below threshold | [METRIC] < [THRESHOLD] for [14] consecutive days | Kill |
-| R2 | Maintenance cost exceeds value | > [X] eng-hours/month on unplanned work | Kill |
-| R3 | Consecutive sprints with unplanned work | [3] sprints in a row | Kill |
-| R4 | Dependency CVE | CVSS >= 7.0 in any dependency introduced by this component | Kill unless patched in 72h |
-| R5 | Team velocity impact | Measurable velocity decrease > [15%] since introduction | Kill |
-| R6 | Onboarding friction | New team member cannot make a meaningful change within [1 day] | Simplify or kill |
-| R7 | [Project-specific degradation signal] | [Threshold] | Kill |
+| #   | Trigger                                 | Threshold                                                      | Review Default             |
+| --- | --------------------------------------- | -------------------------------------------------------------- | -------------------------- |
+| R1  | Success metric below threshold          | [METRIC] < [THRESHOLD] for [14] consecutive days               | Kill                       |
+| R2  | Maintenance cost exceeds value          | > [X] eng-hours/month on unplanned work                        | Kill                       |
+| R3  | Consecutive sprints with unplanned work | [3] sprints in a row                                           | Kill                       |
+| R4  | Dependency CVE                          | CVSS >= 7.0 in any dependency introduced by this component     | Kill unless patched in 72h |
+| R5  | Team velocity impact                    | Measurable velocity decrease > [15%] since introduction        | Kill                       |
+| R6  | Onboarding friction                     | New team member cannot make a meaningful change within [1 day] | Simplify or kill           |
+| R7  | [Project-specific degradation signal]   | [Threshold]                                                    | Kill                       |
 
 ### Review Meeting Protocol
 
@@ -101,20 +102,21 @@ These define success. The feature must meet ALL of these within the evaluation w
 to earn the right to continue existing. Failure to meet any one criterion triggers a
 Tier 2 review with default-to-kill.
 
-| # | Criterion | Target | Measurement | Window |
-|---|-----------|--------|-------------|--------|
-| S1 | Primary success metric | >= [TARGET] for 7 consecutive days | [Dashboard/query] | [30] days |
-| S2 | Latency / performance | P95 <= [X ms] for 7 consecutive days | APM monitoring | [30] days |
-| S3 | Security | Zero incidents attributable to component | Security monitoring | [30] days |
-| S4 | Cost | Under [BUDGET_CAP] for 7 consecutive days | Billing dashboard | [30] days |
-| S5 | Bus factor | >= 2 people can independently modify and deploy | Demonstrated (not claimed) | [30] days |
-| S6 | Documentation | Exists, validated by non-author, covers ops runbook | Reviewed artifact | [30] days |
-| S7 | Dependency health | All deps maintained, no known vulns, upgrade path clear | Audit | [30] days |
-| S8 | [Project-specific value criterion] | [Target] | [Measurement] | [Window] |
+| #   | Criterion                          | Target                                                  | Measurement                | Window    |
+| --- | ---------------------------------- | ------------------------------------------------------- | -------------------------- | --------- |
+| S1  | Primary success metric             | >= [TARGET] for 7 consecutive days                      | [Dashboard/query]          | [30] days |
+| S2  | Latency / performance              | P95 <= [X ms] for 7 consecutive days                    | APM monitoring             | [30] days |
+| S3  | Security                           | Zero incidents attributable to component                | Security monitoring        | [30] days |
+| S4  | Cost                               | Under [BUDGET_CAP] for 7 consecutive days               | Billing dashboard          | [30] days |
+| S5  | Bus factor                         | >= 2 people can independently modify and deploy         | Demonstrated (not claimed) | [30] days |
+| S6  | Documentation                      | Exists, validated by non-author, covers ops runbook     | Reviewed artifact          | [30] days |
+| S7  | Dependency health                  | All deps maintained, no known vulns, upgrade path clear | Audit                      | [30] days |
+| S8  | [Project-specific value criterion] | [Target]                                                | [Measurement]              | [Window]  |
 
 ### Soft-Go Graduation
 
 When all Soft-Go criteria are met for the full evaluation window:
+
 1. The component graduates to "established" status
 2. Hard kill triggers (Tier 1) remain permanently active
 3. Review triggers (Tier 2) shift to quarterly cadence instead of continuous
@@ -127,15 +129,15 @@ When all Soft-Go criteria are met for the full evaluation window:
 These criteria specifically target vanity engineering recurrence. Include at least 3
 in every kill criteria framework:
 
-| # | Criterion | What It Catches |
-|---|-----------|----------------|
-| A1 | No abstraction may be added without 2+ concrete consumers | Premature abstraction |
-| A2 | No new dependency without written justification (problem it solves, alternatives considered, maintenance cost accepted) | Framework worship |
-| A3 | Any component not modified in [90] days is flagged for deletion review | Code that exists because nobody deletes things |
-| A4 | Architecture changes require a "what could be simpler?" section in the RFC | Complexity bias |
-| A5 | No technology choice based on "learning opportunity" in production systems | Resume-driven development |
-| A6 | Complexity budget: each feature gets a max file/module count proportional to its user value | Over-decomposition |
-| A7 | The question "could a junior engineer maintain this?" must be answered in every design review | Intellectual self-indulgence |
+| #   | Criterion                                                                                                               | What It Catches                                |
+| --- | ----------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| A1  | No abstraction may be added without 2+ concrete consumers                                                               | Premature abstraction                          |
+| A2  | No new dependency without written justification (problem it solves, alternatives considered, maintenance cost accepted) | Framework worship                              |
+| A3  | Any component not modified in [90] days is flagged for deletion review                                                  | Code that exists because nobody deletes things |
+| A4  | Architecture changes require a "what could be simpler?" section in the RFC                                              | Complexity bias                                |
+| A5  | No technology choice based on "learning opportunity" in production systems                                              | Resume-driven development                      |
+| A6  | Complexity budget: each feature gets a max file/module count proportional to its user value                             | Over-decomposition                             |
+| A7  | The question "could a junior engineer maintain this?" must be answered in every design review                           | Intellectual self-indulgence                   |
 
 ---
 

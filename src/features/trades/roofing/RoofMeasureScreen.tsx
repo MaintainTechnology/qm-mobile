@@ -188,7 +188,11 @@ export function RoofMeasureScreen() {
 
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>STATE</Text>
-          <PillGroup options={AU_STATES.map(s => [s, s] as const)} value={state} onChange={v => setState(v as AuState)} />
+          <PillGroup
+            options={AU_STATES.map(s => [s, s] as const)}
+            value={state}
+            onChange={v => setState(v as AuState)}
+          />
         </View>
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>DEFAULT ROOF MATERIAL</Text>
@@ -267,8 +271,16 @@ export function RoofMeasureScreen() {
             {singleIncluded ? (
               <View style={styles.tierRow}>
                 {singleIncluded.price.tiers.map((t, i) => (
-                  <View key={t.tier} style={[styles.tierTile, { borderColor: colors.inkLine, backgroundColor: colors.inkDeep }]}>
-                    <Text style={[styles.tierLabel, { color: colors.textDim }]}>{TIER_LABELS[i]?.toUpperCase()}</Text>
+                  <View
+                    key={t.tier}
+                    style={[
+                      styles.tierTile,
+                      { borderColor: colors.inkLine, backgroundColor: colors.inkDeep },
+                    ]}
+                  >
+                    <Text style={[styles.tierLabel, { color: colors.textDim }]}>
+                      {TIER_LABELS[i]?.toUpperCase()}
+                    </Text>
                     <Text style={[styles.tierValue, { color: colors.accentText }]}>
                       {formatAud(centsFromApiDollars(t.inc_gst))}
                     </Text>
@@ -291,7 +303,11 @@ export function RoofMeasureScreen() {
               disabled={quote.structures.length === 0}
             />
             {saveRoof.data?.ok === true ? (
-              <Notice tone="accent" label="Saved" body={`Job ${saveRoof.data.id.slice(0, 8)} saved.`} />
+              <Notice
+                tone="accent"
+                label="Saved"
+                body={`Job ${saveRoof.data.id.slice(0, 8)} saved.`}
+              />
             ) : null}
             {saveRoof.data?.ok === false ? (
               <Notice
@@ -302,7 +318,12 @@ export function RoofMeasureScreen() {
               />
             ) : null}
             {saveRoof.isError ? (
-              <Notice tone="danger" label="Could not save" body={apiErrorMessage(saveRoof.error)} onRetry={onSave} />
+              <Notice
+                tone="danger"
+                label="Could not save"
+                body={apiErrorMessage(saveRoof.error)}
+                onRetry={onSave}
+              />
             ) : null}
 
             {singleIncluded && inspectionIncluded.length > 0 ? (
@@ -311,7 +332,9 @@ export function RoofMeasureScreen() {
                 label="Site-visit structure(s) not in this quote"
                 body={`This quote covers ${singleIncluded.label} only. ${inspectionIncluded
                   .map(s => s.label)
-                  .join(', ')} still ${inspectionIncluded.length === 1 ? 'needs' : 'need'} the paid on-site visit — that's a separate quote once it's done.`}
+                  .join(
+                    ', ',
+                  )} still ${inspectionIncluded.length === 1 ? 'needs' : 'need'} the paid on-site visit — that's a separate quote once it's done.`}
               />
             ) : null}
 
@@ -321,24 +344,24 @@ export function RoofMeasureScreen() {
               loading={saveAsQuote.isPending}
               disabled={!singleIncluded}
             />
-            {saveAsQuote.data?.ok === true ? (
-              (() => {
-                const { shareUrl, existing } = saveAsQuote.data;
-                return (
-                  <>
-                    <Notice
-                      tone="accent"
-                      label={existing ? 'Quote already exists' : 'Quote created'}
-                      body={shareUrl}
-                    />
-                    <GhostButton
-                      label="Share quote link"
-                      onPress={() => void Share.share({ message: shareUrl })}
-                    />
-                  </>
-                );
-              })()
-            ) : null}
+            {saveAsQuote.data?.ok === true
+              ? (() => {
+                  const { shareUrl, existing } = saveAsQuote.data;
+                  return (
+                    <>
+                      <Notice
+                        tone="accent"
+                        label={existing ? 'Quote already exists' : 'Quote created'}
+                        body={shareUrl}
+                      />
+                      <GhostButton
+                        label="Share quote link"
+                        onPress={() => void Share.share({ message: shareUrl })}
+                      />
+                    </>
+                  );
+                })()
+              : null}
             {saveAsQuote.isError ? (
               <Notice
                 tone="danger"
@@ -368,7 +391,9 @@ function StructureCard({
   const { colors } = useTheme();
   const inspection = structure.price.routing.decision === 'inspection_required';
   const areaLabel =
-    structure.metrics.sloped_area_m2 != null ? `${Math.round(structure.metrics.sloped_area_m2)} m²` : '—';
+    structure.metrics.sloped_area_m2 != null
+      ? `${Math.round(structure.metrics.sloped_area_m2)} m²`
+      : '—';
 
   return (
     <Card style={[{ gap: 12 }, !included && { opacity: 0.55 }]}>
@@ -386,21 +411,42 @@ function StructureCard({
           <Text style={[styles.structureLabel, { color: colors.textPri }]}>{structure.label}</Text>
         </View>
         <View
-          style={[styles.checkbox, { borderColor: included ? colors.accent : colors.inkLine, backgroundColor: included ? colors.accent : 'transparent' }]}
+          style={[
+            styles.checkbox,
+            {
+              borderColor: included ? colors.accent : colors.inkLine,
+              backgroundColor: included ? colors.accent : 'transparent',
+            },
+          ]}
         >
-          {included ? <Text style={{ color: colors.accentInk, fontFamily: fonts.sans.bold, fontSize: 12 }}>✓</Text> : null}
+          {included ? (
+            <Text style={{ color: colors.accentInk, fontFamily: fonts.sans.bold, fontSize: 12 }}>
+              ✓
+            </Text>
+          ) : null}
         </View>
       </Pressable>
 
       <Text style={[styles.structureArea, { color: colors.textSec }]}>
-        {areaLabel} sloped area · {structure.metrics.form} · {structure.inputs.material.replace(/_/g, ' ')}
+        {areaLabel} sloped area · {structure.metrics.form} ·{' '}
+        {structure.inputs.material.replace(/_/g, ' ')}
       </Text>
 
       <View style={styles.tierRow}>
         {structure.price.tiers.map((t, i) => (
-          <View key={t.tier} style={[styles.tierTile, { borderColor: colors.inkLine, backgroundColor: colors.inkDeep }]}>
-            <Text style={[styles.tierLabel, { color: colors.textDim }]}>{TIER_LABELS[i]?.toUpperCase()}</Text>
-            <Text style={[styles.tierValue, { color: colors.textPri }]}>{formatAud(centsFromApiDollars(t.inc_gst))}</Text>
+          <View
+            key={t.tier}
+            style={[
+              styles.tierTile,
+              { borderColor: colors.inkLine, backgroundColor: colors.inkDeep },
+            ]}
+          >
+            <Text style={[styles.tierLabel, { color: colors.textDim }]}>
+              {TIER_LABELS[i]?.toUpperCase()}
+            </Text>
+            <Text style={[styles.tierValue, { color: colors.textPri }]}>
+              {formatAud(centsFromApiDollars(t.inc_gst))}
+            </Text>
             <Text style={[styles.tierSub, { color: colors.textDim }]}>inc GST</Text>
           </View>
         ))}
@@ -437,10 +483,27 @@ const styles = StyleSheet.create({
   tierTile: { flex: 1, borderWidth: 1, borderRadius: 10, padding: 12, gap: 6 },
   tierLabel: { fontFamily: fonts.sans.semiBold, fontSize: 10, letterSpacing: 0.8 },
   tierValue: { fontFamily: fonts.mono.bold, fontSize: 16, fontVariant: ['tabular-nums'] },
-  tierSub: { fontFamily: fonts.mono.medium, fontSize: 9, letterSpacing: 0.8, textTransform: 'uppercase' },
-  structureHeader: { flexDirection: 'row', alignItems: 'flex-start', gap: 10, minHeight: touch.minimum },
+  tierSub: {
+    fontFamily: fonts.mono.medium,
+    fontSize: 9,
+    letterSpacing: 0.8,
+    textTransform: 'uppercase',
+  },
+  structureHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: 10,
+    minHeight: touch.minimum,
+  },
   structureLabel: { marginTop: 4, fontFamily: fonts.sans.bold, fontSize: 16 },
   structureArea: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
-  checkbox: { width: 26, height: 26, borderRadius: 7, borderWidth: 1, alignItems: 'center', justifyContent: 'center' },
+  checkbox: {
+    width: 26,
+    height: 26,
+    borderRadius: 7,
+    borderWidth: 1,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   calloutNote: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
 });

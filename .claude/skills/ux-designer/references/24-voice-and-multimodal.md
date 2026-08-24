@@ -6,7 +6,7 @@ glance, and switch devices mid-task. This reference treats input modality as a
 first-class design concern—voice, touch, pointer, keyboard, and their combinations—
 across the range of contexts a product runs in (phone, desktop, watch, TV, car).
 
-> This file is about *input modality in general*. For conversational AI chat
+> This file is about _input modality in general_. For conversational AI chat
 > patterns specifically, see [14-ai-ux-patterns.md](14-ai-ux-patterns.md).
 > The two overlap (a voice assistant is often LLM-backed) but the concerns here—
 > discoverability, recognition feedback, modality fallback—apply to any voice or
@@ -23,7 +23,7 @@ other primary input—discoverable, with clear state, confirmation, and error pa
 ### Discoverability
 
 - Don't bury voice behind an unlabeled mic glyph. Surface what it can do—suggested
-  utterances ("Try: *set a timer for 10 minutes*"), an onboarding hint, or visible
+  utterances ("Try: _set a timer for 10 minutes_"), an onboarding hint, or visible
   example commands.
 - Voice's weakness is that **the command space is invisible**. Unlike a menu, users
   can't see their options. Show examples in context and after errors.
@@ -45,14 +45,14 @@ States to make visible:
 ```
 
 - Show **live transcription** of what was heard so the user can catch misrecognition
-  immediately ("I said *Karen* not *Aaron*").
+  immediately ("I said _Karen_ not _Aaron_").
 - Pair audio output with a **visual transcript** of what the system said.
 
 ### Confirmation & error recovery
 
 - **Confirm consequential actions** before executing ("Delete all photos from
   June—are you sure?"), but don't nag for trivial, reversible ones.
-- Always show what was *recognized*, not just what was done, so errors are traceable.
+- Always show what was _recognized_, not just what was done, so errors are traceable.
 - On failure, **offer a path forward**: re-prompt with an example, fall back to a
   visual chooser, or let the user edit the transcribed text—never a dead-end
   "Sorry, I didn't understand."
@@ -91,7 +91,7 @@ States to make visible:
 ```
 
 The result is **multimodal by default**: voice in, but the response is spoken,
-shown as text, *and* leaves behind tappable controls so the user can continue by
+shown as text, _and_ leaves behind tappable controls so the user can continue by
 whichever modality suits the moment.
 
 ### Activation: wake words vs. push-to-talk
@@ -109,16 +109,18 @@ whichever modality suits the moment.
 ```js
 // Web Speech API — surface interim results so users see misrecognition live
 const rec = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
-rec.interimResults = true;     // stream partial transcripts → live feedback
+rec.interimResults = true; // stream partial transcripts → live feedback
 rec.lang = navigator.language; // honor the user's locale (see i18n reference)
 
-rec.onstart  = () => setState('listening');   // show waveform / pulsing mic
-rec.onresult = (e) => {
-  const t = Array.from(e.results).map(r => r[0].transcript).join('');
-  showTranscript(t);                          // user can catch "Aaron" vs "Karen"
+rec.onstart = () => setState('listening'); // show waveform / pulsing mic
+rec.onresult = e => {
+  const t = Array.from(e.results)
+    .map(r => r[0].transcript)
+    .join('');
+  showTranscript(t); // user can catch "Aaron" vs "Karen"
 };
-rec.onerror  = (e) => recoverWithVisualFallback(e.error); // never a dead end
-rec.onend    = () => setState('idle');        // always return to a known state
+rec.onerror = e => recoverWithVisualFallback(e.error); // never a dead end
+rec.onend = () => setState('idle'); // always return to a known state
 ```
 
 ### Privacy is part of voice UX
@@ -173,16 +175,16 @@ users move fluidly between them. The classic example: "put **that** [point] **th
 ### Modality-appropriate design per context
 
 The right primary modality depends on the device and the user's situation. Design
-the *same capability* to suit each.
+the _same capability_ to suit each.
 
-| Context | Constraints | Lean on |
-|---------|-------------|---------|
-| **Phone (on the go)** | One hand, glancing, noisy/quiet | Touch primary; voice for hands-busy |
-| **Desktop** | Keyboard + precise pointer, focused | Keyboard shortcuts, pointer; voice optional |
-| **Watch** | Tiny screen, brief glances | Voice + a few taps; minimal text entry |
-| **TV / 10-foot UI** | Distance, D-pad/remote, no keyboard | Voice search >> on-screen keyboard; large focus targets |
-| **Car** | Eyes/hands occupied, safety-critical | Voice primary; minimal-glance visuals, large touch zones |
-| **Kiosk / public** | Shared, may be loud, privacy concerns | Touch primary; voice often inappropriate |
+| Context               | Constraints                           | Lean on                                                  |
+| --------------------- | ------------------------------------- | -------------------------------------------------------- |
+| **Phone (on the go)** | One hand, glancing, noisy/quiet       | Touch primary; voice for hands-busy                      |
+| **Desktop**           | Keyboard + precise pointer, focused   | Keyboard shortcuts, pointer; voice optional              |
+| **Watch**             | Tiny screen, brief glances            | Voice + a few taps; minimal text entry                   |
+| **TV / 10-foot UI**   | Distance, D-pad/remote, no keyboard   | Voice search >> on-screen keyboard; large focus targets  |
+| **Car**               | Eyes/hands occupied, safety-critical  | Voice primary; minimal-glance visuals, large touch zones |
+| **Kiosk / public**    | Shared, may be loud, privacy concerns | Touch primary; voice often inappropriate                 |
 
 - **"Eyes-free / hands-free" contexts** (driving, cooking) make voice essential and
   visual-only UIs unusable—but a noisy or public context can make voice useless.
@@ -201,11 +203,11 @@ the *same capability* to suit each.
 ## Cross-Device Continuity
 
 Users start a task on one device and finish on another. Continuity is a multimodal
-problem because the *input* changes across devices, not just the layout.
+problem because the _input_ changes across devices, not just the layout.
 
 - **Handoff:** let a task move between devices with state intact (a started form, a
   half-written message, a playback position). Surface "continue on this device".
-- **Responsive *input*, not just responsive *layout*:** a layout that reflows but
+- **Responsive _input_, not just responsive _layout_:** a layout that reflows but
   still assumes hover, precise clicks, or a physical keyboard fails on touch/TV/voice.
   Adapt interactions (tap targets, focus order, voice entry) to the device's modality.
 - **Context preservation:** carry selection, scroll position, undo history, and auth
@@ -222,15 +224,15 @@ Voice and multimodal design overlap heavily with accessibility (see
 exclude others—design for both directions.
 
 - **Voice as an assistive input:** for users with motor or dexterity impairments,
-  voice can be the *primary* way to operate an interface. Voice control
+  voice can be the _primary_ way to operate an interface. Voice control
   (Voice Control, Voice Access) needs every actionable element to be reliably named
   and reachable—the same semantics screen readers need.
-- **Captions and visual alternatives for audio output:** anything the system *says*
+- **Captions and visual alternatives for audio output:** anything the system _says_
   must also be available as text for Deaf and hard-of-hearing users, and for anyone
   in a sound-off context.
 - **Never make voice the only path.** Speech-impaired users, people with strong
   accents, non-native speakers, and those in quiet/public/noisy settings need a
-  non-voice route to the same outcome. Voice is an *addition*, not a replacement.
+  non-voice route to the same outcome. Voice is an _addition_, not a replacement.
 - Visual recognition feedback (live transcript) doubles as an accessibility feature.
 
 ---

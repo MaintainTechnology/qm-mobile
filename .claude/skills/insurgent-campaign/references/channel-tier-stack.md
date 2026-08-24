@@ -8,19 +8,19 @@ Stage 4 of `SKILL.md` uses this to assemble the channel plan.
 
 ## Function first, cost second
 
-Before picking a channel, pick its *function*. Channels exist to do one of three things,
+Before picking a channel, pick its _function_. Channels exist to do one of three things,
 and the most common failure in underdog campaigns is using a channel for the wrong
 function — paying for demand capture when the bottleneck is trust, or running organic
 when the bottleneck is awareness and demand is already addressable.
 
-| Function | What it does | Best-fit channels | When to use |
-|---|---|---|---|
-| **Demand capture** | Meet existing demand at the moment someone is looking | Google Search (non-brand, long-tail), Bing Search, SEO content for intent queries, directory listings | The user's bottleneck is *getting found when people already want the thing*. Demand exists; the job is not to create it, only to capture it. Strongest for lesser-known challengers on non-brand queries. **Weak for brand-keyword bidding** — traffic arrives organically anyway (see Template 5 in `lift-test-templates.md`). |
-| **Paid amplification** | Accelerate reach of already-working organic content | Meta ads (retargeting + lookalikes), TikTok Spark Ads, LinkedIn promoted posts, YouTube ads against warm audiences | The user has an organic winner (24–48h traction gate passed — saves, shares, sustained watch time) and wants to reach the next audience ring faster. Works indirectly more than directly — Meta's own tooling now measures downstream *search lift* from paid social, a tacit admission the platform click is not the whole mechanism. Never use paid amplification as a substitute for organic resonance; amplifying a dud just spends money faster. |
-| **Trust compounding** | Build credibility, community, and distribution the competitor cannot buy | Founder / leader social presence, community nodes (Slack/Discord/WhatsApp/local chapters), newsletters, earned media, volunteer / advocate networks, referral systems | The user's bottleneck is *trust* — people can find them, sometimes click, but do not convert, subscribe, donate, or refer. Slow, compounding, the only function that produces a moat. Every insurgent campaign leads with this. |
+| Function               | What it does                                                             | Best-fit channels                                                                                                                                                     | When to use                                                                                                                                                                                                                                                                                                                                                                                                                                           |
+| ---------------------- | ------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Demand capture**     | Meet existing demand at the moment someone is looking                    | Google Search (non-brand, long-tail), Bing Search, SEO content for intent queries, directory listings                                                                 | The user's bottleneck is _getting found when people already want the thing_. Demand exists; the job is not to create it, only to capture it. Strongest for lesser-known challengers on non-brand queries. **Weak for brand-keyword bidding** — traffic arrives organically anyway (see Template 5 in `lift-test-templates.md`).                                                                                                                       |
+| **Paid amplification** | Accelerate reach of already-working organic content                      | Meta ads (retargeting + lookalikes), TikTok Spark Ads, LinkedIn promoted posts, YouTube ads against warm audiences                                                    | The user has an organic winner (24–48h traction gate passed — saves, shares, sustained watch time) and wants to reach the next audience ring faster. Works indirectly more than directly — Meta's own tooling now measures downstream _search lift_ from paid social, a tacit admission the platform click is not the whole mechanism. Never use paid amplification as a substitute for organic resonance; amplifying a dud just spends money faster. |
+| **Trust compounding**  | Build credibility, community, and distribution the competitor cannot buy | Founder / leader social presence, community nodes (Slack/Discord/WhatsApp/local chapters), newsletters, earned media, volunteer / advocate networks, referral systems | The user's bottleneck is _trust_ — people can find them, sometimes click, but do not convert, subscribe, donate, or refer. Slow, compounding, the only function that produces a moat. Every insurgent campaign leads with this.                                                                                                                                                                                                                       |
 
-**How to route:** in Stage 4 of the skill, the first question is *which function does
-this campaign need?* — not *which channel looks appealing?* A mild-asymmetry user with a
+**How to route:** in Stage 4 of the skill, the first question is _which function does
+this campaign need?_ — not _which channel looks appealing?_ A mild-asymmetry user with a
 trust bottleneck should not be routed to paid amplification just because they can afford
 it. A severe-asymmetry user with a pure demand-capture problem (existing search volume,
 no awareness) might correctly spend a disproportionate share on non-brand Google Search
@@ -40,12 +40,12 @@ bottlenecks burn paid budget on cold audiences who were never going to trust the
 These produce compounding returns, resist platform changes, and cannot be replicated by
 competitors with money alone.
 
-| Channel | Why it works | What to watch |
-|---|---|---|
-| **Founder / leader personal social presence** | Parasocial trust. Algorithms reward individuals over brands. Zero production cost. | Consistency beats intensity. 3 posts a week for a year beats 30 posts in a month and silence after. |
-| **Community nodes** (Slack, Discord, WhatsApp, Circle, local chapters, user groups) | Direct, unmediated contact. Platform-change-proof. Members recruit members. | Real community has two-way traffic. If only the leader posts, it is a broadcast channel in disguise. **Community-build is a multi-week sub-campaign, not a 1h/week line item** — budget 3–4h/week sustained after a 4-week seed sprint with daily founder presence. Underinvest and it dies. See `SKILL.md` Stage 5 community block for the full cadence. |
-| **Word-of-mouth referral systems** | Highest-trust channel known. A share from a trusted friend outweighs thousands of ad impressions. | Measure referral *lift*, not referral *volume*. Most referrals happen without incentives — paid referral programs often just rebate behavior that was already happening. |
-| **Volunteer / advocate networks** | For movements, nonprofits, and cause-led campaigns: every volunteer is ~45M× more persuasive than a paid impression in their own social circle. | Friction is the enemy. Give advocates shareable material, clear asks, and low-effort ways to contribute. |
+| Channel                                                                             | Why it works                                                                                                                                    | What to watch                                                                                                                                                                                                                                                                                                                                             |
+| ----------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Founder / leader personal social presence**                                       | Parasocial trust. Algorithms reward individuals over brands. Zero production cost.                                                              | Consistency beats intensity. 3 posts a week for a year beats 30 posts in a month and silence after.                                                                                                                                                                                                                                                       |
+| **Community nodes** (Slack, Discord, WhatsApp, Circle, local chapters, user groups) | Direct, unmediated contact. Platform-change-proof. Members recruit members.                                                                     | Real community has two-way traffic. If only the leader posts, it is a broadcast channel in disguise. **Community-build is a multi-week sub-campaign, not a 1h/week line item** — budget 3–4h/week sustained after a 4-week seed sprint with daily founder presence. Underinvest and it dies. See `SKILL.md` Stage 5 community block for the full cadence. |
+| **Word-of-mouth referral systems**                                                  | Highest-trust channel known. A share from a trusted friend outweighs thousands of ad impressions.                                               | Measure referral _lift_, not referral _volume_. Most referrals happen without incentives — paid referral programs often just rebate behavior that was already happening.                                                                                                                                                                                  |
+| **Volunteer / advocate networks**                                                   | For movements, nonprofits, and cause-led campaigns: every volunteer is ~45M× more persuasive than a paid impression in their own social circle. | Friction is the enemy. Give advocates shareable material, clear asks, and low-effort ways to contribute.                                                                                                                                                                                                                                                  |
 
 **Tier 1 is not free.** It costs the leader's time, attention, and sustained effort. Most
 organizations fail at Tier 1 not because it is expensive but because it is slow and
@@ -58,29 +58,29 @@ leaders lose patience.
 These produce meaningful reach on platforms that still reward organic content, or through
 earned channels where credibility is borrowed.
 
-| Channel | 2025–2026 benchmark | When to lead with this |
-|---|---|---|
-| **Organic TikTok** | ~2.50% engagement rate, ~3,092 likes/post avg, ~170 shares/post — highest organic reach of any major platform, though compressing annually. | Visual/demonstrable content, audience under 40, willingness to post frequently and unpolished. |
-| **Organic LinkedIn** (thought leadership) | Rewards comment-thread depth and personal, professional content. | B2B, founder-led, consulting, enterprise sales, policy, any audience that wears a work identity. |
-| **Email newsletters to owned audience** | Direct, deliverable, platform-independent. Open rates 20–40% for engaged lists vs. Meta organic reach at ~3%. | Long-form thinking, recurring cadence, any audience that gave you their email. |
-| **Earned media** (press coverage, podcast appearances, other creators' platforms) | Third-party endorsement. One good podcast appearance in a relevant show can outperform a year of paid ads for credibility. | Newsworthy actions, strong founder story, niche expertise that journalists or creators want to borrow. |
-| **Organic Facebook Groups** | The last meaningful organic surface on Meta. Niche Groups with active moderation still reach their members. | Community-of-practice niches, local/regional audiences, existing group membership. |
+| Channel                                                                           | 2025–2026 benchmark                                                                                                                         | When to lead with this                                                                                 |
+| --------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| **Organic TikTok**                                                                | ~2.50% engagement rate, ~3,092 likes/post avg, ~170 shares/post — highest organic reach of any major platform, though compressing annually. | Visual/demonstrable content, audience under 40, willingness to post frequently and unpolished.         |
+| **Organic LinkedIn** (thought leadership)                                         | Rewards comment-thread depth and personal, professional content.                                                                            | B2B, founder-led, consulting, enterprise sales, policy, any audience that wears a work identity.       |
+| **Email newsletters to owned audience**                                           | Direct, deliverable, platform-independent. Open rates 20–40% for engaged lists vs. Meta organic reach at ~3%.                               | Long-form thinking, recurring cadence, any audience that gave you their email.                         |
+| **Earned media** (press coverage, podcast appearances, other creators' platforms) | Third-party endorsement. One good podcast appearance in a relevant show can outperform a year of paid ads for credibility.                  | Newsworthy actions, strong founder story, niche expertise that journalists or creators want to borrow. |
+| **Organic Facebook Groups**                                                       | The last meaningful organic surface on Meta. Niche Groups with active moderation still reach their members.                                 | Community-of-practice niches, local/regional audiences, existing group membership.                     |
 
-Note: organic Facebook *Pages* are effectively dead — engagement 0.15%, impressions down
+Note: organic Facebook _Pages_ are effectively dead — engagement 0.15%, impressions down
 35% YoY. Do not invest there. Facebook Groups are different — they still work.
 
 ---
 
 ## Tier 3 — Moderate cost, moderate ROI (use selectively)
 
-Paid tactics that are worth running *when organic has already proven the content and
-audience*. Never the starting point.
+Paid tactics that are worth running _when organic has already proven the content and
+audience_. Never the starting point.
 
-| Channel | When it works | When it does not |
-|---|---|---|
-| **Boost top-performing organic posts** | Only after 24–48h of real organic traction (saves, shares, sustained watch time). You are amplifying a proven winner. | As a default "boost every post" strategy. You end up paying to reach people who would not have engaged anyway. |
-| **Long-tail, high-intent Google Ads** | Capturing existing demand. Someone searching "[your product category] for [specific use case]" has intent you can convert. | Broad or brand keywords. Studies (including eBay's internal research) show brand-keyword search ads often have zero measurable short-term lift. |
-| **Warm retargeting** (website visitors, email list, past engagers) | Re-engaging an audience that has already shown interest. CPAs 2–3× better than cold audiences in most verticals. | As a substitute for building a warm audience in the first place. You must have traffic/interest to retarget. |
+| Channel                                                            | When it works                                                                                                              | When it does not                                                                                                                                |
+| ------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Boost top-performing organic posts**                             | Only after 24–48h of real organic traction (saves, shares, sustained watch time). You are amplifying a proven winner.      | As a default "boost every post" strategy. You end up paying to reach people who would not have engaged anyway.                                  |
+| **Long-tail, high-intent Google Ads**                              | Capturing existing demand. Someone searching "[your product category] for [specific use case]" has intent you can convert. | Broad or brand keywords. Studies (including eBay's internal research) show brand-keyword search ads often have zero measurable short-term lift. |
+| **Warm retargeting** (website visitors, email list, past engagers) | Re-engaging an audience that has already shown interest. CPAs 2–3× better than cold audiences in most verticals.           | As a substitute for building a warm audience in the first place. You must have traffic/interest to retarget.                                    |
 
 The **24–48h organic traction gate** is the single most important discipline in this tier.
 The rule: if a post does not generate organic signal (saves, shares, watch time, deep
@@ -91,12 +91,12 @@ and often bot-inflated.
 
 ## Tier 4 — High cost, declining ROI (use only with rigorous measurement)
 
-| Channel | Why it is declining | When (if ever) to use |
-|---|---|---|
-| **Broad Facebook / Instagram ad campaigns** (cold audiences) | CPMs rising, iOS privacy changes, declining conversion quality, ad fatigue at 5–6 impressions. | Only with a geo-holdout or conversion-lift test proving incremental lift. Otherwise you are paying for attributed conversions that would have happened anyway. |
-| **Generic Google Ads on competitive keywords** | CPC rising 10–15% YoY. You are in an AI-automated bidding war with competitors who have deeper pockets. | Rarely. Long-tail is almost always a better bet for challengers. |
-| **Display advertising** | Ad blockers, banner blindness, low CTR, minimal persuasion effect. | Almost never for underdogs. Brand-awareness argument is weak compared to earned media. |
-| **Influencer partnerships without organic credibility** | Audiences can now tell which creators are selling anything to anyone. Partnerships that do not match a creator's actual audience interest burn both sides. | When the creator genuinely uses and cares about the product, and the partnership looks like it. |
+| Channel                                                      | Why it is declining                                                                                                                                        | When (if ever) to use                                                                                                                                          |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **Broad Facebook / Instagram ad campaigns** (cold audiences) | CPMs rising, iOS privacy changes, declining conversion quality, ad fatigue at 5–6 impressions.                                                             | Only with a geo-holdout or conversion-lift test proving incremental lift. Otherwise you are paying for attributed conversions that would have happened anyway. |
+| **Generic Google Ads on competitive keywords**               | CPC rising 10–15% YoY. You are in an AI-automated bidding war with competitors who have deeper pockets.                                                    | Rarely. Long-tail is almost always a better bet for challengers.                                                                                               |
+| **Display advertising**                                      | Ad blockers, banner blindness, low CTR, minimal persuasion effect.                                                                                         | Almost never for underdogs. Brand-awareness argument is weak compared to earned media.                                                                         |
+| **Influencer partnerships without organic credibility**      | Audiences can now tell which creators are selling anything to anyone. Partnerships that do not match a creator's actual audience interest burn both sides. | When the creator genuinely uses and cares about the product, and the partnership looks like it.                                                                |
 
 ---
 
@@ -147,7 +147,7 @@ showed roughly:
 - ~5% other
 
 The composition is instructive not because Hungary is directly translatable to every
-commercial context, but because the *shape* is: Tier 1 community + Tier 2 algorithmic
+commercial context, but because the _shape_ is: Tier 1 community + Tier 2 algorithmic
 organic did the overwhelming majority of the work. Paid contributed a single-digit share.
 For most underdogs across sectors, the winning shape will look similar.
 

@@ -11,7 +11,9 @@ const log = (...a) => console.error('[collect-sub-agent-outputs]', ...a);
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (args.inputs.length === 0 && !args.manifestPath) {
-    console.error('usage: node scripts/collect-sub-agent-outputs.mjs [--manifest briefs/manifest.json] <output-file-or-dir...> [--out recommendations.json] [--strict]');
+    console.error(
+      'usage: node scripts/collect-sub-agent-outputs.mjs [--manifest briefs/manifest.json] <output-file-or-dir...> [--out recommendations.json] [--strict]',
+    );
     process.exit(1);
   }
 
@@ -53,7 +55,8 @@ async function main() {
     }
 
     for (const record of records) {
-      const candidateRef = record.candidateRef ?? inferCandidateRefFromFile(file, expected, records.length);
+      const candidateRef =
+        record.candidateRef ?? inferCandidateRefFromFile(file, expected, records.length);
       if (!candidateRef) {
         summary.missingCandidateRef++;
         errors.push(`${file}: output is missing candidateRef`);
@@ -71,7 +74,7 @@ async function main() {
     const byRef = new Map();
     for (const item of collected) {
       const ref = item.record.candidateRef;
-      if (!expected.some((b) => b.candidateRef === ref)) {
+      if (!expected.some(b => b.candidateRef === ref)) {
         errors.push(`${item.sourcePath}: unknown candidateRef ${ref}`);
         continue;
       }
@@ -81,16 +84,16 @@ async function main() {
       }
       byRef.set(ref, item);
     }
-    const missing = expected.filter((b) => !byRef.has(b.candidateRef));
+    const missing = expected.filter(b => !byRef.has(b.candidateRef));
     for (const b of missing) errors.push(`missing output for candidateRef ${b.candidateRef}`);
-    ordered = expected.map((b) => byRef.get(b.candidateRef)).filter(Boolean);
+    ordered = expected.map(b => byRef.get(b.candidateRef)).filter(Boolean);
   } else {
     ordered = collected.sort((a, b) => a.sourcePath.localeCompare(b.sourcePath));
   }
 
-  const records = [...preResolvedRecords, ...ordered.map((item) => item.record)];
-  summary.kept = records.filter((r) => r?.abstain !== true).length;
-  summary.abstained = records.filter((r) => r?.abstain === true).length;
+  const records = [...preResolvedRecords, ...ordered.map(item => item.record)];
+  summary.kept = records.filter(r => r?.abstain !== true).length;
+  summary.abstained = records.filter(r => r?.abstain === true).length;
 
   if (errors.length > 0) {
     for (const e of errors) log(`error: ${e}`);
@@ -109,7 +112,9 @@ async function main() {
   } else {
     process.stdout.write(serialized);
   }
-  log(`done: ${summary.files} files, ${summary.kept} recommendation draft(s), ${summary.abstained} found no supported change, ${summary.parseFailed} parse failed, ${summary.nonObject} invalid output(s)`);
+  log(
+    `done: ${summary.files} files, ${summary.kept} recommendation draft(s), ${summary.abstained} found no supported change, ${summary.parseFailed} parse failed, ${summary.nonObject} invalid output(s)`,
+  );
 }
 
 function parseArgs(argv) {
@@ -130,7 +135,7 @@ async function collectInputFiles(paths) {
   const out = [];
   for (const p of paths) {
     const s = await stat(p);
-    if (s.isDirectory()) out.push(...await walkDir(p));
+    if (s.isDirectory()) out.push(...(await walkDir(p)));
     else if (s.isFile()) out.push(p);
   }
   return out.sort((a, b) => a.localeCompare(b));
@@ -142,7 +147,7 @@ async function walkDir(dir) {
   for (const e of entries.sort((a, b) => a.name.localeCompare(b.name))) {
     if (e.name.startsWith('.')) continue;
     const p = resolve(dir, e.name);
-    if (e.isDirectory()) out.push(...await walkDir(p));
+    if (e.isDirectory()) out.push(...(await walkDir(p)));
     else if (e.isFile()) out.push(p);
   }
   return out;
@@ -166,7 +171,9 @@ function readPreResolvedRecords(manifest) {
   if (!manifest || !Array.isArray(manifest.preResolvedRecords)) return [];
   return manifest.preResolvedRecords.map((r, i) => {
     if (!isRecordObject(r)) {
-      throw new TypeError(`manifest.preResolvedRecords[${i}] must be a recommendation or no-recommendation record`);
+      throw new TypeError(
+        `manifest.preResolvedRecords[${i}] must be a recommendation or no-recommendation record`,
+      );
     }
     if (!r.candidateRef) {
       throw new TypeError(`manifest.preResolvedRecords[${i}].candidateRef is required`);
@@ -248,7 +255,8 @@ function normalizeOutput(value) {
   if (isRecordObject(unwrapped)) return [unwrapped];
   if (unwrapped && typeof unwrapped === 'object') {
     if (isRecordObject(unwrapped.recommendation)) return [unwrapped.recommendation];
-    if (Array.isArray(unwrapped.recommendations)) return unwrapped.recommendations.filter(isRecordObject);
+    if (Array.isArray(unwrapped.recommendations))
+      return unwrapped.recommendations.filter(isRecordObject);
   }
   return [];
 }
@@ -259,7 +267,7 @@ function unwrapEnvelope(value) {
     if (!current || typeof current !== 'object' || Array.isArray(current)) return current;
     if (Array.isArray(current.recommendations) || current.recommendation) return current;
     const keys = Object.keys(current);
-    const envelopeKey = ['data', 'result', 'insights'].find((k) => keys.length === 1 && k in current);
+    const envelopeKey = ['data', 'result', 'insights'].find(k => keys.length === 1 && k in current);
     if (!envelopeKey) return current;
     current = current[envelopeKey];
   }
@@ -269,14 +277,14 @@ function unwrapEnvelope(value) {
 function isRecordObject(value) {
   if (!value || typeof value !== 'object' || Array.isArray(value)) return false;
   if (value.abstain === true) return true;
-  return ['what', 'why', 'fix', 'bucket', 'affectedFiles', 'citations'].some((k) => k in value);
+  return ['what', 'why', 'fix', 'bucket', 'affectedFiles', 'citations'].some(k => k in value);
 }
 
 function inferCandidateRefFromFile(file, expected, recordCount) {
   if (recordCount !== 1 || expected.length === 0) return null;
   if (expected.length === 1) return expected[0].candidateRef;
   const name = basename(file);
-  const matches = expected.filter((b) => {
+  const matches = expected.filter(b => {
     if (!b.group && b.index == null) return false;
     const group = escapeRegExp(String(b.group ?? ''));
     const index = escapeRegExp(String(b.index));
@@ -289,7 +297,7 @@ function escapeRegExp(value) {
   return String(value).replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('[collect-sub-agent-outputs] FAILED:', err.message);
   console.error(err.stack);
   process.exit(1);

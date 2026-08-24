@@ -116,11 +116,13 @@ But [EVIDENCE OR REASONING].
 ### Template 1: The Carousel Hook + Caption
 
 **Carousel Structure:**
+
 - Slide 1: Bold hook/title
 - Slides 2-7: Value points (one per slide)
 - Final slide: CTA + branding
 
 **Caption:**
+
 ```
 [HOOK that matches Slide 1]
 
@@ -230,24 +232,28 @@ Want the full breakdown? [CTA for product/resource]
 ## Platform-Specific Tips
 
 ### Twitter/X:
+
 - Shorter paragraphs (often single sentences)
 - More casual/punchy tone
 - Threads for education, single tweets for hot takes
 - Quote tweets for engagement
 
 ### Instagram:
+
 - Visual-first (caption supports the image/video)
 - Longer captions OK (but front-load the hook)
 - Heavy use of line breaks
 - Hashtags matter for discovery
 
 ### LinkedIn:
+
 - See linkedin-templates.md for full breakdown
 - Professional but personable
 - Story-driven performs well
 - Engagement bait works (polls, questions)
 
 ### TikTok:
+
 - Hook in first 1-3 seconds or you're dead
 - Face-to-camera builds trust
 - Trending sounds boost reach

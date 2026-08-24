@@ -5,34 +5,36 @@
 ## Design Tokens (MUST USE)
 
 ### Typography
+
 ```css
-font-serif: "Cormorant Garamond", Georgia, serif;
-font-sans: "DM Sans", system-ui, sans-serif;
+font-serif: 'Cormorant Garamond', Georgia, serif;
+font-sans: 'DM Sans', system-ui, sans-serif;
 ```
 
 ### Editorial Color Palette
+
 ```css
 /* Backgrounds */
---paper: #FFFFFF;           /* Pure white background */
---paper-alt: #F5F2EC;       /* Warm off-white for diagram backgrounds */
+--paper: #ffffff; /* Pure white background */
+--paper-alt: #f5f2ec; /* Warm off-white for diagram backgrounds */
 
 /* Text Colors */
---ink-900: #302C27;         /* Primary text, headings */
---ink-700: #4A4540;         /* Secondary text */
---ink-500: #706C66;         /* Tertiary text, labels */
---ink-400: #9C9890;         /* Subtle text, annotations */
+--ink-900: #302c27; /* Primary text, headings */
+--ink-700: #4a4540; /* Secondary text */
+--ink-500: #706c66; /* Tertiary text, labels */
+--ink-400: #9c9890; /* Subtle text, annotations */
 
 /* Borders */
---line: #E3DFD7;            /* Borders, dividers */
+--line: #e3dfd7; /* Borders, dividers */
 
 /* Accent Colors */
---gold: #C49A6C;            /* Brand accent, highlights */
---vermillion: #C07050;      /* Warnings, negative states */
---green: #5C8A6B;           /* Positive states, success */
---blue: #5C7A8A;            /* Informational, neutral */
---purple: #7A6C8A;          /* Special, advanced */
---orange: #D4845C;          /* Warm accent, caution */
---yellow: #D4A84C;          /* Highlights, attention */
+--gold: #c49a6c; /* Brand accent, highlights */
+--vermillion: #c07050; /* Warnings, negative states */
+--green: #5c8a6b; /* Positive states, success */
+--blue: #5c7a8a; /* Informational, neutral */
+--purple: #7a6c8a; /* Special, advanced */
+--orange: #d4845c; /* Warm accent, caution */
+--yellow: #d4a84c; /* Highlights, attention */
 ```
 
 ---
@@ -40,13 +42,16 @@ font-sans: "DM Sans", system-ui, sans-serif;
 ## SVG Diagram Requirements
 
 ### 1. Base Structure
+
 Every diagram MUST be self-contained with:
+
 - `viewBox` attribute for responsiveness
 - Embedded `<style>` block with design tokens
 - Maximum suggested height: 400px
 - Background: `#F5F2EC` with `#E3DFD7` border
 
 ### 2. Required Style Block
+
 ```xml
 <style>
   .diagram-title { font-family: "Cormorant Garamond", Georgia, serif; font-size: 18px; fill: #302C27; font-weight: 500; }
@@ -57,6 +62,7 @@ Every diagram MUST be self-contained with:
 ```
 
 ### 3. Standard Defs Block
+
 ```xml
 <defs>
   <!-- Gradients -->
@@ -108,16 +114,19 @@ Every diagram MUST be self-contained with:
 ## SVG Techniques for Visual Variety
 
 ### 1. Curved Paths (Organic Flow)
+
 ```xml
 <path d="M 50,100 Q 150,50 250,100 T 450,100" stroke="#C49A6C" fill="none" stroke-width="2"/>
 ```
 
 ### 2. Rounded Corners
+
 ```xml
 <rect x="10" y="10" width="100" height="60" rx="12" ry="12" fill="#5C8A6B"/>
 ```
 
 ### 3. Icon Paths
+
 ```xml
 <!-- Checkmark -->
 <path d="M 5,12 L 10,17 L 20,7" stroke="#5C8A6B" stroke-width="2" fill="none" stroke-linecap="round"/>
@@ -130,6 +139,7 @@ Every diagram MUST be self-contained with:
 ```
 
 ### 4. Dashed/Dotted Lines
+
 ```xml
 <line stroke-dasharray="5,5" ... />  <!-- dashed -->
 <line stroke-dasharray="2,4" ... />  <!-- dotted -->
@@ -139,14 +149,14 @@ Every diagram MUST be self-contained with:
 
 ## Diagram Types & When to Use
 
-| Concept Type | Diagram Style | Key Elements |
-|--------------|---------------|--------------|
-| Processes | Flowing curves with nodes | Bezier paths, rounded boxes, arrows |
-| Comparisons | Radial/circular or split | Two circles, connecting arrows |
-| Hierarchies | Isometric stacks/pyramids | Layered shapes with gradients |
-| Networks | Connected nodes with glows | Radial gradients, dashed connections |
-| Timelines | Horizontal with markers | Gradient line, milestone circles |
-| Data/Metrics | Gauges, spectrums | Arc paths, color gradients |
+| Concept Type | Diagram Style              | Key Elements                         |
+| ------------ | -------------------------- | ------------------------------------ |
+| Processes    | Flowing curves with nodes  | Bezier paths, rounded boxes, arrows  |
+| Comparisons  | Radial/circular or split   | Two circles, connecting arrows       |
+| Hierarchies  | Isometric stacks/pyramids  | Layered shapes with gradients        |
+| Networks     | Connected nodes with glows | Radial gradients, dashed connections |
+| Timelines    | Horizontal with markers    | Gradient line, milestone circles     |
+| Data/Metrics | Gauges, spectrums          | Arc paths, color gradients           |
 
 ---
 
@@ -177,27 +187,28 @@ Every diagram MUST be self-contained with:
 ## HTML Page Structure
 
 ### CSS Variables
+
 ```css
 :root {
   /* Typography */
-  --font-serif: "Cormorant Garamond", Georgia, serif;
-  --font-sans: "DM Sans", system-ui, sans-serif;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'DM Sans', system-ui, sans-serif;
 
   /* Colors */
-  --paper: #FFFFFF;
-  --paper-alt: #F5F2EC;
-  --ink-900: #302C27;
-  --ink-700: #4A4540;
-  --ink-500: #706C66;
-  --ink-400: #9C9890;
-  --line: #E3DFD7;
-  --gold: #C49A6C;
-  --vermillion: #C07050;
-  --green: #5C8A6B;
-  --blue: #5C7A8A;
-  --purple: #7A6C8A;
-  --orange: #D4845C;
-  --yellow: #D4A84C;
+  --paper: #ffffff;
+  --paper-alt: #f5f2ec;
+  --ink-900: #302c27;
+  --ink-700: #4a4540;
+  --ink-500: #706c66;
+  --ink-400: #9c9890;
+  --line: #e3dfd7;
+  --gold: #c49a6c;
+  --vermillion: #c07050;
+  --green: #5c8a6b;
+  --blue: #5c7a8a;
+  --purple: #7a6c8a;
+  --orange: #d4845c;
+  --yellow: #d4a84c;
 
   /* Spacing */
   --space-1: 8px;
@@ -210,18 +221,47 @@ Every diagram MUST be self-contained with:
 ```
 
 ### Typography Scale
+
 ```css
-h1 { font-family: var(--font-serif); font-size: 2.25rem; color: var(--ink-900); font-weight: 500; }
-h2 { font-family: var(--font-serif); font-size: 1.5rem; color: var(--ink-900); font-weight: 500; }
-h3 { font-family: var(--font-serif); font-size: 1.25rem; color: var(--ink-700); font-weight: 500; }
-body { font-family: var(--font-sans); font-size: 16px; color: var(--ink-700); line-height: 1.6; }
-.label { font-size: 13px; color: var(--ink-500); }
-.annotation { font-size: 11px; color: var(--ink-400); font-style: italic; }
+h1 {
+  font-family: var(--font-serif);
+  font-size: 2.25rem;
+  color: var(--ink-900);
+  font-weight: 500;
+}
+h2 {
+  font-family: var(--font-serif);
+  font-size: 1.5rem;
+  color: var(--ink-900);
+  font-weight: 500;
+}
+h3 {
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  color: var(--ink-700);
+  font-weight: 500;
+}
+body {
+  font-family: var(--font-sans);
+  font-size: 16px;
+  color: var(--ink-700);
+  line-height: 1.6;
+}
+.label {
+  font-size: 13px;
+  color: var(--ink-500);
+}
+.annotation {
+  font-size: 11px;
+  color: var(--ink-400);
+  font-style: italic;
+}
 ```
 
 ### Component Patterns
 
 **Summary Box:**
+
 ```css
 .summary-box {
   background: var(--paper-alt);
@@ -232,6 +272,7 @@ body { font-family: var(--font-sans); font-size: 16px; color: var(--ink-700); li
 ```
 
 **Cards:**
+
 ```css
 .card {
   background: var(--paper);
@@ -242,6 +283,7 @@ body { font-family: var(--font-sans); font-size: 16px; color: var(--ink-700); li
 ```
 
 **Badges:**
+
 ```css
 .badge {
   display: inline-block;
@@ -251,12 +293,22 @@ body { font-family: var(--font-sans); font-size: 16px; color: var(--ink-700); li
   text-transform: uppercase;
   letter-spacing: 0.05em;
 }
-.badge-gold { background: var(--gold); color: white; }
-.badge-green { background: var(--green); color: white; }
-.badge-blue { background: var(--blue); color: white; }
+.badge-gold {
+  background: var(--gold);
+  color: white;
+}
+.badge-green {
+  background: var(--green);
+  color: white;
+}
+.badge-blue {
+  background: var(--blue);
+  color: white;
+}
 ```
 
 **Diagram Container:**
+
 ```css
 .diagram-container {
   background: var(--paper-alt);

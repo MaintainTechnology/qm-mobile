@@ -110,7 +110,10 @@ export function OverlayRatesCard({
 
   function onSave() {
     const nextErrors: Record<string, string> = {};
-    const parsed = fields.map(f => ({ field: f, result: parseRateCents(values[f.key] ?? '', f.bound) }));
+    const parsed = fields.map(f => ({
+      field: f,
+      result: parseRateCents(values[f.key] ?? '', f.bound),
+    }));
     for (const { field, result } of parsed) {
       if (result.error) nextErrors[field.key] = result.error;
     }
@@ -126,13 +129,16 @@ export function OverlayRatesCard({
       if (existing) return existing;
       const source = overrides[mapKey];
       const draft: Record<string, unknown> =
-        source != null && typeof source === 'object' ? { ...(source as Record<string, unknown>) } : {};
+        source != null && typeof source === 'object'
+          ? { ...(source as Record<string, unknown>) }
+          : {};
       mapDrafts.set(mapKey, draft);
       return draft;
     }
     for (const { field, result } of parsed) {
       const target = field.mapKey ? draftFor(field.mapKey) : overrides;
-      if (result.provided && result.cents != null) target[field.key] = apiDollarsFromCents(result.cents);
+      if (result.provided && result.cents != null)
+        target[field.key] = apiDollarsFromCents(result.cents);
       else delete target[field.key];
     }
     for (const [mapKey, draft] of mapDrafts) overrides[mapKey] = draft;
@@ -148,9 +154,14 @@ export function OverlayRatesCard({
       saving={save.isPending}
       error={
         save.isError
-          ? apiErrorMessage(save.error, 'Couldn’t reach QuoteMax — check your connection and try again.')
+          ? apiErrorMessage(
+              save.error,
+              'Couldn’t reach QuoteMax — check your connection and try again.',
+            )
           : save.data?.ok === false
-            ? (save.data.error ?? save.data.issues?.map(i => i.message).join(' · ') ?? 'That didn’t save — try again.')
+            ? (save.data.error ??
+              save.data.issues?.map(i => i.message).join(' · ') ??
+              'That didn’t save — try again.')
             : null
       }
       saved={save.data?.ok === true}

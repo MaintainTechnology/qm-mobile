@@ -9,18 +9,19 @@ allowed-tools: Read, Write, Edit, Glob, Grep
 ## Overview
 
 Document Studio is the unified system for creating and updating all NGM professional documents. It maintains consistency across:
+
 - **Voice & Tone**: Professional yet personable, confident without being salesy
 - **Visual Design**: The NGM editorial design system (gold accents, Cormorant Garamond/Source Serif 4/DM Sans fonts, clean hierarchy)
 - **Messaging**: Accurate, up-to-date descriptions of NGM programs, credentials, and value propositions
 
 ## Document Types Supported
 
-| Type | Use Case | Output Location |
-|------|----------|-----------------|
-| **Proposal** | Client-specific proposals from meetings/transcripts | `content/docs/proposal-[client]-[date].html` |
-| **Flyer** | 1-2 page print-ready marketing materials | `content/docs/[name]-flyer.html` |
-| **Sponsor Packet** | Multi-page event sponsorship materials | `content/docs/[event]-sponsor-packet.html` |
-| **One-Pager** | Single-page overviews of programs/services | `content/docs/[topic]-one-pager.html` |
+| Type               | Use Case                                            | Output Location                              |
+| ------------------ | --------------------------------------------------- | -------------------------------------------- |
+| **Proposal**       | Client-specific proposals from meetings/transcripts | `content/docs/proposal-[client]-[date].html` |
+| **Flyer**          | 1-2 page print-ready marketing materials            | `content/docs/[name]-flyer.html`             |
+| **Sponsor Packet** | Multi-page event sponsorship materials              | `content/docs/[event]-sponsor-packet.html`   |
+| **One-Pager**      | Single-page overviews of programs/services          | `content/docs/[topic]-one-pager.html`        |
 
 ---
 
@@ -29,19 +30,23 @@ Document Studio is the unified system for creating and updating all NGM professi
 Before creating or updating ANY document:
 
 ### 1. Check Existing Documents
+
 ```
 Glob: content/docs/*.html
 ```
 
 ### 2. Read Reference Materials
+
 - **Voice Guide**: `.claude/skills/document-studio/voice-and-style.md`
 - **NGM Programs**: `.claude/skills/document-studio/ngm-programs.md`
 - **Design System**: `.claude/skills/document-studio/design-system.md`
 
 ### 3. For Updates, Read the Existing Document
+
 Read the full document to understand current structure before making changes.
 
 ### 4. For New Documents, Read 1-2 Similar Examples
+
 Learn from existing documents of the same type to maintain consistency.
 
 ---
@@ -49,6 +54,7 @@ Learn from existing documents of the same type to maintain consistency.
 ## Voice & Style Summary
 
 **Core Principles:**
+
 1. **Confident, not salesy** — We state facts and outcomes, not hype
 2. **Specific, not vague** — Concrete numbers, real credentials, specific outcomes
 3. **First-principles reasoning** — We explain WHY, not just what
@@ -56,6 +62,7 @@ Learn from existing documents of the same type to maintain consistency.
 5. **Outcome-focused** — Lead with transformation, not features
 
 **Avoid:**
+
 - Marketing buzzwords ("revolutionary", "game-changing", "cutting-edge")
 - Vague claims ("best-in-class", "world-class")
 - Hyperbole and superlatives
@@ -63,6 +70,7 @@ Learn from existing documents of the same type to maintain consistency.
 - Feature dumping without context
 
 **Use:**
+
 - Specific metrics and outcomes
 - Third-person references to Dr. Vinjamoori in formal docs
 - First-person "I/we" in proposals after initial meeting
@@ -78,35 +86,41 @@ See `voice-and-style.md` for complete guidance.
 Always reference programs accurately. Key offerings:
 
 ### Longevity Intelligence Platform (LIP)
+
 - AI-powered clinical intelligence for longevity practitioners
 - 50,000+ peer-reviewed studies synthesized
 - Combines research + protocols + proprietary frameworks
 - "As I get smarter, you get smarter"
 
 ### AI Lab Report Generator
+
 - Transforms raw labs into publication-quality patient reports
 - 5-minute turnaround vs 45-minute manual process
 - Customizable to practice philosophy and branding
 - Handles metabolic, endocrine, longevity markers
 
 ### Educational Curriculum
+
 - 150+ deep-dive modules
 - Topics: hormones, peptides, GLP-1s, diagnostics, aging frameworks, AI
 - Monthly live lectures with latest research
 - NGM Certification pathway
 
 ### NGM Community & Mentorship
+
 - Engaged private practitioner community
 - Weekly live sessions with Dr. Vinjamoori
 - Real-time case feedback
 - Expert network access
 
 ### NGM Commons
+
 - Vendor intelligence platform for longevity clinicians
 - Research-driven, AI-native vendor profiles
 - Helps clinicians evaluate solutions before buying
 
 ### NGM Summit
+
 - Global forum on healthspan medicine and clinical innovation
 - Inaugural event: Japan 2026
 - Partnership with Nakanoshima Qross (Osaka's medical innovation district)
@@ -118,24 +132,27 @@ See `ngm-programs.md` for complete details, pricing, and positioning.
 ## Design System Summary
 
 ### Color Palette
+
 ```css
---paper: #FEFDFB;        /* Main background */
---paper-alt: #F5F2EC;    /* Secondary background */
---ink-900: #302C27;      /* Darkest text, headings */
---ink-700: #4A4540;      /* Body text */
---ink-500: #706C66;      /* Secondary text */
---ink-400: #9C9890;      /* Muted text */
---line: #E3DFD7;         /* Borders, dividers */
---gold: #C49A6C;         /* Accent color (use sparingly) */
---vermillion: #C07050;   /* Alert/CTA accent (rare) */
+--paper: #fefdfb; /* Main background */
+--paper-alt: #f5f2ec; /* Secondary background */
+--ink-900: #302c27; /* Darkest text, headings */
+--ink-700: #4a4540; /* Body text */
+--ink-500: #706c66; /* Secondary text */
+--ink-400: #9c9890; /* Muted text */
+--line: #e3dfd7; /* Borders, dividers */
+--gold: #c49a6c; /* Accent color (use sparingly) */
+--vermillion: #c07050; /* Alert/CTA accent (rare) */
 ```
 
 ### Typography
+
 - **Headings**: Cormorant Garamond (display serif) - elegant, editorial feel
 - **Body**: Source Serif 4 (body serif) - warm, readable
 - **UI/Labels**: DM Sans (sans-serif), uppercase, letter-spacing 0.08-0.12em
 
 ### Key Components
+
 - **Section numbers**: Black square with white number
 - **Highlight boxes**: Paper-alt background, gold left border
 - **Pricing tables**: Clean borders, recommended row highlighted
@@ -151,11 +168,13 @@ See `design-system.md` for complete CSS and component patterns.
 ### Proposals
 
 **Required inputs:**
+
 1. Client name
 2. Meeting transcript or notes
 3. Proposal type (consulting/enterprise) - can be inferred
 
 **Process:**
+
 1. Read `voice-and-style.md` and `ngm-programs.md`
 2. Read 1-2 recent proposals from `content/docs/`
 3. Extract from transcript: client info, pain points, goals, budget signals
@@ -163,6 +182,7 @@ See `design-system.md` for complete CSS and component patterns.
 5. Save to `content/docs/proposal-[client-slug]-[YYYY-MM-DD].html`
 
 **Section Framework:**
+
 1. Header (NGM wordmark, date, client name)
 2. Executive Summary (2-3 sentences max)
 3. Understanding Your Situation (from transcript)
@@ -174,11 +194,13 @@ See `design-system.md` for complete CSS and component patterns.
 ### Flyers
 
 **Required inputs:**
+
 1. Topic/program to promote
 2. Target audience
 3. Call-to-action (what should reader do?)
 
 **Process:**
+
 1. Read `voice-and-style.md` and `ngm-programs.md`
 2. Read existing flyers from `content/docs/`
 3. Design for 8.5x11" print (use `.page` container)
@@ -186,6 +208,7 @@ See `design-system.md` for complete CSS and component patterns.
 5. Save to `content/docs/[topic]-flyer.html`
 
 **Must include:**
+
 - NGM header with logo mark
 - Clear value proposition headline
 - 3-4 key benefits/features
@@ -195,11 +218,13 @@ See `design-system.md` for complete CSS and component patterns.
 ### Sponsor Packets
 
 **Required inputs:**
+
 1. Event name and details
 2. Sponsorship tiers and pricing
 3. Value propositions for sponsors
 
 **Process:**
+
 1. Read `voice-and-style.md` and existing sponsor packets
 2. Design as multi-page document (use page breaks)
 3. Include: cover, opportunity, tiers, leadership, contact
@@ -208,11 +233,13 @@ See `design-system.md` for complete CSS and component patterns.
 ### One-Pagers
 
 **Required inputs:**
+
 1. Topic/program
 2. Target audience
 3. Key points to convey
 
 **Process:**
+
 1. Single page, scannable format
 2. Use visual hierarchy heavily
 3. Focus on outcomes and benefits
@@ -233,17 +260,20 @@ When asked to update a document:
 ### Common Update Types
 
 **Content updates:**
+
 - Refresh dates and timelines
 - Update pricing or tiers
 - Add/remove sections
 - Update credentials or outcomes
 
 **Styling updates:**
+
 - Apply latest design system
 - Fix print formatting
 - Improve mobile responsiveness
 
 **Repurposing:**
+
 - Adapt proposal for different client
 - Create variant of flyer for different audience
 - Generate new sponsor packet from existing template
@@ -283,22 +313,25 @@ Before finalizing any document:
 ## Usage Examples
 
 ### Create a proposal
+
 ```
 Create a proposal for Acme Health based on our meeting. Here's the transcript: [paste]
 ```
 
 ### Create a flyer
+
 ```
 Create a 1-page flyer for NGM Commons targeting longevity vendors at conferences.
 ```
 
 ### Update existing document
+
 ```
 Update the NGM Summit sponsor packet - change the date to October 2026 and add a new "Founding Partner" tier at $25,000.
 ```
 
 ### Repurpose a document
+
 ```
 Take the Trellis proposal and adapt it for a similar company called MedTech Labs.
 ```
-

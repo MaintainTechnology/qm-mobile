@@ -21,7 +21,7 @@ description: |
   NOT for: Soul training, photoshoots, cards, explainers (use
   higgsfield-video-explainer), playable games/assets (use
   higgsfield-game-generation), or TTS.
-argument-hint: "[prompt-or-analysis-request] [--model <name>] [--image|--video <path-or-id>]"
+argument-hint: '[prompt-or-analysis-request] [--model <name>] [--image|--video <path-or-id>]'
 allowed-tools: Bash
 ---
 
@@ -38,7 +38,6 @@ Before any other command:
    curl -fsSL https://raw.githubusercontent.com/higgsfield-ai/cli/main/install.sh | sh
    ```
 2. If `higgsfield account status` fails with `Session expired` / `Not authenticated`, ask the user to run `higgsfield auth login` (interactive) and wait for confirmation.
-
 
 ## UX Rules
 
@@ -128,13 +127,13 @@ For workflow jobs, use `higgsfield generate workflow <workflow_name> ... --wait`
 
 ## Media flags
 
-| Flag | Purpose | Models that accept it |
-|---|---|---|
-| `--image <path-or-id>` | reference image | most image models, `grok_video_v15`, `multi_image_to_3d`, `seedance_2_0`, `veo3`, `marketing_studio_video` |
-| `--start-image <path-or-id>` | first frame for image-to-video transitions | `grok_video_v15`, `kling3_0`, `kling3_0_turbo`, `kling2_6`, `veo3_1`, `seedance_2_0`, `marketing_studio_video` |
-| `--end-image <path-or-id>` | last frame for transitions | `kling3_0`, `seedance_2_0`, `marketing_studio_video` |
-| `--video <path-or-id>` | reference or analyzed video | `seedance_2_0`, `brain_activity` |
-| `--audio <path-or-id>` | reference audio (lipsync, soundtrack match) | `seedance_2_0` (use this, NOT `--generate-audio`) |
+| Flag                         | Purpose                                     | Models that accept it                                                                                          |
+| ---------------------------- | ------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| `--image <path-or-id>`       | reference image                             | most image models, `grok_video_v15`, `multi_image_to_3d`, `seedance_2_0`, `veo3`, `marketing_studio_video`     |
+| `--start-image <path-or-id>` | first frame for image-to-video transitions  | `grok_video_v15`, `kling3_0`, `kling3_0_turbo`, `kling2_6`, `veo3_1`, `seedance_2_0`, `marketing_studio_video` |
+| `--end-image <path-or-id>`   | last frame for transitions                  | `kling3_0`, `seedance_2_0`, `marketing_studio_video`                                                           |
+| `--video <path-or-id>`       | reference or analyzed video                 | `seedance_2_0`, `brain_activity`                                                                               |
+| `--audio <path-or-id>`       | reference audio (lipsync, soundtrack match) | `seedance_2_0` (use this, NOT `--generate-audio`)                                                              |
 
 For reference-array models, the explicit flags are `--image-references`, `--video-references`, and `--audio-references`; `--image`, `--video`, and `--audio` are short aliases when the schema exposes those params.
 
@@ -208,15 +207,15 @@ higgsfield marketing-studio ad-formats list --json
    - Existing product → `higgsfield marketing-studio products list --json`
    - URL → `higgsfield marketing-studio products fetch --url <url> --wait` (polls until import done)
    - Local images → `higgsfield upload create <photo>...` then `higgsfield marketing-studio products create --title "..." --image <id>...`
-   Capture product id. When using `--hook_id`, strongly prefer passing `--product_ids`; hooks are designed to pivot into a product and work poorly without product context.
+     Capture product id. When using `--hook_id`, strongly prefer passing `--product_ids`; hooks are designed to pivot into a product and work poorly without product context.
 2. **Pick avatar if needed.**
    - Default: `higgsfield marketing-studio avatars list` and pick a preset matching the brand voice.
    - Custom: `higgsfield marketing-studio avatars create --name "..." --image <upload_id>`.
-   For UGC modes, you may omit `--avatars` when no specific presenter is required and the brief mentions a person; the backend can synthesize a Soul Character.
+     For UGC modes, you may omit `--avatars` when no specific presenter is required and the brief mentions a person; the backend can synthesize a Soul Character.
 3. **Optionally pick setup items.**
    - Hook: `higgsfield marketing-studio hooks list --json`
    - Setting: `higgsfield marketing-studio settings list --json`
-   Pass selected IDs as `--hook_id <hook_id>` and `--setting_id <setting_id>` for `marketing_studio_video` only. Do not copy the hook's prompt into `--prompt` unless the user explicitly wants to reinforce the same wording.
+     Pass selected IDs as `--hook_id <hook_id>` and `--setting_id <setting_id>` for `marketing_studio_video` only. Do not copy the hook's prompt into `--prompt` unless the user explicitly wants to reinforce the same wording.
 4. **Pick mode if needed.** Default is `ugc`; `--mode` is not required just because `--hook_id` is present. Other current slugs: `ugc_how_to`, `ugc_unboxing`, `product_showcase`, `product_review`, `tv_spot`, `wild_card`, `ugc_virtual_try_on`, `virtual_try_on`. **Hook/setting are valid only for `ugc`, `ugc_how_to`, `ugc_unboxing`, `product_review`, `ugc_virtual_try_on`** — do not pass `--hook_id` / `--setting_id` with the other modes. See `references/marketing-modes.md`.
 5. **Generate (one-shot).**
    ```bash

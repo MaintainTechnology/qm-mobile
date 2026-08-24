@@ -18,16 +18,16 @@ Anchors for the NGM tools on `/longevity-intelligence-core`, verified against th
 Explorer, Peptide GPS, Knowledge, Business Advisor.
 
 > **No "Web Explorer" tab exists.** Do not invent one. Closest things: the `advanced` (Advanced
-> Analysis) tab, or the "Deep Research" *mode* inside biomarker/advanced (`LIC:~2775`) — a mode, not a tab.
+> Analysis) tab, or the "Deep Research" _mode_ inside biomarker/advanced (`LIC:~2775`) — a mode, not a tab.
 
 ## Per-tool
 
-| Tool | tab click (label) | activeTab | trigger | ready-signal |
-|------|-------------------|-----------|---------|--------------|
-| Biomarker Analysis | "Biomarker Analysis" | `biomarker` | `setInputFiles('input#files')` (`BiomarkerAnalysisDashboard.tsx:516`, accept `.pdf,.jpg,.jpeg,.png,.txt,.csv`) → click "Generate analysis report" (`:1087`) | `#biomarker-visual-report-iframe` becomes visible (`LIC:~3855`); it only mounts once the visual report is ready. Wrapper `div[data-report-section]` (`LIC:~3510`). Pipeline up to ~30 min. |
-| Knowledge Assistant | "Knowledge" | `knowledge` | fill `getByPlaceholder("Ask a question")` (`:2355/:2961`) → click `button[aria-label="Send message"]` (`:3093`) | `button[aria-label="Stop generating"]` (`:2939/:3078`) detaches; assistant `.prose` block present (`:2597`). |
-| Business Advisor | "Business Advisor" | `operations` | fill `getByPlaceholder("Ask a question")` (`:975/:1404`) → **press Enter** | **No aria-labels on send/stop.** Done = `button[title="Download as PDF"]` appears (`BusinessAdvisor.tsx:1330`) — the action row renders only on a finished answer. Fallback signal: the `isLoading` thinking-dots block (`:1353`) clears. |
-| Therapy Explorer | "Therapy Explorer" | `therapy` | fill `getByPlaceholder(/Ask a clinical question/)` (`:1148`) → click `button[aria-label="Send message"]` (`:1177`) | `button[aria-label="Stop generating"]` (`:1162/:1286/:1329`) detaches; assistant answer present. |
+| Tool                | tab click (label)    | activeTab    | trigger                                                                                                                                                     | ready-signal                                                                                                                                                                                                                              |
+| ------------------- | -------------------- | ------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Biomarker Analysis  | "Biomarker Analysis" | `biomarker`  | `setInputFiles('input#files')` (`BiomarkerAnalysisDashboard.tsx:516`, accept `.pdf,.jpg,.jpeg,.png,.txt,.csv`) → click "Generate analysis report" (`:1087`) | `#biomarker-visual-report-iframe` becomes visible (`LIC:~3855`); it only mounts once the visual report is ready. Wrapper `div[data-report-section]` (`LIC:~3510`). Pipeline up to ~30 min.                                                |
+| Knowledge Assistant | "Knowledge"          | `knowledge`  | fill `getByPlaceholder("Ask a question")` (`:2355/:2961`) → click `button[aria-label="Send message"]` (`:3093`)                                             | `button[aria-label="Stop generating"]` (`:2939/:3078`) detaches; assistant `.prose` block present (`:2597`).                                                                                                                              |
+| Business Advisor    | "Business Advisor"   | `operations` | fill `getByPlaceholder("Ask a question")` (`:975/:1404`) → **press Enter**                                                                                  | **No aria-labels on send/stop.** Done = `button[title="Download as PDF"]` appears (`BusinessAdvisor.tsx:1330`) — the action row renders only on a finished answer. Fallback signal: the `isLoading` thinking-dots block (`:1353`) clears. |
+| Therapy Explorer    | "Therapy Explorer"   | `therapy`    | fill `getByPlaceholder(/Ask a clinical question/)` (`:1148`) → click `button[aria-label="Send message"]` (`:1177`)                                          | `button[aria-label="Stop generating"]` (`:1162/:1286/:1329`) detaches; assistant answer present.                                                                                                                                          |
 
 ## Chrome to hide
 
@@ -47,6 +47,6 @@ Explorer, Peptide GPS, Knowledge, Business Advisor.
 - Tab opening uses `getByText(label, { exact: true }).first()`. "Knowledge" is a short label that
   could collide with other on-page text; if it mis-clicks, switch to a more specific nav locator.
 - Only the active tab's component is mounted, so placeholders like "Ask a question" (shared by
-  Knowledge + Business) are unambiguous *after* the tab is opened.
+  Knowledge + Business) are unambiguous _after_ the tab is opened.
 - Business Advisor submit uses Enter. If the composer ever switches Enter to insert-newline, add an
   explicit send-button locator in `tools.config.ts`.

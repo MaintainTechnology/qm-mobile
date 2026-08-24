@@ -50,7 +50,10 @@ function readBufferInternal(cwd, { strict }) {
 export function writeBuffer(cwd, buffer) {
   const filePath = getBufferPath(cwd);
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
-  fs.writeFileSync(filePath, JSON.stringify({ version: BUFFER_VERSION, entries: buffer.entries }, null, 2));
+  fs.writeFileSync(
+    filePath,
+    JSON.stringify({ version: BUFFER_VERSION, entries: buffer.entries }, null, 2),
+  );
 }
 
 /**
@@ -68,7 +71,7 @@ export function stageEntry(cwd, newEntry) {
     let mergedIntoExisting = false;
     for (const existing of buf.entries) {
       if (existing.pageUrl !== pageUrl) continue;
-      const existingOpIdx = existing.ops.findIndex((op) => op.ref === newOp.ref);
+      const existingOpIdx = existing.ops.findIndex(op => op.ref === newOp.ref);
       if (existingOpIdx >= 0) {
         // Keep the original source text but refresh the latest DOM/source evidence.
         existing.ops[existingOpIdx] = {
@@ -85,7 +88,7 @@ export function stageEntry(cwd, newEntry) {
     }
     if (mergedIntoExisting) continue;
     // No existing op for this (pageUrl, ref). Find or create an entry to hold it.
-    let entry = buf.entries.find((e) => e.pageUrl === pageUrl && e.id === newEntry.id);
+    let entry = buf.entries.find(e => e.pageUrl === pageUrl && e.id === newEntry.id);
     if (!entry) {
       entry = {
         id: newEntry.id,

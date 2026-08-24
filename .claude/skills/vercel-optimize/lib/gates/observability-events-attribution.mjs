@@ -21,34 +21,36 @@ export function gate(signals) {
   if (total <= 0) return [];
 
   const eventsBilled = services
-    .filter((s) => EVENTS_RE.test(String(s?.name ?? '')))
+    .filter(s => EVENTS_RE.test(String(s?.name ?? '')))
     .reduce((acc, s) => acc + Number(s.billedCost ?? s.cost ?? 0), 0);
   if (eventsBilled <= 0) return [];
 
   const share = eventsBilled / total;
-  if (share <= 0.20) return [];
+  if (share <= 0.2) return [];
 
-  const critical = share > 0.30;
+  const critical = share > 0.3;
 
-  return [{
-    kind: metadata.id,
-    scope: 'account',
-    files: [],
-    priority: critical ? 70 : 55,
-    confidence: 0.82,
-    o11ySignal: `observability_events_share=${(share * 100).toFixed(0)}%`,
-    reason: critical
-      ? 'observability events exceed 30% of total billed cost'
-      : 'observability events exceed 20% of total billed cost',
-    question: `Observability Events are ${(share * 100).toFixed(0)}% of the bill. Which routes drive event volume — low-cache-hit traffic, broad middleware invocation, or high custom-span cardinality — and can event volume be reduced upstream of the meter?`,
-    evidence: {
-      metric: 'usage.services',
-      eventsBilled,
-      totalBilled: total,
-      observabilityEventsShare: share,
-      critical,
+  return [
+    {
+      kind: metadata.id,
+      scope: 'account',
+      files: [],
+      priority: critical ? 70 : 55,
+      confidence: 0.82,
+      o11ySignal: `observability_events_share=${(share * 100).toFixed(0)}%`,
+      reason: critical
+        ? 'observability events exceed 30% of total billed cost'
+        : 'observability events exceed 20% of total billed cost',
+      question: `Observability Events are ${(share * 100).toFixed(0)}% of the bill. Which routes drive event volume — low-cache-hit traffic, broad middleware invocation, or high custom-span cardinality — and can event volume be reduced upstream of the meter?`,
+      evidence: {
+        metric: 'usage.services',
+        eventsBilled,
+        totalBilled: total,
+        observabilityEventsShare: share,
+        critical,
+      },
     },
-  }];
+  ];
 }
 
 function sumBilled(services) {

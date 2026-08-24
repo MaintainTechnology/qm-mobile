@@ -7,13 +7,15 @@ allowed-tools: Read, Write, Edit
 # EduSales Content Writer
 
 ## Overview
-This skill creates **educational sales content** - content that provides genuine value through teaching while naturally positioning a product or service as the solution. The goal is content that readers *want* to engage with because they learn something, and where the promotion feels helpful rather than pushy.
+
+This skill creates **educational sales content** - content that provides genuine value through teaching while naturally positioning a product or service as the solution. The goal is content that readers _want_ to engage with because they learn something, and where the promotion feels helpful rather than pushy.
 
 ## Core Philosophy
 
 **Edusales = Education + Native Promotion**
 
 The best promotional content doesn't feel promotional. It:
+
 - Leads with value and insight
 - Establishes authority through teaching
 - Positions the product as a natural extension of the lesson
@@ -22,10 +24,15 @@ The best promotional content doesn't feel promotional. It:
 ## Content Types Supported
 
 ### 1. LinkedIn Posts
+
 ### 2. Email Sequences / Nurture Campaigns
+
 ### 3. Single Promotional Emails
+
 ### 4. Social Media Posts (Twitter/X, Instagram captions)
+
 ### 5. Newsletter Content
+
 ### 6. Launch Announcements
 
 ---
@@ -35,9 +42,11 @@ The best promotional content doesn't feel promotional. It:
 Every piece of content follows this psychological flow:
 
 ### Stage 1: HOOK (Pattern Interrupt)
+
 Grab attention with something unexpected, relatable, or provocative.
 
 **Hook Types:**
+
 - **Contrarian**: Challenge a common belief
 - **Story**: Personal narrative that draws them in
 - **Hypothetical**: "If I had to start over..."
@@ -46,15 +55,18 @@ Grab attention with something unexpected, relatable, or provocative.
 - **Bold Claim**: Make a statement they need to verify
 
 **Examples:**
+
 - "If I lost everything today, here's exactly what I'd do"
 - "After 3 years with AI, I've finally cracked my workflow"
 - "Most people get this completely wrong"
 - "The problem isn't [obvious thing]. It's [surprising thing]."
 
 ### Stage 2: EDUCATE (Value Delivery)
+
 Deliver genuine, actionable insight. This is where trust is built.
 
 **Education Formats:**
+
 - Step-by-step frameworks
 - Behind-the-scenes breakdowns
 - "Here's what actually works" revelations
@@ -63,15 +75,18 @@ Deliver genuine, actionable insight. This is where trust is built.
 - Personal learnings from experience
 
 **Rules:**
+
 - Be specific, not vague
 - Use concrete examples
 - Make it actionable
 - Don't hold back value to "save it for the sale"
 
 ### Stage 3: BRIDGE (Natural Transition)
+
 Connect the education to your solution without a jarring shift.
 
 **Bridge Phrases:**
+
 - "This is exactly why I built..."
 - "It's the same approach I've baked into..."
 - "This is what [Product] does automatically..."
@@ -79,9 +94,11 @@ Connect the education to your solution without a jarring shift.
 - "After doing this manually, I created..."
 
 ### Stage 4: OFFER (Soft Promotion)
+
 Present your product/service as a natural next step, not a hard sell.
 
 **Offer Styles:**
+
 - **Resource**: "If you want to go deeper, here's where to start"
 - **Tool**: "I built [Tool] to handle this for you"
 - **Waitlist**: "We're opening to X new users"
@@ -89,9 +106,11 @@ Present your product/service as a natural next step, not a hard sell.
 - **Social Proof**: "Join X others who are already using this"
 
 ### Stage 5: CTA (Clear Next Step)
+
 One clear action. Make it easy.
 
 **CTA Types:**
+
 - Comment-based: "Drop 'YES' in the comments"
 - Link-based: "Join the waitlist here: [link]"
 - Engagement: "Save this for later"
@@ -104,6 +123,7 @@ One clear action. Make it easy.
 ### LinkedIn Posts
 
 **Structure:**
+
 ```
 [Hook - 1-2 lines, pattern interrupt]
 
@@ -121,6 +141,7 @@ One clear action. Make it easy.
 ```
 
 **Formatting Guidelines:**
+
 - First line = most important (it's the preview)
 - Max 2-3 sentences per paragraph
 - Use line breaks liberally (every 1-2 sentences)
@@ -132,6 +153,7 @@ One clear action. Make it easy.
 ### Email Sequences
 
 **Single Email Structure:**
+
 ```
 Subject Line: [Curiosity/Benefit - keep under 50 chars]
 Preview Text: [Expands on subject, adds intrigue]
@@ -163,6 +185,7 @@ Preview Text: [Expands on subject, adds intrigue]
 ### Twitter/X Posts
 
 **Structure:**
+
 ```
 [Hook - punchy, 1 line]
 
@@ -172,6 +195,7 @@ Preview Text: [Expands on subject, adds intrigue]
 ```
 
 **Guidelines:**
+
 - Even shorter paragraphs than LinkedIn
 - More personality, less polish
 - Threads work well for educational content
@@ -182,34 +206,44 @@ Preview Text: [Expands on subject, adds intrigue]
 ## Product Integration Techniques
 
 ### Technique 1: The "Why I Built This" Story
+
 Frame the product as your solution to a problem you personally faced.
 
-*Example:*
+_Example:_
+
 > "After rewriting 200+ client emails manually, I thought: there has to be a better way. That's why I built [Product]."
 
 ### Technique 2: The "Here's My Workflow" Reveal
+
 Share your actual process, with your product as one natural tool in the stack.
 
-*Example:*
+_Example:_
+
 > "My content workflow: 1) Capture ideas in Notion, 2) Draft in [Product], 3) Edit in Google Docs, 4) Schedule in Buffer"
 
 ### Technique 3: The "Hidden Feature" Tease
+
 Educate about a capability, then reveal your product has it.
 
-*Example:*
+_Example:_
+
 > "The best writers use 'swipe files' - collections of proven hooks and formats. I've built a swipe library directly into [Product]."
 
 ### Technique 4: The "Before/After" Contrast
+
 Show the painful manual way vs. your solution.
 
-*Example:*
+_Example:_
+
 > "Most people: Open ChatGPT, ask for generic post, get generic output.
 > With [Product]: Feed it your voice, your swipes, your knowledge. Get YOU, faster."
 
 ### Technique 5: The "Social Proof Embed"
+
 Let results do the selling.
 
-*Example:*
+_Example:_
+
 > "After 50+ user calls, here's what I learned... [education]. This feedback shaped [Product] 2.0."
 
 ---
@@ -217,6 +251,7 @@ Let results do the selling.
 ## Voice & Tone Guidelines
 
 ### DO:
+
 - Write like you talk
 - Use "I" and "you" freely
 - Be specific with numbers and examples
@@ -225,6 +260,7 @@ Let results do the selling.
 - Use contractions (it's, you're, don't)
 
 ### DON'T:
+
 - Use corporate jargon
 - Sound like a press release
 - Make claims without backing them up
@@ -233,6 +269,7 @@ Let results do the selling.
 - Oversell or overpromise
 
 ### Power Words for EduSales:
+
 - "Here's exactly..."
 - "The truth is..."
 - "What most people miss..."
@@ -256,6 +293,7 @@ When creating edusales content, provide:
 6. **CTA Goal**: What action you want readers to take
 
 ### Optional Inputs:
+
 - Tone preference (casual, professional, bold)
 - Specific constraints (word count, format)
 - Urgency elements (launch date, limited spots)
@@ -269,6 +307,7 @@ When creating edusales content, provide:
 ### LinkedIn Post Example
 
 **Input:**
+
 - Product: AI writing tool called "Kleo"
 - Benefit: Writes in your voice using your past content
 - Audience: LinkedIn creators and entrepreneurs
@@ -276,6 +315,7 @@ When creating edusales content, provide:
 - CTA: Join waitlist
 
 **Output:**
+
 ```
 After 3 years with AI, 100s of LinkedIn posts, and 50+ user calls... I've finally cracked my workflow.
 
@@ -320,6 +360,7 @@ Join the waitlist in the comments.
 ### Email Example
 
 **Input:**
+
 - Product: Copywriting course
 - Benefit: Learn the meta-skill that drives all marketing
 - Audience: Aspiring entrepreneurs
@@ -327,6 +368,7 @@ Join the waitlist in the comments.
 - CTA: Enroll now
 
 **Output:**
+
 ```
 Subject: The one skill I'd rebuild everything on
 Preview: If I had to start from zero tomorrow...

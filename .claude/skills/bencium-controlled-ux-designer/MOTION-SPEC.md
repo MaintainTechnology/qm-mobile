@@ -7,74 +7,87 @@ Detailed animation specifications for consistent motion design across projects.
 ### Standard Easings
 
 **Ease-out (Entrances)**
+
 ```css
 cubic-bezier(0.0, 0.0, 0.2, 1)
 ```
+
 Use for: Elements entering view, expanding, appearing
 
 **Ease-in (Exits)**
+
 ```css
 cubic-bezier(0.4, 0.0, 1, 1)
 ```
+
 Use for: Elements leaving view, collapsing, disappearing
 
 **Ease-in-out (Transitions)**
+
 ```css
 cubic-bezier(0.4, 0.0, 0.2, 1)
 ```
+
 Use for: State changes, transformations, element swaps
 
 **Linear (Continuous)**
+
 ```css
 linear
 ```
+
 Use for: Loading spinners, continuous animations, marquee scrolls
 
 ### Custom Easings
 
 **Spring (Bouncy)**
+
 ```css
 cubic-bezier(0.68, -0.55, 0.265, 1.55)
 ```
+
 Use for: Playful interactions, game-like UIs, attention-grabbing
 
 **Sharp (Quick snap)**
+
 ```css
 cubic-bezier(0.4, 0.0, 0.6, 1)
 ```
+
 Use for: Mechanical interactions, precise movements
 
 ## Duration Tables
 
 ### By Interaction Type
 
-| Interaction | Duration | Easing | Example |
-|-------------|----------|--------|---------|
-| Button press | 100ms | ease-out | Background color change |
-| Hover state | 150ms | ease-out | Underline appearing |
-| Checkbox toggle | 150ms | ease-out | Checkmark animation |
-| Tooltip appear | 200ms | ease-out | Tooltip fade in |
-| Tab switch | 250ms | ease-in-out | Content swap |
-| Accordion expand | 300ms | ease-out | Height animation |
-| Modal open | 300ms | ease-out | Fade + scale up |
-| Modal close | 250ms | ease-in | Fade + scale down |
-| Page transition | 400ms | ease-in-out | Route change |
-| Sheet slide-in | 300ms | ease-out | Bottom sheet |
-| Toast notification | 300ms | ease-out | Slide in from top |
+| Interaction        | Duration | Easing      | Example                 |
+| ------------------ | -------- | ----------- | ----------------------- |
+| Button press       | 100ms    | ease-out    | Background color change |
+| Hover state        | 150ms    | ease-out    | Underline appearing     |
+| Checkbox toggle    | 150ms    | ease-out    | Checkmark animation     |
+| Tooltip appear     | 200ms    | ease-out    | Tooltip fade in         |
+| Tab switch         | 250ms    | ease-in-out | Content swap            |
+| Accordion expand   | 300ms    | ease-out    | Height animation        |
+| Modal open         | 300ms    | ease-out    | Fade + scale up         |
+| Modal close        | 250ms    | ease-in     | Fade + scale down       |
+| Page transition    | 400ms    | ease-in-out | Route change            |
+| Sheet slide-in     | 300ms    | ease-out    | Bottom sheet            |
+| Toast notification | 300ms    | ease-out    | Slide in from top       |
 
 ### By Element Weight
 
-| Element Weight | Duration | Example |
-|----------------|----------|---------|
-| Lightweight (< 100px) | 150ms | Icons, badges, chips |
-| Standard (100-500px) | 300ms | Cards, panels, list items |
-| Weighty (> 500px) | 500ms | Modals, full-page transitions |
+| Element Weight        | Duration | Example                       |
+| --------------------- | -------- | ----------------------------- |
+| Lightweight (< 100px) | 150ms    | Icons, badges, chips          |
+| Standard (100-500px)  | 300ms    | Cards, panels, list items     |
+| Weighty (> 500px)     | 500ms    | Modals, full-page transitions |
 
 ## State-Specific Animations
 
 ### Hover States
 
 **Button Hover:**
+
 ```tsx
 // Tailwind
 <button className="
@@ -94,23 +107,29 @@ Use for: Mechanical interactions, precise movements
 ```
 
 **Link Hover:**
+
 ```tsx
-<a className="
+<a
+  className="
   underline-offset-4
   hover:underline
   transition-all duration-200 ease-out
-">
+"
+>
   Link Text
 </a>
 ```
 
 **Card Hover:**
+
 ```tsx
-<div className="
+<div
+  className="
   transition-all duration-200 ease-out
   hover:shadow-lg
   hover:scale-[1.02]
-">
+"
+>
   Card Content
 </div>
 ```
@@ -118,30 +137,37 @@ Use for: Mechanical interactions, precise movements
 ### Focus States
 
 **Keyboard Focus:**
+
 ```tsx
-<button className="
+<button
+  className="
   focus:outline-none
   focus:ring-4 focus:ring-blue-500
   focus:ring-offset-2
   transition-all duration-200 ease-out
-">
+"
+>
   Focus Me
 </button>
 ```
 
 **Input Focus:**
+
 ```tsx
-<input className="
+<input
+  className="
   border-2 border-slate-300
   focus:border-blue-500
   focus:ring-4 focus:ring-blue-200
   transition-all duration-200 ease-out
-" />
+"
+/>
 ```
 
 ### Active/Pressed States
 
 **Button Press:**
+
 ```tsx
 <motion.button
   whileTap={{ scale: 0.98 }}
@@ -162,6 +188,7 @@ Use for: Mechanical interactions, precise movements
 ### Disabled States
 
 **Disabled Button:**
+
 ```tsx
 <button
   disabled
@@ -178,6 +205,7 @@ Use for: Mechanical interactions, precise movements
 ### Loading States
 
 **Loading Spinner:**
+
 ```tsx
 <div className="
   w-8 h-8 border-4 border-slate-300
@@ -198,6 +226,7 @@ Use for: Mechanical interactions, precise movements
 ```
 
 **Skeleton Loader:**
+
 ```tsx
 <div className="animate-pulse space-y-4">
   <div className="h-4 bg-slate-200 rounded w-3/4"></div>
@@ -218,23 +247,25 @@ Use for: Mechanical interactions, precise movements
 ### Success Feedback
 
 **Checkmark Animation:**
+
 ```tsx
 <motion.div
   initial={{ opacity: 0, scale: 0.5 }}
   animate={{ opacity: 1, scale: 1 }}
-  transition={{ duration: 0.3, ease: "easeOut" }}
+  transition={{ duration: 0.3, ease: 'easeOut' }}
 >
   <CheckCircle className="text-green-600" size={48} />
 </motion.div>
 ```
 
 **Toast Notification:**
+
 ```tsx
 <motion.div
   initial={{ y: -100, opacity: 0 }}
   animate={{ y: 0, opacity: 1 }}
   exit={{ y: -100, opacity: 0 }}
-  transition={{ duration: 0.3, ease: "easeOut" }}
+  transition={{ duration: 0.3, ease: 'easeOut' }}
   className="bg-green-600 text-white p-4 rounded-lg"
 >
   Success! Changes saved.
@@ -244,6 +275,7 @@ Use for: Mechanical interactions, precise movements
 ### Error Feedback
 
 **Shake Animation:**
+
 ```tsx
 <motion.div
   animate={{ x: [0, -4, 4, -4, 4, 0] }}
@@ -266,12 +298,13 @@ Use for: Mechanical interactions, precise movements
 ```
 
 **Error Message Slide-in:**
+
 ```tsx
 <motion.div
   initial={{ height: 0, opacity: 0 }}
-  animate={{ height: "auto", opacity: 1 }}
+  animate={{ height: 'auto', opacity: 1 }}
   exit={{ height: 0, opacity: 0 }}
-  transition={{ duration: 0.2, ease: "easeOut" }}
+  transition={{ duration: 0.2, ease: 'easeOut' }}
   className="text-red-600 text-sm"
 >
   Please enter a valid email address
@@ -281,13 +314,14 @@ Use for: Mechanical interactions, precise movements
 ### Warning Feedback
 
 **Pulse Animation:**
+
 ```tsx
 <motion.div
   animate={{ scale: [1, 1.05, 1] }}
   transition={{
     duration: 0.6,
-    ease: "easeInOut",
-    repeat: Infinity
+    ease: 'easeInOut',
+    repeat: Infinity,
   }}
   className="border-2 border-amber-500"
 >
@@ -298,36 +332,37 @@ Use for: Mechanical interactions, precise movements
 ### Form Validation
 
 **Field Validation (On Blur):**
+
 ```tsx
 // Validate on blur, not during typing
 <input
-  onBlur={(e) => {
+  onBlur={e => {
     const isValid = validateEmail(e.target.value);
     setError(!isValid);
   }}
   className={`
     border-2 transition-all duration-200 ease-out
-    ${error
-      ? 'border-red-500 focus:ring-red-200'
-      : 'border-slate-300 focus:ring-blue-200'
-    }
+    ${error ? 'border-red-500 focus:ring-red-200' : 'border-slate-300 focus:ring-blue-200'}
   `}
-/>
+/>;
 
-{error && (
-  <motion.p
-    initial={{ opacity: 0, y: -10 }}
-    animate={{ opacity: 1, y: 0 }}
-    className="text-red-600 text-sm mt-1"
-  >
-    Please enter a valid email
-  </motion.p>
-)}
+{
+  error && (
+    <motion.p
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="text-red-600 text-sm mt-1"
+    >
+      Please enter a valid email
+    </motion.p>
+  );
+}
 ```
 
 ## Common Animation Patterns
 
 ### Fade In
+
 ```tsx
 // Framer Motion
 <motion.div
@@ -350,6 +385,7 @@ Use for: Mechanical interactions, precise movements
 ```
 
 ### Slide Up
+
 ```tsx
 // Framer Motion
 <motion.div
@@ -378,19 +414,21 @@ Use for: Mechanical interactions, precise movements
 ```
 
 ### Scale + Fade (Modal)
+
 ```tsx
 // Framer Motion
 <motion.div
   initial={{ opacity: 0, scale: 0.95 }}
   animate={{ opacity: 1, scale: 1 }}
   exit={{ opacity: 0, scale: 0.95 }}
-  transition={{ duration: 0.3, ease: "easeOut" }}
+  transition={{ duration: 0.3, ease: 'easeOut' }}
 >
   Modal content
 </motion.div>
 ```
 
 ### Stagger Children
+
 ```tsx
 // Framer Motion
 <motion.ul
@@ -399,9 +437,9 @@ Use for: Mechanical interactions, precise movements
   variants={{
     visible: {
       transition: {
-        staggerChildren: 0.1
-      }
-    }
+        staggerChildren: 0.1,
+      },
+    },
   }}
 >
   {items.map(item => (
@@ -409,7 +447,7 @@ Use for: Mechanical interactions, precise movements
       key={item.id}
       variants={{
         hidden: { opacity: 0, x: -20 },
-        visible: { opacity: 1, x: 0 }
+        visible: { opacity: 1, x: 0 },
       }}
     >
       {item.name}
@@ -445,6 +483,7 @@ Use for: Mechanical interactions, precise movements
 ```
 
 **Implementation in React:**
+
 ```tsx
 import { useReducedMotion } from 'framer-motion';
 
@@ -457,7 +496,7 @@ function MyComponent() {
       animate={{ opacity: 1, y: 0 }}
       transition={{
         duration: shouldReduceMotion ? 0.01 : 0.3,
-        ease: "easeOut"
+        ease: 'easeOut',
       }}
     >
       Content
@@ -480,13 +519,12 @@ function MyComponent() {
 ## Animation & Gestalt Principles
 
 ### Proximity
+
 Animated elements that are near each other should move together to reinforce grouping:
+
 ```tsx
 // Animate card and its children together
-<motion.div
-  initial={{ opacity: 0, y: 20 }}
-  animate={{ opacity: 1, y: 0 }}
->
+<motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}>
   <h3>Title</h3>
   <p>Content</p>
   <button>Action</button>
@@ -494,7 +532,9 @@ Animated elements that are near each other should move together to reinforce gro
 ```
 
 ### Similarity
+
 Similar elements should have similar animation characteristics:
+
 ```tsx
 // All buttons use same hover animation
 const buttonAnimation = {
@@ -507,17 +547,21 @@ const buttonAnimation = {
 ```
 
 ### Continuity
+
 Movement should follow natural, smooth paths:
+
 ```tsx
 // Smooth curve, not jumpy angles
 <motion.div
   animate={{ x: [0, 50, 100], y: [0, -25, 0] }}
-  transition={{ duration: 1, ease: "easeInOut" }}
+  transition={{ duration: 1, ease: 'easeInOut' }}
 />
 ```
 
 ### Figure-Ground
+
 Important elements animate while backgrounds stay stable:
+
 ```tsx
 // Background fades out, modal animates in
 <>

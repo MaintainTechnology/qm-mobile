@@ -36,8 +36,8 @@ the roles clean and the loop fast.
   nothing to review against.
 - Read the **entire** spec. It is the only standard you judge against. Note its
   Requirements, Definition of done, Edge cases, Constraints, and Non-goals.
-- If `/build` left a coverage report, read it as a *map of what the builder
-  intended* — but do not trust it. Verify every claim yourself against the actual
+- If `/build` left a coverage report, read it as a _map of what the builder
+  intended_ — but do not trust it. Verify every claim yourself against the actual
   code and behavior. The builder marking a box does not mean it's done.
 
 ## Step 2: Verify independently, item by item
@@ -82,27 +82,35 @@ Use this structure:
 
 ```markdown
 ## Review — specs/<name>.md
-**Verdict: PASS** ✓   (or **FAIL** — N issues)
+
+**Verdict: PASS** ✓ (or **FAIL** — N issues)
 
 ### Requirements
+
 - R1: <text> — PASS — <evidence: file:line / test / observed behavior>
 - R3: <text> — FAIL — <what's wrong, concretely>
 
 ### Definition of done
+
 - <item> — PASS/FAIL — <evidence or gap>
 
 ### Edge cases
+
 - <case> → <expected> — PASS/FAIL — <evidence or gap>
 
 ### Constraints
+
 - <constraint> — respected? — <evidence>
 
 ### Non-goals / scope creep
+
 - <anything built that's out of scope> — FAIL — <what to remove>, or "none — clean"
 
-### Fixes for /build  (only when FAIL)
+### Fixes for /build (only when FAIL)
+
 A consolidated, actionable list. Tag each fix with the spec item it resolves so
 /build can address them directly and the next review can re-check them:
+
 1. [R3] <specific change needed to satisfy R3>
 2. [DoD: <item>] <specific change>
 3. [Edge: <case>] <specific change>

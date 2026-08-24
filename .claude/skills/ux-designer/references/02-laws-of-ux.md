@@ -32,6 +32,7 @@ Avoid:
 ```
 
 ### Minimum Target Sizes
+
 - **Touch (mobile):** 44×44px (Apple) / 48×48dp (Material Design)
 - **Mouse (desktop):** 24×24px minimum, 44×44px recommended
 - **Spacing between targets:** 8px minimum
@@ -68,6 +69,7 @@ Avoid:
 ```
 
 ### The Magic Number
+
 Navigation menus should typically have **7±2 items** at the top level, though research suggests **4-5 items** may be optimal for quick scanning.
 
 ---
@@ -202,6 +204,7 @@ Don't remove necessary complexity:
 Principles of visual perception that explain how humans group visual elements.
 
 ### Proximity
+
 Elements close together are perceived as related.
 
 ```
@@ -213,6 +216,7 @@ Use for:
 ```
 
 ### Similarity
+
 Elements that look similar are perceived as related.
 
 ```
@@ -224,6 +228,7 @@ Use for:
 ```
 
 ### Continuity
+
 Elements arranged in a line or curve are perceived as related.
 
 ```
@@ -235,6 +240,7 @@ Use for:
 ```
 
 ### Closure
+
 The mind fills in missing information to complete shapes.
 
 ```
@@ -246,6 +252,7 @@ Use for:
 ```
 
 ### Common Region
+
 Elements within a boundary are perceived as grouped.
 
 ```
@@ -257,6 +264,7 @@ Use for:
 ```
 
 ### Figure-Ground
+
 The mind separates foreground from background.
 
 ```
@@ -272,36 +280,47 @@ Use for:
 ## Additional Important Laws
 
 ### Aesthetic-Usability Effect
+
 Users often perceive aesthetically pleasing designs as more usable, even when they're not.
 
 ### Doherty Threshold
+
 Productivity increases when computer and user interact at a pace (< 400ms) that ensures neither has to wait on the other.
 
 ### Law of Common Region
+
 Elements tend to be perceived as groups if they share an enclosed area.
 
 ### Law of Prägnanz
+
 People interpret ambiguous images as simple and complete.
 
 ### Mere Exposure Effect
+
 The more exposure people have to something, the more they prefer it.
 
 ### Occam's Razor
+
 Among competing hypotheses, the one with the fewest assumptions should be selected.
 
 ### Pareto Principle (80/20 Rule)
+
 Roughly 80% of effects come from 20% of causes. Focus on the vital few features/screens.
 
 ### Postel's Law
+
 Be liberal in what you accept and conservative in what you send.
 
 ### Serial Position Effect
+
 Users best remember the first and last items in a series.
 
 ### Von Restorff Effect (Isolation Effect)
+
 Items that stand out are more likely to be remembered.
 
 ### Zeigarnik Effect
+
 People remember uncompleted tasks better than completed ones.
 
 ---

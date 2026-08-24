@@ -2,7 +2,7 @@
 
 **Paper:** "Physical activity and biological age measured by DNA methylation clocks: a systematic review and meta-analysis"
 
-**Source:** *Lancet Healthy Longevity*, Article 100835. Open access.
+**Source:** _Lancet Healthy Longevity_, Article 100835. Open access.
 
 **Audit goal:** Identify the editorial anchor for an NGM LinkedIn post.
 
@@ -22,13 +22,13 @@ Read end-to-end (not just the abstract). Five candidate findings surface:
 
 ## Step 2 — Sharpness scoring
 
-| Candidate | Counter-int | Practical | Mechanism | Differentiation | Specificity | **Total** |
-|-----------|------------:|----------:|----------:|----------------:|------------:|----------:|
-| 1. GrimAge β = -0.09 (abstract headline) | 2 | 3 | 3 | 1 | 5 | **14** |
-| 2. Hannum/PhenoAge null result | 4 | 2 | 4 | 3 | 4 | **17** |
-| 3. Horvath signal driven by 1 study | 3 | 1 | 2 | 4 | 4 | **14** |
-| 4. **Occupational PA showed no benefit** | **5** | **5** | **5** | **5** | **4** | **24** |
-| 5. Publication bias on funnel plots | 2 | 1 | 1 | 3 | 3 | **10** |
+| Candidate                                | Counter-int | Practical | Mechanism | Differentiation | Specificity | **Total** |
+| ---------------------------------------- | ----------: | --------: | --------: | --------------: | ----------: | --------: |
+| 1. GrimAge β = -0.09 (abstract headline) |           2 |         3 |         3 |               1 |           5 |    **14** |
+| 2. Hannum/PhenoAge null result           |           4 |         2 |         4 |               3 |           4 |    **17** |
+| 3. Horvath signal driven by 1 study      |           3 |         1 |         2 |               4 |           4 |    **14** |
+| 4. **Occupational PA showed no benefit** |       **5** |     **5** |     **5** |           **5** |       **4** |    **24** |
+| 5. Publication bias on funnel plots      |           2 |         1 |         1 |               3 |           3 |    **10** |
 
 ## Step 3 — The four "tells" check on the leading candidate
 
@@ -61,4 +61,4 @@ All four tells fire. This is the anchor.
 
 ## Lesson archived
 
-For meta-analyses and large pooled studies, the abstract typically foregrounds the *primary effect size*. The sharpest finding is often a *contrast within the data* (subgroup analyses, sex-stratified results, occupational vs leisure splits, RCT vs cross-sectional sub-comparisons). Hunt for these contrasts deliberately. They are where NGM's editorial differentiation lives.
+For meta-analyses and large pooled studies, the abstract typically foregrounds the _primary effect size_. The sharpest finding is often a _contrast within the data_ (subgroup analyses, sex-stratified results, occupational vs leisure splits, RCT vs cross-sectional sub-comparisons). Hunt for these contrasts deliberately. They are where NGM's editorial differentiation lives.

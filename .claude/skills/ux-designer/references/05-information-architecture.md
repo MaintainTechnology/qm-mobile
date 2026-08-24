@@ -9,6 +9,7 @@ Information Architecture (IA) is the structural design of shared information env
 ### What is Information Architecture?
 
 IA is the blueprint of a digital product, defining:
+
 - How content is organized and categorized
 - How users navigate between sections
 - How information is labeled and described
@@ -26,6 +27,7 @@ IA is the blueprint of a digital product, defining:
 ## Organization Structures
 
 ### Hierarchical (Tree)
+
 Most common structure. Content flows from broad to specific.
 
 ```
@@ -42,6 +44,7 @@ Home
 **Best for:** E-commerce, documentation, corporate sites
 
 ### Sequential (Linear)
+
 Content follows a specific order.
 
 ```
@@ -51,6 +54,7 @@ Step 1 → Step 2 → Step 3 → Step 4 → Done
 **Best for:** Onboarding flows, tutorials, checkout processes
 
 ### Matrix
+
 Multiple navigation paths to the same content.
 
 ```
@@ -64,6 +68,7 @@ Products can be accessed by:
 **Best for:** E-commerce, catalogs, databases
 
 ### Network (Web)
+
 No fixed hierarchy; content interconnects freely.
 
 ```
@@ -187,6 +192,7 @@ Best for:
 ## Labeling Best Practices
 
 ### Clarity Over Cleverness
+
 ```
 Good: "Pricing"
 Bad: "Investment Levels"
@@ -199,6 +205,7 @@ Bad: "Command Center"
 ```
 
 ### Consistency
+
 ```
 Consistent verb forms:
 - Create Project
@@ -212,12 +219,14 @@ Not:
 ```
 
 ### User Language
+
 - Use terms users understand
 - Test labels with real users
 - Avoid internal jargon
 - Research common search terms
 
 ### Scannability
+
 - Front-load important words
 - Keep labels short (1-3 words)
 - Use parallel structure
@@ -233,12 +242,7 @@ Not:
 <!-- Prominent, always visible -->
 <form role="search">
   <label for="search" class="sr-only">Search</label>
-  <input
-    type="search"
-    id="search"
-    placeholder="Search products..."
-    aria-label="Search products"
-  />
+  <input type="search" id="search" placeholder="Search products..." aria-label="Search products" />
   <button type="submit">
     <span class="sr-only">Search</span>
     🔍
@@ -247,6 +251,7 @@ Not:
 ```
 
 **Guidelines:**
+
 - Place in expected location (header, top-right)
 - Make it large enough to see query
 - Use placeholder text to indicate scope
@@ -267,6 +272,7 @@ Essential elements:
 ```
 
 ### Zero Results Page
+
 ```
 "No results for 'xyz'"
 - Check spelling
@@ -284,11 +290,13 @@ Essential elements:
 Users organize content into groups that make sense to them.
 
 **Open Card Sort:**
+
 - Users create their own category names
 - Reveals mental models
 - Good for new products
 
 **Closed Card Sort:**
+
 - Users sort into predefined categories
 - Tests existing structure
 - Good for validation
@@ -313,6 +321,7 @@ Structure:
 ```
 
 **Metrics:**
+
 - Success rate
 - Directness (first click correct)
 - Time to complete
@@ -330,18 +339,21 @@ Measure where users first click to complete a task.
 ## 2026 Trends
 
 ### AI-Powered IA
+
 - Dynamic categorization based on user behavior
 - Personalized navigation paths
 - Predictive search and recommendations
 - Auto-tagging and organization
 
 ### Voice and Conversational IA
+
 - Structure content for voice interfaces
 - Natural language navigation
 - Question-based organization
 - Conversational menus
 
 ### Zero UI
+
 - Interfaces that anticipate needs
 - Reduce navigation through prediction
 - Ambient computing integration
@@ -377,10 +389,10 @@ Homepage
 
 Spreadsheet of all existing content.
 
-| URL | Title | Type | Owner | Last Updated | Action |
-|-----|-------|------|-------|--------------|--------|
-| /about | About Us | Page | Marketing | 2024-06 | Keep |
-| /old-promo | Summer Sale | Landing | Marketing | 2023-08 | Delete |
+| URL        | Title       | Type    | Owner     | Last Updated | Action |
+| ---------- | ----------- | ------- | --------- | ------------ | ------ |
+| /about     | About Us    | Page    | Marketing | 2024-06      | Keep   |
+| /old-promo | Summer Sale | Landing | Marketing | 2023-08      | Delete |
 
 ### User Flow Diagrams
 

@@ -17,11 +17,13 @@ mcp__plugin_<plugin-name>_<server-name>__<tool-name>
 ### Examples
 
 **Asana plugin with asana server:**
+
 - `mcp__plugin_asana_asana__asana_create_task`
 - `mcp__plugin_asana_asana__asana_search_tasks`
 - `mcp__plugin_asana_asana__asana_get_project`
 
 **Custom plugin with database server:**
+
 - `mcp__plugin_myplug_database__query`
 - `mcp__plugin_myplug_database__execute`
 - `mcp__plugin_myplug_database__list_tables`
@@ -29,11 +31,13 @@ mcp__plugin_<plugin-name>_<server-name>__<tool-name>
 ### Discovering Tool Names
 
 **Use `/mcp` command:**
+
 ```bash
 /mcp
 ```
 
 This shows:
+
 - All available MCP servers
 - Tools provided by each server
 - Tool schemas and descriptions
@@ -48,14 +52,13 @@ Specify MCP tools in command frontmatter:
 ```markdown
 ---
 description: Create a new Asana task
-allowed-tools: [
-  "mcp__plugin_asana_asana__asana_create_task"
-]
+allowed-tools: ['mcp__plugin_asana_asana__asana_create_task']
 ---
 
 # Create Task Command
 
 To create a task:
+
 1. Gather task details from user
 2. Use mcp__plugin_asana_asana__asana_create_task with the details
 3. Confirm creation to user
@@ -65,11 +68,12 @@ To create a task:
 
 ```markdown
 ---
-allowed-tools: [
-  "mcp__plugin_asana_asana__asana_create_task",
-  "mcp__plugin_asana_asana__asana_search_tasks",
-  "mcp__plugin_asana_asana__asana_get_project"
-]
+allowed-tools:
+  [
+    'mcp__plugin_asana_asana__asana_create_task',
+    'mcp__plugin_asana_asana__asana_search_tasks',
+    'mcp__plugin_asana_asana__asana_get_project',
+  ]
 ---
 ```
 
@@ -77,7 +81,7 @@ allowed-tools: [
 
 ```markdown
 ---
-allowed-tools: ["mcp__plugin_asana_asana__*"]
+allowed-tools: ['mcp__plugin_asana_asana__*']
 ---
 ```
 
@@ -86,13 +90,12 @@ allowed-tools: ["mcp__plugin_asana_asana__*"]
 ### Tool Usage in Command Instructions
 
 **Example command:**
+
 ```markdown
 ---
 description: Search and create Asana tasks
-allowed-tools: [
-  "mcp__plugin_asana_asana__asana_search_tasks",
-  "mcp__plugin_asana_asana__asana_create_task"
-]
+allowed-tools:
+  ['mcp__plugin_asana_asana__asana_search_tasks', 'mcp__plugin_asana_asana__asana_create_task']
 ---
 
 # Asana Task Management
@@ -100,6 +103,7 @@ allowed-tools: [
 ## Searching Tasks
 
 To search for tasks:
+
 1. Use mcp__plugin_asana_asana__asana_search_tasks
 2. Provide search filters (assignee, project, etc.)
 3. Display results to user
@@ -107,6 +111,7 @@ To search for tasks:
 ## Creating Tasks
 
 To create a task:
+
 1. Gather task details:
    - Title (required)
    - Description
@@ -150,6 +155,7 @@ The agent has access to all Asana MCP tools without pre-approval.
 ### Agent Tool Access
 
 Agents have broader tool access than commands:
+
 - Can use any tool Claude determines is necessary
 - Don't need pre-allowed lists
 - Should document which tools they typically use
@@ -162,6 +168,7 @@ Single tool call with validation:
 
 ```markdown
 Steps:
+
 1. Validate user provided required fields
 2. Call mcp__plugin_api_server__create_item with validated data
 3. Check for errors
@@ -174,6 +181,7 @@ Chain multiple tool calls:
 
 ```markdown
 Steps:
+
 1. Search for existing items: mcp__plugin_api_server__search
 2. If not found, create new: mcp__plugin_api_server__create
 3. Add metadata: mcp__plugin_api_server__update_metadata
@@ -186,6 +194,7 @@ Multiple calls with same tool:
 
 ```markdown
 Steps:
+
 1. Get list of items to process
 2. For each item:
    - Call mcp__plugin_api_server__update_item
@@ -199,6 +208,7 @@ Graceful error handling:
 
 ```markdown
 Steps:
+
 1. Try to call mcp__plugin_api_server__get_data
 2. If error (rate limit, network, etc.):
    - Wait and retry (max 3 attempts)
@@ -214,6 +224,7 @@ Steps:
 Each MCP tool has a schema defining its parameters. View with `/mcp`.
 
 **Example schema:**
+
 ```json
 {
   "name": "asana_create_task",
@@ -263,6 +274,7 @@ Claude automatically structures tool calls based on schema:
 
 ```markdown
 Steps:
+
 1. Check required parameters:
    - Title is not empty
    - Workspace ID is provided
@@ -278,6 +290,7 @@ Steps:
 
 ```markdown
 Steps:
+
 1. Call MCP tool
 2. On success:
    - Extract relevant data from response
@@ -290,6 +303,7 @@ Steps:
 
 ```markdown
 Steps:
+
 1. Call MCP tool
 2. On error:
    - Check error type (auth, rate limit, validation, etc.)
@@ -302,6 +316,7 @@ Steps:
 
 ```markdown
 Steps:
+
 1. Batch operation with multiple MCP calls
 2. Track successes and failures separately
 3. Report summary:
@@ -315,8 +330,10 @@ Steps:
 ### Batching Requests
 
 **Good: Single query with filters**
+
 ```markdown
 Steps:
+
 1. Call mcp__plugin_api_server__search with filters:
    - project_id: "123"
    - status: "active"
@@ -325,8 +342,10 @@ Steps:
 ```
 
 **Avoid: Many individual queries**
+
 ```markdown
 Steps:
+
 1. For each item ID:
    - Call mcp__plugin_api_server__get_item
    - Process item
@@ -336,6 +355,7 @@ Steps:
 
 ```markdown
 Steps:
+
 1. Call expensive MCP operation: mcp__plugin_api_server__analyze
 2. Store results in variable for reuse
 3. Use cached results for subsequent operations
@@ -348,6 +368,7 @@ When tools don't depend on each other, call in parallel:
 
 ```markdown
 Steps:
+
 1. Make parallel calls (Claude handles this automatically):
    - mcp__plugin_api_server__get_project
    - mcp__plugin_api_server__get_users
@@ -361,8 +382,10 @@ Steps:
 ### User Experience
 
 **Provide feedback:**
+
 ```markdown
 Steps:
+
 1. Inform user: "Searching Asana tasks..."
 2. Call mcp__plugin_asana_asana__asana_search_tasks
 3. Show progress: "Found 15 tasks, analyzing..."
@@ -370,8 +393,10 @@ Steps:
 ```
 
 **Handle long operations:**
+
 ```markdown
 Steps:
+
 1. Warn user: "This may take a minute..."
 2. Break into smaller steps with updates
 3. Show incremental progress
@@ -381,6 +406,7 @@ Steps:
 ### Error Messages
 
 **Good error messages:**
+
 ```
 ❌ "Could not create task. Please check:
    1. You're logged into Asana
@@ -389,6 +415,7 @@ Steps:
 ```
 
 **Poor error messages:**
+
 ```
 ❌ "Error: MCP tool returned 403"
 ```
@@ -396,10 +423,12 @@ Steps:
 ### Documentation
 
 **Document MCP tool usage in command:**
+
 ```markdown
 ## MCP Tools Used
 
 This command uses the following Asana MCP tools:
+
 - **asana_search_tasks**: Search for tasks matching criteria
 - **asana_create_task**: Create new task with details
 - **asana_update_task**: Update existing task properties
@@ -420,16 +449,20 @@ Ensure you're authenticated to Asana before running this command.
 ### Test Scenarios
 
 **Test successful calls:**
+
 ```markdown
 Steps:
+
 1. Create test data in external service
 2. Run command that queries this data
 3. Verify correct results returned
 ```
 
 **Test error cases:**
+
 ```markdown
 Steps:
+
 1. Test with missing authentication
 2. Test with invalid parameters
 3. Test with non-existent resources
@@ -437,8 +470,10 @@ Steps:
 ```
 
 **Test edge cases:**
+
 ```markdown
 Steps:
+
 1. Test with empty results
 2. Test with maximum results
 3. Test with special characters
@@ -451,26 +486,31 @@ Steps:
 
 ```markdown
 ---
-allowed-tools: [
-  "mcp__plugin_api_server__create_item",
-  "mcp__plugin_api_server__read_item",
-  "mcp__plugin_api_server__update_item",
-  "mcp__plugin_api_server__delete_item"
-]
+allowed-tools:
+  [
+    'mcp__plugin_api_server__create_item',
+    'mcp__plugin_api_server__read_item',
+    'mcp__plugin_api_server__update_item',
+    'mcp__plugin_api_server__delete_item',
+  ]
 ---
 
 # Item Management
 
 ## Create
+
 Use create_item with required fields...
 
 ## Read
+
 Use read_item with item ID...
 
 ## Update
+
 Use update_item with item ID and changes...
 
 ## Delete
+
 Use delete_item with item ID (ask for confirmation first)...
 ```
 
@@ -478,6 +518,7 @@ Use delete_item with item ID (ask for confirmation first)...
 
 ```markdown
 Steps:
+
 1. **Search**: mcp__plugin_api_server__search with filters
 2. **Filter**: Apply additional local filtering if needed
 3. **Transform**: Process each result
@@ -488,6 +529,7 @@ Steps:
 
 ```markdown
 Steps:
+
 1. **Setup**: Gather all required information
 2. **Validate**: Check data completeness
 3. **Execute**: Chain of MCP tool calls:
@@ -504,6 +546,7 @@ Steps:
 ### Tools Not Available
 
 **Check:**
+
 - MCP server configured correctly
 - Server connected (check `/mcp`)
 - Tool names match exactly (case-sensitive)
@@ -512,6 +555,7 @@ Steps:
 ### Tool Calls Failing
 
 **Check:**
+
 - Authentication is valid
 - Parameters match tool schema
 - Required parameters provided
@@ -520,6 +564,7 @@ Steps:
 ### Performance Issues
 
 **Check:**
+
 - Batching queries instead of individual calls
 - Caching results when appropriate
 - Not making unnecessary tool calls
@@ -528,6 +573,7 @@ Steps:
 ## Conclusion
 
 Effective MCP tool usage requires:
+
 1. **Understanding tool schemas** via `/mcp`
 2. **Pre-allowing tools** in commands appropriately
 3. **Handling errors gracefully**

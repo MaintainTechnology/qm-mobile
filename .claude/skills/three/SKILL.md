@@ -22,9 +22,9 @@ The adapter sets `window.__hfThreeTime` and dispatches `new CustomEvent("hf-seek
 ```html
 <canvas id="three-layer"></canvas>
 <script type="module">
-  import * as THREE from "https://cdn.jsdelivr.net/npm/three@0.181.2/+esm";
+  import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.181.2/+esm';
 
-  const canvas = document.getElementById("three-layer");
+  const canvas = document.getElementById('three-layer');
   const renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true });
   // Match these to your composition's frame size.
   renderer.setSize(1920, 1080, false);
@@ -47,7 +47,7 @@ The adapter sets `window.__hfThreeTime` and dispatches `new CustomEvent("hf-seek
     renderer.render(scene, camera);
   }
 
-  window.addEventListener("hf-seek", (event) => {
+  window.addEventListener('hf-seek', event => {
     renderAt(event.detail.time);
   });
 

@@ -147,7 +147,7 @@ The wizard keeps its current 4-step shell but gains the web's gate and fields.
 Solar, aircon, signage, commercial painting, estimator/takeoff, flyer/video/marketing studio, CRM,
 files, calendar, follow-ups, billing/payouts/Stripe, admin, logo upload, availability editor,
 address autocomplete, maps/street-view/3D anywhere, SMS intent path, Face ID, password reset,
-push notifications. The painting *tool* (estimator) is out; painting *rates* are in.
+push notifications. The painting _tool_ (estimator) is out; painting _rates_ are in.
 
 ## Definition of done
 

@@ -63,6 +63,7 @@ OUTPUT as JSON:
 ### intervention_dosing
 
 **Query:** "What's the recommended rapamycin dose for longevity?"
+
 ```json
 {
   "intent": "intervention_dosing",
@@ -84,6 +85,7 @@ OUTPUT as JSON:
 ```
 
 **Query:** "How much thymosin alpha-1 for immune support?"
+
 ```json
 {
   "intent": "intervention_dosing",
@@ -107,6 +109,7 @@ OUTPUT as JSON:
 ### biomarker_interpretation
 
 **Query:** "What does low IGF-1 with high insulin resistance mean?"
+
 ```json
 {
   "intent": "biomarker_interpretation",
@@ -133,6 +136,7 @@ OUTPUT as JSON:
 ```
 
 **Query:** "My patient has elevated homocysteine - what should I check?"
+
 ```json
 {
   "intent": "biomarker_interpretation",
@@ -156,6 +160,7 @@ OUTPUT as JSON:
 ### mechanism
 
 **Query:** "How does AMPK activate autophagy?"
+
 ```json
 {
   "intent": "mechanism",
@@ -182,6 +187,7 @@ OUTPUT as JSON:
 ```
 
 **Query:** "What pathways does rapamycin affect?"
+
 ```json
 {
   "intent": "mechanism",
@@ -205,6 +211,7 @@ OUTPUT as JSON:
 ### regulatory
 
 **Query:** "Is BPC-157 legal?"
+
 ```json
 {
   "intent": "regulatory",
@@ -228,6 +235,7 @@ OUTPUT as JSON:
 ### interaction
 
 **Query:** "Can I take metformin with rapamycin?"
+
 ```json
 {
   "intent": "interaction",
@@ -256,6 +264,7 @@ OUTPUT as JSON:
 ### comparison
 
 **Query:** "Rapamycin vs everolimus for longevity"
+
 ```json
 {
   "intent": "comparison",
@@ -284,6 +293,7 @@ OUTPUT as JSON:
 ### general
 
 **Query:** "Tell me about mTOR"
+
 ```json
 {
   "intent": "general",
@@ -329,12 +339,14 @@ If intent is unclear, classify as most likely with "low" confidence and include 
 ## Entity ID Normalization
 
 When guessing `likely_id`:
+
 - Lowercase
 - Hyphenate multi-word names
 - Use common abbreviations (IGF-1 → igf1)
 - Greek letters spelled out (alpha → alpha)
 
 Examples:
+
 - "Thymosin Alpha-1" → "thymosin-alpha-1"
 - "IGF-1" → "igf1"
 - "HOMA-IR" → "homa-ir"

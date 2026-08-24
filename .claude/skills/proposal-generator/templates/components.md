@@ -20,7 +20,9 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ### Current State / Desired State
 
 ```html
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-4) 0;">
+<div
+  style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-4) 0;"
+>
   <div>
     <h4 style="color: var(--ink-500); margin-bottom: var(--space-2);">Where You Are</h4>
     <ul>
@@ -44,7 +46,10 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 
 ```html
 <div class="highlight-box">
-  <p><strong>The core opportunity:</strong> Brief statement of the main opportunity or insight from the conversation.</p>
+  <p>
+    <strong>The core opportunity:</strong> Brief statement of the main opportunity or insight from
+    the conversation.
+  </p>
 </div>
 ```
 
@@ -55,7 +60,10 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ### Scope Overview
 
 ```html
-<p>Based on our conversation, we propose a <strong>[engagement type]</strong> focused on [primary objective]. This engagement will deliver:</p>
+<p>
+  Based on our conversation, we propose a <strong>[engagement type]</strong> focused on [primary
+  objective]. This engagement will deliver:
+</p>
 
 <ul>
   <li>Deliverable 1 with brief description</li>
@@ -132,7 +140,9 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ### What's Included / What's Not
 
 ```html
-<div style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-4) 0;">
+<div
+  style="display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-4); margin: var(--space-4) 0;"
+>
   <div>
     <h4 style="margin-bottom: var(--space-2);">What's Included</h4>
     <ul>
@@ -160,16 +170,25 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ### Credentials List
 
 ```html
-<p>Dr. Anant Vinjamoori brings a unique combination of clinical expertise, operational experience, and technology innovation:</p>
+<p>
+  Dr. Anant Vinjamoori brings a unique combination of clinical expertise, operational experience,
+  and technology innovation:
+</p>
 
 <ul class="credentials-list">
   <li>
     <span class="credential-icon">◆</span>
-    <span><strong>Harvard Medical School</strong> — Clinical foundation in evidence-based medicine</span>
+    <span
+      ><strong>Harvard Medical School</strong> — Clinical foundation in evidence-based
+      medicine</span
+    >
   </li>
   <li>
     <span class="credential-icon">◆</span>
-    <span><strong>Chief Medical Officer, Modern Age</strong> — Built the first national-scale longevity clinic in the U.S.</span>
+    <span
+      ><strong>Chief Medical Officer, Modern Age</strong> — Built the first national-scale longevity
+      clinic in the U.S.</span
+    >
   </li>
   <li>
     <span class="credential-icon">◆</span>
@@ -177,7 +196,10 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
   </li>
   <li>
     <span class="credential-icon">◆</span>
-    <span><strong>Advisor to $1B+ companies</strong> — Strategic guidance to leading longevity ventures</span>
+    <span
+      ><strong>Advisor to $1B+ companies</strong> — Strategic guidance to leading longevity
+      ventures</span
+    >
   </li>
 </ul>
 ```
@@ -234,7 +256,11 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 
 ```html
 <div class="highlight-box">
-  <p><strong>Relevant experience:</strong> When we built Modern Age, we faced similar challenges around [specific challenge]. The approach we developed—[brief description]—resulted in [outcome]. We'll apply the same methodology here.</p>
+  <p>
+    <strong>Relevant experience:</strong> When we built Modern Age, we faced similar challenges
+    around [specific challenge]. The approach we developed—[brief description]—resulted in
+    [outcome]. We'll apply the same methodology here.
+  </p>
 </div>
 ```
 
@@ -381,7 +407,10 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
   <p>Based on similar implementations, we project:</p>
   <ul style="margin-bottom: 0;">
     <li><strong>Time savings:</strong> X hours/week per clinician on report generation</li>
-    <li><strong>Revenue opportunity:</strong> $XX,XXX additional monthly revenue from longevity services</li>
+    <li>
+      <strong>Revenue opportunity:</strong> $XX,XXX additional monthly revenue from longevity
+      services
+    </li>
     <li><strong>Payback period:</strong> X months</li>
   </ul>
 </div>
@@ -397,7 +426,11 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 <section class="cta-section">
   <h3>Ready to Move Forward?</h3>
   <p>Let's schedule a brief call to discuss any questions and outline next steps.</p>
-  <a href="mailto:anant@nextgenerationmedicine.co?subject=Proposal%20Follow-up%20-%20ClientName" class="cta-button">Schedule a Call</a>
+  <a
+    href="mailto:anant@nextgenerationmedicine.co?subject=Proposal%20Follow-up%20-%20ClientName"
+    class="cta-button"
+    >Schedule a Call</a
+  >
   <p class="cta-note">This proposal is valid for 30 days.</p>
 </section>
 ```
@@ -407,9 +440,18 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ```html
 <section class="cta-section">
   <h3>Let's Get Started</h3>
-  <p>Based on your timeline, we recommend beginning within the next two weeks to hit your Q1 launch target.</p>
-  <a href="mailto:anant@nextgenerationmedicine.co?subject=Ready%20to%20Proceed%20-%20ClientName" class="cta-button">Confirm & Begin</a>
-  <p class="cta-note">Reply to this email or schedule directly: <a href="#">calendly.com/anant-ngm</a></p>
+  <p>
+    Based on your timeline, we recommend beginning within the next two weeks to hit your Q1 launch
+    target.
+  </p>
+  <a
+    href="mailto:anant@nextgenerationmedicine.co?subject=Ready%20to%20Proceed%20-%20ClientName"
+    class="cta-button"
+    >Confirm & Begin</a
+  >
+  <p class="cta-note">
+    Reply to this email or schedule directly: <a href="#">calendly.com/anant-ngm</a>
+  </p>
 </section>
 ```
 
@@ -418,8 +460,15 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ```html
 <section class="cta-section">
   <h3>Which Option Works Best?</h3>
-  <p>Reply with your preferred option, or let's schedule a call to discuss which approach fits your situation.</p>
-  <a href="mailto:anant@nextgenerationmedicine.co?subject=Proposal%20Selection%20-%20ClientName" class="cta-button">Let's Discuss</a>
+  <p>
+    Reply with your preferred option, or let's schedule a call to discuss which approach fits your
+    situation.
+  </p>
+  <a
+    href="mailto:anant@nextgenerationmedicine.co?subject=Proposal%20Selection%20-%20ClientName"
+    class="cta-button"
+    >Let's Discuss</a
+  >
   <p class="cta-note">Questions? Reply to this email anytime.</p>
 </section>
 ```
@@ -438,7 +487,10 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 
 ```html
 <p class="text-small text-muted" style="margin-top: var(--space-4);">
-  <em>Note: This proposal is confidential and intended solely for the recipient. Pricing and scope are valid for 30 days from the date above.</em>
+  <em
+    >Note: This proposal is confidential and intended solely for the recipient. Pricing and scope
+    are valid for 30 days from the date above.</em
+  >
 </p>
 ```
 
@@ -447,7 +499,9 @@ Reusable HTML patterns for building proposal sections. Copy and customize as nee
 ```html
 <h3>Terms</h3>
 <ul class="text-small">
-  <li><strong>Payment:</strong> 50% upon signing, 50% upon completion (or monthly for retainers)</li>
+  <li>
+    <strong>Payment:</strong> 50% upon signing, 50% upon completion (or monthly for retainers)
+  </li>
   <li><strong>Timeline:</strong> Work begins within 2 weeks of signed agreement</li>
   <li><strong>Confidentiality:</strong> All information shared is kept strictly confidential</li>
   <li><strong>IP:</strong> Deliverables become client property upon final payment</li>

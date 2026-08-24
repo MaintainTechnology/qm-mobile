@@ -34,13 +34,13 @@ browser turn-by-turn (`agent-browser`) and not a deterministic script
 
 ## ⚠ Two different products — don't cross their APIs
 
-| | Open-source `browser-use` (this skill's focus) | Browser Use **Cloud** |
-|---|---|---|
-| Install | `pip install browser-use` | `pip install browser-use-sdk` |
-| Entry point | `Agent(task=…, llm=…)` → `await agent.run()` | `AsyncBrowserUse()` → `await client.run(…)` |
-| Structured output arg | `output_model_schema=` (on the `Agent` ctor) | `output_schema=` (on `client.run`) |
-| Persistence | `user_data_dir` / `storage_state` | managed `profile_id` |
-| Secrets | `sensitive_data={…}` | `secrets={…}` |
+|                       | Open-source `browser-use` (this skill's focus) | Browser Use **Cloud**                       |
+| --------------------- | ---------------------------------------------- | ------------------------------------------- |
+| Install               | `pip install browser-use`                      | `pip install browser-use-sdk`               |
+| Entry point           | `Agent(task=…, llm=…)` → `await agent.run()`   | `AsyncBrowserUse()` → `await client.run(…)` |
+| Structured output arg | `output_model_schema=` (on the `Agent` ctor)   | `output_schema=` (on `client.run`)          |
+| Persistence           | `user_data_dir` / `storage_state`              | managed `profile_id`                        |
+| Secrets               | `sensitive_data={…}`                           | `secrets={…}`                               |
 
 Mixing these up (e.g. passing `output_schema` to the local `Agent`) is the most
 common error. This skill is the **open-source `Agent`** unless you specifically
@@ -79,7 +79,7 @@ if __name__ == "__main__":
 ```
 
 `run()` is **async** — always drive it from `asyncio.run(...)`. `max_steps` lives
-on `run()` (default 500), *not* on the constructor.
+on `run()` (default 500), _not_ on the constructor.
 
 ## Core API essentials
 
@@ -110,7 +110,7 @@ history = await agent.run()
 repo = history.structured_output      # parsed Repo instance
 ```
 
-(Constructor arg is `output_model_schema` for the OSS Agent — `output_schema` is the *Cloud* SDK.)
+(Constructor arg is `output_model_schema` for the OSS Agent — `output_schema` is the _Cloud_ SDK.)
 
 ### Handling credentials safely
 

@@ -64,7 +64,7 @@ values through the design brief.
   z-index: 1;
 }
 
-.scroll-scrub__layer[data-video-painted="true"] .scroll-scrub__poster {
+.scroll-scrub__layer[data-video-painted='true'] .scroll-scrub__poster {
   visibility: hidden;
 }
 
@@ -111,11 +111,11 @@ values through the design brief.
 }
 
 .scroll-scrub__route-button:hover,
-.scroll-scrub__route-button[aria-current="step"] {
+.scroll-scrub__route-button[aria-current='step'] {
   color: var(--ss-ink);
 }
 
-.scroll-scrub__route-button[aria-current="step"] {
+.scroll-scrub__route-button[aria-current='step'] {
   text-decoration: underline;
   text-decoration-color: var(--ss-accent);
   text-decoration-thickness: 0.15em;
@@ -149,7 +149,7 @@ values through the design brief.
   pointer-events: none;
 }
 
-.scroll-scrub__chapter[data-align="right"] .scroll-scrub__chapter-pin {
+.scroll-scrub__chapter[data-align='right'] .scroll-scrub__chapter-pin {
   justify-content: flex-end;
 }
 
@@ -163,7 +163,7 @@ values through the design brief.
   position: absolute;
   z-index: -1;
   inset: -3rem -5rem;
-  content: "";
+  content: '';
   background: radial-gradient(
     ellipse at center,
     color-mix(in srgb, var(--ss-bg) 88%, transparent) 0%,
@@ -246,12 +246,11 @@ values through the design brief.
   }
 
   .scroll-scrub__chapter-pin,
-  .scroll-scrub__chapter[data-align="right"] .scroll-scrub__chapter-pin {
+  .scroll-scrub__chapter[data-align='right'] .scroll-scrub__chapter-pin {
     align-items: flex-end;
     justify-content: flex-start;
     padding: 6.5rem max(1.25rem, env(safe-area-inset-right))
-      calc(4rem + env(safe-area-inset-bottom))
-      max(1.25rem, env(safe-area-inset-left));
+      calc(4rem + env(safe-area-inset-bottom)) max(1.25rem, env(safe-area-inset-left));
   }
 
   .scroll-scrub__copy {

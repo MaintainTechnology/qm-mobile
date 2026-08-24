@@ -64,7 +64,16 @@
           },
           "route": {
             "type": "string",
-            "enum": ["oral", "subcutaneous", "intramuscular", "intravenous", "topical", "sublingual", "intranasal", "other"],
+            "enum": [
+              "oral",
+              "subcutaneous",
+              "intramuscular",
+              "intravenous",
+              "topical",
+              "sublingual",
+              "intranasal",
+              "other"
+            ],
             "description": "Administration route"
           },
           "context": {

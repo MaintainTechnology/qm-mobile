@@ -26,6 +26,7 @@ Onboarding is the critical bridge between sign-up and engaged usage. This refere
 ```
 
 **Best practices:**
+
 - Keep tours to 3-5 steps maximum
 - Highlight one feature per step with a spotlight/overlay
 - Always allow skipping ("Skip tour" visible on every step)
@@ -73,6 +74,7 @@ Onboarding is the critical bridge between sign-up and engaged usage. This refere
 ```
 
 **Best practices:**
+
 - 4-6 items (not overwhelming)
 - Pre-check completed items (account creation counts!)
 - Progress bar/percentage for motivation
@@ -146,6 +148,7 @@ Level 2 — Show more:
 ```
 
 **Principles:**
+
 - Show the most common options by default
 - Hide advanced options behind expandable sections
 - Use sensible defaults so advanced options are rarely needed
@@ -182,6 +185,7 @@ Examples:
 The time between sign-up and the user experiencing core product value.
 
 **Optimization strategies:**
+
 - Remove unnecessary sign-up steps (defer profile completion)
 - Auto-configure based on sign-up context (role, company size)
 - Pre-populate with relevant templates or data
@@ -264,6 +268,7 @@ Minimal sign-up (3 fields max):
 ```
 
 **Best practices:**
+
 - Social login / SSO options reduce friction significantly
 - Defer non-essential fields (name, company) to post-sign-up
 - Email-first flow: collect email, then ask for password on next step
@@ -302,12 +307,12 @@ Day 7:      "Connect your calendar?" (when value is clear)
 
 Every empty screen is an opportunity to onboard:
 
-| Screen | Instead of "No data" | Show |
-|--------|---------------------|------|
-| Dashboard | Empty widgets | Pre-configured widgets with sample data |
-| Project list | "No projects" | Templates + "Create first project" CTA |
-| Inbox | "No messages" | "Invite your team to start conversations" |
-| Analytics | "No data yet" | "Connect a data source" + preview |
+| Screen       | Instead of "No data" | Show                                      |
+| ------------ | -------------------- | ----------------------------------------- |
+| Dashboard    | Empty widgets        | Pre-configured widgets with sample data   |
+| Project list | "No projects"        | Templates + "Create first project" CTA    |
+| Inbox        | "No messages"        | "Invite your team to start conversations" |
+| Analytics    | "No data yet"        | "Connect a data source" + preview         |
 
 ### Starter Templates
 
@@ -369,16 +374,16 @@ Step 1        Step 2         Step 3        Done!
 
 ### Key Metrics
 
-| Metric | Target | How to measure |
-|--------|--------|---------------|
-| Sign-up completion | > 85% | Users who complete sign-up / started |
-| Onboarding completion | > 65% | Users who finish checklist / total |
-| Time to first value | < 5 min | Time from sign-up to activation event |
-| Day 1 retention | > 40% | Users who return the day after sign-up |
-| Day 7 retention | > 25% | Users who return within first week |
-| Activation rate | > 30% | Users who reach aha moment / total sign-ups |
-| Tour skip rate | Monitor | High skip may indicate poor tour design |
-| Checklist item completion | Track per item | Identifies friction points |
+| Metric                    | Target         | How to measure                              |
+| ------------------------- | -------------- | ------------------------------------------- |
+| Sign-up completion        | > 85%          | Users who complete sign-up / started        |
+| Onboarding completion     | > 65%          | Users who finish checklist / total          |
+| Time to first value       | < 5 min        | Time from sign-up to activation event       |
+| Day 1 retention           | > 40%          | Users who return the day after sign-up      |
+| Day 7 retention           | > 25%          | Users who return within first week          |
+| Activation rate           | > 30%          | Users who reach aha moment / total sign-ups |
+| Tour skip rate            | Monitor        | High skip may indicate poor tour design     |
+| Checklist item completion | Track per item | Identifies friction points                  |
 
 ### Drop-Off Analysis
 

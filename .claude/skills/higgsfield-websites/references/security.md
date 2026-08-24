@@ -33,6 +33,7 @@ Map these boundaries for every website with data. Each boundary is a point where
 #### Browser → Worker (untrusted → trusted)
 
 All data crossing this boundary is attacker-controlled:
+
 - URL path and query parameters
 - Request headers (including cookies, but cookies are tamper-resistant if `HttpOnly`)
 - Form submissions and JSON request bodies
@@ -47,6 +48,7 @@ Both run in the same Cloudflare environment. The channel is trusted, but SQL inj
 #### Worker → External API (trusted → semi-trusted)
 
 Outbound `fetch()` from server functions. Risks:
+
 - SSRF if the URL comes from user input
 - Response injection if the external API is compromised
 - Secret leakage if auth headers are sent to the wrong host
@@ -70,6 +72,7 @@ Enumerate every entry point before analyzing threats. Build this list by scannin
 #### Page Routes (`app/src/routes/**`)
 
 For each route file, record:
+
 - Path pattern (e.g., `/dashboard`, `/settings/$userId`)
 - Auth required: yes/no
 - Data loaded: what server functions or loaders run
@@ -78,6 +81,7 @@ For each route file, record:
 #### Server Functions (`createServerFn`)
 
 For each server function, record:
+
 - Name and location
 - HTTP method (GET/POST)
 - Input shape (what data it accepts from the client)
@@ -87,6 +91,7 @@ For each server function, record:
 #### API Routes (`app/src/routes/api/**`)
 
 For each API route, record:
+
 - Path and HTTP methods handled
 - Auth check: present/absent
 - Input sources (body, query params, path params)
@@ -108,16 +113,16 @@ For each API route, record:
 
 ### Asset Classification
 
-| Asset | Location | Sensitivity | Protection |
-|-------|----------|-------------|------------|
-| User credentials (passwords) | D1 | Critical | Hashed (bcrypt/argon2), never logged, never returned to client |
-| Session tokens | Cookie | Critical | `HttpOnly; Secure; SameSite=Strict`, rotated on login |
-| PII (email, name, etc.) | D1 | High | Access-controlled by user ID, not in client bundle |
-| Uploaded files | R2 | Medium-High | Access-controlled, validated MIME/size, sanitized filenames |
-| Application data (posts, etc.) | D1 | Medium | Access-controlled per ownership or visibility settings |
-| R2 objects (public assets) | R2 | Low | Public by design, no sensitive content |
-| KV cache entries | KV | Low-Medium | May contain derived data; TTL-bounded; no secrets as values |
-| API keys (external services) | Cloudflare Secrets | Critical | Never in code, injected via `env`, never logged |
+| Asset                          | Location           | Sensitivity | Protection                                                     |
+| ------------------------------ | ------------------ | ----------- | -------------------------------------------------------------- |
+| User credentials (passwords)   | D1                 | Critical    | Hashed (bcrypt/argon2), never logged, never returned to client |
+| Session tokens                 | Cookie             | Critical    | `HttpOnly; Secure; SameSite=Strict`, rotated on login          |
+| PII (email, name, etc.)        | D1                 | High        | Access-controlled by user ID, not in client bundle             |
+| Uploaded files                 | R2                 | Medium-High | Access-controlled, validated MIME/size, sanitized filenames    |
+| Application data (posts, etc.) | D1                 | Medium      | Access-controlled per ownership or visibility settings         |
+| R2 objects (public assets)     | R2                 | Low         | Public by design, no sensitive content                         |
+| KV cache entries               | KV                 | Low-Medium  | May contain derived data; TTL-bounded; no secrets as values    |
+| API keys (external services)   | Cloudflare Secrets | Critical    | Never in code, injected via `env`, never logged                |
 
 ---
 
@@ -126,6 +131,7 @@ For each API route, record:
 #### Anonymous Internet User
 
 **Capabilities:**
+
 - Reach all public routes and API endpoints
 - Submit arbitrary form data, JSON bodies, file uploads
 - Craft malicious URLs (XSS payloads in query params, path traversal)
@@ -137,6 +143,7 @@ For each API route, record:
 #### Authenticated User
 
 **Capabilities:**
+
 - Everything anonymous users can do, plus valid session
 - Access own data and attempt to access other users' data (IDOR)
 - Attempt privilege escalation (modify role claims, access admin routes)
@@ -192,8 +199,10 @@ const createNote = createServerFn({ method: 'POST' })
   .handler(async ({ data, request }) => {
     const session = await getSession(request);
     if (!session) throw new Error('Unauthorized');
-    await db.prepare('INSERT INTO notes (id, user_id, title, body) VALUES (?, ?, ?, ?)')
-      .bind(crypto.randomUUID(), session.userId, data.title, data.body).run();
+    await db
+      .prepare('INSERT INTO notes (id, user_id, title, body) VALUES (?, ?, ?, ?)')
+      .bind(crypto.randomUUID(), session.userId, data.title, data.body)
+      .run();
   });
 ```
 
@@ -202,6 +211,7 @@ const createNote = createServerFn({ method: 'POST' })
 **Attack:** There is one deploy and one D1 database — the live one. Test data created while building or debugging lands in production data, and destructive "test" queries modify real user data.
 
 **Mitigation:**
+
 - Never use real user data for testing
 - If you must seed test rows, tag them explicitly (e.g. an `is_test` column or a reserved prefix) and clean them up
 - Get explicit user approval before destructive migrations, `UPDATE`s, or backfills
@@ -249,6 +259,7 @@ function validateUrl(input: string): URL {
 **Attack:** Attacker sends forged webhook payloads to callback endpoints, or replays legitimate webhooks to duplicate side effects (double payment credits, duplicate notifications).
 
 **Mitigation:**
+
 - Verify webhook signatures using `crypto.subtle.timingSafeEqual()` (see worker-hardening rule 4)
 - Track processed webhook IDs in D1/KV to enforce idempotency
 - Reject webhooks with timestamps older than 5 minutes
@@ -311,7 +322,7 @@ export default {
   async fetch(request: Request) {
     currentUser = await getUser(request); // overwrites for ALL concurrent requests
     return handleRequest();
-  }
+  },
 };
 ```
 
@@ -321,7 +332,7 @@ export default {
   async fetch(request: Request, env: Env, ctx: ExecutionContext) {
     const user = await getUser(request);
     return handleRequest(user, env);
-  }
+  },
 };
 ```
 
@@ -351,7 +362,7 @@ Never put API keys, tokens, passwords, or connection strings in source code or `
 
 ```ts
 // BAD
-const API_KEY = "sk-proj-abc123...";
+const API_KEY = 'sk-proj-abc123...';
 
 // GOOD -- store it with `higgsfield website secrets set <website_id> --name … --value …`
 // Access SERVER-SIDE via bindings().API_KEY (add it to AppEnv in bindings.server.ts)
@@ -421,7 +432,7 @@ export default {
   async fetch(request, env, ctx) {
     ctx.passThroughOnException();
     return handleRequest(request, env);
-  }
+  },
 };
 
 // GOOD -- explicit error handling
@@ -433,7 +444,7 @@ export default {
       console.error('Worker error:', err);
       return new Response('Internal Server Error', { status: 500 });
     }
-  }
+  },
 };
 ```
 
@@ -464,8 +475,8 @@ export function applySecurityHeaders(response: Response): Response {
       "img-src 'self' data: https:; media-src 'self' https:; " +
       "connect-src 'self' https:; " +
       "frame-ancestors 'self' https://*.higgsfield.app https://higgsfield.app " +
-      "https://*.higgsfield.ai https://fnf-dev.anwar-695.workers.dev " +
-      "https://feat-apps-marketplace-tools-fnf-dev.anwar-695.workers.dev; " +
+      'https://*.higgsfield.ai https://fnf-dev.anwar-695.workers.dev ' +
+      'https://feat-apps-marketplace-tools-fnf-dev.anwar-695.workers.dev; ' +
       "base-uri 'self'; form-action 'self'",
   );
   headers.set('Strict-Transport-Security', 'max-age=63072000; includeSubDomains; preload');
@@ -496,10 +507,11 @@ allowlist — never narrow it to `'none'` and never remove it.
 
 ```ts
 // BAD -- trusts client input shape
-const getUser = createServerFn({ method: 'GET' })
-  .handler(async ({ data }: { data: { userId: string } }) => {
+const getUser = createServerFn({ method: 'GET' }).handler(
+  async ({ data }: { data: { userId: string } }) => {
     return db.prepare('SELECT * FROM users WHERE id = ?').bind(data.userId).first();
-  });
+  },
+);
 
 // GOOD -- validate before use
 const getUser = createServerFn({ method: 'GET' })
@@ -547,7 +559,7 @@ return new Response(null, {
   status: 302,
   headers: {
     'Set-Cookie': cookie,
-    'Location': '/dashboard',
+    Location: '/dashboard',
   },
 });
 ```
@@ -580,18 +592,18 @@ Never add CORS headers to page routes. Only add them to `/api/*` routes consumed
 
 ### Anti-Patterns to Flag
 
-| Pattern | Risk | Fix |
-|---------|------|-----|
-| `Math.random()` for IDs/tokens | Predictable values, session hijacking | `crypto.randomUUID()` or `crypto.getRandomValues()` |
-| `let x = ...` at module scope | Cross-request data leakage | Move to function params or request-scoped context |
-| `await response.text()` on external fetch | OOM crash on large response | Stream with `Response(upstream.body)` |
-| Hardcoded string resembling a key (`sk-`, `ghp_`, `Bearer`) | Secret in source code / git history | `higgsfield website secrets set` + `bindings().SECRET_NAME` server-side |
-| `===` comparing secrets/tokens | Timing side-channel leaks secret | `crypto.subtle.timingSafeEqual()` |
-| `ctx.passThroughOnException()` | Bypasses all Worker security on error | `try/catch` with explicit error response |
-| Missing `await` on async call | Silent error loss, data leak | `await`, `return`, or `ctx.waitUntil()` |
-| Secret value in JSX prop `<Comp token={env.KEY}>` | Secret in client HTML source | Fetch in server function, return only safe data |
-| `Access-Control-Allow-Origin: *` | Any origin reads responses | Allowlist specific origins or omit CORS |
-| `eval()` / `new Function()` | Arbitrary code execution | Remove; use static logic or JSON parsing |
+| Pattern                                                     | Risk                                  | Fix                                                                     |
+| ----------------------------------------------------------- | ------------------------------------- | ----------------------------------------------------------------------- |
+| `Math.random()` for IDs/tokens                              | Predictable values, session hijacking | `crypto.randomUUID()` or `crypto.getRandomValues()`                     |
+| `let x = ...` at module scope                               | Cross-request data leakage            | Move to function params or request-scoped context                       |
+| `await response.text()` on external fetch                   | OOM crash on large response           | Stream with `Response(upstream.body)`                                   |
+| Hardcoded string resembling a key (`sk-`, `ghp_`, `Bearer`) | Secret in source code / git history   | `higgsfield website secrets set` + `bindings().SECRET_NAME` server-side |
+| `===` comparing secrets/tokens                              | Timing side-channel leaks secret      | `crypto.subtle.timingSafeEqual()`                                       |
+| `ctx.passThroughOnException()`                              | Bypasses all Worker security on error | `try/catch` with explicit error response                                |
+| Missing `await` on async call                               | Silent error loss, data leak          | `await`, `return`, or `ctx.waitUntil()`                                 |
+| Secret value in JSX prop `<Comp token={env.KEY}>`           | Secret in client HTML source          | Fetch in server function, return only safe data                         |
+| `Access-Control-Allow-Origin: *`                            | Any origin reads responses            | Allowlist specific origins or omit CORS                                 |
+| `eval()` / `new Function()`                                 | Arbitrary code execution              | Remove; use static logic or JSON parsing                                |
 
 ---
 
@@ -645,18 +657,16 @@ Check every `createServerFn` that reads or writes user data. It must verify auth
 
 ```ts
 // FAIL -- no auth check
-const getUserNotes = createServerFn({ method: 'GET' })
-  .handler(async ({ data }) => {
-    return db.prepare('SELECT * FROM notes WHERE user_id = ?').bind(data.userId).all();
-  });
+const getUserNotes = createServerFn({ method: 'GET' }).handler(async ({ data }) => {
+  return db.prepare('SELECT * FROM notes WHERE user_id = ?').bind(data.userId).all();
+});
 
 // PASS -- auth check before data access
-const getUserNotes = createServerFn({ method: 'GET' })
-  .handler(async ({ data, request }) => {
-    const session = await getSession(request);
-    if (!session?.userId) throw new Error('Unauthorized');
-    return db.prepare('SELECT * FROM notes WHERE user_id = ?').bind(session.userId).all();
-  });
+const getUserNotes = createServerFn({ method: 'GET' }).handler(async ({ data, request }) => {
+  const session = await getSession(request);
+  if (!session?.userId) throw new Error('Unauthorized');
+  return db.prepare('SELECT * FROM notes WHERE user_id = ?').bind(session.userId).all();
+});
 ```
 
 Also check: API routes under `app/src/routes/api/` must verify auth. Page loaders returning private data must check session. Never rely on client-side route guards alone.
@@ -711,6 +721,7 @@ bun audit 2>/dev/null || npm audit 2>/dev/null || echo "No audit tool available"
 ```
 
 Check `package.json` for:
+
 - Dependencies with known CVEs
 - Unmaintained packages (no updates in 2+ years for security-relevant deps)
 - Unnecessary dependencies that expand attack surface
@@ -738,12 +749,14 @@ Skip if site has no file uploads or external data processing. If present, check:
 #### A09: Logging Failures
 
 Flag `console.log` / `console.error` that prints:
+
 - Passwords or password hashes
 - API keys, tokens, secrets
 - Full request bodies on auth endpoints
 - Full database rows containing PII
 
 Check that error responses to clients do not contain:
+
 - Stack traces (`at Object.<anonymous>`, file paths)
 - Internal hostnames or IP addresses
 - Database error messages with schema details
@@ -754,21 +767,19 @@ Skip if no server functions make outbound HTTP requests. If present, check:
 
 ```ts
 // FAIL -- fetches arbitrary user-supplied URL
-const proxyFetch = createServerFn({ method: 'POST' })
-  .handler(async ({ data }) => {
-    const res = await fetch(data.url); // user controls destination
-    return res.json();
-  });
+const proxyFetch = createServerFn({ method: 'POST' }).handler(async ({ data }) => {
+  const res = await fetch(data.url); // user controls destination
+  return res.json();
+});
 
 // PASS -- allowlisted domains
 const ALLOWED_HOSTS = ['api.example.com', 'cdn.example.com'];
-const proxyFetch = createServerFn({ method: 'POST' })
-  .handler(async ({ data }) => {
-    const url = new URL(data.url);
-    if (!ALLOWED_HOSTS.includes(url.hostname)) throw new Error('Blocked');
-    const res = await fetch(url.toString());
-    return res.json();
-  });
+const proxyFetch = createServerFn({ method: 'POST' }).handler(async ({ data }) => {
+  const url = new URL(data.url);
+  if (!ALLOWED_HOSTS.includes(url.hostname)) throw new Error('Blocked');
+  const res = await fetch(url.toString());
+  return res.json();
+});
 ```
 
 Also check for: internal network access (`localhost`, `127.0.0.1`, `10.*`, `192.168.*`, `169.254.169.254` -- the metadata endpoint).
@@ -790,7 +801,9 @@ const jwtSecret = process.env.JWT_SECRET ?? 'changeme';
 const verifySignature = options.verify ?? true; // should be ?? false or mandatory
 
 // BAD -- empty catch swallows auth/crypto errors
-try { await verifyToken(token); } catch {} // attacker wins on any error
+try {
+  await verifyToken(token);
+} catch {} // attacker wins on any error
 ```
 
 #### Dangerous Zero/Null/Empty Defaults
@@ -890,6 +903,7 @@ Present audit results as a table. One row per check. Same format as the SEO audi
 ```
 
 Status values:
+
 - **PASS** -- check passed, no issues
 - **FAIL** -- security issue found, must fix before deploy
 - **WARN** -- potential issue, needs manual review

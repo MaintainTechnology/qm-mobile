@@ -11,6 +11,7 @@ Ralph-Inspired Adaptive Learning Framework for iterative, quality-gated biomarke
 ## Overview
 
 This skill runs comprehensive biomarker analysis using the RALF architecture:
+
 - **Iterative Processing**: Each category processed independently with fresh context
 - **KB Enrichment**: Per-category VectorShift KB queries inform analysis
 - **Dual Validation Gates**: Structural completeness + clinical accuracy
@@ -83,6 +84,7 @@ PHASE 3: SYNTHESIS
 ## Categories
 
 ### Core Categories (Always Present)
+
 1. **GENERAL HEALTH**: CBC, CMP, liver/kidney function
 2. **METABOLIC FUNCTION**: A1c, glucose, insulin, ApoB, triglycerides
 3. **INFLAMMATION**: hs-CRP, homocysteine, GGT
@@ -90,6 +92,7 @@ PHASE 3: SYNTHESIS
 5. **NUTRIENTS**: Vitamin D, ferritin, B12, magnesium
 
 ### Dynamic Modules (Auto-detected)
+
 - Organic acids
 - Microbiome
 - Genetics/Epigenetics
@@ -98,13 +101,13 @@ PHASE 3: SYNTHESIS
 
 ## User Preference Levels
 
-| Level | Description |
-|-------|-------------|
-| 1 | Ultra-conservative: Evidence-based medicine only |
-| 2 | Conservative: Some emerging research considered |
-| 3 | Balanced: Mix of conventional and alternative |
-| 4 | Progressive: Experimental approaches |
-| 5 | Cutting-edge: Biohacker methodologies |
+| Level | Description                                      |
+| ----- | ------------------------------------------------ |
+| 1     | Ultra-conservative: Evidence-based medicine only |
+| 2     | Conservative: Some emerging research considered  |
+| 3     | Balanced: Mix of conventional and alternative    |
+| 4     | Progressive: Experimental approaches             |
+| 5     | Cutting-edge: Biohacker methodologies            |
 
 ## Clinical Conventions
 
@@ -135,12 +138,14 @@ State is persisted in `.biomarker-analysis/`:
 ## Validation Gates
 
 ### Gate 1: Structural Completeness
+
 - Status paragraph ≥100 words
 - Root causes paragraph ≥100 words
 - Interventions paragraph ≥100 words
 - All biomarkers referenced by name
 
 ### Gate 2: Clinical Accuracy
+
 - Biomarker values match source exactly
 - Units are correct
 - Status classifications accurate
@@ -149,10 +154,10 @@ State is persisted in `.biomarker-analysis/`:
 
 ## Cost Comparison
 
-| Pipeline | Cost/Report |
-|----------|-------------|
-| VectorShift (current) | ~$1.00 |
-| RALF (Haiku 4.5) | ~$0.22 |
+| Pipeline              | Cost/Report |
+| --------------------- | ----------- |
+| VectorShift (current) | ~$1.00      |
+| RALF (Haiku 4.5)      | ~$0.22      |
 
 **78% cost reduction** with maintained or improved quality.
 

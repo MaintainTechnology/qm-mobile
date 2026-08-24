@@ -2,7 +2,7 @@
 name: generate-lectures-bulk
 description: Generate all lectures from a course outline in parallel using asyncio for 3-5x faster processing
 user_invocable: true
-arguments: "<outline_path> [--dry-run] [--start N] [--end N] [--materials PATH] [--max-concurrent N] [--no-llm-parser]"
+arguments: '<outline_path> [--dry-run] [--start N] [--end N] [--materials PATH] [--max-concurrent N] [--no-llm-parser]'
 allowed-tools: Read, Bash, Glob, Grep
 ---
 
@@ -12,10 +12,10 @@ Generate complete lecture packages from a course outline by running the VectorSh
 
 ## Performance Comparison
 
-| Approach | 5 Lectures | 10 Lectures |
-|----------|------------|-------------|
+| Approach                        | 5 Lectures | 10 Lectures |
+| ------------------------------- | ---------- | ----------- |
 | Sequential (/generate-lectures) | ~30-50 min | ~60-100 min |
-| **Parallel (this skill)** | ~10-15 min | ~15-25 min |
+| **Parallel (this skill)**       | ~10-15 min | ~15-25 min  |
 
 ## Slash Command Usage
 
@@ -24,6 +24,7 @@ Generate complete lecture packages from a course outline by running the VectorSh
 ```
 
 **Examples:**
+
 - `/generate-lectures-bulk outline.md` - Generate all lectures in parallel
 - `/generate-lectures-bulk outline.md --dry-run` - Preview without API calls
 - `/generate-lectures-bulk outline.md --max-concurrent 3` - Limit to 3 parallel jobs
@@ -36,6 +37,7 @@ When this skill is invoked, execute the following steps:
 ### Step 1: Parse Arguments
 
 Extract from invocation:
+
 - `outline_path` (required)
 - `--dry-run` - Preview only
 - `--start N` - Start from lecture N
@@ -77,6 +79,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/parallel_lecture_runne
 ### Step 5: Report Results
 
 After completion, show the user:
+
 - Number of successful/failed lectures
 - Actual time vs sequential estimate
 - Speedup achieved
@@ -95,33 +98,33 @@ After completion, show the user:
 
 ## Pipeline Information
 
-| Property | Value |
-|----------|-------|
-| Pipeline ID | `69601d086fdec16163dc80fe` |
-| Pipeline Name | Individual Lecture HTML v1 (SVG Diagrams) |
-| Max Concurrent | Configurable (default: 5) |
+| Property       | Value                                     |
+| -------------- | ----------------------------------------- |
+| Pipeline ID    | `69601d086fdec16163dc80fe`                |
+| Pipeline Name  | Individual Lecture HTML v1 (SVG Diagrams) |
+| Max Concurrent | Configurable (default: 5)                 |
 
 ## Output Files
 
 For each lecture, the following files are saved to `outputs/{course_name}/`:
 
-| File | Content |
-|------|---------|
-| `lecture_N_slides.json` | Structured JSON slides |
-| `lecture_N_transcript.md` | TTS-ready speaker script |
-| `lecture_N_blueprint.md` | Slide-by-slide plan |
-| `lecture_N_research_dossier.md` | Deep research content |
-| `lecture_N_kb_context.md` | Knowledge base results |
+| File                            | Content                  |
+| ------------------------------- | ------------------------ |
+| `lecture_N_slides.json`         | Structured JSON slides   |
+| `lecture_N_transcript.md`       | TTS-ready speaker script |
+| `lecture_N_blueprint.md`        | Slide-by-slide plan      |
+| `lecture_N_research_dossier.md` | Deep research content    |
+| `lecture_N_kb_context.md`       | Knowledge base results   |
 
 ## Error Handling
 
-| Scenario | Behavior |
-|----------|----------|
-| 1 lecture fails | Other lectures continue, failure reported at end |
-| Rate limited (429) | Automatic retry with backoff |
-| Network error | Retry up to 10 times per job |
-| Timeout (30 min/lecture) | Mark as failed, continue others |
-| All lectures fail | Exit with error, show diagnostics |
+| Scenario                 | Behavior                                         |
+| ------------------------ | ------------------------------------------------ |
+| 1 lecture fails          | Other lectures continue, failure reported at end |
+| Rate limited (429)       | Automatic retry with backoff                     |
+| Network error            | Retry up to 10 times per job                     |
+| Timeout (30 min/lecture) | Mark as failed, continue others                  |
+| All lectures fail        | Exit with error, show diagnostics                |
 
 ## Output Retrieval Fallback
 
@@ -158,12 +161,14 @@ If parallel generation has issues, fall back to sequential:
 ## When to Use This Skill
 
 Use this skill when:
+
 - Processing multiple lectures (3+) for significant time savings
 - Need faster turnaround on course generation
 - System resources can handle concurrent processing
 - VectorShift API is responding normally
 
 Use `/generate-lectures` (sequential) when:
+
 - Processing only 1-2 lectures (minimal benefit from parallelism)
 - Need detailed per-lecture progress visibility
 - Troubleshooting API issues

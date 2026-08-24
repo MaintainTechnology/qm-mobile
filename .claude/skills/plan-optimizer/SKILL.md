@@ -23,7 +23,7 @@ an explicit rubric, critique it, rewrite it to fix the weaknesses, and
 repeat, keeping the best version seen so far, until the score stops improving.
 That plateau is your signal that further iteration is just noise, and you stop.
 
-The reason this works is that scoring and rewriting are *separate* acts.
+The reason this works is that scoring and rewriting are _separate_ acts.
 Generating a plan and judging a plan use different cognitive muscles; forcing an
 explicit critique between revisions converts blind rewriting into directed
 search that climbs toward a target rather than drifting sideways.
@@ -32,7 +32,7 @@ search that climbs toward a target rather than drifting sideways.
 
 Use it whenever there's a plan that should be as good as it can reasonably get
 and the cost of a weak plan is real. If the user just wants a quick first draft,
-don't impose the loop, offer it. If they want the *best* plan, run the
+don't impose the loop, offer it. If they want the _best_ plan, run the
 loop.
 
 ## The loop at a glance
@@ -64,7 +64,7 @@ loop can only climb as high as the rubric lets it perceive quality, so a vague
 rubric gives you a low, noisy ceiling. Spend real effort here.
 
 A good rubric is domain-adapted, weighted, and as objective as possible. Derive
-the criteria from what would actually make *this* plan succeed or fail, not from
+the criteria from what would actually make _this_ plan succeed or fail, not from
 a generic checklist. Most strong plans, whatever the domain, are graded on some
 mix of:
 
@@ -95,7 +95,7 @@ higher final ceiling. Then score it against the rubric (Step 3).
 ## Step 3: Score
 
 Score the current plan from 0 to 100. Do this as a deliberate, separate pass:
-go criterion by criterion, assign each a sub-score, note *why*, then combine by
+go criterion by criterion, assign each a sub-score, note _why_, then combine by
 the weights. Always write a one-line rationale per criterion. The rationale is
 what feeds the next critique, and it's what keeps scoring honest rather than a
 gut number.
@@ -105,21 +105,21 @@ Two guards against noisy scoring:
 - Require a margin to accept. Only replace the current best if the new score
   beats it by a meaningful margin (e.g. +2 on a 100 scale), not by a fraction.
   Scoring has noise; without a margin you'll "improve" into a worse plan.
-- Re-anchor occasionally. Every few rounds, re-read the *original* rubric
+- Re-anchor occasionally. Every few rounds, re-read the _original_ rubric
   fresh rather than drifting toward whatever the latest plan happens to do well.
   This catches reward-hacking, where revisions start optimizing for a score the
   rubric didn't really intend.
 
 ## Step 4: Improve (critique, then rewrite)
 
-This is the engine. Do *not* just say "make it better" and rewrite, that
+This is the engine. Do _not_ just say "make it better" and rewrite, that
 produces lateral drift. Instead, in two explicit moves:
 
-1. *Critique.* Against the rubric, list the specific weaknesses of the current
+1. _Critique._ Against the rubric, list the specific weaknesses of the current
    best plan, ordered by how much they cost in score. Be concrete: "no rollback
    step for the migration", not "could be more robust". Name the lowest-scoring
    criteria and why they're low.
-2. *Rewrite.* Produce a new full version of the plan that directly fixes the
+2. _Rewrite._ Produce a new full version of the plan that directly fixes the
    critique's top items, while preserving what already scored well. Don't
    regress strengths to chase a weakness.
 
@@ -140,7 +140,7 @@ best-of-N round to try to escape the local optimum. If best-of-N also fails to
 beat the ceiling by the margin, you've genuinely converged. Stop.
 
 If the user has access to a stronger model than the one running the loop, note
-that running the *improve* and *score* steps on a stronger model is the single
+that running the _improve_ and _score_ steps on a stronger model is the single
 biggest lever. A stronger model proposes structurally better rewrites and also
 perceives flaws a weaker scorer misses, which raises the ceiling itself.
 
@@ -162,7 +162,7 @@ Return:
 3. The score trajectory (e.g. `62 → 74 → 81 → 83 → 83`) so the user sees the
    climb and the plateau.
 4. A short note on what the loop changed: the 2-3 biggest improvements made
-   from first draft to final, so the user understands *why* it's better.
+   from first draft to final, so the user understands _why_ it's better.
 
 Keep the process visible but concise. The user cares most about the final plan;
 the trajectory and rationale are evidence that it's been genuinely hardened, not

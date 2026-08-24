@@ -34,13 +34,19 @@ export const metadata = {
   trafficIndependent: true,
   description:
     'Edge runtime is a constrained sandbox with no node: builtins and a much smaller cold-start budget than Node functions. Heavy SDKs (sharp, @aws-sdk/*, @prisma/client, pg, puppeteer) either fail at deploy or inflate cold-start latency. Move the import to a Node runtime function, or replace with an edge-compatible alternative (e.g., neon-driver instead of pg).',
-  fix:
-    'Either (a) drop the `export const runtime = \'edge\'` so the route runs on Node (default in 2026), or (b) replace the heavy import with an edge-compatible alternative. For DB: use @neondatabase/serverless or @planetscale/database instead of pg/mysql2. For image: do the work in a Node route handler. For auth signing: use jose (Web Crypto) instead of jsonwebtoken.',
+  fix: "Either (a) drop the `export const runtime = 'edge'` so the route runs on Node (default in 2026), or (b) replace the heavy import with an edge-compatible alternative. For DB: use @neondatabase/serverless or @planetscale/database instead of pg/mysql2. For image: do the work in a Node route handler. For auth signing: use jose (Web Crypto) instead of jsonwebtoken.",
   citations: [
     'https://vercel.com/docs/functions/runtimes/edge-runtime',
     'https://vercel.com/docs/fluid-compute',
   ],
-  excludeGlobs: ['node_modules/**', '.next/**', 'dist/**', '__tests__/**', '**/*.test.*', '**/*.spec.*'],
+  excludeGlobs: [
+    'node_modules/**',
+    '.next/**',
+    'dist/**',
+    '__tests__/**',
+    '**/*.test.*',
+    '**/*.spec.*',
+  ],
   includeGlobs: ['**/*.{ts,tsx,js,mjs}'],
 };
 
@@ -55,14 +61,16 @@ export function scan({ files }) {
       if (TYPE_IMPORT_RE.test(line)) continue;
       const specifiers = extractSpecifiers(line);
       for (const spec of specifiers) {
-        const match = HEAVY_PATTERNS.find((re) => re.test(spec));
+        const match = HEAVY_PATTERNS.find(re => re.test(spec));
         if (!match) continue;
         out.push({
           pattern: metadata.id,
           file: path,
           line: i + 1,
           evidence: `import "${spec}" in edge-runtime file`,
-          edgeReason: isMiddleware(path) ? 'middleware (always edge)' : 'export const runtime = "edge"',
+          edgeReason: isMiddleware(path)
+            ? 'middleware (always edge)'
+            : 'export const runtime = "edge"',
           importedModule: spec,
           trafficIndependent: metadata.trafficIndependent,
         });

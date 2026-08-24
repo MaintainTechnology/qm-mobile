@@ -52,7 +52,11 @@ test('throws on a short placeholder that never grows past minChars', async () =>
 test('does not settle early while text is still growing', async () => {
   // Grows by 50 chars every poll and never stops — must hit the deadline, not return.
   let n = 0;
-  const growing: TextSource = { async innerText() { return 'x'.repeat((n += 50)); } };
+  const growing: TextSource = {
+    async innerText() {
+      return 'x'.repeat((n += 50));
+    },
+  };
   await assert.rejects(() => settleText(growing, { ...OPTS, ...fakeClock() }), /never settled/);
 });
 

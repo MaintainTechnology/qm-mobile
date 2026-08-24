@@ -4,13 +4,13 @@ This reference covers how to read a VectorShift Python SDK pipeline and extract 
 
 ## Node type cheat sheet
 
-| SDK type | Purpose | JS service file | Complexity |
-|---|---|---|---|
-| `InputNode` | Receives the user's input | Handled by route's `extractInput()` | Trivial |
-| `LlmNode` | Calls Anthropic, Google, OpenAI, AWS Bedrock, etc. | `services/<name>.js` | High — many fields |
-| `CodeExecutionNode` | Runs a deterministic Python function | `services/<name>.js` (port to JS) | High — port Python logic exactly |
-| `KnowledgeBaseNode` | Queries a VectorShift KB | `services/knowledge-base.js` (shared) | Medium |
-| `OutputNode` | Surfaces the final value | Handled by orchestrator return | Trivial |
+| SDK type            | Purpose                                            | JS service file                       | Complexity                       |
+| ------------------- | -------------------------------------------------- | ------------------------------------- | -------------------------------- |
+| `InputNode`         | Receives the user's input                          | Handled by route's `extractInput()`   | Trivial                          |
+| `LlmNode`           | Calls Anthropic, Google, OpenAI, AWS Bedrock, etc. | `services/<name>.js`                  | High — many fields               |
+| `CodeExecutionNode` | Runs a deterministic Python function               | `services/<name>.js` (port to JS)     | High — port Python logic exactly |
+| `KnowledgeBaseNode` | Queries a VectorShift KB                           | `services/knowledge-base.js` (shared) | Medium                           |
+| `OutputNode`        | Surfaces the final value                           | Handled by orchestrator return        | Trivial                          |
 
 ---
 
@@ -77,11 +77,11 @@ export const IP_GUARD_CONFIG = Object.freeze({
 
 ### Provider → client library mapping
 
-| SDK `provider=` | JS client | Install |
-|---|---|---|
-| `"anthropic"` | `@anthropic-ai/sdk` | `npm i @anthropic-ai/sdk` |
-| `"google"` | `@google/generative-ai` | `npm i @google/generative-ai` |
-| `"openai"` | `openai` | `npm i openai` |
+| SDK `provider=`   | JS client                         | Install                                 |
+| ----------------- | --------------------------------- | --------------------------------------- |
+| `"anthropic"`     | `@anthropic-ai/sdk`               | `npm i @anthropic-ai/sdk`               |
+| `"google"`        | `@google/generative-ai`           | `npm i @google/generative-ai`           |
+| `"openai"`        | `openai`                          | `npm i openai`                          |
 | `"aws"` (Bedrock) | `@aws-sdk/client-bedrock-runtime` | `npm i @aws-sdk/client-bedrock-runtime` |
 
 ### System prompt extraction — critical
@@ -110,7 +110,12 @@ prompt=f"User Question: {ip_guard_gate.safe_input}\n--- SOURCE 1: PATHWAY KB ---
 
 ```js
 // JS
-export function buildSynthesizerUserPrompt({ safeInput, pathwayText, interventionText, biomarkerText }) {
+export function buildSynthesizerUserPrompt({
+  safeInput,
+  pathwayText,
+  interventionText,
+  biomarkerText,
+}) {
   return `User Question: ${safeInput}
 --- SOURCE 1: PATHWAY KB (Broad + Targeted) ---
 
@@ -185,7 +190,12 @@ export function runGateNode({ guardResponse, userInput }) {
   }
 
   // 4. Pass-through
-  return { is_blocked: 'false', block_category: category, block_message: '', safe_input: userInput };
+  return {
+    is_blocked: 'false',
+    block_category: category,
+    block_message: '',
+    safe_input: userInput,
+  };
 }
 ```
 
@@ -283,11 +293,11 @@ The `role` field is your call — name it semantically based on what the KB cont
 
 The SDK string is the source of truth. Do NOT "fix" these:
 
-| SDK string | Don't rewrite to |
-|---|---|
-| `gemini-3.1-pro-preview` | `gemini-3-pro-preview` |
-| `claude-haiku-4-5-20251001` | `claude-haiku-4-5` |
-| `gpt-4o-mini-2024-07-18` | `gpt-4o-mini` |
+| SDK string                  | Don't rewrite to       |
+| --------------------------- | ---------------------- |
+| `gemini-3.1-pro-preview`    | `gemini-3-pro-preview` |
+| `claude-haiku-4-5-20251001` | `claude-haiku-4-5`     |
+| `gpt-4o-mini-2024-07-18`    | `gpt-4o-mini`          |
 
 ### KB role mis-assignment
 

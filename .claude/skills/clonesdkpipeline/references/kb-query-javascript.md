@@ -88,11 +88,23 @@ export const KB_CONFIG = Object.freeze({
   rerank_documents: true,
   num_chunks_to_rerank: 10,
   rerank_model: 'cohere/rerank-english-v3.0',
-  query_prefix: ' ',      // leading space from SDK f" {safe_input}"
+  query_prefix: ' ', // leading space from SDK f" {safe_input}"
   nodes: Object.freeze({
-    knowledge_base_0: Object.freeze({ node_name: 'knowledge_base_0', kb_id: '<ID>', role: 'intervention' }),
-    knowledge_base_1: Object.freeze({ node_name: 'knowledge_base_1', kb_id: '<ID>', role: 'pathway' }),
-    knowledge_base_2: Object.freeze({ node_name: 'knowledge_base_2', kb_id: '<ID>', role: 'biomarker' }),
+    knowledge_base_0: Object.freeze({
+      node_name: 'knowledge_base_0',
+      kb_id: '<ID>',
+      role: 'intervention',
+    }),
+    knowledge_base_1: Object.freeze({
+      node_name: 'knowledge_base_1',
+      kb_id: '<ID>',
+      role: 'pathway',
+    }),
+    knowledge_base_2: Object.freeze({
+      node_name: 'knowledge_base_2',
+      kb_id: '<ID>',
+      role: 'biomarker',
+    }),
   }),
 });
 
@@ -141,22 +153,36 @@ function formatKbResult(label, result) {
     return `[${label}] No results returned.`;
   }
 
-  return candidates.map((chunk, i) => {
-    const idx = i + 1;
-    const text =
-      chunk.text || chunk.content || chunk.chunk || chunk.page_content || chunk.document ||
-      (typeof chunk === 'string' ? chunk : JSON.stringify(chunk));
+  return candidates
+    .map((chunk, i) => {
+      const idx = i + 1;
+      const text =
+        chunk.text ||
+        chunk.content ||
+        chunk.chunk ||
+        chunk.page_content ||
+        chunk.document ||
+        (typeof chunk === 'string' ? chunk : JSON.stringify(chunk));
 
-    const score =
-      typeof chunk.score === 'number' ? ` | score=${chunk.score.toFixed(4)}` :
-      typeof chunk.rerank_score === 'number' ? ` | rerank=${chunk.rerank_score.toFixed(4)}` : '';
+      const score =
+        typeof chunk.score === 'number'
+          ? ` | score=${chunk.score.toFixed(4)}`
+          : typeof chunk.rerank_score === 'number'
+            ? ` | rerank=${chunk.rerank_score.toFixed(4)}`
+            : '';
 
-    const source = chunk.source || chunk.metadata?.source || chunk.metadata?.file_name ||
-                   chunk.metadata?.document_name || chunk.document_name || '';
+      const source =
+        chunk.source ||
+        chunk.metadata?.source ||
+        chunk.metadata?.file_name ||
+        chunk.metadata?.document_name ||
+        chunk.document_name ||
+        '';
 
-    const header = `--- [${label} #${idx}]${source ? ` source=${source}` : ''}${score} ---`;
-    return `${header}\n${text}`;
-  }).join('\n\n');
+      const header = `--- [${label} #${idx}]${source ? ` source=${source}` : ''}${score} ---`;
+      return `${header}\n${text}`;
+    })
+    .join('\n\n');
 }
 
 async function queryVectorShiftKb({ kbId, query, label }) {
@@ -174,7 +200,9 @@ async function queryVectorShiftKb({ kbId, query, label }) {
 
   if (!res.ok) {
     const errText = await res.text().catch(() => '');
-    throw new Error(`VectorShift KB ${label} (${kbId}) returned ${res.status}: ${errText.slice(0, 500)}`);
+    throw new Error(
+      `VectorShift KB ${label} (${kbId}) returned ${res.status}: ${errText.slice(0, 500)}`,
+    );
   }
 
   const json = await res.json();
@@ -187,12 +215,24 @@ async function queryVectorShiftKb({ kbId, query, label }) {
 }
 
 export async function runKnowledgeBases(safeInput) {
-  const query = `${KB_CONFIG.query_prefix}${safeInput}`;  // matches SDK f" {safe_input}"
+  const query = `${KB_CONFIG.query_prefix}${safeInput}`; // matches SDK f" {safe_input}"
 
   const [intervention, pathway, biomarker] = await Promise.all([
-    queryVectorShiftKb({ kbId: process.env.KB_INTERVENTION_ID || KB_CONFIG.nodes.knowledge_base_0.kb_id, query, label: 'INTERVENTION' }),
-    queryVectorShiftKb({ kbId: process.env.KB_PATHWAY_ID       || KB_CONFIG.nodes.knowledge_base_1.kb_id, query, label: 'PATHWAY' }),
-    queryVectorShiftKb({ kbId: process.env.KB_BIOMARKER_ID     || KB_CONFIG.nodes.knowledge_base_2.kb_id, query, label: 'BIOMARKER' }),
+    queryVectorShiftKb({
+      kbId: process.env.KB_INTERVENTION_ID || KB_CONFIG.nodes.knowledge_base_0.kb_id,
+      query,
+      label: 'INTERVENTION',
+    }),
+    queryVectorShiftKb({
+      kbId: process.env.KB_PATHWAY_ID || KB_CONFIG.nodes.knowledge_base_1.kb_id,
+      query,
+      label: 'PATHWAY',
+    }),
+    queryVectorShiftKb({
+      kbId: process.env.KB_BIOMARKER_ID || KB_CONFIG.nodes.knowledge_base_2.kb_id,
+      query,
+      label: 'BIOMARKER',
+    }),
   ]);
 
   return { intervention, pathway, biomarker };

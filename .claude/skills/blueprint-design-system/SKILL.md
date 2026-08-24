@@ -21,6 +21,7 @@ The Blueprint Design System creates a sophisticated, editorial aesthetic for Per
 ## When to Use This Skill
 
 Invoke this skill when:
+
 - Building new pages for Personal Action Blueprint products
 - Applying consistent styling to itinerary or session pages
 - Creating profile cards, session items, or vendor cards
@@ -34,20 +35,28 @@ Invoke this skill when:
 Before applying styles to any page:
 
 ### 1. Read the Complete Style Guide
+
 ```
 Read: .claude/skills/blueprint-design-system/style-guide.md
 ```
 
 ### 2. Check Existing Pages for Consistency
+
 ```
 Glob: **/*.html
 ```
+
 Look for pages already using the blueprint system to maintain consistency.
 
 ### 3. Verify Font Import
+
 Ensure the Google Fonts import is present in the `<head>`:
+
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ---
@@ -58,15 +67,15 @@ Ensure the Google Fonts import is present in the `<head>`:
 
 ```css
 :root {
-  --paper: #FFFFFF;        /* Primary background */
-  --paper-alt: #F5F2EC;    /* Secondary background */
-  --ink-900: #302C27;      /* Primary text */
-  --ink-700: #4A4540;      /* Strong emphasis */
-  --ink-500: #706C66;      /* Secondary text */
-  --ink-400: #9C9890;      /* Tertiary text */
-  --line: #E3DFD7;         /* Borders/dividers */
-  --gold: #C49A6C;         /* Accent/highlights */
-  --vermillion: #C07050;   /* Hover states/CTA */
+  --paper: #ffffff; /* Primary background */
+  --paper-alt: #f5f2ec; /* Secondary background */
+  --ink-900: #302c27; /* Primary text */
+  --ink-700: #4a4540; /* Strong emphasis */
+  --ink-500: #706c66; /* Secondary text */
+  --ink-400: #9c9890; /* Tertiary text */
+  --line: #e3dfd7; /* Borders/dividers */
+  --gold: #c49a6c; /* Accent/highlights */
+  --vermillion: #c07050; /* Hover states/CTA */
 }
 ```
 
@@ -86,39 +95,43 @@ Ensure the Google Fonts import is present in the `<head>`:
 
 ### Typography Scale
 
-| Element | Size | Line Height |
-|---------|------|-------------|
-| Hero (h1) | clamp(40px, 5vw, 56px) | 1.05 |
-| XXL (h2) | clamp(32px, 4vw, 42px) | 1.2 |
-| XL (h3) | clamp(24px, 3vw, 32px) | 1.2 |
-| Large (h4) | clamp(18px, 2.5vw, 24px) | 1.3 |
-| Medium | 17px | 1.5 |
-| Small (body) | 15px | 1.6 |
-| Extra Small | 13px | 1.5 |
+| Element      | Size                     | Line Height |
+| ------------ | ------------------------ | ----------- |
+| Hero (h1)    | clamp(40px, 5vw, 56px)   | 1.05        |
+| XXL (h2)     | clamp(32px, 4vw, 42px)   | 1.2         |
+| XL (h3)      | clamp(24px, 3vw, 32px)   | 1.2         |
+| Large (h4)   | clamp(18px, 2.5vw, 24px) | 1.3         |
+| Medium       | 17px                     | 1.5         |
+| Small (body) | 15px                     | 1.6         |
+| Extra Small  | 13px                     | 1.5         |
 
 ---
 
 ## Component Quick Reference
 
 ### Header
+
 - Background: `--paper-alt` (#F5F2EC)
 - Bottom border: 1px solid `--line`
 - Padding: 32px 0
 - Contains: Wordmark (left) + Language toggle + Back link (right)
 
 ### Profile Card
+
 - Background: `--paper-alt`
 - Padding: 32px
 - Border radius: 4px
 - Contains profile name, badge, details with divider
 
 ### Section Numbers
+
 - Size: 32px × 32px
 - Background: `--ink-900`
 - Color: white
 - Font weight: 600
 
 ### Session Items
+
 - Grid layout: 60px | 1fr (time | content)
 - Gap: 20px
 - Bottom border: 1px solid `--line`
@@ -126,12 +139,14 @@ Ensure the Google Fonts import is present in the `<head>`:
 - Time display: monospace font
 
 ### Vendor Cards
+
 - Border: 1px solid `--line`
 - Padding: 20px
 - Hover: translateY(-2px) + shadow 0 8px 16px rgba(0,0,0,0.08)
 - Transition: all 0.3s
 
 ### CTA Button
+
 - Padding: 14px 28px
 - Background: `--ink-900` → Hover: `--vermillion`
 - Color: white
@@ -140,6 +155,7 @@ Ensure the Google Fonts import is present in the `<head>`:
 - Arrow animation on hover
 
 ### Language Toggle
+
 - Button padding: 6px 10px
 - Inactive: `--ink-500` text
 - Active: White text on `--gold` background
@@ -150,9 +166,11 @@ Ensure the Google Fonts import is present in the `<head>`:
 ## Implementation Workflow
 
 ### 1. Set Up Base Styles
+
 Apply the CSS reset and base typography from `style-guide.md`.
 
 ### 2. Implement Layout Container
+
 ```css
 .container {
   max-width: 900px;
@@ -162,26 +180,29 @@ Apply the CSS reset and base typography from `style-guide.md`.
 ```
 
 ### 3. Add Components
+
 Use the component patterns from the style guide. Each component follows the design tokens.
 
 ### 4. Apply Interactive States
+
 - Buttons: background transition + translateY on hover
 - Cards: shadow + lift on hover
 - Links: color transitions
 
 ### 5. Verify Responsiveness
+
 Test with clamp() typography at different viewport widths.
 
 ---
 
 ## Special Elements
 
-| Element | Style |
-|---------|-------|
-| Profile badges | Gold background, uppercase, letter-spacing 0.08em |
-| Section subtitles | Italic, `--ink-500` color |
-| Intelligence highlights | `--gold` color, font-weight 600 |
-| Category headers | Uppercase, letter-spacing 0.08em, `--gold` color |
+| Element                 | Style                                             |
+| ----------------------- | ------------------------------------------------- |
+| Profile badges          | Gold background, uppercase, letter-spacing 0.08em |
+| Section subtitles       | Italic, `--ink-500` color                         |
+| Intelligence highlights | `--gold` color, font-weight 600                   |
+| Category headers        | Uppercase, letter-spacing 0.08em, `--gold` color  |
 
 ---
 
@@ -217,21 +238,25 @@ Before finalizing any page:
 ## Usage Examples
 
 ### Apply blueprint styling to a new page
+
 ```
 Apply the Personal Action Blueprint design system to this itinerary page.
 ```
 
 ### Style session items
+
 ```
 Style these session items following the blueprint design system with time/content grid.
 ```
 
 ### Create a profile card
+
 ```
 Create a profile card component following the blueprint design system.
 ```
 
 ### Add vendor cards with hover effects
+
 ```
 Add vendor cards with the blueprint hover elevation effect.
 ```

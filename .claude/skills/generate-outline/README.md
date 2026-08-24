@@ -17,16 +17,17 @@ Generate course outlines with automatic PDF compression for large reference mate
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
+| Flag                   | Description                                |
+| ---------------------- | ------------------------------------------ |
 | `--materials <folder>` | Folder containing PDF materials (required) |
-| `--outline <file>` | Existing outline to revise |
-| `--dry-run` | Preview without API calls |
-| `--output <folder>` | Custom output folder |
+| `--outline <file>`     | Existing outline to revise                 |
+| `--dry-run`            | Preview without API calls                  |
+| `--output <folder>`    | Custom output folder                       |
 
 ## Output
 
 Each run generates:
+
 - `course_dossier.md` - Deep research from Perplexity
 - `course_outline.md` - Structured 10-15 lecture curriculum
 

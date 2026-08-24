@@ -33,14 +33,14 @@ Wrap target elements, paste CSS and JS, then drive the sweep from your timeline:
 
 ```js
 tl.fromTo(
-  ".shimmer-sweep-target",
+  '.shimmer-sweep-target',
   {
-    "--shimmer-pos": "-20%",
+    '--shimmer-pos': '-20%',
   },
   {
-    "--shimmer-pos": "120%",
+    '--shimmer-pos': '120%',
     duration: 1.2,
-    ease: "power2.inOut",
+    ease: 'power2.inOut',
     stagger: 0.15,
   },
   2.0,
@@ -54,17 +54,17 @@ Paste the overlay HTML and CSS, then drive `.grid-cell` scale in your timeline:
 ```js
 // Cover screen
 tl.to(
-  ".grid-cell",
-  { scale: 1, duration: 0.6, stagger: { amount: 0.6, from: "center" }, ease: "power2.inOut" },
+  '.grid-cell',
+  { scale: 1, duration: 0.6, stagger: { amount: 0.6, from: 'center' }, ease: 'power2.inOut' },
   5.0,
 );
 // Swap scenes
-tl.set("#scene-a", { opacity: 0 }, 5.6);
-tl.set("#scene-b", { opacity: 1 }, 5.6);
+tl.set('#scene-a', { opacity: 0 }, 5.6);
+tl.set('#scene-b', { opacity: 1 }, 5.6);
 // Reveal
 tl.to(
-  ".grid-cell",
-  { scale: 0, duration: 0.6, stagger: { amount: 0.6, from: "edges" }, ease: "power2.inOut" },
+  '.grid-cell',
+  { scale: 0, duration: 0.6, stagger: { amount: 0.6, from: 'edges' }, ease: 'power2.inOut' },
   5.6,
 );
 ```

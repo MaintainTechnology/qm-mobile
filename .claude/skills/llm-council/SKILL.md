@@ -22,19 +22,19 @@ The real win of cross-vendor is catching **correlated blind spots** — things e
 
 Spawn **all five Agent calls in a single message** (one block, five tool calls) so they run concurrently. Each is a `general-purpose` agent on **`opus`** — every seat gets the smartest model. Give each the **same question** plus its lens. Members never see each other.
 
-| Member | model | Lens (what it's told to prioritize) |
-|---|---|---|
-| Pragmatist | `opus` | What actually works under real constraints. Bias to action and the concrete next move. |
-| Red-teamer | `opus` | Attack the premise. Where does this fail? Is the question itself wrong or missing something? |
-| Domain rigorist | `opus` | Technical correctness and precision. Name the real tradeoffs exactly; no hand-waving. |
-| First-principles | `opus` | Ignore convention and best-practice. Reason up from fundamentals; question defaults. |
-| Generalist | `opus` | Breadth. Connect angles, weigh the whole picture, answer plainly. |
+| Member           | model  | Lens (what it's told to prioritize)                                                          |
+| ---------------- | ------ | -------------------------------------------------------------------------------------------- |
+| Pragmatist       | `opus` | What actually works under real constraints. Bias to action and the concrete next move.       |
+| Red-teamer       | `opus` | Attack the premise. Where does this fail? Is the question itself wrong or missing something? |
+| Domain rigorist  | `opus` | Technical correctness and precision. Name the real tradeoffs exactly; no hand-waving.        |
+| First-principles | `opus` | Ignore convention and best-practice. Reason up from fundamentals; question defaults.         |
+| Generalist       | `opus` | Breadth. Connect angles, weigh the whole picture, answer plainly.                            |
 
 Diversity comes from the **lenses**, not from weaker models — a dumber model is noise, not a fresh perspective. Member count and lenses are easy to tune later.
 
 Prompt template for each member:
 
-> You are one member of an expert council answering a question independently. Your job is to give your **genuine best answer** — the lens below is what you should *emphasize*, not a character to perform.
+> You are one member of an expert council answering a question independently. Your job is to give your **genuine best answer** — the lens below is what you should _emphasize_, not a character to perform.
 >
 > **Your lens:** {lens}
 >
@@ -63,6 +63,7 @@ Reviewer prompt template:
 > {Response A … Response E, each as "Response X:\n{answer}"}
 >
 > Your task:
+>
 > 1. Evaluate each response individually — what it does well, what it does poorly — judging on **accuracy and insight only**, not style or length.
 > 2. Then give a final ranking, best to worst.
 >
@@ -122,12 +123,12 @@ python3 ~/.claude/skills/llm-council/scripts/council_openrouter.py "the exact qu
 
 Default lineup is the original Karpathy council, editable as `COUNCIL_MODELS` at the top of the script:
 
-| Seat | OpenRouter slug |
-|---|---|
-| GPT | `openai/gpt-5.5` |
+| Seat   | OpenRouter slug                 |
+| ------ | ------------------------------- |
+| GPT    | `openai/gpt-5.5`                |
 | Gemini | `google/gemini-3.1-pro-preview` |
-| Claude | `anthropic/claude-opus-4.8` |
-| Grok | `x-ai/grok-4.3` |
+| Claude | `anthropic/claude-opus-4.8`     |
+| Grok   | `x-ai/grok-4.3`                 |
 
 Then:
 
@@ -136,6 +137,7 @@ Then:
 3. **Output (same format as default mode),** but in the council note name the **models** (`GPT > Claude > Grok > Gemini`), and call out anything where the vendors **diverged** — that divergence is the whole point of paying for this mode.
 
 Handling the script's output:
+
 - `error` field present → relay it. The common one is a missing `OPENROUTER_API_KEY`: tell Jason to add `OPENROUTER_API_KEY=sk-or-...` to the project `.env` (get it at openrouter.ai/keys), then re-run.
 - `failures[]` non-empty → one or more model slugs failed (often a renamed/retired slug returning HTTP 404). Note which seat dropped; if ≥2 members still answered, the council is still valid. Fix by editing `COUNCIL_MODELS`.
 - Want a single-model chairman instead of you? Pipe the question + answers to one more `--models` call (e.g. `--models "google/gemini-3-pro-preview"`). Not the default — you (the orchestrator with full context) are the better Chairman.

@@ -33,7 +33,12 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { BrandMark } from '@/components/BrandMark';
 import { PrimaryCta } from '@/features/auth/ui';
 import { useChats } from '@/features/chats/chats-api';
-import { chatDisplayName, chatInitial, lastMessagePreview, relativeTime } from '@/features/chats/format';
+import {
+  chatDisplayName,
+  chatInitial,
+  lastMessagePreview,
+  relativeTime,
+} from '@/features/chats/format';
 import { CopyIcon, SunIcon } from '@/features/home/icons';
 import { apiErrorMessage } from '@/lib/api';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
@@ -56,7 +61,8 @@ function quoteStatusChip(quote: QuoteRow): { label: string; tone: Tone } {
 
 /** "hot_water_replace" → "Hot Water Replace"; falls back to the scope text, then a generic label. */
 function jobLabel(quote: QuoteRow): string {
-  if (quote.job_type) return quote.job_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+  if (quote.job_type)
+    return quote.job_type.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
   return quote.scope_of_works?.trim() || 'General enquiry';
 }
 
@@ -162,8 +168,7 @@ export function HomeScreen() {
   // cache is enough to land there. The attention card and recent-quote rows deep-link to the
   // specific quote via the `quoteId` param, which the Quotes tab reads to open that quote's detail.
   const goToQuotes = () => router.push('/quotes');
-  const goToQuote = (quoteId: string) =>
-    router.push({ pathname: '/quotes', params: { quoteId } });
+  const goToQuote = (quoteId: string) => router.push({ pathname: '/quotes', params: { quoteId } });
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.inkDeep, paddingTop: insets.top }}>
@@ -205,7 +210,9 @@ export function HomeScreen() {
           <Text style={[styles.errorTitle, { color: colors.textPri }]}>
             COULDN’T LOAD YOUR DASHBOARD
           </Text>
-          <Text style={[styles.centerText, { color: colors.textDim }]}>{apiErrorMessage(error)}</Text>
+          <Text style={[styles.centerText, { color: colors.textDim }]}>
+            {apiErrorMessage(error)}
+          </Text>
           <View style={styles.retryBtn}>
             <PrimaryCta label="Retry" onPress={() => void refetch()} />
           </View>
@@ -272,7 +279,13 @@ export function HomeScreen() {
 
           {/* Needs your attention — the newest in-review quote, or nothing at all. */}
           {attentionQuote ? (
-            <View style={[styles.attentionCard, card, { borderColor: 'rgba(245,158,11,0.42)', marginTop: 20 }]}>
+            <View
+              style={[
+                styles.attentionCard,
+                card,
+                { borderColor: 'rgba(245,158,11,0.42)', marginTop: 20 },
+              ]}
+            >
               <View style={styles.attentionHeader}>
                 <PulseDot color={colors.warningBright} />
                 <Text style={[styles.attentionLabel, { color: colors.warningBright }]}>
@@ -284,7 +297,9 @@ export function HomeScreen() {
                   style={[styles.attentionName, { color: colors.textPri, flexShrink: 1 }]}
                   numberOfLines={1}
                 >
-                  {attentionQuote.customer_full_name || attentionQuote.customer_first_name || 'Customer'}
+                  {attentionQuote.customer_full_name ||
+                    attentionQuote.customer_first_name ||
+                    'Customer'}
                   {attentionQuote.suburb ? ` · ${attentionQuote.suburb}` : ''}
                 </Text>
                 <Text style={[styles.attentionMeta, { color: colors.textDim }]}>
@@ -300,7 +315,9 @@ export function HomeScreen() {
                 onPress={() => goToQuote(attentionQuote.id)}
                 style={[styles.reviewBtn, { backgroundColor: colors.accent }]}
               >
-                <Text style={[styles.reviewBtnText, { color: colors.accentInk }]}>REVIEW QUOTE →</Text>
+                <Text style={[styles.reviewBtnText, { color: colors.accentInk }]}>
+                  REVIEW QUOTE →
+                </Text>
               </Pressable>
             </View>
           ) : null}
@@ -349,14 +366,18 @@ export function HomeScreen() {
             </View>
             <View style={[styles.kpiCell, { backgroundColor: colors.inkCard }]}>
               <Text style={[styles.kpiLabel, { color: colors.textDim }]}>IN REVIEW</Text>
-              <Text style={[styles.kpiValue, { color: colors.textPri }]}>{stats.inReviewCount}</Text>
+              <Text style={[styles.kpiValue, { color: colors.textPri }]}>
+                {stats.inReviewCount}
+              </Text>
               <Text style={[styles.kpiSub, { color: colors.textSec }]}>Awaiting send</Text>
             </View>
           </View>
 
           {/* Your QuoteMax number */}
           <View style={[styles.numberCard, card]}>
-            <Text style={[styles.numberLabel, { color: colors.textDim }]}>YOUR QUOTEMAX NUMBER</Text>
+            <Text style={[styles.numberLabel, { color: colors.textDim }]}>
+              YOUR QUOTEMAX NUMBER
+            </Text>
             <View style={styles.numberRow}>
               <Text style={[styles.numberValue, { color: colors.textPri }]}>
                 {smsOrVoiceNumber ?? 'Pending'}
@@ -448,12 +469,15 @@ export function HomeScreen() {
                         {jobLabel(q)}
                       </Text>
                       <Text style={[styles.quoteMeta, { color: colors.textDim }]}>
-                        {(q.suburb ?? '—').toUpperCase()} · {q.channel === 'voice' ? 'VOICE' : 'SMS'}
+                        {(q.suburb ?? '—').toUpperCase()} ·{' '}
+                        {q.channel === 'voice' ? 'VOICE' : 'SMS'}
                       </Text>
                     </View>
                     <View style={styles.quoteRight}>
                       <Text style={[styles.quoteValue, { color: colors.textPri }]}>
-                        {q.total_inc_gst != null ? formatAud(centsFromApiDollars(q.total_inc_gst)) : '—'}
+                        {q.total_inc_gst != null
+                          ? formatAud(centsFromApiDollars(q.total_inc_gst))
+                          : '—'}
                       </Text>
                       {q.total_inc_gst != null ? (
                         <Text style={[styles.quoteAmountMeta, { color: colors.textDim }]}>
@@ -521,7 +545,10 @@ export function HomeScreen() {
                     </View>
                     <View style={{ flex: 1, minWidth: 0 }}>
                       <View style={styles.chatNameRow}>
-                        <Text style={[styles.chatName, { color: colors.textPri }]} numberOfLines={1}>
+                        <Text
+                          style={[styles.chatName, { color: colors.textPri }]}
+                          numberOfLines={1}
+                        >
                           {who}
                         </Text>
                         <Text style={[styles.chatTime, { color: colors.textDim }]}>

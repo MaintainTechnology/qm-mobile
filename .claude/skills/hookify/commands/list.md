@@ -1,6 +1,6 @@
 ---
 description: List all configured hookify rules
-allowed-tools: ["Glob", "Read", "Skill"]
+allowed-tools: ['Glob', 'Read', 'Skill']
 ---
 
 # List Hookify Rules
@@ -12,6 +12,7 @@ Show all configured hookify rules in the project.
 ## Steps
 
 1. Use Glob tool to find all hookify rule files:
+
    ```
    pattern: ".claude/hookify.*.local.md"
    ```
@@ -36,6 +37,7 @@ Show all configured hookify rules in the project.
 ```
 
 4. For each rule, show a brief preview:
+
 ```
 ### warn-dangerous-rm
 **Event**: bash
@@ -47,6 +49,7 @@ Show all configured hookify rules in the project.
 ```
 
 5. Add helpful footer:
+
 ```
 ---
 
@@ -75,7 +78,9 @@ To get started:
 
 Example:
 ```
+
 /hookify Warn me when I use console.log
+
 ```
 
 Check `${CLAUDE_PLUGIN_ROOT}/examples/` for example rule files.

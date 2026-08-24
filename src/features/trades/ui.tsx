@@ -5,7 +5,15 @@
  * general-purpose primitives for this feature only.
  */
 import type { ReactNode } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View, type StyleProp, type ViewStyle } from 'react-native';
+import {
+  Pressable,
+  StyleSheet,
+  Text,
+  TextInput,
+  View,
+  type StyleProp,
+  type ViewStyle,
+} from 'react-native';
 
 import { fonts, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -101,13 +109,22 @@ export function Notice({
 }) {
   const { colors } = useTheme();
   const toneColor =
-    tone === 'danger' ? colors.dangerBright : tone === 'warn' ? colors.warningBright : colors.accentText;
+    tone === 'danger'
+      ? colors.dangerBright
+      : tone === 'warn'
+        ? colors.warningBright
+        : colors.accentText;
   return (
     <View style={[styles.notice, { borderColor: toneColor, backgroundColor: colors.inkCard }]}>
       <Text style={[styles.noticeLabel, { color: toneColor }]}>{label}</Text>
       {body ? <Text style={[styles.noticeBody, { color: colors.textSec }]}>{body}</Text> : null}
       {onRetry ? (
-        <Pressable accessibilityRole="button" onPress={onRetry} style={styles.noticeRetry} hitSlop={8}>
+        <Pressable
+          accessibilityRole="button"
+          onPress={onRetry}
+          style={styles.noticeRetry}
+          hitSlop={8}
+        >
           <Text style={[styles.noticeRetryLabel, { color: toneColor }]}>TRY AGAIN</Text>
         </Pressable>
       ) : null}

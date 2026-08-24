@@ -90,16 +90,16 @@ Rules below came out of two independent website-to-hyperframes builds (2026-04-2
   <!-- BAD: two transforms on one element -->
   <img class="hero" src="..." />
   <script>
-    tl.from(".hero", { y: 50, opacity: 0, duration: 0.6 }, 0);
-    tl.to(".hero", { scale: 1.04, duration: beat }, 0); // kills the entrance
+    tl.from('.hero', { y: 50, opacity: 0, duration: 0.6 }, 0);
+    tl.to('.hero', { scale: 1.04, duration: beat }, 0); // kills the entrance
   </script>
 
   <!-- GOOD option A: combine into one tween -->
   <script>
     tl.fromTo(
-      ".hero",
+      '.hero',
       { y: 50, opacity: 0, scale: 1.0 },
-      { y: 0, opacity: 1, scale: 1.04, duration: beat, ease: "none" },
+      { y: 0, opacity: 1, scale: 1.04, duration: beat, ease: 'none' },
       0,
     );
   </script>
@@ -107,8 +107,8 @@ Rules below came out of two independent website-to-hyperframes builds (2026-04-2
   <!-- GOOD option B: split across parent + child -->
   <div class="hero-wrap"><img class="hero" src="..." /></div>
   <script>
-    tl.from(".hero-wrap", { y: 50, opacity: 0, duration: 0.6 }, 0); // entrance on parent
-    tl.to(".hero", { scale: 1.04, duration: beat }, 0); // Ken Burns on child
+    tl.from('.hero-wrap', { y: 50, opacity: 0, duration: 0.6 }, 0); // entrance on parent
+    tl.to('.hero', { scale: 1.04, duration: beat }, 0); // Ken Burns on child
   </script>
   ```
 
@@ -126,17 +126,17 @@ Rules below came out of two independent website-to-hyperframes builds (2026-04-2
 
   ```js
   // BAD: lives outside the timeline, never renders in capture
-  gsap.to(".aura", { scale: 1.08, yoyo: true, repeat: 5, duration: 1.2 });
+  gsap.to('.aura', { scale: 1.08, yoyo: true, repeat: 5, duration: 1.2 });
 
   // GOOD: seekable, deterministic, renders
-  tl.to(".aura", { scale: 1.08, yoyo: true, repeat: 5, duration: 1.2 }, 0);
+  tl.to('.aura', { scale: 1.08, yoyo: true, repeat: 5, duration: 1.2 }, 0);
   ```
 
 - **Hard-kill every scene boundary, not just captions.** The caption hard-kill rule above generalizes: any element whose visibility changes at a beat boundary needs a deterministic `tl.set()` kill after its fade, because later tweens on the same element (or `immediateRender` from a sibling tween) can resurrect it. Apply to every element with an exit animation:
 
   ```js
   tl.to(el, { opacity: 0, duration: 0.3 }, beatEnd);
-  tl.set(el, { opacity: 0, visibility: "hidden" }, beatEnd + 0.3); // deterministic kill
+  tl.set(el, { opacity: 0, visibility: 'hidden' }, beatEnd + 0.3); // deterministic kill
   ```
 
 These are the exact rules with the exact code examples — don't summarize or shorten them. They exist because compositions that lint clean still ship broken without them.

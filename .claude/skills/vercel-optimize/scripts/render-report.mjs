@@ -7,7 +7,10 @@ import { dirname, resolve } from 'node:path';
 import { buildFinalReportMessage, renderReport } from '../lib/render-report.mjs';
 import { dedupeRecommendations } from '../lib/dedup-recs.mjs';
 import { canonicalizeRoute } from '../lib/route-normalize.mjs';
-import { hasUnsupportedCacheLifeCdnText, splitCustomerSafeObservations } from '../lib/observation-safety.mjs';
+import {
+  hasUnsupportedCacheLifeCdnText,
+  splitCustomerSafeObservations,
+} from '../lib/observation-safety.mjs';
 
 const log = (...a) => console.error('[render-report]', ...a);
 const HARD_REGEN_TRIGGERS = new Set([
@@ -19,7 +22,9 @@ const HARD_REGEN_TRIGGERS = new Set([
 async function main() {
   const args = parseArgs(process.argv.slice(2));
   if (!args.recsPath || !args.gatePath || !args.signalsPath) {
-    console.error('usage: node scripts/render-report.mjs <recommendations.json> <gate.json> <signals.json> [--project NAME] [--out FILE] [--message-out FILE] [--no-timestamp] [--debug-out FILE]');
+    console.error(
+      'usage: node scripts/render-report.mjs <recommendations.json> <gate.json> <signals.json> [--project NAME] [--out FILE] [--message-out FILE] [--no-timestamp] [--debug-out FILE]',
+    );
     process.exit(1);
   }
 
@@ -37,10 +42,10 @@ async function main() {
   const hardRegenRefs = new Set(
     Array.isArray(recsRaw.regenPlan)
       ? recsRaw.regenPlan
-          .filter((p) => HARD_REGEN_TRIGGERS.has(p.regenTrigger))
-          .map((p) => p.candidateRef)
+          .filter(p => HARD_REGEN_TRIGGERS.has(p.regenTrigger))
+          .map(p => p.candidateRef)
           .filter(Boolean)
-      : []
+      : [],
   );
   const activeCandidates = [
     ...(Array.isArray(gateRaw.toLaunch) ? gateRaw.toLaunch : []),
@@ -53,33 +58,32 @@ async function main() {
     : (recsRaw.recsGraded ?? []);
   const needsReviewDrops = [];
   const candidateRecommendations = Array.isArray(recsRaw)
-    ? recsRaw.filter((r) => r?.abstain !== true)
+    ? recsRaw.filter(r => r?.abstain !== true)
     : wrapperRecommendations
         .filter((r, i) => (r.quality?.overall ?? 0) >= 0.55)
-        .filter((r) => !hardRegenRefs.has(r.candidateRef));
+        .filter(r => !hardRegenRefs.has(r.candidateRef));
   const recommendationsRaw = candidateRecommendations
-        .filter((r) => {
-          if (r?.abstain === true || r?.needsReview !== true) return true;
-          needsReviewDrops.push({
-            candidateRef: r.candidateRef ?? null,
-            reason: 'This recommendation needs a manual safety review before it is ready to apply.',
-          });
-          return false;
-        })
-        .filter((r) => {
-          if (!enforceCurrentGate) return true;
-          if (recommendationMatchesActiveCandidate(r, activeCandidates)) return true;
-          staleRecommendationDrops.push({
-            candidateRef: r.candidateRef ?? null,
-            reason: 'This recommendation came from a candidate that is not in the current run output. Re-run from a clean run directory before applying it.',
-          });
-          return false;
-        });
+    .filter(r => {
+      if (r?.abstain === true || r?.needsReview !== true) return true;
+      needsReviewDrops.push({
+        candidateRef: r.candidateRef ?? null,
+        reason: 'This recommendation needs a manual safety review before it is ready to apply.',
+      });
+      return false;
+    })
+    .filter(r => {
+      if (!enforceCurrentGate) return true;
+      if (recommendationMatchesActiveCandidate(r, activeCandidates)) return true;
+      staleRecommendationDrops.push({
+        candidateRef: r.candidateRef ?? null,
+        reason:
+          'This recommendation came from a candidate that is not in the current run output. Re-run from a clean run directory before applying it.',
+      });
+      return false;
+    });
   const recommendations = dedupeRecommendations(recommendationsRaw);
   const readyTargets = new Set(
-    recommendations
-      .map((r) => candidateTarget(r?.candidateRef))
-      .filter(Boolean)
+    recommendations.map(r => candidateTarget(r?.candidateRef)).filter(Boolean),
   );
   const droppedContradictions = !Array.isArray(recsRaw)
     ? (recsRaw.recsGraded ?? [])
@@ -87,7 +91,9 @@ async function main() {
         .filter(({ r }) => hardRegenRefs.has(r.candidateRef))
         .map(({ r, i }) => ({
           candidateRef: r.candidateRef ?? null,
-          reason: publicHardRegenReason(recsRaw.regenPlan?.find((p) => p.index === i || p.candidateRef === r.candidateRef)),
+          reason: publicHardRegenReason(
+            recsRaw.regenPlan?.find(p => p.index === i || p.candidateRef === r.candidateRef),
+          ),
         }))
     : [];
 
@@ -97,24 +103,32 @@ async function main() {
   // Contradiction-dropped recs ride alongside them so customers see WHY a rec
   // was held back instead of it silently disappearing.
   const baseAbstentions = Array.isArray(recsRaw)
-    ? recsRaw.filter((r) => r?.abstain === true).map((r) => ({
-        candidateRef: r.candidateRef ?? null,
-        reason: publicNoChangeReason(r.reason ?? '(no reason recorded)'),
-      }))
-    : (recsRaw.abstentions ?? []).map((r) => ({
+    ? recsRaw
+        .filter(r => r?.abstain === true)
+        .map(r => ({
+          candidateRef: r.candidateRef ?? null,
+          reason: publicNoChangeReason(r.reason ?? '(no reason recorded)'),
+        }))
+    : (recsRaw.abstentions ?? []).map(r => ({
         ...r,
         reason: publicNoChangeReason(r.reason ?? '(no reason recorded)'),
       }));
-  const publicBaseAbstentions = baseAbstentions.filter((r) => !readyTargets.has(candidateTarget(r?.candidateRef)));
+  const publicBaseAbstentions = baseAbstentions.filter(
+    r => !readyTargets.has(candidateTarget(r?.candidateRef)),
+  );
   // Observations: no-change findings carrying a structured non-perf finding
   // (deployment regression, error storm, etc.).
   const flattenedObservations = Array.isArray(recsRaw)
-    ? flattenObservations(recsRaw.filter((r) => r?.abstain === true))
+    ? flattenObservations(recsRaw.filter(r => r?.abstain === true))
     : flattenObservations([
         ...(Array.isArray(recsRaw.observations) ? recsRaw.observations : []),
         ...(Array.isArray(recsRaw.abstentions) ? recsRaw.abstentions : []),
       ]);
-  const { observations: safeObservations, heldBackObservations } = splitCustomerSafeObservations(flattenedObservations, baseAbstentions, signalsRaw);
+  const { observations: safeObservations, heldBackObservations } = splitCustomerSafeObservations(
+    flattenedObservations,
+    baseAbstentions,
+    signalsRaw,
+  );
   const observations = suppressReadyCoveredObservations(safeObservations, recommendations);
 
   const abstentions = [
@@ -122,29 +136,32 @@ async function main() {
     ...droppedContradictions,
     ...staleRecommendationDrops,
     ...needsReviewDrops,
-    ...(Array.isArray(recsRaw.withheldRecommendations) ? recsRaw.withheldRecommendations.map((d) => ({
-      candidateRef: d.candidateRef ?? null,
-      reason: publicWithheldReason(d),
-      needsEvidence: true,
-    })) : []),
-    ...(Array.isArray(recsRaw.sanitizerDropped) ? recsRaw.sanitizerDropped.map((d) => ({
-      candidateRef: d.candidateRef ?? null,
-      reason: `This needs a closer review before it is safe to apply: ${d.reason ?? 'review required'}.`,
-      needsEvidence: true,
-    })) : []),
-    ...(Array.isArray(recsRaw.heldBackObservations) ? recsRaw.heldBackObservations.map((d) => ({
-      ...d,
-      needsEvidence: true,
-    })) : []),
+    ...(Array.isArray(recsRaw.withheldRecommendations)
+      ? recsRaw.withheldRecommendations.map(d => ({
+          candidateRef: d.candidateRef ?? null,
+          reason: publicWithheldReason(d),
+          needsEvidence: true,
+        }))
+      : []),
+    ...(Array.isArray(recsRaw.sanitizerDropped)
+      ? recsRaw.sanitizerDropped.map(d => ({
+          candidateRef: d.candidateRef ?? null,
+          reason: `This needs a closer review before it is safe to apply: ${d.reason ?? 'review required'}.`,
+          needsEvidence: true,
+        }))
+      : []),
+    ...(Array.isArray(recsRaw.heldBackObservations)
+      ? recsRaw.heldBackObservations.map(d => ({
+          ...d,
+          needsEvidence: true,
+        }))
+      : []),
     ...heldBackObservations,
   ];
 
   // Full catalog lets the renderer recover o11ySignal + aliasRoutes that recs
   // didn't propagate, and canonicalize segment-tree candidateRefs.
-  const allCandidates = [
-    ...activeCandidates,
-    ...gated,
-  ];
+  const allCandidates = [...activeCandidates, ...gated];
 
   const md = renderReport({
     recommendations,
@@ -156,7 +173,8 @@ async function main() {
     opts: {
       projectName: args.projectName,
       generatedAt: args.noTimestamp ? null : new Date().toISOString(),
-      heldBackCount: (Number.isInteger(recsRaw.summary?.withheldRecommendations)
+      heldBackCount:
+        (Number.isInteger(recsRaw.summary?.withheldRecommendations)
           ? recsRaw.summary.withheldRecommendations
           : (Array.isArray(recsRaw.regenPlan) ? recsRaw.regenPlan.length : 0) +
             (Array.isArray(recsRaw.qualityDropped) ? recsRaw.qualityDropped.length : 0)) +
@@ -218,14 +236,17 @@ function parseArgs(argv) {
     else if (a === '--out') out.outPath = resolve(argv[++i]);
     else if (a.startsWith('--out=')) out.outPath = resolve(a.slice('--out='.length));
     else if (a === '--message-out') out.messageOutPath = resolve(argv[++i]);
-    else if (a.startsWith('--message-out=')) out.messageOutPath = resolve(a.slice('--message-out='.length));
+    else if (a.startsWith('--message-out='))
+      out.messageOutPath = resolve(a.slice('--message-out='.length));
     else if (a === '--no-timestamp') out.noTimestamp = true;
     else if (a === '--debug-out') out.debugOutPath = resolve(argv[++i]);
-    else if (a.startsWith('--debug-out=')) out.debugOutPath = resolve(a.slice('--debug-out='.length));
+    else if (a.startsWith('--debug-out='))
+      out.debugOutPath = resolve(a.slice('--debug-out='.length));
     else if (a === '--debug') {
-      console.error('[render-report] --debug no longer writes internal details into customer markdown; use --debug-out FILE');
-    }
-    else out.positional.push(a);
+      console.error(
+        '[render-report] --debug no longer writes internal details into customer markdown; use --debug-out FILE',
+      );
+    } else out.positional.push(a);
   }
   out.recsPath = out.positional[0];
   out.gatePath = out.positional[1];
@@ -264,7 +285,7 @@ function publicHardRegenReason(plan) {
 function recommendationMatchesActiveCandidate(rec, candidates) {
   const ref = parseCandidateRef(rec?.candidateRef);
   if (!ref) return true;
-  return candidates.some((candidate) => candidateMatchesRef(candidate, ref));
+  return candidates.some(candidate => candidateMatchesRef(candidate, ref));
 }
 
 function parseCandidateRef(ref) {
@@ -278,7 +299,8 @@ function candidateMatchesRef(candidate, ref) {
   if (!candidate || candidate.kind !== ref.kind) return false;
   if (candidate.scope === 'account' || ref.target === '<account>') return true;
 
-  const candidateTarget = candidate.route ?? candidate.hostname ?? candidate.file ?? candidate.target ?? null;
+  const candidateTarget =
+    candidate.route ?? candidate.hostname ?? candidate.file ?? candidate.target ?? null;
   if (!candidateTarget || !ref.target) return false;
 
   const a = String(candidateTarget);
@@ -299,7 +321,7 @@ function suppressReadyCoveredObservations(observations, recommendations = []) {
     readyFamiliesByTarget.set(target, set);
   }
 
-  return observations.filter((observation) => {
+  return observations.filter(observation => {
     const parsed = parseCandidateRef(observation?.candidateRef);
     const target = candidateTarget(observation?.candidateRef);
     const family = candidateFamily(parsed?.kind);
@@ -359,9 +381,7 @@ function buildDebugArtifact({
   droppedContradictions = [],
 }) {
   const wrapper = Array.isArray(recsRaw) ? null : recsRaw;
-  const sourceRecords = Array.isArray(recsRaw)
-    ? recsRaw
-    : (recsRaw.recsGraded ?? []);
+  const sourceRecords = Array.isArray(recsRaw) ? recsRaw : (recsRaw.recsGraded ?? []);
   const summary = wrapper?.summary
     ? {
         ...wrapper.summary,
@@ -385,8 +405,8 @@ function buildDebugArtifact({
     rawRecommendationCount: recommendationsRaw.length,
     gateBudget: gateRaw?.budget ?? null,
     recommendations: sourceRecords
-      .filter((record) => record && record.abstain !== true)
-      .map((record) => ({
+      .filter(record => record && record.abstain !== true)
+      .map(record => ({
         candidateRef: record.candidateRef ?? null,
         what: record.what ?? null,
         verification: record.verification ?? null,
@@ -413,7 +433,12 @@ function flattenObservations(records) {
       });
       continue;
     }
-    if ('summary' in record || 'evidence' in record || 'suggestedAction' in record || 'kind' in record) {
+    if (
+      'summary' in record ||
+      'evidence' in record ||
+      'suggestedAction' in record ||
+      'kind' in record
+    ) {
       out.push({
         candidateRef: record.candidateRef ?? null,
         summary: coerceOptionalString(record.summary),
@@ -430,7 +455,7 @@ function coerceOptionalString(value) {
   return value == null ? value : String(value);
 }
 
-main().catch((err) => {
+main().catch(err => {
   console.error('[render-report] FAILED:', err.message);
   console.error(err.stack);
   process.exit(1);

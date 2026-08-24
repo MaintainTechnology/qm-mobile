@@ -18,17 +18,18 @@ Batch-generate lecture packages from a course outline using the VectorShift Indi
 
 ## Options
 
-| Flag | Description |
-|------|-------------|
-| `--dry-run` | Preview execution plan without API calls |
-| `--start N` | Start from lecture N |
-| `--end N` | Stop after lecture N |
-| `--materials PATH` | Custom materials folder |
-| `--no-llm-parser` | Use regex parser instead of LLM |
+| Flag               | Description                              |
+| ------------------ | ---------------------------------------- |
+| `--dry-run`        | Preview execution plan without API calls |
+| `--start N`        | Start from lecture N                     |
+| `--end N`          | Stop after lecture N                     |
+| `--materials PATH` | Custom materials folder                  |
+| `--no-llm-parser`  | Use regex parser instead of LLM          |
 
 ## Output
 
 Each lecture generates:
+
 - `lecture_N_slides.json` - Structured slides for UniversalLecture renderer
 - `lecture_N_transcript.md` - TTS-ready speaker script
 - `lecture_N_blueprint.md` - Slide-by-slide plan

@@ -11,7 +11,15 @@
  *
  * Requires Playwright:  npm i -D playwright && npx playwright install chromium
  */
-import { readFileSync, mkdirSync, existsSync, readdirSync, statSync, writeFileSync, unlinkSync } from 'node:fs';
+import {
+  readFileSync,
+  mkdirSync,
+  existsSync,
+  readdirSync,
+  statSync,
+  writeFileSync,
+  unlinkSync,
+} from 'node:fs';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { dirname, resolve, join, relative, sep, basename, extname } from 'node:path';
 
@@ -24,23 +32,42 @@ const GEN = join(ASSETS_DIR, 'generator.html');
 // sync as new assets are dropped in. Keys are normalised file names; values are paths
 // relative to assets/ (the generator resolves + URL-encodes them at use).
 const IMG = new Set(['.svg', '.png', '.jpg', '.jpeg', '.webp']);
-const normKey = s => s.toLowerCase().replace(/\.[^.]+$/, '').replace(/\s*\(\d+\)$/, '').replace(/[^a-z0-9]/g, '');
+const normKey = s =>
+  s
+    .toLowerCase()
+    .replace(/\.[^.]+$/, '')
+    .replace(/\s*\(\d+\)$/, '')
+    .replace(/[^a-z0-9]/g, '');
 function scanAssets() {
-  const icons = {}, backgrounds = {}, logos = {};
+  const icons = {},
+    backgrounds = {},
+    logos = {};
   const walk = dir => {
     for (const name of readdirSync(dir)) {
       const p = join(dir, name);
-      let st; try { st = statSync(p); } catch { continue; }
-      if (st.isDirectory()) { walk(p); continue; }
+      let st;
+      try {
+        st = statSync(p);
+      } catch {
+        continue;
+      }
+      if (st.isDirectory()) {
+        walk(p);
+        continue;
+      }
       const ext = extname(p).toLowerCase();
       if (!IMG.has(ext)) continue;
       const rel = relative(ASSETS_DIR, p).split(sep).join('/');
       const parent = (rel.split('/').slice(-2, -1)[0] || '').toLowerCase();
       const key = normKey(basename(p));
       const isSvg = ext === '.svg';
-      if (/icon/.test(parent)) { if (!icons[key] || (isSvg && !icons[key].endsWith('.svg'))) icons[key] = rel; }
-      else if (parent === 'logos' || parent === 'logo') { if (!logos[key] || (isSvg && !logos[key].endsWith('.svg'))) logos[key] = rel; }
-      else if (/background|graphic|identifier/.test(parent)) { if (!backgrounds[key]) backgrounds[key] = rel; }
+      if (/icon/.test(parent)) {
+        if (!icons[key] || (isSvg && !icons[key].endsWith('.svg'))) icons[key] = rel;
+      } else if (parent === 'logos' || parent === 'logo') {
+        if (!logos[key] || (isSvg && !logos[key].endsWith('.svg'))) logos[key] = rel;
+      } else if (/background|graphic|identifier/.test(parent)) {
+        if (!backgrounds[key]) backgrounds[key] = rel;
+      }
     }
   };
   walk(ASSETS_DIR);
@@ -50,9 +77,12 @@ const manifest = scanAssets();
 
 // ---- args ----
 const args = process.argv.slice(2);
-const flag = (name, def) => { const i = args.indexOf('--' + name); return i >= 0 ? args[i + 1] : def; };
+const flag = (name, def) => {
+  const i = args.indexOf('--' + name);
+  return i >= 0 ? args[i + 1] : def;
+};
 const slidesPath = args.find(a => !a.startsWith('--') && a.endsWith('.json'));
-const [W, H] = (flag('size', '1080x1350')).split('x').map(Number);
+const [W, H] = flag('size', '1080x1350').split('x').map(Number);
 const OUT = resolve(flag('out', './out'));
 const FOOTER = flag('footer', 'maintainmedia.com');
 const SCALE = Number(flag('scale', '1'));
@@ -73,7 +103,9 @@ let chromium;
 try {
   ({ chromium } = await import('playwright'));
 } catch {
-  console.error('\nPlaywright is not installed. Install it once:\n  npm i -D playwright && npx playwright install chromium\n');
+  console.error(
+    '\nPlaywright is not installed. Install it once:\n  npm i -D playwright && npx playwright install chromium\n',
+  );
   process.exit(1);
 }
 
@@ -81,17 +113,35 @@ mkdirSync(OUT, { recursive: true });
 
 const browser = await chromium.launch();
 const page = await browser.newPage({ viewport: { width: W, height: H }, deviceScaleFactor: SCALE });
-await page.addInitScript((data) => { window.__ASSETS = data; window.__NO_AUTORENDER = true; }, manifest);
+await page.addInitScript(data => {
+  window.__ASSETS = data;
+  window.__NO_AUTORENDER = true;
+}, manifest);
 await page.goto(pathToFileURL(GEN).href, { waitUntil: 'load' });
-console.log(`  assets discovered: ${Object.keys(manifest.icons).length} icons, ${Object.keys(manifest.backgrounds).length} backgrounds, ${Object.keys(manifest.logos).length} logos`);
+console.log(
+  `  assets discovered: ${Object.keys(manifest.icons).length} icons, ${Object.keys(manifest.backgrounds).length} backgrounds, ${Object.keys(manifest.logos).length} logos`,
+);
 
 // render + wait for fonts and every image (icons, logo)
-await page.evaluate(async ({ slides, W, H, FOOTER }) => {
-  await window.renderSlides(slides || window.SLIDES, { width: W, height: H, footer: FOOTER });
-  await document.fonts.ready;
-  await Promise.all([...document.images].map(i => i.complete ? 1 : new Promise(r => { i.onload = i.onerror = r; })));
-  document.querySelectorAll('.slide').forEach(el => { /* re-fit after images */ });
-}, { slides, W, H, FOOTER });
+await page.evaluate(
+  async ({ slides, W, H, FOOTER }) => {
+    await window.renderSlides(slides || window.SLIDES, { width: W, height: H, footer: FOOTER });
+    await document.fonts.ready;
+    await Promise.all(
+      [...document.images].map(i =>
+        i.complete
+          ? 1
+          : new Promise(r => {
+              i.onload = i.onerror = r;
+            }),
+      ),
+    );
+    document.querySelectorAll('.slide').forEach(el => {
+      /* re-fit after images */
+    });
+  },
+  { slides, W, H, FOOTER },
+);
 await page.waitForTimeout(150);
 
 // ---- PNG per slide ----
@@ -118,10 +168,28 @@ const pdfHtml = `<!doctype html><html><head><meta charset="utf-8"><style>
 writeFileSync(pdfHtmlPath, pdfHtml);
 const pdfPage = await browser.newPage();
 await pdfPage.goto(pathToFileURL(pdfHtmlPath).href, { waitUntil: 'load' });
-await pdfPage.evaluate(() => Promise.all([...document.images].map(i => (i.complete && i.naturalWidth) ? 1 : new Promise(r => { i.onload = i.onerror = r; }))));
+await pdfPage.evaluate(() =>
+  Promise.all(
+    [...document.images].map(i =>
+      i.complete && i.naturalWidth
+        ? 1
+        : new Promise(r => {
+            i.onload = i.onerror = r;
+          }),
+    ),
+  ),
+);
 const pdfPath = join(OUT, 'carousel.pdf');
-await pdfPage.pdf({ path: pdfPath, width: `${W}px`, height: `${H}px`, printBackground: true, preferCSSPageSize: true });
-try { unlinkSync(pdfHtmlPath); } catch {}
+await pdfPage.pdf({
+  path: pdfPath,
+  width: `${W}px`,
+  height: `${H}px`,
+  printBackground: true,
+  preferCSSPageSize: true,
+});
+try {
+  unlinkSync(pdfHtmlPath);
+} catch {}
 console.log('  ✓ ' + pdfPath);
 
 await browser.close();

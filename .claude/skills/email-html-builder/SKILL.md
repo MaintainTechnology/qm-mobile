@@ -9,6 +9,7 @@ This skill transforms markdown email files into production-ready HTML that can b
 ## When to Use
 
 Use this skill when:
+
 - Converting markdown email sequences to HubSpot HTML
 - Building single promotional emails
 - Creating nurture sequence emails
@@ -17,10 +18,12 @@ Use this skill when:
 ## Input Requirements
 
 Provide one of the following:
+
 1. **File path(s)** to markdown email file(s) in the repository
 2. **Raw markdown content** for the email(s)
 
 If providing a sequence file (like `elite-mentorship-nurture.md`), specify which email(s) to convert:
+
 - "Convert email 1"
 - "Convert all emails"
 - "Convert emails 3-5"
@@ -34,50 +37,72 @@ Every email follows this structure:
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>{{EMAIL_SUBJECT}}</title>
-  <!--[if mso]>
-  <style type="text/css">
-    body, table, td {font-family: Arial, sans-serif !important;}
-  </style>
-  <![endif]-->
-</head>
-<body style="margin: 0; padding: 0; background-color: #F5F2EC; font-family: 'DM Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <title>{{EMAIL_SUBJECT}}</title>
+    <!--[if mso]>
+      <style type="text/css">
+        body,
+        table,
+        td {
+          font-family: Arial, sans-serif !important;
+        }
+      </style>
+    <![endif]-->
+  </head>
+  <body
+    style="margin: 0; padding: 0; background-color: #F5F2EC; font-family: 'DM Sans', Arial, sans-serif; -webkit-font-smoothing: antialiased;"
+  >
+    <!-- Email Container -->
+    <table
+      role="presentation"
+      cellpadding="0"
+      cellspacing="0"
+      width="100%"
+      style="background-color: #F5F2EC;"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 20px;">
+          <!-- Content Container -->
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            width="600"
+            style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E3DFD7;"
+          >
+            {{EMAIL_CONTENT}}
+          </table>
 
-  <!-- Email Container -->
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F2EC;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
-
-        <!-- Content Container -->
-        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E3DFD7;">
-
-          {{EMAIL_CONTENT}}
-
-        </table>
-
-        <!-- Footer -->
-        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px;">
-          <tr>
-            <td style="padding: 32px 40px; text-align: center;">
-              <p style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14px; color: #302C27;">
-                Next Generation Medicine
-              </p>
-              <p style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 12px; color: #9C9890;">
-                nextgenerationmedicine.co
-              </p>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
-</body>
+          <!-- Footer -->
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            width="600"
+            style="max-width: 600px;"
+          >
+            <tr>
+              <td style="padding: 32px 40px; text-align: center;">
+                <p
+                  style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14px; color: #302C27;"
+                >
+                  Next Generation Medicine
+                </p>
+                <p
+                  style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 12px; color: #9C9890;"
+                >
+                  nextgenerationmedicine.co
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
 ```
 
@@ -86,6 +111,7 @@ Every email follows this structure:
 ## Style Reference (Inline Values)
 
 ### Colors (use hex values, not CSS variables)
+
 ```
 Paper (background):     #FFFFFF
 Paper Alt:              #F5F2EC
@@ -99,6 +125,7 @@ Vermillion (CTA):       #C07050
 ```
 
 ### Typography (email-safe stacks)
+
 ```
 Serif:     'Cormorant Garamond', Georgia, serif
 Sans:      'DM Sans', Arial, sans-serif
@@ -106,6 +133,7 @@ Monospace: 'Courier New', monospace
 ```
 
 ### Font Sizes
+
 ```
 Headline:    28px (line-height: 1.2)
 Subhead:     20px (line-height: 1.3)
@@ -119,10 +147,13 @@ Caption:     12px (line-height: 1.4)
 ## Component Patterns
 
 ### Header Block
+
 ```html
 <tr>
   <td style="padding: 40px 40px 32px 40px; border-bottom: 1px solid #E3DFD7;">
-    <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; color: #302C27;">
+    <p
+      style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; color: #302C27;"
+    >
       Next Generation Medicine
     </p>
   </td>
@@ -130,6 +161,7 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Body Content Block
+
 ```html
 <tr>
   <td style="padding: 40px;">
@@ -139,42 +171,62 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Paragraph
+
 ```html
-<p style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
+<p
+  style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+>
   {{TEXT}}
 </p>
 ```
 
 ### Headline (H2 equivalent)
+
 ```html
-<h2 style="margin: 0 0 16px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.3; color: #302C27;">
+<h2
+  style="margin: 0 0 16px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 24px; font-weight: 500; line-height: 1.3; color: #302C27;"
+>
   {{HEADLINE}}
 </h2>
 ```
 
 ### Subhead (H3 equivalent)
+
 ```html
-<h3 style="margin: 32px 0 12px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; line-height: 1.3; color: #302C27;">
+<h3
+  style="margin: 32px 0 12px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; line-height: 1.3; color: #302C27;"
+>
   {{SUBHEAD}}
 </h3>
 ```
 
 ### Bold Text
+
 ```html
 <strong style="font-weight: 600; color: #302C27;">{{TEXT}}</strong>
 ```
 
 ### Italic Text
+
 ```html
 <em style="font-style: italic; color: #706C66;">{{TEXT}}</em>
 ```
 
 ### Bullet List
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 20px 0;">
   <tr>
-    <td width="20" valign="top" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;">—</td>
-    <td style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
+    <td
+      width="20"
+      valign="top"
+      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;"
+    >
+      —
+    </td>
+    <td
+      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+    >
       {{ITEM_TEXT}}
     </td>
   </tr>
@@ -182,11 +234,20 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Numbered List
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 20px 0;">
   <tr>
-    <td width="24" valign="top" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C; font-weight: 600;">1.</td>
-    <td style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
+    <td
+      width="24"
+      valign="top"
+      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C; font-weight: 600;"
+    >
+      1.
+    </td>
+    <td
+      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+    >
       {{ITEM_TEXT}}
     </td>
   </tr>
@@ -194,11 +255,14 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Blockquote / Highlight Box
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 24px 0;">
   <tr>
     <td style="padding: 20px 24px; background-color: #F5F2EC; border-left: 4px solid #C49A6C;">
-      <p style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #4A4540; font-style: italic;">
+      <p
+        style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 15px; line-height: 1.6; color: #4A4540; font-style: italic;"
+      >
         {{QUOTE_TEXT}}
       </p>
     </td>
@@ -207,11 +271,16 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Primary CTA Button
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
   <tr>
     <td style="background-color: #302C27; border-radius: 2px;">
-      <a href="{{URL}}" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; text-decoration: none; letter-spacing: 0.02em;">
+      <a
+        href="{{URL}}"
+        target="_blank"
+        style="display: inline-block; padding: 14px 28px; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; text-decoration: none; letter-spacing: 0.02em;"
+      >
         {{BUTTON_TEXT}} →
       </a>
     </td>
@@ -220,15 +289,21 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Secondary CTA (Text Link)
+
 ```html
 <p style="margin: 24px 0 0 0;">
-  <a href="{{URL}}" target="_blank" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 14px; color: #C49A6C; text-decoration: underline;">
+  <a
+    href="{{URL}}"
+    target="_blank"
+    style="font-family: 'DM Sans', Arial, sans-serif; font-size: 14px; color: #C49A6C; text-decoration: underline;"
+  >
     {{LINK_TEXT}} →
   </a>
 </p>
 ```
 
 ### Divider Line
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 32px 0;">
   <tr>
@@ -238,15 +313,20 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### Signature Block
+
 ```html
 <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 32px;">
   <tr>
     <td>
-      <p style="margin: 0 0 4px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
+      <p
+        style="margin: 0 0 4px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+      >
         — Anant
       </p>
-      <p style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; color: #9C9890;">
-        Dr. Anant Vinjamoori<br>
+      <p
+        style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; color: #9C9890;"
+      >
+        Dr. Anant Vinjamoori<br />
         Harvard-trained physician | Chief Longevity Officer, Superpower
       </p>
     </td>
@@ -255,11 +335,20 @@ Caption:     12px (line-height: 1.4)
 ```
 
 ### P.S. Block
+
 ```html
-<table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #E3DFD7;">
+<table
+  role="presentation"
+  cellpadding="0"
+  cellspacing="0"
+  width="100%"
+  style="margin-top: 24px; padding-top: 24px; border-top: 1px solid #E3DFD7;"
+>
   <tr>
     <td>
-      <p style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #706C66;">
+      <p
+        style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 14px; line-height: 1.6; color: #706C66;"
+      >
         <strong style="color: #302C27;">P.S.</strong> — {{PS_TEXT}}
       </p>
     </td>
@@ -289,6 +378,7 @@ When converting markdown to HTML:
 ## HubSpot Personalization Tokens
 
 Replace these placeholders with HubSpot tokens:
+
 - `[First Name]` → `{{ contact.firstname }}`
 - `[Email]` → `{{ contact.email }}`
 - `[Company]` → `{{ contact.company }}`
@@ -310,8 +400,10 @@ For sequences, output each email separately with clear dividers.
 ## Example Input → Output
 
 ### Input (Markdown):
+
 ```markdown
 ## Email 1
+
 **Subject:** Why I stopped advising and started teaching
 **Preview:** The gap I couldn't ignore anymore
 
@@ -335,120 +427,197 @@ Here's what I noticed:
 ```
 
 ### Output (HTML):
+
 ```html
 <!-- SUBJECT: Why I stopped advising and started teaching -->
 <!-- PREVIEW: The gap I couldn't ignore anymore -->
 
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Why I stopped advising and started teaching</title>
-</head>
-<body style="margin: 0; padding: 0; background-color: #F5F2EC; font-family: 'DM Sans', Arial, sans-serif;">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Why I stopped advising and started teaching</title>
+  </head>
+  <body
+    style="margin: 0; padding: 0; background-color: #F5F2EC; font-family: 'DM Sans', Arial, sans-serif;"
+  >
+    <table
+      role="presentation"
+      cellpadding="0"
+      cellspacing="0"
+      width="100%"
+      style="background-color: #F5F2EC;"
+    >
+      <tr>
+        <td align="center" style="padding: 40px 20px;">
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            width="600"
+            style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E3DFD7;"
+          >
+            <!-- Header -->
+            <tr>
+              <td style="padding: 40px 40px 32px 40px; border-bottom: 1px solid #E3DFD7;">
+                <p
+                  style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; color: #302C27;"
+                >
+                  Next Generation Medicine
+                </p>
+              </td>
+            </tr>
 
-  <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="background-color: #F5F2EC;">
-    <tr>
-      <td align="center" style="padding: 40px 20px;">
+            <!-- Body -->
+            <tr>
+              <td style="padding: 40px;">
+                <p
+                  style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                >
+                  Hey {{ contact.firstname }},
+                </p>
 
-        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px; background-color: #FFFFFF; border: 1px solid #E3DFD7;">
+                <p
+                  style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                >
+                  Thanks for your interest in Elite.
+                </p>
 
-          <!-- Header -->
-          <tr>
-            <td style="padding: 40px 40px 32px 40px; border-bottom: 1px solid #E3DFD7;">
-              <p style="margin: 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 18px; font-weight: 500; color: #302C27;">
-                Next Generation Medicine
-              </p>
-            </td>
-          </tr>
+                <p
+                  style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                >
+                  Here's what I noticed:
+                </p>
 
-          <!-- Body -->
-          <tr>
-            <td style="padding: 40px;">
+                <!-- Bullet List -->
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  width="100%"
+                  style="margin: 0 0 8px 0;"
+                >
+                  <tr>
+                    <td
+                      width="20"
+                      valign="top"
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;"
+                    >
+                      —
+                    </td>
+                    <td
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                    >
+                      The same questions kept coming up
+                    </td>
+                  </tr>
+                </table>
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  width="100%"
+                  style="margin: 0 0 8px 0;"
+                >
+                  <tr>
+                    <td
+                      width="20"
+                      valign="top"
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;"
+                    >
+                      —
+                    </td>
+                    <td
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                    >
+                      I was giving the same advice over and over
+                    </td>
+                  </tr>
+                </table>
+                <table
+                  role="presentation"
+                  cellpadding="0"
+                  cellspacing="0"
+                  width="100%"
+                  style="margin: 0 0 20px 0;"
+                >
+                  <tr>
+                    <td
+                      width="20"
+                      valign="top"
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;"
+                    >
+                      —
+                    </td>
+                    <td
+                      style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                    >
+                      Talented clinicians were building alone
+                    </td>
+                  </tr>
+                </table>
 
-              <p style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                Hey {{ contact.firstname }},
-              </p>
+                <p
+                  style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                >
+                  <strong style="font-weight: 600; color: #302C27;"
+                    >That's why I built Elite.</strong
+                  >
+                </p>
 
-              <p style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                Thanks for your interest in Elite.
-              </p>
+                <!-- CTA Button -->
+                <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
+                  <tr>
+                    <td style="background-color: #302C27; border-radius: 2px;">
+                      <a
+                        href="https://buy.stripe.com/xxx"
+                        target="_blank"
+                        style="display: inline-block; padding: 14px 28px; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; text-decoration: none; letter-spacing: 0.02em;"
+                      >
+                        Join Elite →
+                      </a>
+                    </td>
+                  </tr>
+                </table>
 
-              <p style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                Here's what I noticed:
-              </p>
+                <!-- Signature -->
+                <p
+                  style="margin: 32px 0 0 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;"
+                >
+                  — Anant
+                </p>
+              </td>
+            </tr>
+          </table>
 
-              <!-- Bullet List -->
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 8px 0;">
-                <tr>
-                  <td width="20" valign="top" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;">—</td>
-                  <td style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                    The same questions kept coming up
-                  </td>
-                </tr>
-              </table>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 8px 0;">
-                <tr>
-                  <td width="20" valign="top" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;">—</td>
-                  <td style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                    I was giving the same advice over and over
-                  </td>
-                </tr>
-              </table>
-              <table role="presentation" cellpadding="0" cellspacing="0" width="100%" style="margin: 0 0 20px 0;">
-                <tr>
-                  <td width="20" valign="top" style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #C49A6C;">—</td>
-                  <td style="font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                    Talented clinicians were building alone
-                  </td>
-                </tr>
-              </table>
-
-              <p style="margin: 0 0 20px 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                <strong style="font-weight: 600; color: #302C27;">That's why I built Elite.</strong>
-              </p>
-
-              <!-- CTA Button -->
-              <table role="presentation" cellpadding="0" cellspacing="0" style="margin: 32px 0;">
-                <tr>
-                  <td style="background-color: #302C27; border-radius: 2px;">
-                    <a href="https://buy.stripe.com/xxx" target="_blank" style="display: inline-block; padding: 14px 28px; font-family: 'DM Sans', Arial, sans-serif; font-size: 13px; font-weight: 600; color: #FFFFFF; text-decoration: none; letter-spacing: 0.02em;">
-                      Join Elite →
-                    </a>
-                  </td>
-                </tr>
-              </table>
-
-              <!-- Signature -->
-              <p style="margin: 32px 0 0 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 16px; line-height: 1.6; color: #4A4540;">
-                — Anant
-              </p>
-
-            </td>
-          </tr>
-
-        </table>
-
-        <!-- Footer -->
-        <table role="presentation" cellpadding="0" cellspacing="0" width="600" style="max-width: 600px;">
-          <tr>
-            <td style="padding: 32px 40px; text-align: center;">
-              <p style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14px; color: #302C27;">
-                Next Generation Medicine
-              </p>
-              <p style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 12px; color: #9C9890;">
-                nextgenerationmedicine.co
-              </p>
-            </td>
-          </tr>
-        </table>
-
-      </td>
-    </tr>
-  </table>
-
-</body>
+          <!-- Footer -->
+          <table
+            role="presentation"
+            cellpadding="0"
+            cellspacing="0"
+            width="600"
+            style="max-width: 600px;"
+          >
+            <tr>
+              <td style="padding: 32px 40px; text-align: center;">
+                <p
+                  style="margin: 0 0 8px 0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: 14px; color: #302C27;"
+                >
+                  Next Generation Medicine
+                </p>
+                <p
+                  style="margin: 0; font-family: 'DM Sans', Arial, sans-serif; font-size: 12px; color: #9C9890;"
+                >
+                  nextgenerationmedicine.co
+                </p>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+  </body>
 </html>
 ```
 
@@ -468,6 +637,7 @@ Options:
 ```
 
 Example:
+
 ```
 Convert content/email-sequences/elite-mentorship-nurture.md email 1 to HubSpot HTML
 ```

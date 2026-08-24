@@ -16,12 +16,12 @@ User research is the systematic study of target users to understand their behavi
 
 ### Key Statistics (2025)
 
-| Method | Popularity |
-|--------|------------|
-| User interviews | 86% |
-| Usability testing | 84% |
-| Surveys | 77% |
-| Concept testing | 64% |
+| Method            | Popularity |
+| ----------------- | ---------- |
+| User interviews   | 86%        |
+| Usability testing | 84%        |
+| Surveys           | 77%        |
+| Concept testing   | 64%        |
 
 ---
 
@@ -29,21 +29,21 @@ User research is the systematic study of target users to understand their behavi
 
 ### Qualitative vs. Quantitative
 
-| Qualitative | Quantitative |
-|-------------|--------------|
-| "Why" and "How" | "What" and "How many" |
-| Deep understanding | Statistical significance |
-| Small sample sizes | Large sample sizes |
-| Exploratory | Measurable |
-| Interviews, observations | Surveys, analytics |
+| Qualitative              | Quantitative             |
+| ------------------------ | ------------------------ |
+| "Why" and "How"          | "What" and "How many"    |
+| Deep understanding       | Statistical significance |
+| Small sample sizes       | Large sample sizes       |
+| Exploratory              | Measurable               |
+| Interviews, observations | Surveys, analytics       |
 
 ### Generative vs. Evaluative
 
-| Generative (Discovery) | Evaluative (Validation) |
-|------------------------|------------------------|
-| What should we build? | Does this work? |
-| Early-stage exploration | Testing solutions |
-| Understand problems | Measure effectiveness |
+| Generative (Discovery)    | Evaluative (Validation)    |
+| ------------------------- | -------------------------- |
+| What should we build?     | Does this work?            |
+| Early-stage exploration   | Testing solutions          |
+| Understand problems       | Measure effectiveness      |
 | Interviews, field studies | Usability tests, A/B tests |
 
 ---
@@ -55,6 +55,7 @@ User research is the systematic study of target users to understand their behavi
 One-on-one conversations to understand user experiences, needs, and pain points.
 
 **When to use:**
+
 - Early discovery phase
 - Understanding context of use
 - Exploring new problem spaces
@@ -92,6 +93,7 @@ Question Examples:
 Observing users as they attempt to complete tasks with your product.
 
 **When to use:**
+
 - Validating design decisions
 - Identifying usability issues
 - Comparing design alternatives
@@ -99,12 +101,12 @@ Observing users as they attempt to complete tasks with your product.
 
 **Types:**
 
-| Type | Description | Sample Size |
-|------|-------------|-------------|
-| Moderated | Facilitator guides the session | 5-8 |
-| Unmoderated | Participant completes alone | 10-20+ |
-| Remote | Via video conferencing | Any |
-| In-person | Same physical location | 5-8 |
+| Type        | Description                    | Sample Size |
+| ----------- | ------------------------------ | ----------- |
+| Moderated   | Facilitator guides the session | 5-8         |
+| Unmoderated | Participant completes alone    | 10-20+      |
+| Remote      | Via video conferencing         | Any         |
+| In-person   | Same physical location         | 5-8         |
 
 **Best Practices:**
 
@@ -134,6 +136,7 @@ Running the Test:
 Collecting structured data from many users.
 
 **When to use:**
+
 - Measuring satisfaction (NPS, CSAT)
 - Validating findings at scale
 - Prioritizing features
@@ -169,6 +172,7 @@ Keep It Short:
 Understanding how users categorize and label information.
 
 **When to use:**
+
 - Designing navigation
 - Organizing content
 - Creating taxonomies
@@ -176,11 +180,11 @@ Understanding how users categorize and label information.
 
 **Types:**
 
-| Type | Description | Use |
-|------|-------------|-----|
-| Open | Users create their own categories | Discovery |
+| Type   | Description                           | Use        |
+| ------ | ------------------------------------- | ---------- |
+| Open   | Users create their own categories     | Discovery  |
 | Closed | Users sort into predefined categories | Validation |
-| Hybrid | Mix of open and closed | Refinement |
+| Hybrid | Mix of open and closed                | Refinement |
 
 **Tools:** OptimalSort, Maze, Miro
 
@@ -189,6 +193,7 @@ Understanding how users categorize and label information.
 Validating whether users can find items in your information architecture.
 
 **When to use:**
+
 - Testing navigation structure
 - Validating IA changes
 - Before/after IA redesigns
@@ -212,6 +217,7 @@ Validating whether users can find items in your information architecture.
 Analyzing behavioral data to understand what users do.
 
 **When to use:**
+
 - Always (continuous)
 - Identifying problem areas
 - Measuring feature adoption
@@ -245,6 +251,7 @@ User Behavior:
 Comparing two or more versions to see which performs better.
 
 **When to use:**
+
 - Optimizing specific metrics
 - Validating design changes
 - Testing copy variations
@@ -289,15 +296,16 @@ Not:
 
 **Sample Sizes:**
 
-| Method | Typical Sample |
-|--------|---------------|
-| Interviews | 5-12 |
-| Usability testing | 5-8 per round |
-| Card sorting | 15-30 |
-| Surveys | 100+ for quantitative |
-| A/B tests | Varies (statistical power) |
+| Method            | Typical Sample             |
+| ----------------- | -------------------------- |
+| Interviews        | 5-12                       |
+| Usability testing | 5-8 per round              |
+| Card sorting      | 15-30                      |
+| Surveys           | 100+ for quantitative      |
+| A/B tests         | Varies (statistical power) |
 
 **Recruitment Sources:**
+
 - Existing user base
 - Recruitment platforms (UserTesting, Respondent.io)
 - Social media
@@ -305,6 +313,7 @@ Not:
 - Panel providers
 
 **Screening:**
+
 - Demographics
 - Relevant experience
 - Product usage
@@ -317,6 +326,7 @@ Not:
 ### Remote Research
 
 **Advantages:**
+
 - Global reach
 - Lower cost
 - More convenient
@@ -324,6 +334,7 @@ Not:
 - Natural environment
 
 **Challenges:**
+
 - Technical issues
 - Harder to build rapport
 - Less contextual observation
@@ -334,6 +345,7 @@ Not:
 ### In-Person Research
 
 **Advantages:**
+
 - Deeper rapport
 - Full context observation
 - Non-verbal cues visible
@@ -341,6 +353,7 @@ Not:
 - Prototype testing
 
 **Challenges:**
+
 - Geographic limitations
 - Higher cost
 - Scheduling difficulties
@@ -444,6 +457,7 @@ Impact: Could recover ~15% of abandoned carts."
 ### Continuous Research
 
 Moving from project-based to always-on research:
+
 - Regular user touchpoints
 - Embedded research in product teams
 - Research repositories (Dovetail, Notion)
@@ -496,15 +510,15 @@ Participants must know:
 
 ## Tools Overview
 
-| Category | Tools |
-|----------|-------|
-| Interviews | Zoom, UserInterviews.com |
-| Usability | UserTesting, Maze, Lookback |
-| Surveys | Typeform, SurveyMonkey |
-| Analytics | Mixpanel, Amplitude, Hotjar |
-| Card Sorting | OptimalSort, Maze |
-| Repository | Dovetail, Condens, Notion |
-| Prototyping | Figma, ProtoPie |
+| Category     | Tools                       |
+| ------------ | --------------------------- |
+| Interviews   | Zoom, UserInterviews.com    |
+| Usability    | UserTesting, Maze, Lookback |
+| Surveys      | Typeform, SurveyMonkey      |
+| Analytics    | Mixpanel, Amplitude, Hotjar |
+| Card Sorting | OptimalSort, Maze           |
+| Repository   | Dovetail, Condens, Notion   |
+| Prototyping  | Figma, ProtoPie             |
 
 ---
 

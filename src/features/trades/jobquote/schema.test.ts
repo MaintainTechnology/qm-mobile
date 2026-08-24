@@ -11,8 +11,13 @@ describe('explainJobQuoteFailure', () => {
   });
 
   it('maps not_entitled with the reason', () => {
-    const err = new ApiError('failed', 402, '/x', { error: 'not_entitled', reason: 'trial expired' });
-    expect(explainJobQuoteFailure(err)).toBe('Quoting is not enabled on your plan (trial expired).');
+    const err = new ApiError('failed', 402, '/x', {
+      error: 'not_entitled',
+      reason: 'trial expired',
+    });
+    expect(explainJobQuoteFailure(err)).toBe(
+      'Quoting is not enabled on your plan (trial expired).',
+    );
   });
 
   it('tells the tradie to check the Quotes tab once an intake exists', () => {

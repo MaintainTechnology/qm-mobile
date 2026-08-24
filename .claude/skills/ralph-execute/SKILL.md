@@ -21,12 +21,14 @@ Ralph is an autonomous AI coding loop that ships features while you sleep. Each 
 ```
 
 **Arguments:**
+
 - `--max-iterations N` - Override max iterations (default: from prd.json or 10)
 - `--story US-XXX` - Target a specific story instead of next priority
 - `--dry-run` - Show what would be done without making changes
 - `--skip-blocked` - Skip blocked stories without re-attempting
 
 **Examples:**
+
 ```bash
 /ralph-execute                        # Continue from where we left off
 /ralph-execute --max-iterations 5     # Run up to 5 stories
@@ -41,6 +43,7 @@ Ralph is an autonomous AI coding loop that ships features while you sleep. Each 
 #### Step 1.1: Load PRD
 
 Read `.ralph/prd.json`. If not found:
+
 ```
 ERROR: No PRD found at .ralph/prd.json
 
@@ -50,6 +53,7 @@ Run /ralph-plan first to generate a PRD with user stories.
 #### Step 1.2: Check for Branch Change (Archival)
 
 If current branch differs from `prd.branchName`, archive previous run:
+
 ```bash
 mkdir -p .ralph/archive/[old-branch]-[timestamp]
 mv .ralph/prd.json .ralph/archive/[old-branch]-[timestamp]/
@@ -63,6 +67,7 @@ git branch --show-current
 ```
 
 If not on the correct branch:
+
 ```bash
 git checkout [prd.branchName]
 ```
@@ -70,6 +75,7 @@ git checkout [prd.branchName]
 #### Step 1.4: Load Progress Context
 
 Read `.ralph/progress.txt` to understand:
+
 - Previous learnings and patterns
 - Files modified in past iterations
 - Common gotchas discovered
@@ -79,6 +85,7 @@ Read `.ralph/progress.txt` to understand:
 #### Step 1.5: Load AGENTS.md
 
 Read root-level `AGENTS.md` and any directory-level AGENTS.md files for:
+
 - Module-specific patterns
 - API conventions
 - Known gotchas
@@ -100,6 +107,7 @@ const nextStory = prd.userStories
 ```
 
 If no pending stories:
+
 - Check for blocked stories (offer to retry if `--skip-blocked` not set)
 - If all passed/blocked, report completion
 
@@ -149,6 +157,7 @@ Update prd.json: `status: "in_progress"`
 Update TodoWrite to show current task
 
 **Step 3.2: Research Codebase**
+
 - Read AGENTS.md + progress.txt "Codebase Patterns" section
 - Find similar patterns in codebase using Glob/Grep
 - Check commit history for related changes
@@ -156,6 +165,7 @@ Update TodoWrite to show current task
 
 **Step 3.3: Create Implementation Plan**
 Before writing code, document:
+
 - Which files to create/modify
 - Which patterns to follow
 - Potential gotchas to avoid
@@ -165,12 +175,14 @@ Before writing code, document:
 **Step 3.4: Implement the Story**
 
 **CRITICAL IMPLEMENTATION RULES:**
+
 1. **ONE story at a time** - Never implement multiple stories in one iteration
 2. **Follow existing patterns** - Match the codebase style exactly
 3. **Minimal changes** - Only modify what's needed for this story
 4. **Type safety first** - Ensure TypeScript compiles before other checks
 
 **For UI Stories, Apply Frontend-Design Principles:**
+
 - Design thinking first - establish aesthetic direction before coding
 - Use distinctive fonts, cohesive color schemes with CSS variables
 - High-impact moments (page-load) over scattered micro-interactions
@@ -181,21 +193,27 @@ Before writing code, document:
 Execute in order:
 
 1. **TypeScript Check (Required)**
+
    ```bash
    npm run check 2>&1
    ```
+
    On failure: Parse error output, attempt fix, re-run (max 2 attempts)
 
 2. **Lint Check (Required)**
+
    ```bash
    npm run lint 2>&1
    ```
+
    On failure: Run `npm run lint -- --fix`, then re-check
 
 3. **Test Check (Optional)**
+
    ```bash
    npm run test 2>&1
    ```
+
    If configured in prd.json
 
 4. **Build Check (Optional)**
@@ -207,6 +225,7 @@ Execute in order:
 **Step 3.6: Browser Verification (UI Stories)**
 
 For stories with `requiresBrowserVerification: true`:
+
 - Use `visual-polish-inspector` skill or Chrome extension
 - Navigate to the page where UI change was made
 - Take screenshot to verify rendering
@@ -215,6 +234,7 @@ For stories with `requiresBrowserVerification: true`:
 - Record pass/fail in progress.txt
 
 **Requirements:**
+
 - Chrome browser open
 - Claude in Chrome extension (v1.0.36+) installed
 - Dev server running (`npm run dev`)
@@ -223,6 +243,7 @@ For stories with `requiresBrowserVerification: true`:
 
 **Step 3.7: Evaluate Quality**
 Before committing, verify:
+
 - Code quality: Clean, readable, follows patterns
 - Security: No obvious vulnerabilities
 - Performance: No unnecessary re-renders or expensive operations
@@ -231,6 +252,7 @@ Before committing, verify:
 **Step 3.8: Handle Failures**
 
 On quality gate failure:
+
 ```javascript
 story.failureCount += 1;
 
@@ -251,6 +273,7 @@ if (story.failureCount >= prd.config.maxFailuresPerStory) {
 **Step 3.9: Commit Changes**
 
 If all quality gates pass:
+
 ```bash
 git add -A
 git commit -m "feat: US-XXX - [Story Title]
@@ -261,6 +284,7 @@ Co-Authored-By: Claude <noreply@anthropic.com>"
 ```
 
 **Step 3.10: Update prd.json**
+
 ```javascript
 story.status = 'passed';
 story.completedAt = new Date().toISOString();
@@ -274,19 +298,23 @@ prd.updatedAt = new Date().toISOString();
 **Step 3.11: Update AGENTS.md**
 
 If reusable patterns were discovered, add to AGENTS.md:
+
 ```markdown
 ## Module: src/components/auth/
+
 - Forms use react-hook-form + zod validation
 - Auth state from `@clerk/nextjs`
 - Follow LoginForm.tsx as pattern
 ```
 
 **Good AGENTS.md additions:**
+
 - "When modifying X, also update Y"
 - "This module uses pattern Z"
 - "Tests require dev server running"
 
 **Don't add to AGENTS.md:**
+
 - Story-specific details
 - Temporary notes
 - Info already in progress.txt
@@ -324,11 +352,13 @@ Update the "CODEBASE PATTERNS (Consolidated)" section at the TOP of progress.txt
 #### Step 4.1: Check for Next Story
 
 If pending stories remain AND iterations < max:
+
 - **Continue to next iteration** (back to Phase 2)
 
 #### Step 4.2: Handle Completion
 
 If all stories passed or blocked:
+
 ```
 RALPH EXECUTION COMPLETE
 ━━━━━━━━━━━━━━━━━━━━━━━━
@@ -393,6 +423,7 @@ Result: Still failing. Will retry next iteration.
 ### Resuming Across Sessions
 
 When `/ralph-execute` is run in a new session:
+
 1. Read `.ralph/prd.json` for current state
 2. Read `.ralph/progress.txt` for learned context
 3. Read `AGENTS.md` for reusable patterns
@@ -403,6 +434,7 @@ When `/ralph-execute` is run in a new session:
 ### Cross-Session Learnings
 
 progress.txt serves as persistent memory:
+
 - Patterns discovered in iteration 1 inform iteration 5
 - Gotchas are avoided in future stories
 - File locations are remembered
@@ -412,14 +444,18 @@ progress.txt serves as persistent memory:
 ## Critical Success Factors
 
 ### 1. Small Stories
+
 Must fit in one context window.
+
 ```
 ❌ Too big: "Build entire auth system"
 ✅ Right size: "Add login form", "Add email validation", "Add auth server action"
 ```
 
 ### 2. Feedback Loops
+
 Ralph needs fast feedback:
+
 - `npm run check` (typecheck)
 - `npm run lint`
 - `npm run test`
@@ -427,6 +463,7 @@ Ralph needs fast feedback:
 Without these, broken code compounds.
 
 ### 3. Explicit Criteria
+
 ```
 ❌ Vague: "Users can log in"
 ✅ Explicit:
@@ -438,19 +475,23 @@ Without these, broken code compounds.
 ```
 
 ### 4. Learnings Compound
+
 By story 10, Ralph knows patterns from stories 1-9.
 
 ### 5. CI Must Stay Green
+
 Quality gates prevent error compounding across iterations.
 
 ## Common Gotchas
 
 **Idempotent migrations:**
+
 ```sql
 ADD COLUMN IF NOT EXISTS email TEXT;
 ```
 
 **Interactive prompts:**
+
 ```bash
 echo -e "\n\n\n" | npm run db:generate
 ```

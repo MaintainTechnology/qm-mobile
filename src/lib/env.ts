@@ -12,6 +12,22 @@ import Constants from 'expo-constants';
 const apiBase = process.env.EXPO_PUBLIC_API_URL;
 
 /**
+ * Clerk publishable key. Core 3 requires this to be passed to `<ClerkProvider>`
+ * explicitly: environment variables are not inlined inside `node_modules` in a
+ * production React Native build, so Clerk can no longer read it for itself.
+ * Publishable, as the name says — configuration, not a secret.
+ */
+export function clerkPublishableKey(): string {
+  const key = process.env.EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY;
+  if (!key) {
+    throw new Error(
+      'EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY is not set. Copy .env.example to .env.local and paste the key from the Clerk dashboard.',
+    );
+  }
+  return key;
+}
+
+/**
  * On a device, `localhost` is the phone, not the machine running the QuoteMax
  * web app. In dev, rewrite it to the host Metro is serving from (the dev
  * machine's LAN IP) so .env.local can stay `http://localhost:3000` for

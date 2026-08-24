@@ -79,7 +79,9 @@ const STAGES = [
 
 const TOTAL_STAGES = STAGES.length + 1; // +1 for output routing
 
-export function getTotalStages() { return TOTAL_STAGES; }
+export function getTotalStages() {
+  return TOTAL_STAGES;
+}
 export function getStageNames() {
   return [...STAGES.map(s => s.name), 'Output Routing'];
 }
@@ -150,20 +152,23 @@ import { v4 as uuidv4 } from 'uuid';
 import { runPipeline, getTotalStages, getStageNames } from '../pipeline/orchestrator.js';
 
 const router = Router();
-const tasks = new Map();             // taskId → job state
-const subscribers = new Map();       // taskId → Set<res> for SSE
+const tasks = new Map(); // taskId → job state
+const subscribers = new Map(); // taskId → Set<res> for SSE
 
 const MAX_CONCURRENT = parseInt(process.env.MAX_CONCURRENT_PIPELINES || '5', 10);
 let activePipelines = 0;
 
 // Cleanup sweep — keep finished jobs 30min
-setInterval(() => {
-  const cutoff = Date.now() - 30 * 60 * 1000;
-  for (const [taskId, task] of tasks) {
-    const ended = task.completedAt ? new Date(task.completedAt).getTime() : 0;
-    if (task.status !== 'running' && ended && ended < cutoff) tasks.delete(taskId);
-  }
-}, 10 * 60 * 1000);
+setInterval(
+  () => {
+    const cutoff = Date.now() - 30 * 60 * 1000;
+    for (const [taskId, task] of tasks) {
+      const ended = task.completedAt ? new Date(task.completedAt).getTime() : 0;
+      if (task.status !== 'running' && ended && ended < cutoff) tasks.delete(taskId);
+    }
+  },
+  10 * 60 * 1000,
+);
 
 function buildStatusResponse(taskId, task) {
   const elapsed = task.startedAt
@@ -245,7 +250,10 @@ function startAsync(req, res) {
     stage: 'Initializing',
     progress: { stage: 'Initializing', stageIndex: 0, totalStages },
     startedAt: new Date().toISOString(),
-    result: null, error: null, failedStage: null, completedAt: null,
+    result: null,
+    error: null,
+    failedStage: null,
+    completedAt: null,
   });
 
   activePipelines++;
@@ -272,13 +280,20 @@ function startAsync(req, res) {
       const finalStatus = result.blocked ? 'blocked' : 'completed';
       updateTask(taskId, {
         status: finalStatus,
-        progress: { stage: 'Output Routing', stageIndex: result.totalStages, totalStages: result.totalStages },
+        progress: {
+          stage: 'Output Routing',
+          stageIndex: result.totalStages,
+          totalStages: result.totalStages,
+        },
         completedAt: new Date().toISOString(),
         result,
       });
       emitTaskEvent(taskId, finalStatus, buildStatusResponse(taskId, tasks.get(taskId)));
       const subs = subscribers.get(taskId);
-      if (subs) { for (const r of subs) r.end(); subscribers.delete(taskId); }
+      if (subs) {
+        for (const r of subs) r.end();
+        subscribers.delete(taskId);
+      }
     })
     .catch(err => {
       activePipelines--;
@@ -290,15 +305,18 @@ function startAsync(req, res) {
       });
       emitTaskEvent(taskId, 'error', buildStatusResponse(taskId, tasks.get(taskId)));
       const subs = subscribers.get(taskId);
-      if (subs) { for (const r of subs) r.end(); subscribers.delete(taskId); }
+      if (subs) {
+        for (const r of subs) r.end();
+        subscribers.delete(taskId);
+      }
     });
 }
 
 router.post('/run/async', startAsync);
-router.post('/start', startAsync);                                    // biomarker-style alias
+router.post('/start', startAsync); // biomarker-style alias
 
 router.get('/run/status/:taskId', getStatus);
-router.get('/status/:taskId', getStatus);                             // biomarker alias
+router.get('/status/:taskId', getStatus); // biomarker alias
 function getStatus(req, res) {
   const task = tasks.get(req.params.taskId);
   if (!task) return res.status(404).json({ error: 'Task not found' });
@@ -316,7 +334,9 @@ router.get('/run/stream/:taskId', (req, res) => {
   res.setHeader('Connection', 'keep-alive');
 
   if (['completed', 'failed', 'cancelled', 'blocked'].includes(task.status)) {
-    res.write(`event: ${task.status}\ndata: ${JSON.stringify(buildStatusResponse(taskId, task))}\n\n`);
+    res.write(
+      `event: ${task.status}\ndata: ${JSON.stringify(buildStatusResponse(taskId, task))}\n\n`,
+    );
     return res.end();
   }
 
@@ -328,7 +348,10 @@ router.get('/run/stream/:taskId', (req, res) => {
 
   req.on('close', () => {
     const subs = subscribers.get(taskId);
-    if (subs) { subs.delete(res); if (subs.size === 0) subscribers.delete(taskId); }
+    if (subs) {
+      subs.delete(res);
+      if (subs.size === 0) subscribers.delete(taskId);
+    }
   });
 });
 
@@ -368,7 +391,9 @@ When Railway redeploys, it sends SIGTERM then force-kills after 30s. Drain in-fl
 
 ```js
 // src/index.js (tail)
-const server = app.listen(PORT, HOST, () => { /* ... */ });
+const server = app.listen(PORT, HOST, () => {
+  /* ... */
+});
 
 // Long-running Gemini calls need generous keep-alive
 server.keepAliveTimeout = 125_000;
@@ -382,7 +407,10 @@ async function gracefulShutdown(signal) {
   console.log(`\n  ${signal} received — draining connections...`);
 
   server.close(err => {
-    if (err) { console.error('  Shutdown error:', err.message); process.exit(1); }
+    if (err) {
+      console.error('  Shutdown error:', err.message);
+      process.exit(1);
+    }
     console.log('  Server closed cleanly.');
     process.exit(0);
   });

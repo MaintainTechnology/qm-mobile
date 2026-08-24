@@ -49,7 +49,11 @@ export function ChevronLeftIcon({ color, size = 16 }: { color: string; size?: nu
 export function EyeIcon({ color, size = 17 }: { color: string; size?: number }) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-      <Path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z" stroke={color} strokeWidth={1.75} />
+      <Path
+        d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"
+        stroke={color}
+        strokeWidth={1.75}
+      />
       <Circle cx={12} cy={12} r={3} stroke={color} strokeWidth={1.75} />
     </Svg>
   );
@@ -159,9 +163,7 @@ export function BackButton({ onPress }: { onPress: () => void }) {
 /** The 52px hairline-bottomed header bar on sign-in and onboarding. */
 export function AuthHeader({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
-  return (
-    <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>{children}</View>
-  );
+  return <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>{children}</View>;
 }
 
 /** The "or" divider on sign-in. */
@@ -253,6 +255,7 @@ export function Field({
           </Text>
         ) : null}
         <TextInput
+          accessibilityLabel={label}
           value={value}
           onChangeText={onChangeText}
           onFocus={() => setFocused(true)}

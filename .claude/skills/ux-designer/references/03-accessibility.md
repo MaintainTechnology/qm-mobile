@@ -10,10 +10,10 @@ Accessibility ensures digital products are usable by people with disabilities. B
 
 ### Conformance Levels
 
-| Level | Description | Requirement |
-|-------|-------------|-------------|
-| **A** | Minimum accessibility | Essential barriers removed |
-| **AA** | Recommended standard | Most common target for compliance |
+| Level   | Description           | Requirement                             |
+| ------- | --------------------- | --------------------------------------- |
+| **A**   | Minimum accessibility | Essential barriers removed              |
+| **AA**  | Recommended standard  | Most common target for compliance       |
 | **AAA** | Highest accessibility | Maximum inclusion (not always feasible) |
 
 ### Four Principles (POUR)
@@ -28,6 +28,7 @@ Accessibility ensures digital products are usable by people with disabilities. B
 ## New Success Criteria in WCAG 2.2
 
 ### Focus Not Obscured (Minimum) - 2.4.11 (AA)
+
 When an element receives keyboard focus, it is not entirely hidden by other content.
 
 ```css
@@ -43,12 +44,15 @@ When an element receives keyboard focus, it is not entirely hidden by other cont
 ```
 
 ### Focus Not Obscured (Enhanced) - 2.4.12 (AAA)
+
 When focused, no part of the element is hidden by author-created content.
 
 ### Focus Appearance - 2.4.13 (AAA)
+
 Focus indicators must have sufficient size and contrast.
 
 ### Dragging Movements - 2.5.7 (AA)
+
 Functionality using dragging can be operated with a single pointer without dragging.
 
 ```html
@@ -59,9 +63,11 @@ Functionality using dragging can be operated with a single pointer without dragg
 ```
 
 ### Target Size (Minimum) - 2.5.8 (AA)
+
 Touch targets must be at least 24×24 CSS pixels, with exceptions for inline links, user agent controls, and essential presentations.
 
 ### Accessible Authentication (Minimum) - 3.3.8 (AA)
+
 Authentication processes don't require cognitive function tests (like remembering passwords) unless alternatives are provided.
 
 ```
@@ -73,9 +79,11 @@ Compliant methods:
 ```
 
 ### Accessible Authentication (Enhanced) - 3.3.9 (AAA)
+
 No cognitive test required at all for authentication.
 
 ### Redundant Entry - 3.3.7 (A)
+
 Don't require users to re-enter information already provided in the same session.
 
 ---
@@ -84,14 +92,15 @@ Don't require users to re-enter information already provided in the same session
 
 ### Contrast Requirements
 
-| Content Type | Minimum Ratio (AA) | Enhanced (AAA) |
-|--------------|-------------------|----------------|
-| Normal text (< 18pt) | 4.5:1 | 7:1 |
-| Large text (≥ 18pt or 14pt bold) | 3:1 | 4.5:1 |
-| UI components & graphics | 3:1 | - |
-| Focus indicators | 3:1 | - |
+| Content Type                     | Minimum Ratio (AA) | Enhanced (AAA) |
+| -------------------------------- | ------------------ | -------------- |
+| Normal text (< 18pt)             | 4.5:1              | 7:1            |
+| Large text (≥ 18pt or 14pt bold) | 3:1                | 4.5:1          |
+| UI components & graphics         | 3:1                | -              |
+| Focus indicators                 | 3:1                | -              |
 
 ### Testing Contrast
+
 ```javascript
 // Calculate contrast ratio
 function getContrastRatio(l1, l2) {
@@ -102,12 +111,14 @@ function getContrastRatio(l1, l2) {
 ```
 
 **Tools:**
+
 - WebAIM Contrast Checker
 - Stark (Figma plugin)
 - Chrome DevTools accessibility panel
 - axe DevTools
 
 ### Color Blindness
+
 Approximately 8% of men and 0.5% of women have some form of color vision deficiency.
 
 ```
@@ -124,6 +135,7 @@ Never rely on color alone to convey:
 ## Keyboard Navigation
 
 ### Requirements
+
 All functionality must be accessible via keyboard.
 
 ```html
@@ -141,6 +153,7 @@ All functionality must be accessible via keyboard.
 ```
 
 ### Focus Management
+
 ```css
 /* Never hide focus outlines without replacement */
 :focus {
@@ -160,6 +173,7 @@ All functionality must be accessible via keyboard.
 ```
 
 ### Keyboard Shortcuts
+
 ```
 Standard expectations:
 - Tab: Move to next focusable element
@@ -174,6 +188,7 @@ Standard expectations:
 ## Screen Reader Compatibility
 
 ### Semantic HTML
+
 ```html
 <!-- Use semantic elements -->
 <header>...</header>
@@ -184,10 +199,12 @@ Standard expectations:
 <footer>...</footer>
 
 <!-- Not divs with roles -->
-<div role="navigation">...</div> <!-- Less ideal -->
+<div role="navigation">...</div>
+<!-- Less ideal -->
 ```
 
 ### ARIA (Accessible Rich Internet Applications)
+
 ```html
 <!-- Labels -->
 <button aria-label="Close dialog">×</button>
@@ -198,7 +215,9 @@ Standard expectations:
 
 <!-- States -->
 <button aria-expanded="false" aria-controls="menu">Menu</button>
-<ul id="menu" aria-hidden="true">...</ul>
+<ul id="menu" aria-hidden="true">
+  ...
+</ul>
 
 <!-- Live regions for dynamic content -->
 <div aria-live="polite" aria-atomic="true">
@@ -207,6 +226,7 @@ Standard expectations:
 ```
 
 ### Image Accessibility
+
 ```html
 <!-- Informative images -->
 <img src="chart.png" alt="Sales increased 20% in Q4 2024" />
@@ -217,9 +237,7 @@ Standard expectations:
 <!-- Complex images -->
 <figure>
   <img src="diagram.png" alt="System architecture diagram" />
-  <figcaption>
-    Full description of the system architecture...
-  </figcaption>
+  <figcaption>Full description of the system architecture...</figcaption>
 </figure>
 ```
 
@@ -231,12 +249,8 @@ Standard expectations:
 <form>
   <!-- Always associate labels -->
   <label for="email">Email address</label>
-  <input type="email" id="email" name="email"
-         aria-required="true"
-         aria-describedby="email-error" />
-  <span id="email-error" role="alert">
-    Please enter a valid email address
-  </span>
+  <input type="email" id="email" name="email" aria-required="true" aria-describedby="email-error" />
+  <span id="email-error" role="alert"> Please enter a valid email address </span>
 
   <!-- Group related fields -->
   <fieldset>
@@ -253,6 +267,7 @@ Standard expectations:
 ```
 
 ### Error Handling
+
 ```html
 <!-- Announce errors -->
 <div role="alert" aria-live="assertive">
@@ -268,6 +283,7 @@ Standard expectations:
 ## Motion and Animation
 
 ### Respecting User Preferences
+
 ```css
 /* Reduce motion for users who prefer it */
 @media (prefers-reduced-motion: reduce) {
@@ -293,6 +309,7 @@ Standard expectations:
 ```
 
 ### Auto-Playing Content
+
 - Never auto-play video with sound
 - Provide pause/stop controls for any auto-playing content
 - Avoid flashing content (> 3 flashes per second can trigger seizures)
@@ -302,6 +319,7 @@ Standard expectations:
 ## Touch Accessibility
 
 ### Target Sizes (WCAG 2.2)
+
 ```css
 /* Minimum 24×24px for WCAG 2.2 AA */
 /* Recommended 44×44px for comfortable tapping */
@@ -318,6 +336,7 @@ Standard expectations:
 ```
 
 ### Touch Alternatives
+
 ```html
 <!-- Provide alternatives to complex gestures -->
 <div class="carousel">
@@ -335,6 +354,7 @@ Accessibility is now a hard legal obligation in major markets, not just a best
 practice. The headline change is the European Accessibility Act.
 
 ### European Accessibility Act (EAA)
+
 - **In force since:** June 28, 2025 — enforcement is active now
 - **Applies to:** A broad set of digital products and services sold in the EU —
   e-commerce, banking, e-books, ticketing, transport, electronic communications,
@@ -351,6 +371,7 @@ practice. The headline change is the European Accessibility Act.
   documents, or support channels.
 
 ### Other Regulations
+
 - **US:** ADA (case law increasingly treats websites as places of public
   accommodation), Section 508 (federal procurement, aligned to WCAG 2.0 AA)
 - **EU:** Web Accessibility Directive (public-sector sites/apps, EN 301 549)
@@ -363,12 +384,14 @@ practice. The headline change is the European Accessibility Act.
 ## Testing Checklist
 
 ### Automated Testing
+
 - [ ] axe DevTools
 - [ ] WAVE
 - [ ] Lighthouse
 - [ ] Pa11y
 
 ### Manual Testing
+
 - [ ] Keyboard-only navigation
 - [ ] Screen reader testing (NVDA, VoiceOver, JAWS)
 - [ ] 200% zoom level
@@ -376,6 +399,7 @@ practice. The headline change is the European Accessibility Act.
 - [ ] Reduced motion preference
 
 ### User Testing
+
 - [ ] Include users with disabilities
 - [ ] Test with assistive technologies
 - [ ] Gather feedback on pain points

@@ -11,10 +11,11 @@ This file lives in the ralph-content context for direct retrieval. When the user
 ## SLEEP & NSDR
 
 **To ensure a terrible nights sleep:**
-1) nap more than 90min in the afternoon
-2) >100mg caffeine after 4pm
-3) eat right before bed time (I confess I do this now and again, as I can't fall asleep hungry)
-4) Sleep in on weekends more than 1hr longer than usual duration
+
+1. nap more than 90min in the afternoon
+2. > 100mg caffeine after 4pm
+3. eat right before bed time (I confess I do this now and again, as I can't fall asleep hungry)
+4. Sleep in on weekends more than 1hr longer than usual duration
 
 ---
 
@@ -35,6 +36,7 @@ Mouth breathing during sleep is not just undesirable; it is actually dangerous.
 ---
 
 **You might consider taking (30-60 min before bed):**
+
 - 145mg Magnesium Threonate or 200mg Magnesium Bisglycinate
 - 50mg Apigenin
 - 100-400mg Theanine
@@ -46,13 +48,14 @@ Mouth breathing during sleep is not just undesirable; it is actually dangerous.
 ## DOPAMINE & MOTIVATION
 
 **Dopamine:**
-1) is not about pleasure.
-2) drives motivation.
-3) mediates reward driven learning.
-4) is non-infinite but renewable.
-5) is also involved in movement.
-6) plays a role in vision.
-7) can be controlled.
+
+1. is not about pleasure.
+2. drives motivation.
+3. mediates reward driven learning.
+4. is non-infinite but renewable.
+5. is also involved in movement.
+6. plays a role in vision.
+7. can be controlled.
 
 ---
 
@@ -69,9 +72,10 @@ Your dopamine reward circuitry activation better predicts addiction and relapse 
 ---
 
 Deliberate cold exposure, deliberate heat exposure & cyclic hyperventilation each have been shown to cause:
-1) increases in dopamine release
-2) cortisol reduction
-3) mitochondrial activation
+
+1. increases in dopamine release
+2. cortisol reduction
+3. mitochondrial activation
 
 These are all triggered by the same event: acute increases in adrenaline. #Biology
 
@@ -80,21 +84,24 @@ These are all triggered by the same event: acute increases in adrenaline. #Biolo
 ## NEUROPLASTICITY & LEARNING
 
 **A wealth of data indicate that deliberate neuroplasticity (your brain's ability change in response to specific intended experiences):**
-1) requires focus during learning
-2) actual rewiring occurs in sleep
-3) is accelerated by increasing adrenaline immediately POST learning
+
+1. requires focus during learning
+2. actual rewiring occurs in sleep
+3. is accelerated by increasing adrenaline immediately POST learning
 
 ---
 
 Neuroplasticity, your brain's ability to change & learn, is a two part process:
-1) Learning is triggered by focused attention, especially to novel, emotionally laden or otherwise meaningful events.
-2) Actual brain rewiring occurs during sleep, and other forms of deep rest.
+
+1. Learning is triggered by focused attention, especially to novel, emotionally laden or otherwise meaningful events.
+2. Actual brain rewiring occurs during sleep, and other forms of deep rest.
 
 ---
 
 Self-Directed Neuroplasticity: your ability to change your nervous system in specific ways = 2 steps:
-1) Deliberate focus (the more intense the better) on the thing you're trying to learn
-2) Sleep & Non-Sleep Deep Rest (NSDR) states, which are when actual neural rewiring occurs
+
+1. Deliberate focus (the more intense the better) on the thing you're trying to learn
+2. Sleep & Non-Sleep Deep Rest (NSDR) states, which are when actual neural rewiring occurs
 
 ---
 
@@ -154,7 +161,7 @@ Best health protocol kit for time spent = 1st 90 min of day: hydrate, sunlight
 
 ## HORMONES & BIOCHEMISTRY
 
-The major effect of testosterone on the brain is that it *makes effort feel good*.
+The major effect of testosterone on the brain is that it _makes effort feel good_.
 
 ---
 
@@ -212,7 +219,7 @@ It's my experience that ultimate mindset to cultivate & strive for every single 
 
 ---
 
-The most important step toward robust mental & physical health is when we realize that no single protocol, program supplement or Rx is alone going to solve it & we instead initiate a series of *daily actions toward persistent wellbeing*.
+The most important step toward robust mental & physical health is when we realize that no single protocol, program supplement or Rx is alone going to solve it & we instead initiate a series of _daily actions toward persistent wellbeing_.
 
 ---
 
@@ -241,6 +248,7 @@ The Huberman Lab podcast Neural Network newsletter is condensed 1-3page PDFs of 
 ## VOICE PATTERNS DERIVED FROM CORPUS
 
 ### Recurring opening templates (count across corpus)
+
 1. **The data are clear / The data on X seem clear:** [Confidence-from-evidence opener.] (4+ instances)
 2. **Numbered list with mechanism claims:** "Dopamine: 1) is not about pleasure. 2) drives motivation..." (8+ instances)
 3. **Mechanism convergence:** "X, Y, and Z all cause: 1) effect, 2) effect, 3) effect. Triggered by the same event: [molecule]." (~3 instances)
@@ -253,31 +261,37 @@ The Huberman Lab podcast Neural Network newsletter is condensed 1-3page PDFs of 
 10. **Time-stamped protocol:** "1st 90 min of day: ..." or "30-60 min before bed: ..." (5+ instances)
 
 ### Body cadence
+
 - Numbers in nearly every sentence: "150-180min," "100mg," "30-60min," "5-10 sets," "1-3min at 35-45F," "145mg," "10-20min."
 - Pathway/molecule names as familiar nouns: dopamine, cortisol, epinephrine, adrenaline, adenosine, GnRH, BDNF, GLP-1, IGF-1, mTOR, AMPK.
 - "&" instead of "and" inside content (Huberman almost always uses ampersand mid-sentence).
-- "*emphasis*" with asterisks for the load-bearing word.
+- "_emphasis_" with asterisks for the load-bearing word.
 - Active mechanism verbs: triggered, drives, modulates, blocks, clears, recruits, manufactures, sequesters, replenishes, restores.
 
 ### Vocabulary palette (corpus-confirmed)
-- *Tools, Protocol, Toolkit*
-- *Zero-cost, no sign up*
-- *The data are clear / the data seem clear*
-- *Levers, cascade, pathway, axis*
-- *Triggered by, drives, blocks, modulates, manufactured from, substrate of*
-- *Spectacular, wild, significant, long lasting, powerfully*
-- *Daily actions, persistent wellbeing*
+
+- _Tools, Protocol, Toolkit_
+- _Zero-cost, no sign up_
+- _The data are clear / the data seem clear_
+- _Levers, cascade, pathway, axis_
+- _Triggered by, drives, blocks, modulates, manufactured from, substrate of_
+- _Spectacular, wild, significant, long lasting, powerfully_
+- _Daily actions, persistent wellbeing_
 
 ### Hashtags (occasional, era-dependent)
+
 #science #biology #medicine #basics
 
 ### Self-disclosure parentheticals
+
 "(I confess I do this now and again, as I can't fall asleep hungry)"
 "(or entirely)"
 Used sparingly, but lands as honest texture.
 
 ### CRITICAL ABSENCE: methodology critique register
+
 Across 58 posts, ZERO instances of:
+
 - "underpowered," "noise band," "coefficient of variation"
 - "the trial failed," "the data are weak," "sponsor bias"
 - "we cannot conclude," "fails to show," "rubric"
@@ -286,5 +300,5 @@ Across 58 posts, ZERO instances of:
 When Huberman names a limitation (e.g., the BPC-157 post), it is embedded in the mechanism story ("There are many animal studies showing efficacy but essentially no clinical trials and few human studies"), framed as a fact about the field's evidence state, NOT as a debunk of the molecule. The molecule remains the protagonist.
 
 ### CRITICAL ABSENCE: cynical register
-Confidence about biology never wavers. Even when correcting popular framings ("Rather than thinking about dopamine as 'reward'…"), the correction is *generative* — it offers a better frame, not a takedown of the wrong one.
 
+Confidence about biology never wavers. Even when correcting popular framings ("Rather than thinking about dopamine as 'reward'…"), the correction is _generative_ — it offers a better frame, not a takedown of the wrong one.

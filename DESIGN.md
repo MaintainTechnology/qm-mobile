@@ -2,75 +2,75 @@
 name: QuoteMax Mobile
 description: The website's warm-charcoal command centre, tailored to a native app in a tradie's gloved hand — one Caterpillar-yellow signal, borders not shadows, 48dp floors.
 colors:
-  ink-deep: "#16120F"
-  ink: "#1E1813"
-  ink-card: "#2B2422"
-  ink-line: "#3A322C"
-  ctl-line: "#7A6E5E"
-  accent: "#FFC400"
-  accent-press: "#E6AC00"
-  accent-soft: "#FFD23D"
-  accent-ink: "#1C1812"
-  logo-body: "#FFFFFF"
-  logo-notch: "#E3C13C"
-  text-pri: "#F6F1EA"
-  text-sec: "#C3B8AC"
-  text-dim: "#A2968A"
-  edge-glow: "#6E6354"
-  edge-deep: "#4A4136"
-  success: "#15803D"
-  success-bright: "#34D27B"
-  warning: "#B45309"
-  warning-bright: "#F59E0B"
-  danger: "#B91C1C"
-  danger-bright: "#F0816B"
-  paper-canvas: "#FAF8F4"
-  paper-sunken: "#F3EEE7"
-  paper-card: "#FFFFFF"
-  paper-line: "#CFC2B0"
-  paper-ctl-line: "#8A7D6A"
-  paper-accent-soft: "#2B2422"
-  paper-ink: "#241E1B"
-  paper-ink-sec: "#5E544E"
-  paper-ink-dim: "#6E645C"
-  paper-accent-ink: "#2B2422"
-  paper-logo-body: "#16120F"
+  ink-deep: '#16120F'
+  ink: '#1E1813'
+  ink-card: '#2B2422'
+  ink-line: '#3A322C'
+  ctl-line: '#7A6E5E'
+  accent: '#FFC400'
+  accent-press: '#E6AC00'
+  accent-soft: '#FFD23D'
+  accent-ink: '#1C1812'
+  logo-body: '#FFFFFF'
+  logo-notch: '#E3C13C'
+  text-pri: '#F6F1EA'
+  text-sec: '#C3B8AC'
+  text-dim: '#A2968A'
+  edge-glow: '#6E6354'
+  edge-deep: '#4A4136'
+  success: '#15803D'
+  success-bright: '#34D27B'
+  warning: '#B45309'
+  warning-bright: '#F59E0B'
+  danger: '#B91C1C'
+  danger-bright: '#F0816B'
+  paper-canvas: '#FAF8F4'
+  paper-sunken: '#F3EEE7'
+  paper-card: '#FFFFFF'
+  paper-line: '#CFC2B0'
+  paper-ctl-line: '#8A7D6A'
+  paper-accent-soft: '#2B2422'
+  paper-ink: '#241E1B'
+  paper-ink-sec: '#5E544E'
+  paper-ink-dim: '#6E645C'
+  paper-accent-ink: '#2B2422'
+  paper-logo-body: '#16120F'
 typography:
   display:
-    fontFamily: "Manrope 800 (Manrope_800ExtraBold)"
+    fontFamily: 'Manrope 800 (Manrope_800ExtraBold)'
     fontSize: 34
     lineHeight: 36
     letterSpacing: -1.36
     transform: uppercase
   headline:
-    fontFamily: "Manrope 800 (Manrope_800ExtraBold)"
+    fontFamily: 'Manrope 800 (Manrope_800ExtraBold)'
     fontSize: 26
     lineHeight: 28
     letterSpacing: -1.04
     transform: uppercase
   title:
-    fontFamily: "Manrope 700 (Manrope_700Bold)"
+    fontFamily: 'Manrope 700 (Manrope_700Bold)'
     fontSize: 18
     lineHeight: 24
     letterSpacing: -0.36
   body:
-    fontFamily: "Manrope 400 (Manrope_400Regular)"
+    fontFamily: 'Manrope 400 (Manrope_400Regular)'
     fontSize: 16
     lineHeight: 24
     letterSpacing: 0
   body-sm:
-    fontFamily: "Manrope 400 (Manrope_400Regular)"
+    fontFamily: 'Manrope 400 (Manrope_400Regular)'
     fontSize: 14
     lineHeight: 20
     letterSpacing: 0
   label:
-    fontFamily: "JetBrains Mono 600 (JetBrainsMono_600SemiBold)"
+    fontFamily: 'JetBrains Mono 600 (JetBrainsMono_600SemiBold)'
     fontSize: 12
     lineHeight: 16
     letterSpacing: 2.16
     transform: uppercase
   price:
-    fontFamily: "JetBrains Mono 700 (JetBrainsMono_700Bold)"
+    fontFamily: 'JetBrains Mono 700 (JetBrainsMono_700Bold)'
     fontSize: 28
     lineHeight: 32
     letterSpacing: 0
@@ -82,15 +82,15 @@ rounded:
   sheet: 16
   pill: 9999
 spacing:
-  "1": 4
-  "2": 8
-  "3": 12
-  "4": 16
-  "5": 20
-  "6": 24
-  "8": 32
-  "12": 48
-  "16": 64
+  '1': 4
+  '2': 8
+  '3': 12
+  '4': 16
+  '5': 20
+  '6': 24
+  '8': 32
+  '12': 48
+  '16': 64
 touch:
   minimum: 48
   listRow: 56
@@ -99,43 +99,43 @@ motion:
   fast: 120
   base: 180
   slow: 240
-  easeOut: "cubic-bezier(0.23, 1, 0.32, 1)"
+  easeOut: 'cubic-bezier(0.23, 1, 0.32, 1)'
   pressScale: 0.97
 components:
   button-primary:
-    backgroundColor: "{colors.accent}"
-    textColor: "{colors.accent-ink}"
-    rounded: "{rounded.control}"
+    backgroundColor: '{colors.accent}'
+    textColor: '{colors.accent-ink}'
+    rounded: '{rounded.control}'
     height: 56
-    padding: "0 24"
+    padding: '0 24'
   button-primary-pressed:
-    backgroundColor: "{colors.accent-press}"
+    backgroundColor: '{colors.accent-press}'
     scale: 0.97
   button-ghost:
-    backgroundColor: "transparent"
-    borderColor: "{colors.ink-line}"
-    textColor: "{colors.text-pri}"
-    rounded: "{rounded.control}"
+    backgroundColor: 'transparent'
+    borderColor: '{colors.ink-line}'
+    textColor: '{colors.text-pri}'
+    rounded: '{rounded.control}'
     height: 48
-    padding: "0 20"
+    padding: '0 20'
   card:
-    backgroundColor: "{colors.ink-card}"
-    borderColor: "{colors.ink-line}"
-    rounded: "{rounded.card}"
+    backgroundColor: '{colors.ink-card}'
+    borderColor: '{colors.ink-line}'
+    rounded: '{rounded.card}'
     padding: 20
   input:
-    backgroundColor: "{colors.ink}"
-    borderColor: "{colors.ink-line}"
-    textColor: "{colors.text-pri}"
-    rounded: "{rounded.control}"
+    backgroundColor: '{colors.ink}'
+    borderColor: '{colors.ink-line}'
+    textColor: '{colors.text-pri}'
+    rounded: '{rounded.control}'
     height: 48
-    padding: "0 16"
+    padding: '0 16'
   status-chip:
-    backgroundColor: "transparent"
+    backgroundColor: 'transparent'
     borderWidth: 1
-    rounded: "{rounded.chip}"
+    rounded: '{rounded.chip}'
     height: 24
-    padding: "0 8"
+    padding: '0 8'
 ---
 
 # Design System: QuoteMax Mobile

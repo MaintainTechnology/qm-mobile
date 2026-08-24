@@ -28,14 +28,14 @@ smoke-test on a small asset before a long batch run.
 
 ## Decision table
 
-| Need | Path |
-|---|---|
-| Stylized game character, fast, zero manual steps | CC0 packs (KayKit/Quaternius) → convert → done |
-| CUSTOM character from text/image, zero manual steps, free | 2D→3D rig-transfer pipeline (Step 4 below) — fully local, but skinning quality is rough on image-to-3D meshes; user rejected it for production. Prefer the native 3D tool |
-| Custom-look humanoid, best skinning quality | Generate T-pose ref → user runs Mixamo manually (no API!) → user gives FBX → convert here |
-| Fully automated 2D→animated GLB, best quality, paid | **Native 3D path — preferred**: inspect `image_to_3d`, select an action with `higgsfield preset list animation-action`, then create with texture, rigging, animation, A-pose, and the chosen integer action ID. Extra clips use `3d_rigging` on the result GLB, then merge locally. **Before any submit read `meshy-input-rules.md`.** Workspace credits only; no provider key. Raw API is fallback only. |
+| Need                                                           | Path                                                                                                                                                                                                                                                                                                                                                                                                                                   |
+| -------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Stylized game character, fast, zero manual steps               | CC0 packs (KayKit/Quaternius) → convert → done                                                                                                                                                                                                                                                                                                                                                                                         |
+| CUSTOM character from text/image, zero manual steps, free      | 2D→3D rig-transfer pipeline (Step 4 below) — fully local, but skinning quality is rough on image-to-3D meshes; user rejected it for production. Prefer the native 3D tool                                                                                                                                                                                                                                                              |
+| Custom-look humanoid, best skinning quality                    | Generate T-pose ref → user runs Mixamo manually (no API!) → user gives FBX → convert here                                                                                                                                                                                                                                                                                                                                              |
+| Fully automated 2D→animated GLB, best quality, paid            | **Native 3D path — preferred**: inspect `image_to_3d`, select an action with `higgsfield preset list animation-action`, then create with texture, rigging, animation, A-pose, and the chosen integer action ID. Extra clips use `3d_rigging` on the result GLB, then merge locally. **Before any submit read `meshy-input-rules.md`.** Workspace credits only; no provider key. Raw API is fallback only.                              |
 | Non-humanoid CREATURE (dragon, quadruped, snake, spider, fish) | The auto-rig is humanoid-only (non-bipeds rig poorly or fail). Options: (a) Tripo3D API — rig types quadruped/hexapod/octopod/avian/serpentine/aquatic + locomotion presets (needs Tripo key, unverified); (b) **Procedural branch — VERIFIED on a dragon**: build skeleton+weights+sine-based clips in headless Blender, `procedural-animation.md` + `$GAME_SKILL/scripts/proc_rig_dragon.py`/`proc_weights.py`/`proc_anim_dragon.py` |
-| Non-rigged props (doors, drones, slimes, turrets) | Procedural animation in Three.js code — no rig needed |
+| Non-rigged props (doors, drones, slimes, turrets)              | Procedural animation in Three.js code — no rig needed                                                                                                                                                                                                                                                                                                                                                                                  |
 
 **Mixamo has NO official API.** Internal REST API exists but auto-rig marker
 placement is interactive-only; browser automation is fragile (Adobe login,
@@ -126,6 +126,7 @@ Full chain with zero manual steps and no external services:
    weights, fixes normals, exports all clips via NLA tracks.
 
 **Critical pitfalls baked into the script (do not regress):**
+
 - `parent_set(type='ARMATURE_AUTO')` (bone heat) FAILS on image-to-3D meshes
   ("failed to find solution for one or more bones") — photogrammetry-style
   topology. Use **Data Transfer of vertex weights from the donor's body
@@ -147,13 +148,13 @@ Meshy returns one GLB per animation. Two merge options:
 
 - **No Blender needed (preferred for Meshy outputs, VERIFIED on a live run
   2026-06-11):** `python3 $GAME_SKILL/scripts/glb_merge_anims.py rigged.glb walk.glb:Walk
-  run.glb:Run idle.glb:Idle attack.glb:Attack out.glb` — stdlib-only, remaps
+run.glb:Run idle.glb:Idle attack.glb:Attack out.glb` — stdlib-only, remaps
   clips by node NAME, applies the root-scale fix and OPAQUE patch
   automatically.
 - Blender path (when the scene needs other edits anyway):
   `blender -b -P $GAME_SKILL/scripts/merge_anim_glbs.py -- rigged.glb idle.glb:Idle attack.glb:Attack out.glb`.
 
-**Scale pitfall (verified bug):** Meshy *library* animations (via
+**Scale pitfall (verified bug):** Meshy _library_ animations (via
 `/animations`) can bake a scale factor into the root bone's scale channel
 (observed: `Hips` scale 1.176 on `idle` while walk/run from the rig were 1.0)
 — the character visibly "grows" when that clip plays. Fix after every merge:
@@ -172,6 +173,7 @@ normals, but geometry is fine. Telltale difference: with BLEND you see
 correctly-lit "innards"; with truly inverted normals the model is dark/black.
 
 Fix layers (all baked into the scripts):
+
 1. **Geometry**: `normals_make_consistent(inside=False)` on every mesh before
    export. Sanity check: mean dot(poly normal, poly center − mesh centroid)
    should be positive.
@@ -199,8 +201,8 @@ white canvas screenshot.
   → `addons/kaykit_character_pack_adventures/Characters/gltf/*.glb` already
   contain all 76 clips (Knight, Mage, Rogue, Barbarian + Rogue_Hooded); the
   `Characters/fbx/` versions are the conversion test bed. Clips include Idle,
-  Walking_A/B/C, Running_A/B, Jump_*, 1H/2H_Melee_Attack_*, Spellcast_*,
-  Block*, Death_A/B, Dodge_*, Hit_*, Sit_*, Cheer, Interact, PickUp, Throw.
+  Walking_A/B/C, Running_A/B, Jump__, 1H/2H_Melee_Attack__, Spellcast__,
+  Block_, Death_A/B, Dodge__, Hit__, Sit_*, Cheer, Interact, PickUp, Throw.
 - **Quaternius** (quaternius.com) — low-poly animated characters, CC0.
 - **Kenney** (kenney.nl/assets) — game kits, CC0.
 

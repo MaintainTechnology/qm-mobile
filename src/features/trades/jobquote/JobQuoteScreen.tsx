@@ -27,7 +27,9 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
   const hasElectrical = trades.includes('electrical');
   const hasPlumbing = trades.includes('plumbing');
 
-  const [trade, setTrade] = useState<'electrical' | 'plumbing'>(hasElectrical ? 'electrical' : 'plumbing');
+  const [trade, setTrade] = useState<'electrical' | 'plumbing'>(
+    hasElectrical ? 'electrical' : 'plumbing',
+  );
   const jobTypes = useMemo(() => jobTypesForTrade(trade), [trade]);
   const [jobType, setJobType] = useState<string>(jobTypes[0] ?? 'other');
   const [answers, setAnswers] = useState<Record<string, string>>({});
@@ -62,9 +64,18 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
     return (catalogue.data?.catalogue ?? [])
       .filter(c => c.category === spec.catalogueCategory && c.active !== false)
       .sort((a, b) => {
-        const pa = typeof a.unit_price_ex_gst === 'string' ? Number.parseFloat(a.unit_price_ex_gst) : a.unit_price_ex_gst;
-        const pb = typeof b.unit_price_ex_gst === 'string' ? Number.parseFloat(b.unit_price_ex_gst) : b.unit_price_ex_gst;
-        return (Number.isFinite(pa) ? (pa as number) : Infinity) - (Number.isFinite(pb) ? (pb as number) : Infinity);
+        const pa =
+          typeof a.unit_price_ex_gst === 'string'
+            ? Number.parseFloat(a.unit_price_ex_gst)
+            : a.unit_price_ex_gst;
+        const pb =
+          typeof b.unit_price_ex_gst === 'string'
+            ? Number.parseFloat(b.unit_price_ex_gst)
+            : b.unit_price_ex_gst;
+        return (
+          (Number.isFinite(pa) ? (pa as number) : Infinity) -
+          (Number.isFinite(pb) ? (pb as number) : Infinity)
+        );
       });
   }, [catalogue.data, spec.catalogueCategory]);
 
@@ -186,7 +197,11 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
               options={[
                 ['', 'Let the estimator choose'],
                 ...products.map(
-                  p => [p.name, [p.name, priceLabel(p.unit_price_ex_gst)].filter(Boolean).join(' — ')] as const,
+                  p =>
+                    [
+                      p.name,
+                      [p.name, priceLabel(p.unit_price_ex_gst)].filter(Boolean).join(' — '),
+                    ] as const,
                 ),
               ]}
               value={productName}
@@ -210,7 +225,12 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           Customer details are optional. Adding them now means sending the quote later is one tap —
           nothing is sent to the customer until you press Send on the quote.
         </Text>
-        <Field label="Customer name" value={customerName} onChangeText={setCustomerName} height={52} />
+        <Field
+          label="Customer name"
+          value={customerName}
+          onChangeText={setCustomerName}
+          height={52}
+        />
         <Field
           label="Customer mobile"
           value={customerMobile}
@@ -236,7 +256,12 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
       />
 
       {jobQuote.isError ? (
-        <Notice tone="danger" label="Could not draft the quote" body={explainJobQuoteFailure(jobQuote.error)} onRetry={onSubmit} />
+        <Notice
+          tone="danger"
+          label="Could not draft the quote"
+          body={explainJobQuoteFailure(jobQuote.error)}
+          onRetry={onSubmit}
+        />
       ) : null}
 
       {jobQuote.isSuccess ? (

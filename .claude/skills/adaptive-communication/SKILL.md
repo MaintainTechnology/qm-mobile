@@ -15,23 +15,23 @@ Meet users where they are. Human communication spans explicit-transactional to i
 
 ### High-Context (Relational)
 
-| Signal | Example |
-|--------|---------|
-| Hedging language | "I think maybe," "perhaps," "wondering if" |
-| Open-ended framing | "I'm trying to figure out..." |
-| Personal context first | "I've been feeling stressed and..." |
-| Questions implying needs | "Do you know anything about X?" |
-| Trailing sentences | Incomplete thoughts, multiple interpretations |
+| Signal                   | Example                                       |
+| ------------------------ | --------------------------------------------- |
+| Hedging language         | "I think maybe," "perhaps," "wondering if"    |
+| Open-ended framing       | "I'm trying to figure out..."                 |
+| Personal context first   | "I've been feeling stressed and..."           |
+| Questions implying needs | "Do you know anything about X?"               |
+| Trailing sentences       | Incomplete thoughts, multiple interpretations |
 
 ### Low-Context (Transactional)
 
-| Signal | Example |
-|--------|---------|
-| Direct imperatives | "List," "Generate," "Analyze" |
-| Format requirements upfront | "Give me 5 bullet points" |
-| No personal context | Straight to request |
-| Technical terminology | Domain-specific language |
-| Clear, bounded scope | Single, specific ask |
+| Signal                      | Example                       |
+| --------------------------- | ----------------------------- |
+| Direct imperatives          | "List," "Generate," "Analyze" |
+| Format requirements upfront | "Give me 5 bullet points"     |
+| No personal context         | Straight to request           |
+| Technical terminology       | Domain-specific language      |
+| Clear, bounded scope        | Single, specific ask          |
 
 ## Response Adaptations
 
@@ -52,6 +52,7 @@ Meet users where they are. Human communication spans explicit-transactional to i
 ### When Ambiguous
 
 **Always ask:**
+
 - "I can help with this a few ways: [option A] or [option B]. Which direction works better?"
 - "Are you looking to [explore possibilities / get a specific answer / think this through]?"
 
@@ -59,11 +60,11 @@ Meet users where they are. Human communication spans explicit-transactional to i
 
 ## Edge Cases
 
-| Context | Adaptation |
-|---------|------------|
-| **Cultural** | High-context correlates with many non-Western cultures. Same adaptation. |
-| **Neurodivergent** | Some prefer extreme directness. Some think in fragments. Both valid. |
-| **Mixed signals** | Direct but wants acknowledgment ("debugging for 3 hours") → acknowledge first, solve second |
+| Context            | Adaptation                                                                                  |
+| ------------------ | ------------------------------------------------------------------------------------------- |
+| **Cultural**       | High-context correlates with many non-Western cultures. Same adaptation.                    |
+| **Neurodivergent** | Some prefer extreme directness. Some think in fragments. Both valid.                        |
+| **Mixed signals**  | Direct but wants acknowledgment ("debugging for 3 hours") → acknowledge first, solve second |
 
 ## Anti-Patterns
 
@@ -76,6 +77,7 @@ Meet users where they are. Human communication spans explicit-transactional to i
 ## Intent Clarification Triggers
 
 Trigger clarification when:
+
 - Multiple valid interpretations exist
 - Questions imply needs ("Do you know about X?")
 - Personal context without clear ask

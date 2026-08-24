@@ -13,11 +13,13 @@ You are analyzing a transcript or writing sample to extract the speaker's unique
 ## Input
 
 **Transcript/Sample:**
+
 ```
 {transcript_content}
 ```
 
 **Educator Context (if available):**
+
 - Name: {educator_name}
 - Specialty: {specialty}
 - Course Topic: {course_topic}
@@ -29,28 +31,36 @@ You are analyzing a transcript or writing sample to extract the speaker's unique
 Analyze the transcript for the following voice characteristics:
 
 ### 1. Tone Analysis
+
 Identify the overall tone:
+
 - Formal vs. conversational
 - Warm vs. clinical
 - Authoritative vs. collaborative
 - Serious vs. light
 
 ### 2. Sentence Rhythm
+
 Examine sentence structure patterns:
+
 - Average sentence length (short/medium/long)
 - Rhythm patterns (e.g., long-short-medium)
 - Use of fragments for emphasis
 - Paragraph length preferences
 
 ### 3. Transition Style
+
 Identify how the speaker moves between topics:
+
 - Transition phrases used (e.g., "Here's what's fascinating...", "Now...")
 - Use of rhetorical questions
 - Bridge techniques (summary-to-new, question-to-answer)
 - Signposting language
 
 ### 4. Rhetorical Devices
+
 Note the use of:
+
 - Metaphors and analogies
 - Stories and examples
 - Rhetorical questions
@@ -58,14 +68,18 @@ Note the use of:
 - Direct address to audience
 
 ### 5. Vocabulary Patterns
+
 Analyze word choice:
+
 - Technical vs. accessible language
 - Jargon handling (explained, assumed, avoided)
 - Unique phrases or verbal tics
 - Formality level
 
 ### 6. Personalization
+
 Identify perspective and connection:
+
 - First person singular ("I") vs. plural ("we")
 - Direct address ("you", "your patients")
 - Personal anecdotes
@@ -94,10 +108,7 @@ Return a JSON object with the extracted voice profile:
       "[Characteristic phrase 4]",
       "[Characteristic phrase 5]"
     ],
-    "avoidPatterns": [
-      "[Pattern the speaker doesn't use]",
-      "[Another pattern to avoid]"
-    ],
+    "avoidPatterns": ["[Pattern the speaker doesn't use]", "[Another pattern to avoid]"],
     "keyCharacteristics": [
       "[Most distinctive trait 1]",
       "[Most distinctive trait 2]",
@@ -112,9 +123,11 @@ Return a JSON object with the extracted voice profile:
 ## Example Analysis
 
 **Input transcript excerpt:**
+
 > "Here's what's fascinating about the gut-brain axis. We used to think these systems operated independently. Your brain does its thing, your gut does its thing. But now we know they're in constant conversation. Let me show you what this looks like in practice..."
 
 **Extracted profile:**
+
 ```json
 {
   "voiceProfile": {

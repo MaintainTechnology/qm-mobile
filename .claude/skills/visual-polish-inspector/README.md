@@ -20,15 +20,15 @@ Tell the agent what pages to inspect:
 
 ## What It Checks
 
-| Category | Key Checks |
-|----------|------------|
-| **Layout** | Page structure, navigation, responsive design |
-| **Typography** | Font rendering, readability, no truncation |
-| **Diagrams** | All 20 types render correctly, labels visible |
-| **Tables** | Headers, alignment, no overflow |
-| **Callouts** | Icons, borders, text readable |
-| **Colors** | Consistent with design system |
-| **Spacing** | Margins, padding, alignment |
+| Category       | Key Checks                                    |
+| -------------- | --------------------------------------------- |
+| **Layout**     | Page structure, navigation, responsive design |
+| **Typography** | Font rendering, readability, no truncation    |
+| **Diagrams**   | All 20 types render correctly, labels visible |
+| **Tables**     | Headers, alignment, no overflow               |
+| **Callouts**   | Icons, borders, text readable                 |
+| **Colors**     | Consistent with design system                 |
+| **Spacing**    | Margins, padding, alignment                   |
 
 ## Prerequisites
 

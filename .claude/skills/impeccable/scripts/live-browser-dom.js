@@ -49,10 +49,14 @@
       const r = el.getBoundingClientRect();
       if (!rectIsUsableAnchor(r)) return null;
       const rect = {
-        x: r.x, y: r.y,
-        top: r.top, left: r.left,
-        right: r.right, bottom: r.bottom,
-        width: r.width, height: r.height,
+        x: r.x,
+        y: r.y,
+        top: r.top,
+        left: r.left,
+        right: r.right,
+        bottom: r.bottom,
+        width: r.width,
+        height: r.height,
       };
       return {
         __impeccableFrozenAnchor: true,
@@ -116,7 +120,7 @@
       if (setPointerEvents) {
         rootEl.style.setProperty('pointer-events', 'auto', 'important');
       }
-      const stop = (e) => e.stopPropagation();
+      const stop = e => e.stopPropagation();
       rootEl.addEventListener('pointerdown', stop);
       rootEl.addEventListener('mousedown', stop);
       rootEl.addEventListener('focusin', stop);

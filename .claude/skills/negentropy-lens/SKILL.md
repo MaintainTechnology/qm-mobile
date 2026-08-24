@@ -40,7 +40,9 @@ After the first parenthetical definition, use the terms freely without repeating
 ## The Two States
 
 ### Entropy (Decay)
+
 Signs of entropy in a system:
+
 - Complexity increases without corresponding capability gain
 - Knowledge lives in people's heads, not in the system
 - Workarounds accumulate; the handbook diverges from reality
@@ -50,7 +52,9 @@ Signs of entropy in a system:
 - Integration points multiply without clear ownership
 
 ### Negentropy (Growth)
+
 Signs of negentropy in a system:
+
 - Each component makes adjacent components better
 - Knowledge compounds — today's output improves tomorrow's input
 - Quality improves through engineering discipline, not heroics

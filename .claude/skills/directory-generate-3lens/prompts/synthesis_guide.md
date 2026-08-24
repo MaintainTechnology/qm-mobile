@@ -12,7 +12,7 @@ This is NOT a listicle or comparison page. It's a two-layer guide:
 ### Why This Format
 
 - The educational guide builds trust and becomes the authoritative resource clinicians share
-- Featured partners benefit from being embedded in the learning context — clinicians encounter them *while learning*
+- Featured partners benefit from being embedded in the learning context — clinicians encounter them _while learning_
 - No free company mentions means sponsored profiles carry genuine commercial value
 - Platform-type frameworks give readers evaluative tools without endorsing specific vendors
 - Clear labeling maintains editorial integrity
@@ -20,6 +20,7 @@ This is NOT a listicle or comparison page. It's a two-layer guide:
 ### CRITICAL: No Company Names in Guide Body
 
 The guide body NEVER names specific companies. Instead:
+
 - Use **platform-type frameworks** (e.g., "Multi-clock array panels," "Buccal ETC enzyme activity assays")
 - Describe approaches by methodology, not by vendor
 - Create "What to Ask" frameworks so clinicians can evaluate any vendor independently
@@ -40,14 +41,14 @@ The KBV2 dossier is especially powerful for guide-mode output because first-prin
 
 ### How KBV2 Enriches Each Guide Section
 
-| Guide Section | KBV2 Source | What It Provides |
-|--------------|-------------|-------------------|
-| **Guide Opening** | `narrative_threads` | Pre-identified arcs that structure the "why this matters" framing |
-| **Core Concepts** | `tier_1_files` (pathways) | Precise mechanistic detail — specific receptors, enzyme cascades, quantified effects |
-| **Evaluation Framework** | `tier_1_files` (biomarkers) + `conflict_synthesis` | What biomarkers actually measure, known assay limitations, measurement controversies |
-| **Evidence Landscape** | `conflict_synthesis` + `citation_harvest` | Authoritative framing of what the field debates, plus curated citations |
-| **Decision Support** | `tier_1_files` (interventions) + `lens_priming.for_lens_3` | Specific dosing, titration, and implementation patterns from curated intervention files |
-| **FAQ** | `recurring_themes` + `conflict_synthesis` | Cross-document themes that anticipate practitioner questions |
+| Guide Section            | KBV2 Source                                                | What It Provides                                                                        |
+| ------------------------ | ---------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| **Guide Opening**        | `narrative_threads`                                        | Pre-identified arcs that structure the "why this matters" framing                       |
+| **Core Concepts**        | `tier_1_files` (pathways)                                  | Precise mechanistic detail — specific receptors, enzyme cascades, quantified effects    |
+| **Evaluation Framework** | `tier_1_files` (biomarkers) + `conflict_synthesis`         | What biomarkers actually measure, known assay limitations, measurement controversies    |
+| **Evidence Landscape**   | `conflict_synthesis` + `citation_harvest`                  | Authoritative framing of what the field debates, plus curated citations                 |
+| **Decision Support**     | `tier_1_files` (interventions) + `lens_priming.for_lens_3` | Specific dosing, titration, and implementation patterns from curated intervention files |
+| **FAQ**                  | `recurring_themes` + `conflict_synthesis`                  | Cross-document themes that anticipate practitioner questions                            |
 
 ### The KBV2 Difference in Guides
 
@@ -91,6 +92,7 @@ Subtitle: "Understanding the science, evaluating the evidence, and choosing the 
 ### 2. The Guide Opening (300-400 words)
 
 Open with the **clinical question** this category answers:
+
 - Why does this category matter to practitioners?
 - What problem does it solve?
 - What makes this space confusing or hard to navigate?
@@ -105,6 +107,7 @@ This is the **first-principles** layer. Structured as:
 **H2: The Science Behind [Category]**
 
 For each major approach:
+
 - **H3: [Approach Name]** (e.g., "Shotgun Metagenomics")
   - What fundamental question does this answer?
   - How does it work mechanistically? (from L1)
@@ -112,6 +115,7 @@ For each major approach:
   - When would a practitioner choose this approach?
 
 Include:
+
 - Methodology comparison table
 - SVG mechanism diagram from L1 (showing actual biological pathways, not generic infographic boxes)
 - Inline Q&A blocks
@@ -195,7 +199,7 @@ A clean, scannable table categorizing the commercial landscape by **platform typ
 
 Below the table: "For specific company evaluations, see our **Featured Partner** profiles, where sponsored companies receive a comprehensive three-lens clinical analysis."
 
-**CRITICAL:** This table must NEVER include specific company names. Each row describes a *category of approach*, not a vendor.
+**CRITICAL:** This table must NEVER include specific company names. Each row describes a _category of approach_, not a vendor.
 
 ### 8. Clinical Decision Support (400-600 words)
 
@@ -216,17 +220,17 @@ Same format as default mode. Merged L2 + L3 citations.
 
 ## Content Depth Requirements
 
-| Section | Word Count | Key Elements |
-|---------|------------|--------------|
-| Guide Opening / Bottom Line | 300-400 | Clinical question, why it matters, bottom-line summary |
-| Core Concepts + Mechanism Diagrams | 800-1200 | Methodology deep-dives, SVG pathway diagrams, pull quotes |
-| Evaluation Framework (Criteria) | 600-800 | Vertical typographic stack of criteria with questions |
-| Commercial Landscape + Platform Types | 500-700 | Platform-types table, decision flow SVG, "What to Ask" columns |
-| Each Featured Partner | 400-600 | Full three-lens profile (sponsors only) |
-| Decision Support / Action Pathways | 400-600 | Finding → Response tables, expectations |
-| FAQ | 500-800 | 6-10 Q&A pairs, bold lead answers |
-| **Total (no partners)** | **3,500-5,000** | Comprehensive guide |
-| **Total (with 2 partners)** | **4,500-6,500** | Guide + deep profiles |
+| Section                               | Word Count      | Key Elements                                                   |
+| ------------------------------------- | --------------- | -------------------------------------------------------------- |
+| Guide Opening / Bottom Line           | 300-400         | Clinical question, why it matters, bottom-line summary         |
+| Core Concepts + Mechanism Diagrams    | 800-1200        | Methodology deep-dives, SVG pathway diagrams, pull quotes      |
+| Evaluation Framework (Criteria)       | 600-800         | Vertical typographic stack of criteria with questions          |
+| Commercial Landscape + Platform Types | 500-700         | Platform-types table, decision flow SVG, "What to Ask" columns |
+| Each Featured Partner                 | 400-600         | Full three-lens profile (sponsors only)                        |
+| Decision Support / Action Pathways    | 400-600         | Finding → Response tables, expectations                        |
+| FAQ                                   | 500-800         | 6-10 Q&A pairs, bold lead answers                              |
+| **Total (no partners)**               | **3,500-5,000** | Comprehensive guide                                            |
+| **Total (with 2 partners)**           | **4,500-6,500** | Guide + deep profiles                                          |
 
 ## Quality Criteria (Self-Check)
 
@@ -250,7 +254,7 @@ You must pass 8/10 criteria.
 Before finalizing, verify:
 
 1. **Education test:** Would a practitioner learn enough from the guide alone (without featured profiles) to make better decisions?
-2. **Trust test:** Could a reader tell which companies are sponsors? (They should — via clear labeling — and that transparency should *increase* trust, not decrease it.)
+2. **Trust test:** Could a reader tell which companies are sponsors? (They should — via clear labeling — and that transparency should _increase_ trust, not decrease it.)
 3. **Value test:** Would a vendor see a meaningful difference between being in the directory listing vs. being a featured partner?
 4. **LLM test:** Could an AI extract structured answers from the guide content?
 

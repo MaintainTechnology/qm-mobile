@@ -2,7 +2,7 @@
 name: generate-lectures-bulk-and-render
 description: Generate lectures in parallel using asyncio and automatically render them in the physician preview system (3-5x faster)
 user_invocable: true
-arguments: "<outline_path> [--physician ID] [--course ID] [--dry-run] [--start N] [--end N] [--materials PATH] [--max-concurrent N] [--no-llm-parser]"
+arguments: '<outline_path> [--physician ID] [--course ID] [--dry-run] [--start N] [--end N] [--materials PATH] [--max-concurrent N] [--no-llm-parser]'
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep
 ---
 
@@ -12,10 +12,10 @@ Generate complete lecture packages in parallel using asyncio and automatically r
 
 ## Performance Comparison
 
-| Approach | 5 Lectures | 10 Lectures |
-|----------|------------|-------------|
+| Approach                                   | 5 Lectures | 10 Lectures |
+| ------------------------------------------ | ---------- | ----------- |
 | Sequential (/generate-lectures-and-render) | ~30-50 min | ~60-100 min |
-| **Parallel (this skill)** | ~10-15 min | ~15-25 min |
+| **Parallel (this skill)**                  | ~10-15 min | ~15-25 min  |
 
 ## Slash Command Usage
 
@@ -24,6 +24,7 @@ Generate complete lecture packages in parallel using asyncio and automatically r
 ```
 
 **Examples:**
+
 - `/generate-lectures-bulk-and-render outline.md` - Generate all in parallel, prompt for physician/course
 - `/generate-lectures-bulk-and-render outline.md --physician dr-abid-husain --course advanced-cardio`
 - `/generate-lectures-bulk-and-render outline.md --dry-run` - Preview only
@@ -42,6 +43,7 @@ When this skill is invoked, execute these phases:
 #### Step 1.1: Parse Arguments
 
 Extract from invocation:
+
 - `outline_path` (required)
 - `--physician ID` (optional)
 - `--course ID` (optional)
@@ -50,11 +52,13 @@ Extract from invocation:
 #### Step 1.2: Prompt for Missing Info
 
 If `--physician` not provided, ask:
+
 ```
 What is the physician ID? (e.g., dr-john-smith)
 ```
 
 If `--course` not provided, ask:
+
 ```
 What is the course ID? (e.g., metabolic-health)
 ```
@@ -62,6 +66,7 @@ What is the course ID? (e.g., metabolic-health)
 #### Step 1.3: Check Registry
 
 Read the registry file:
+
 ```
 content/physician-courses/registry.ts
 ```
@@ -71,24 +76,28 @@ Check if physician ID exists in `physicianRegistry`.
 #### Step 1.4: Handle New vs Existing Physician
 
 **If NEW physician**, collect metadata:
+
 - Physician name (e.g., "Dr. John Smith")
 - Credentials (e.g., "MD", "MD, PhD")
 - Specialty (e.g., "Metabolic Medicine")
 - Bio (optional, one sentence)
 
 **If EXISTING physician**, check if course exists:
+
 - If course exists: will add lectures to existing course
 - If course is new: collect course title and description
 
 #### Step 1.5: Collect Course Info (if new course)
 
 Ask for:
+
 - Course title (e.g., "Advanced Cardiovascular Therapies")
 - Course description (one sentence)
 
 #### Step 1.6: Show Execution Plan
 
 Display summary:
+
 ```
 PHYSICIAN: dr-john-smith (New/Existing)
 COURSE: metabolic-health (New/Existing)
@@ -126,6 +135,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/parallel_lecture_runne
 #### Step 2.2: Monitor Progress
 
 The runner will show real-time progress:
+
 ```
 [05:32] Pending: 0 | Submitting: 0 | Processing: 3 | Completed: 2 | Failed: 0
 ```
@@ -133,6 +143,7 @@ The runner will show real-time progress:
 All lectures process concurrently (up to max-concurrent limit).
 
 Output files per lecture:
+
 - `lecture_N_slides.json` - The JSON we need
 - `lecture_N_transcript.md`
 - `lecture_N_blueprint.md`
@@ -154,6 +165,7 @@ mkdir -p "content/physician-courses/{physician}/{course}"
 ```
 
 Example:
+
 ```bash
 mkdir -p "content/physician-courses/dr-john-smith/metabolic-health"
 ```
@@ -164,7 +176,7 @@ mkdir -p "content/physician-courses/dr-john-smith/metabolic-health"
 
 **Run this Python script to extract clean JSON:**
 
-```python
+````python
 import json
 import os
 
@@ -209,9 +221,10 @@ for i in range(1, NUM_LECTURES + 1):
         with open(target_file, 'w') as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
         print(f"lecture-{i}.json: Cleaned and validated")
-```
+````
 
 **Why this is needed:**
+
 - VectorShift wraps JSON output in \`\`\`json ... \`\`\` code fences
 - Extra HTML content (sources, references) appears after the JSON
 - Next.js/Turbopack requires pure JSON for imports
@@ -235,6 +248,7 @@ import drSmithMetabolicLecture2 from './dr-john-smith/metabolic-health/lecture-2
 ```
 
 Import naming convention: `dr{LastName}{CourseShort}Lecture{N}`
+
 - Extract last name from physician ID: `dr-john-smith` -> `Smith`
 - Shorten course ID: `metabolic-health` -> `Metabolic`
 - Add lecture number: `Lecture1`, `Lecture2`, etc.
@@ -289,11 +303,13 @@ Import naming convention: `dr{LastName}{CourseShort}Lecture{N}`
 #### Step 4.1: Construct Preview URLs
 
 URL pattern:
+
 ```
 http://localhost:3000/preview/courses/{physician}/{course}-{N}
 ```
 
 Examples:
+
 ```
 http://localhost:3000/preview/courses/dr-john-smith/metabolic-health-1
 http://localhost:3000/preview/courses/dr-john-smith/metabolic-health-2
@@ -320,31 +336,31 @@ Remaining preview URLs:
 
 ## Options Reference
 
-| Flag | Description |
-|------|-------------|
-| `<outline_path>` | Required: Path to course outline markdown |
-| `--physician ID` | Pre-specify physician ID (skips prompt) |
-| `--course ID` | Pre-specify course ID (skips prompt) |
-| `--dry-run` | Show execution plan without running pipeline |
-| `--start N` | Start from lecture N |
-| `--end N` | Stop after lecture N |
-| `--materials PATH` | Custom materials folder (default: Abid Husain/) |
-| `--max-concurrent N` | Maximum parallel jobs (default: 5) |
-| `--no-llm-parser` | Use regex parser instead of LLM |
+| Flag                 | Description                                     |
+| -------------------- | ----------------------------------------------- |
+| `<outline_path>`     | Required: Path to course outline markdown       |
+| `--physician ID`     | Pre-specify physician ID (skips prompt)         |
+| `--course ID`        | Pre-specify course ID (skips prompt)            |
+| `--dry-run`          | Show execution plan without running pipeline    |
+| `--start N`          | Start from lecture N                            |
+| `--end N`            | Stop after lecture N                            |
+| `--materials PATH`   | Custom materials folder (default: Abid Husain/) |
+| `--max-concurrent N` | Maximum parallel jobs (default: 5)              |
+| `--no-llm-parser`    | Use regex parser instead of LLM                 |
 
 ---
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Outline not found | Ask for correct path |
-| Some lectures fail | Continue with successful ones, report failures |
-| JSON has markdown fences | Use the cleaning script in Step 3.2 (this is expected behavior) |
-| "Extra data" JSON error | JSON has trailing content - use cleaning script to extract pure JSON |
-| Build fails with "invalid JSON" | Lecture files still have code fences - re-run cleaning script |
-| Registry parse error | Show manual edit instructions |
-| All lectures fail | Report failures, skip registry update |
+| Error                           | Action                                                               |
+| ------------------------------- | -------------------------------------------------------------------- |
+| Outline not found               | Ask for correct path                                                 |
+| Some lectures fail              | Continue with successful ones, report failures                       |
+| JSON has markdown fences        | Use the cleaning script in Step 3.2 (this is expected behavior)      |
+| "Extra data" JSON error         | JSON has trailing content - use cleaning script to extract pure JSON |
+| Build fails with "invalid JSON" | Lecture files still have code fences - re-run cleaning script        |
+| Registry parse error            | Show manual edit instructions                                        |
+| All lectures fail               | Report failures, skip registry update                                |
 
 ## Output Retrieval Fallback
 
@@ -460,17 +476,20 @@ Generation complete! Review the lectures and let me know if you need any adjustm
 The VectorShift pipeline generates lectures with inline SVG diagrams in the `diagramHtml` field of each slide. These are rendered by the `UniversalLecture` component using `dangerouslySetInnerHTML`.
 
 **How it works:**
+
 - Each slide can have a `diagramHtml` field containing raw SVG markup
 - The UniversalLecture component at `src/components/lectures/UniversalLecture.tsx` renders this at lines 250-257
 - SVG diagrams use the editorial color palette (paper, ink, gold, vermillion)
 
 **If diagrams don't render:**
+
 1. Check that the JSON file has `diagramHtml` field in slides (not `diagram`)
 2. Verify the SVG is valid XML (no unclosed tags)
 3. Check browser console for React hydration errors
 4. The `diagramHtml` field should contain a complete `<svg>` element
 
 **Diagram field formats:**
+
 - `diagramHtml` - Inline SVG string (current pipeline output)
 - `diagram` - Structured JSON diagram (legacy format, uses DiagramRenderer)
 

@@ -42,18 +42,19 @@ Analyze the staged diff and write a **brief, descriptive** commit message using 
 
 **Format:** `<type>: <short description>`
 
-| Type | When to use |
-|------|-------------|
-| `feat` | New feature or functionality added |
-| `fix` | Bug fix |
-| `update` | Enhancement to existing feature |
+| Type       | When to use                                |
+| ---------- | ------------------------------------------ |
+| `feat`     | New feature or functionality added         |
+| `fix`      | Bug fix                                    |
+| `update`   | Enhancement to existing feature            |
 | `refactor` | Code restructuring without behavior change |
-| `docs` | Documentation only |
-| `style` | Formatting, whitespace, missing semicolons |
-| `chore` | Build scripts, config, dependencies |
-| `test` | Adding or updating tests |
+| `docs`     | Documentation only                         |
+| `style`    | Formatting, whitespace, missing semicolons |
+| `chore`    | Build scripts, config, dependencies        |
+| `test`     | Adding or updating tests                   |
 
 **Rules for the message:**
+
 - Keep it under 72 characters
 - Describe WHAT changed, not HOW — the diff shows the how
 - If multiple types of changes exist, use the dominant one
@@ -61,6 +62,7 @@ Analyze the staged diff and write a **brief, descriptive** commit message using 
 - End with `Co-Authored-By: Claude Opus 4.6 <noreply@anthropic.com>`
 
 **Examples:**
+
 ```
 feat: add Stripe checkout integration for pro plan
 fix: resolve mobile nav hamburger menu not opening
@@ -96,6 +98,7 @@ If the push fails because the remote branch doesn't exist yet, the `-u` flag han
 ### Step 7: Confirm
 
 Tell the user:
+
 - What was committed (brief summary)
 - The commit message used
 - Which branch it was pushed to

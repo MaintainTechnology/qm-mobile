@@ -49,7 +49,7 @@ Prefer GSAP's **transform aliases** over raw `transform` string:
 ## Function-Based Values
 
 ```javascript
-gsap.to(".item", {
+gsap.to('.item', {
   x: (i, target, targets) => i * 50,
   stagger: 0.1,
 });
@@ -62,13 +62,13 @@ Built-in eases: `power1`–`power4`, `back`, `bounce`, `circ`, `elastic`, `expo`
 ## Defaults
 
 ```javascript
-gsap.defaults({ duration: 0.6, ease: "power2.out" });
+gsap.defaults({ duration: 0.6, ease: 'power2.out' });
 ```
 
 ## Controlling Tweens
 
 ```javascript
-const tween = gsap.to(".box", { x: 100 });
+const tween = gsap.to('.box', { x: 100 });
 tween.pause();
 tween.play();
 tween.reverse();
@@ -85,12 +85,12 @@ Runs setup only when a media query matches; auto-reverts when it stops matching.
 let mm = gsap.matchMedia();
 mm.add(
   {
-    isDesktop: "(min-width: 800px)",
-    reduceMotion: "(prefers-reduced-motion: reduce)",
+    isDesktop: '(min-width: 800px)',
+    reduceMotion: '(prefers-reduced-motion: reduce)',
   },
-  (context) => {
+  context => {
     const { isDesktop, reduceMotion } = context.conditions;
-    gsap.to(".box", {
+    gsap.to('.box', {
       rotation: isDesktop ? 360 : 180,
       duration: reduceMotion ? 0 : 2,
     });
@@ -105,8 +105,8 @@ mm.add(
 ### Creating a Timeline
 
 ```javascript
-const tl = gsap.timeline({ defaults: { duration: 0.5, ease: "power2.out" } });
-tl.to(".a", { x: 100 }).to(".b", { y: 50 }).to(".c", { opacity: 0 });
+const tl = gsap.timeline({ defaults: { duration: 0.5, ease: 'power2.out' } });
+tl.to('.a', { x: 100 }).to('.b', { y: 50 }).to('.c', { opacity: 0 });
 ```
 
 ### Position Parameter
@@ -119,19 +119,19 @@ Third argument controls placement:
 - **Alignment**: `"<"` — same start as previous; `">"` — after previous ends; `"<0.2"` — 0.2s after previous starts
 
 ```javascript
-tl.to(".a", { x: 100 }, 0);
-tl.to(".b", { y: 50 }, "<"); // same start as .a
-tl.to(".c", { opacity: 0 }, "<0.2"); // 0.2s after .b starts
+tl.to('.a', { x: 100 }, 0);
+tl.to('.b', { y: 50 }, '<'); // same start as .a
+tl.to('.c', { opacity: 0 }, '<0.2'); // 0.2s after .b starts
 ```
 
 ### Labels
 
 ```javascript
-tl.addLabel("intro", 0);
-tl.to(".a", { x: 100 }, "intro");
-tl.addLabel("outro", "+=0.5");
-tl.play("outro");
-tl.tweenFromTo("intro", "outro");
+tl.addLabel('intro', 0);
+tl.to('.a', { x: 100 }, 'intro');
+tl.addLabel('outro', '+=0.5');
+tl.play('outro');
+tl.tweenFromTo('intro', 'outro');
 ```
 
 ### Timeline Options
@@ -145,7 +145,7 @@ tl.tweenFromTo("intro", "outro");
 ```javascript
 const master = gsap.timeline();
 const child = gsap.timeline();
-child.to(".a", { x: 100 }).to(".b", { y: 50 });
+child.to('.a', { x: 100 }).to('.b', { y: 50 });
 master.add(child, 0);
 ```
 
@@ -172,9 +172,9 @@ Only on elements that actually animate.
 ### gsap.quickTo() for Frequent Updates
 
 ```javascript
-let xTo = gsap.quickTo("#id", "x", { duration: 0.4, ease: "power3" }),
-  yTo = gsap.quickTo("#id", "y", { duration: 0.4, ease: "power3" });
-container.addEventListener("mousemove", (e) => {
+let xTo = gsap.quickTo('#id', 'x', { duration: 0.4, ease: 'power3' }),
+  yTo = gsap.quickTo('#id', 'y', { duration: 0.4, ease: 'power3' });
+container.addEventListener('mousemove', e => {
   xTo(e.pageX);
   yTo(e.pageY);
 });

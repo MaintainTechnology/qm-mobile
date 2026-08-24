@@ -49,6 +49,7 @@ Design System
 ### Style Guide
 
 Focus on **visual elements**:
+
 - Brand colors
 - Typography
 - Logo usage
@@ -57,6 +58,7 @@ Focus on **visual elements**:
 ### Pattern Library
 
 Collection of **UI patterns**:
+
 - Navigation patterns
 - Form patterns
 - Layout templates
@@ -65,6 +67,7 @@ Collection of **UI patterns**:
 ### Component Library
 
 **Coded UI components**:
+
 - Buttons, inputs, modals
 - Ready-to-use code
 - Framework-specific
@@ -73,6 +76,7 @@ Collection of **UI patterns**:
 ### Design System
 
 **All of the above, plus:**
+
 - Governance processes
 - Contribution guidelines
 - Versioning
@@ -136,18 +140,18 @@ Single source of truth (tokens.json)
 --line-height-normal: 1.5;
 
 /* Spacing tokens */
---space-1: 0.25rem;  /* 4px */
---space-2: 0.5rem;   /* 8px */
---space-3: 0.75rem;  /* 12px */
---space-4: 1rem;     /* 16px */
---space-5: 1.5rem;   /* 24px */
---space-6: 2rem;     /* 32px */
---space-8: 3rem;     /* 48px */
+--space-1: 0.25rem; /* 4px */
+--space-2: 0.5rem; /* 8px */
+--space-3: 0.75rem; /* 12px */
+--space-4: 1rem; /* 16px */
+--space-5: 1.5rem; /* 24px */
+--space-6: 2rem; /* 32px */
+--space-8: 3rem; /* 48px */
 
 /* Shadow tokens */
---shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
---shadow-md: 0 4px 6px rgba(0,0,0,0.1);
---shadow-lg: 0 10px 15px rgba(0,0,0,0.1);
+--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+--shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+--shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 
 /* Border radius tokens */
 --radius-sm: 0.25rem;
@@ -190,7 +194,7 @@ weight files" approach. This is now the default recommendation for design system
 @font-face {
   font-family: 'InterVar';
   src: url('/fonts/Inter.var.woff2') format('woff2-variations');
-  font-weight: 100 900;          /* full weight range in one file */
+  font-weight: 100 900; /* full weight range in one file */
   font-display: swap;
 }
 
@@ -199,12 +203,17 @@ weight files" approach. This is now the default recommendation for design system
 }
 
 /* Use any weight on the axis, not just preset steps */
-.heading { font-weight: 620; }
+.heading {
+  font-weight: 620;
+}
 /* Optical sizing axis tracks the rendered size automatically */
-body { font-optical-sizing: auto; }
+body {
+  font-optical-sizing: auto;
+}
 ```
 
 **Why it matters:**
+
 - **Performance** — one HTTP request and ~one file instead of many static weights
 - **Responsive typography** — interpolate weight/width fluidly across breakpoints
   and even animate them (respecting reduced-motion); great for fluid `clamp()` scales
@@ -275,7 +284,7 @@ interface ButtonProps {
 // Usage
 <Button variant="primary" size="lg" iconLeft={<PlusIcon />}>
   Add Item
-</Button>
+</Button>;
 ```
 
 ---
@@ -463,16 +472,20 @@ Example: 2.3.1
 ## [2.3.0] - 2025-01-15
 
 ### Added
+
 - New `Select` component
 - Dark mode support for `Card`
 
 ### Changed
+
 - Updated Button padding tokens
 
 ### Fixed
+
 - Modal focus trap on Safari
 
 ### Deprecated
+
 - Legacy Grid component (use CSS Grid)
 ```
 
@@ -567,27 +580,27 @@ Efficiency:
 
 ### Design
 
-| Tool | Purpose |
-|------|---------|
-| Figma | Design and prototyping |
-| Figma Tokens | Token management |
-| Storybook | Component development |
+| Tool         | Purpose                |
+| ------------ | ---------------------- |
+| Figma        | Design and prototyping |
+| Figma Tokens | Token management       |
+| Storybook    | Component development  |
 
 ### Development
 
-| Tool | Purpose |
-|------|---------|
-| Style Dictionary | Token transformation |
-| Chromatic | Visual testing |
-| Playwright/Testing Library | Component testing |
+| Tool                       | Purpose              |
+| -------------------------- | -------------------- |
+| Style Dictionary           | Token transformation |
+| Chromatic                  | Visual testing       |
+| Playwright/Testing Library | Component testing    |
 
 ### Documentation
 
-| Tool | Purpose |
-|------|---------|
-| Storybook | Component docs |
-| Supernova | DS documentation |
-| Docusaurus | Website docs |
+| Tool       | Purpose          |
+| ---------- | ---------------- |
+| Storybook  | Component docs   |
+| Supernova  | DS documentation |
+| Docusaurus | Website docs     |
 
 ---
 

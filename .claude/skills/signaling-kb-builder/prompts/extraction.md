@@ -138,8 +138,18 @@ Extract now:
 ```json
 {
   "references": [
-    {"ref_number": 1, "pmid": "24566879", "doi": null, "title": "mTOR inhibition improves immune function..."},
-    {"ref_number": 2, "pmid": null, "doi": "10.1126/scitranslmed.3009892", "title": "TORC1 inhibition enhances..."}
+    {
+      "ref_number": 1,
+      "pmid": "24566879",
+      "doi": null,
+      "title": "mTOR inhibition improves immune function..."
+    },
+    {
+      "ref_number": 2,
+      "pmid": null,
+      "doi": "10.1126/scitranslmed.3009892",
+      "title": "TORC1 inhibition enhances..."
+    }
   ],
   "interventions": [
     {
@@ -153,7 +163,7 @@ Extract now:
           "indication": "longevity/healthspan",
           "route": "oral",
           "context": "Pulsed dosing to avoid immunosuppression",
-          "citations": [{"pmid": "24566879", "title": "mTOR inhibition improves..."}],
+          "citations": [{ "pmid": "24566879", "title": "mTOR inhibition improves..." }],
           "evidence_type": "EXPLICIT",
           "confidence": "moderate",
           "support_refs": [1]
@@ -183,12 +193,8 @@ Extract now:
       "core_nodes": ["MTOR", "RPTOR", "RICTOR", "EIF4EBP1", "RPS6KB1"],
       "upstream_triggers": ["amino acids", "insulin", "IGF-1", "energy status"],
       "downstream_effects": ["protein synthesis", "autophagy inhibition", "lipid synthesis"],
-      "interventions_targeting": [
-        {"intervention_name": "rapamycin", "effect": "inhibit"}
-      ],
-      "crosstalk": [
-        {"target_pathway": "autophagy", "relationship": "inhibits"}
-      ],
+      "interventions_targeting": [{ "intervention_name": "rapamycin", "effect": "inhibit" }],
+      "crosstalk": [{ "target_pathway": "autophagy", "relationship": "inhibits" }],
       "citations": [],
       "confidence": "high"
     }
@@ -198,11 +204,11 @@ Extract now:
       "biomarker_name": "IGF-1",
       "biomarker_id": "igf-1",
       "full_name": "Insulin-like Growth Factor 1",
-      "reference_range": {"low": 100, "high": 300, "unit": "ng/mL"},
+      "reference_range": { "low": 100, "high": 300, "unit": "ng/mL" },
       "interpretation_patterns": [
         {
           "pattern_id": "low-igf1-with-insulin-resistance",
-          "biomarker_state": {"igf1": "low", "homa_ir": "elevated"},
+          "biomarker_state": { "igf1": "low", "homa_ir": "elevated" },
           "interpretation": "Suggests GH resistance or hepatic dysfunction rather than simple GH deficiency",
           "differential": ["hepatic_insulin_resistance", "gh_resistance", "malnutrition"],
           "clinical_implications": "Address insulin resistance before considering GH therapy",
@@ -213,13 +219,13 @@ Extract now:
       "optimal_ranges_by_context": [
         {
           "context": "longevity",
-          "optimal": {"low": 150, "high": 250},
+          "optimal": { "low": 150, "high": 250 },
           "rationale": "Below 150 suggests GH deficiency, above 250 may accelerate aging",
           "citations": []
         }
       ],
       "interventions_affecting": [
-        {"intervention_name": "growth hormone", "effect": "increase", "magnitude": "significant"}
+        { "intervention_name": "growth hormone", "effect": "increase", "magnitude": "significant" }
       ],
       "pathways_involved": ["igf1-axis"]
     }

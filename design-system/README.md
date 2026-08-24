@@ -10,15 +10,15 @@ self-contained (fonts embedded) and works offline.
 
 ## Files
 
-| File | What it is |
-| --- | --- |
-| `index.html` | The brand kit, human-readable. |
-| `tokens.css` | Tokens as CSS custom properties, for this page and any web embeds. |
-| `tokens.json` | Platform-neutral token data. |
-| `../src/lib/theme.ts` | **The app consumes this.** Typed tokens: colours (both themes), type scale, spacing, radii, touch floors, motion. |
-| `assets/logo/` | The two-tone M mark, both colourways. In-app, port the inline-SVG component instead of referencing these files (it must theme). |
-| `assets/fonts/` | Manrope + JetBrains Mono variable woff2 (latin) and the embedding CSS. |
-| `assets/photos/` | Brand photography samples; ship through the duotone pass shown in the kit. |
+| File                  | What it is                                                                                                                      |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------- |
+| `index.html`          | The brand kit, human-readable.                                                                                                  |
+| `tokens.css`          | Tokens as CSS custom properties, for this page and any web embeds.                                                              |
+| `tokens.json`         | Platform-neutral token data.                                                                                                    |
+| `../src/lib/theme.ts` | **The app consumes this.** Typed tokens: colours (both themes), type scale, spacing, radii, touch floors, motion.               |
+| `assets/logo/`        | The two-tone M mark, both colourways. In-app, port the inline-SVG component instead of referencing these files (it must theme). |
+| `assets/fonts/`       | Manrope + JetBrains Mono variable woff2 (latin) and the embedding CSS.                                                          |
+| `assets/photos/`      | Brand photography samples; ship through the duotone pass shown in the kit.                                                      |
 
 ## Using it in the app
 

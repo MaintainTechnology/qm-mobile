@@ -46,13 +46,13 @@ Live cursors show the real-time pointer position of collaborators, creating a se
 
 #### Best Practices
 
-| Aspect | Recommendation |
-|--------|---------------|
-| Label length | Max 12 characters, truncate with ellipsis |
-| Color assignment | Unique per user, consistent across session |
-| Update frequency | 50-100ms for smooth movement |
-| Visibility | Hide after 30-60s of inactivity |
-| Scaling | Consider hiding cursors at extreme zoom levels |
+| Aspect           | Recommendation                                 |
+| ---------------- | ---------------------------------------------- |
+| Label length     | Max 12 characters, truncate with ellipsis      |
+| Color assignment | Unique per user, consistent across session     |
+| Update frequency | 50-100ms for smooth movement                   |
+| Visibility       | Hide after 30-60s of inactivity                |
+| Scaling          | Consider hiding cursors at extreme zoom levels |
 
 #### When Cursors Become Too Many
 
@@ -142,13 +142,27 @@ function handleInput() {
   animation: typing-bounce 1.4s infinite ease-in-out both;
 }
 
-.typing-indicator__dot:nth-child(1) { animation-delay: 0s; }
-.typing-indicator__dot:nth-child(2) { animation-delay: 0.16s; }
-.typing-indicator__dot:nth-child(3) { animation-delay: 0.32s; }
+.typing-indicator__dot:nth-child(1) {
+  animation-delay: 0s;
+}
+.typing-indicator__dot:nth-child(2) {
+  animation-delay: 0.16s;
+}
+.typing-indicator__dot:nth-child(3) {
+  animation-delay: 0.32s;
+}
 
 @keyframes typing-bounce {
-  0%, 80%, 100% { transform: scale(0.6); opacity: 0.5; }
-  40% { transform: scale(1); opacity: 1; }
+  0%,
+  80%,
+  100% {
+    transform: scale(0.6);
+    opacity: 0.5;
+  }
+  40% {
+    transform: scale(1);
+    opacity: 1;
+  }
 }
 ```
 
@@ -210,14 +224,14 @@ Pin comments to specific elements or canvas positions.
 ```javascript
 // Attach comment to element
 const annotation = {
-  id: "comment-123",
-  targetElement: "component-456",
+  id: 'comment-123',
+  targetElement: 'component-456',
   position: { x: 100, y: 50 }, // Relative to target
   thread: [
-    { author: "alice", text: "Should this be blue?", timestamp: "..." },
-    { author: "bob", text: "Good idea, updating now", timestamp: "..." }
+    { author: 'alice', text: 'Should this be blue?', timestamp: '...' },
+    { author: 'bob', text: 'Good idea, updating now', timestamp: '...' },
   ],
-  resolved: false
+  resolved: false,
 };
 ```
 
@@ -243,9 +257,7 @@ Notify specific collaborators.
 function handleMentionTrigger(text) {
   if (text.includes('@')) {
     const query = text.split('@').pop();
-    const matches = collaborators.filter(c =>
-      c.name.toLowerCase().includes(query.toLowerCase())
-    );
+    const matches = collaborators.filter(c => c.name.toLowerCase().includes(query.toLowerCase()));
     showMentionSuggestions(matches);
   }
 }
@@ -288,7 +300,7 @@ class ViewportFollower {
     this.showFollowingIndicator(userId);
 
     // Subscribe to their viewport changes
-    subscribeToViewport(userId, (viewport) => {
+    subscribeToViewport(userId, viewport => {
       animateToViewport(viewport, { duration: 300 });
     });
   }
@@ -333,6 +345,7 @@ Present to collaborators by controlling their view.
 ```
 
 **Implementation:**
+
 1. Presenter clicks "Spotlight me"
 2. All viewers receive notification
 3. Viewers have 3-5 seconds to opt out
@@ -348,7 +361,7 @@ function jumpToUser(userId) {
   const userViewport = getUserViewport(userId);
   animateToViewport(userViewport, {
     duration: 500,
-    easing: 'ease-out'
+    easing: 'ease-out',
   });
   highlightUserCursor(userId, { duration: 2000 });
 }
@@ -358,12 +371,12 @@ function jumpToUser(userId) {
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Cursor update rate | 50-100ms | Smooth movement perception |
-| Typing indicator timeout | 2-3s | After last keystroke |
-| Avatar stack max | 3-5 visible | Before "+N" overflow |
-| Cursor label max | 12 chars | Truncate longer names |
+| Metric                   | Value       | Context                    |
+| ------------------------ | ----------- | -------------------------- |
+| Cursor update rate       | 50-100ms    | Smooth movement perception |
+| Typing indicator timeout | 2-3s        | After last keystroke       |
+| Avatar stack max         | 3-5 visible | Before "+N" overflow       |
+| Cursor label max         | 12 chars    | Truncate longer names      |
 
 ---
 

@@ -97,6 +97,7 @@ Before generating, ALWAYS read these files:
 4. **Existing proposals:** Glob `content/docs/proposal-*.html` and read 1-2 recent ones for tone calibration
 
 Also read the partnership agreement for tier details:
+
 - `content/docs/ngm-commons-partnership-agreement.html`
 
 ---
@@ -106,12 +107,14 @@ Also read the partnership agreement for tier details:
 From the transcript, extract and organize:
 
 ### Company Profile
+
 - Company name, website, founding date
 - Product/service category (diagnostics, supplements, software, devices, services)
 - Stage (startup, growth, established)
 - Funding status (for startup program eligibility: <2 years old OR <$5M raised)
 
 ### Partnership Signals
+
 - What brought them to the conversation?
 - Are they already marketing to clinicians? How?
 - Do they understand the AI discoverability angle?
@@ -119,12 +122,14 @@ From the transcript, extract and organize:
 - Budget signals or objections mentioned
 
 ### Product Fit for Commons
+
 - Is their product relevant to longevity/functional/integrative clinicians?
 - What category would their profile fall under?
 - Do they have clinical evidence or research to feature?
 - What differentiates them from competitors in their category?
 
 ### Relationship Context
+
 - Warm intro or cold outreach?
 - Existing relationship with Dr. Vinjamoori or NGM community?
 - Level of engagement during the call (enthusiastic, cautious, skeptical)
@@ -134,13 +139,13 @@ From the transcript, extract and organize:
 
 ## Step 4: Determine Tier Recommendation
 
-| Signal | Recommended Tier |
-|--------|-----------------|
-| Early-stage, budget-conscious, testing the waters | **Partner** ($5,000/year) |
-| Wants lead gen + profile + analytics | **Partner** ($5,000/year) |
-| Wants category leadership, co-branded content | **Sponsor** ($12,500/year) |
-| Wants executive access to Dr. Vinjamoori | **Sponsor** ($12,500/year) |
-| Startup (<2 yrs or <$5M raised) | **Partner w/ Startup Program** ($2,500/year) |
+| Signal                                            | Recommended Tier                             |
+| ------------------------------------------------- | -------------------------------------------- |
+| Early-stage, budget-conscious, testing the waters | **Partner** ($5,000/year)                    |
+| Wants lead gen + profile + analytics              | **Partner** ($5,000/year)                    |
+| Wants category leadership, co-branded content     | **Sponsor** ($12,500/year)                   |
+| Wants executive access to Dr. Vinjamoori          | **Sponsor** ($12,500/year)                   |
+| Startup (<2 yrs or <$5M raised)                   | **Partner w/ Startup Program** ($2,500/year) |
 
 Present the recommended tier prominently, with the alternative tier as an option. Always present both.
 
@@ -155,26 +160,33 @@ Present the recommended tier prominently, with the alternative tier as an option
 ### Section Framework
 
 #### 1. Header
+
 - NGM Commons wordmark with "N" logo mark
 - "Partnership Proposal" label
 - Date and "Prepared for [Company Name]"
 
 #### 2. Executive Summary (2-3 sentences)
+
 - What Commons is
 - Why this company is a fit
 - The outcome of partnering
 
 **Template:**
+
 > NGM Commons is the vendor intelligence platform where longevity clinicians research solutions before they buy. Based on our conversation, [Company] is well-positioned to reach this audience through an independently researched, AI-optimized profile. This proposal outlines how a Commons partnership puts [Company] in front of clinicians at the moment they're making purchasing decisions.
 
 #### 3. The Opportunity
+
 Extract from transcript:
+
 - The problem they're trying to solve (clinician discovery, lead gen, trust gap)
 - Why traditional marketing isn't working for them
 - The AI discoverability angle (clinicians asking ChatGPT/Perplexity, not Googling)
 
 #### 4. What You Get (Profile Details)
+
 Describe the six profile components:
+
 1. **Quick Take** - Cited executive summary
 2. **How It Works** - Mechanisms, workflows, architecture
 3. **Evidence** - Research citations, validation data
@@ -183,25 +195,29 @@ Describe the six profile components:
 6. **Citations** - Every claim backed by references
 
 #### 5. Your Partnership Tier
+
 Present recommended tier with full benefit breakdown. Include the alternative tier for comparison.
 
 Use the tier table from the partnership agreement:
 
-| Tier | Investment | Key Benefits |
-|------|-----------|-------------|
-| **Partner** | $5,000/year | Full profile, brand customization, lead capture, analytics, category roundups, quarterly strategy call |
+| Tier        | Investment   | Key Benefits                                                                                                             |
+| ----------- | ------------ | ------------------------------------------------------------------------------------------------------------------------ |
+| **Partner** | $5,000/year  | Full profile, brand customization, lead capture, analytics, category roundups, quarterly strategy call                   |
 | **Sponsor** | $12,500/year | Everything in Partner + category sponsorship, content co-creation, event partnership, executive access, priority support |
 
 If startup-eligible, note: "Startup Program: 50% off first year."
 
 #### 6. Why Clinicians Trust Commons
+
 - Built by Dr. Vinjamoori (Harvard Med, CMO of Modern Age, advisor to $1B+ in longevity companies)
 - Independent research methodology, not vendor-written content
 - 200,000+ monthly LinkedIn impressions reaching longevity clinicians, plus an engaged private practitioner community that uses the platform
 - AI-native structure ensures visibility in clinician AI queries
 
 #### 7. Next Steps
+
 Clear CTA:
+
 - "Reply to this email to select your tier"
 - "Schedule a follow-up call to discuss"
 - Include email: anant@nextgenerationmedicine.co
@@ -240,31 +256,34 @@ Reference `design-system.md` for full CSS variables and component patterns.
 
 ## Anti-Patterns
 
-| Don't | Do Instead |
-|-------|-----------|
+| Don't                                      | Do Instead                                                                                                                    |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------- |
 | Generic "we're the best platform" language | Specific: "200,000+ monthly LinkedIn impressions reaching longevity clinicians actively researching vendors in your category" |
-| Dump all of Dr. V's credentials | Select 2-3 relevant to the vendor's space |
-| Lead with pricing | Lead with the opportunity and profile value |
-| Use "revolutionary" or "cutting-edge" | Use specific outcomes and metrics |
-| Make it longer than 3 pages | Keep it tight: opportunity, solution, investment, next steps |
-| Ignore what they said in the call | Reference specific things from the transcript |
+| Dump all of Dr. V's credentials            | Select 2-3 relevant to the vendor's space                                                                                     |
+| Lead with pricing                          | Lead with the opportunity and profile value                                                                                   |
+| Use "revolutionary" or "cutting-edge"      | Use specific outcomes and metrics                                                                                             |
+| Make it longer than 3 pages                | Keep it tight: opportunity, solution, investment, next steps                                                                  |
+| Ignore what they said in the call          | Reference specific things from the transcript                                                                                 |
 
 ---
 
 ## Example Invocations
 
 **After a call (Fireflies):**
+
 ```
 Create a Commons proposal for Vitract. We spoke yesterday about their diagnostics platform.
 ```
 
 **With pasted transcript:**
+
 ```
 Here's the transcript from my call with NutraLab. Generate a Commons partnership proposal.
 [paste transcript]
 ```
 
 **With specific tier:**
+
 ```
 Create a Commons sponsor-tier proposal for BioAge Labs based on our Fireflies call from last week.
 ```
@@ -274,6 +293,7 @@ Create a Commons sponsor-tier proposal for BioAge Labs based on our Fireflies ca
 ## Reference
 
 For detailed program info, pricing, and positioning:
+
 - `.claude/skills/document-studio/ngm-programs.md` (NGM Commons section)
 - `.claude/skills/document-studio/voice-and-style.md` (tone guide)
 - `content/docs/ngm-commons-partnership-agreement.html` (formal agreement terms)

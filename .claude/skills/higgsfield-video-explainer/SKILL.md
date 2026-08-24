@@ -12,7 +12,7 @@ description: |
   mascot/faceless modes, two aspects, and optional burned subtitles. NOT for:
   photoreal films, ads/UGC, talking heads, podcasts, motion typography reels,
   one-off clips without narration, or editing a finished video.
-argument-hint: "[topic or source files] [duration] [language] [aspect ratio]"
+argument-hint: '[topic or source files] [duration] [language] [aspect ratio]'
 allowed-tools: Bash
 ---
 
@@ -24,16 +24,16 @@ Never use the monolithic `video_explainer` job in this skill.
 
 ## MCP-to-CLI mapping
 
-| MCP workflow operation | CLI equivalent |
-|---|---|
-| `get_explainer_presets` | `higgsfield preset list video-explainer --json` |
-| `resolve_explainer_preset` | `higgsfield preset resolve video-explainer <preset_id> --json` |
-| `generate_image` / `nano_banana_pro` | `higgsfield generate create nano_banana_2 ...` |
-| `list_voices` | `higgsfield voices list --json` |
-| `generate_audio` / `seed_audio` | `higgsfield generate create seed_audio ...` |
-| `generate_video` / `gemini_omni` | `higgsfield generate create gemini_omni ...` |
-| `job_status` | `--wait --json` or `higgsfield generate wait <job_id> --json` |
-| `explainer_video` | `higgsfield generate create explainer_video ...` |
+| MCP workflow operation               | CLI equivalent                                                 |
+| ------------------------------------ | -------------------------------------------------------------- |
+| `get_explainer_presets`              | `higgsfield preset list video-explainer --json`                |
+| `resolve_explainer_preset`           | `higgsfield preset resolve video-explainer <preset_id> --json` |
+| `generate_image` / `nano_banana_pro` | `higgsfield generate create nano_banana_2 ...`                 |
+| `list_voices`                        | `higgsfield voices list --json`                                |
+| `generate_audio` / `seed_audio`      | `higgsfield generate create seed_audio ...`                    |
+| `generate_video` / `gemini_omni`     | `higgsfield generate create gemini_omni ...`                   |
+| `job_status`                         | `--wait --json` or `higgsfield generate wait <job_id> --json`  |
+| `explainer_video`                    | `higgsfield generate create explainer_video ...`               |
 
 `nano_banana_2` is the public CLI id for the Nano Banana Pro style-key model used by the MCP workflow.
 
@@ -105,16 +105,16 @@ For local style donors, pass each path with a repeated `--image`. For a web imag
 
 ## Pipeline
 
-| Phase | Output | CLI |
-|---|---|---|
-| 0 Ask | style first; then duration, language, character, aspect, subtitles | `preset list` + user questions |
-| R Research | verified facts and sources | available research tools |
-| 1 Style key | one universal style image | `preset resolve` or `nano_banana_2` |
-| 2 Narration | N labeled narration lines | reasoning |
-| 3 Block prompts | N labeled video prompts | reasoning |
-| 4 Voice | user selects one voice; generate N takes | `voices list` + `seed_audio` |
-| 5 Clips | generate N 10-second clips | `gemini_omni` |
-| 6 Assemble | one final MP4 | `explainer_video` |
+| Phase           | Output                                                             | CLI                                 |
+| --------------- | ------------------------------------------------------------------ | ----------------------------------- |
+| 0 Ask           | style first; then duration, language, character, aspect, subtitles | `preset list` + user questions      |
+| R Research      | verified facts and sources                                         | available research tools            |
+| 1 Style key     | one universal style image                                          | `preset resolve` or `nano_banana_2` |
+| 2 Narration     | N labeled narration lines                                          | reasoning                           |
+| 3 Block prompts | N labeled video prompts                                            | reasoning                           |
+| 4 Voice         | user selects one voice; generate N takes                           | `voices list` + `seed_audio`        |
+| 5 Clips         | generate N 10-second clips                                         | `gemini_omni`                       |
+| 6 Assemble      | one final MP4                                                      | `explainer_video`                   |
 
 Read `references/prompts.md` before Phases 1–3.
 
@@ -235,12 +235,12 @@ Create `blocks.json` with at least two ordered block pairs. The CLI model contra
 ```json
 [
   {
-    "video": {"id": "<clip 1 job UUID>", "type": "video_job"},
-    "audio": {"id": "<voice 1 job UUID>", "type": "audio_job"}
+    "video": { "id": "<clip 1 job UUID>", "type": "video_job" },
+    "audio": { "id": "<voice 1 job UUID>", "type": "audio_job" }
   },
   {
-    "video": {"id": "<clip 2 job UUID>", "type": "video_job"},
-    "audio": {"id": "<voice 2 job UUID>", "type": "audio_job"}
+    "video": { "id": "<clip 2 job UUID>", "type": "video_job" },
+    "audio": { "id": "<voice 2 job UUID>", "type": "audio_job" }
   }
 ]
 ```

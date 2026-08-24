@@ -36,14 +36,24 @@ function safeReadJson(filePath) {
 }
 
 function hookSection(raw) {
-  return raw && raw.hook && typeof raw.hook === 'object' && !Array.isArray(raw.hook) ? raw.hook : null;
+  return raw && raw.hook && typeof raw.hook === 'object' && !Array.isArray(raw.hook)
+    ? raw.hook
+    : null;
 }
 
 function detectorSection(raw) {
-  return raw && raw.detector && typeof raw.detector === 'object' && !Array.isArray(raw.detector) ? raw.detector : null;
+  return raw && raw.detector && typeof raw.detector === 'object' && !Array.isArray(raw.detector)
+    ? raw.detector
+    : null;
 }
 
-const DETECTOR_CONFIG_KEYS = new Set(['ignoreRules', 'ignoreFiles', 'ignoreValues', 'designSystem', 'advisoryRules']);
+const DETECTOR_CONFIG_KEYS = new Set([
+  'ignoreRules',
+  'ignoreFiles',
+  'ignoreValues',
+  'designSystem',
+  'advisoryRules',
+]);
 
 const DEFAULT_DETECTION_CONFIG = Object.freeze({
   ignoreRules: [],
@@ -76,7 +86,11 @@ function applyDetectionConfigSource(config, raw) {
   if (raw.advisoryRules === 'include' || raw.advisoryRules === 'exclude') {
     config.advisoryRules = raw.advisoryRules;
   }
-  if (raw.designSystem && typeof raw.designSystem === 'object' && !Array.isArray(raw.designSystem)) {
+  if (
+    raw.designSystem &&
+    typeof raw.designSystem === 'object' &&
+    !Array.isArray(raw.designSystem)
+  ) {
     config.designSystem = {
       ...config.designSystem,
       enabled: raw.designSystem.enabled === false ? false : true,
@@ -150,16 +164,24 @@ export function writeDetectionConfig(root, detectorConfig, opts = {}) {
 function normalizeDetectionConfigForWrite(config) {
   const out = {};
   if (Array.isArray(config?.ignoreRules)) {
-    out.ignoreRules = uniqueStrings(config.ignoreRules.map((rule) => normalizeIgnoreRule(rule)).filter(Boolean));
+    out.ignoreRules = uniqueStrings(
+      config.ignoreRules.map(rule => normalizeIgnoreRule(rule)).filter(Boolean),
+    );
   }
   if (Array.isArray(config?.ignoreFiles)) {
-    out.ignoreFiles = uniqueStrings(config.ignoreFiles.filter(v => typeof v === 'string' && v.trim()).map(v => v.trim()));
+    out.ignoreFiles = uniqueStrings(
+      config.ignoreFiles.filter(v => typeof v === 'string' && v.trim()).map(v => v.trim()),
+    );
   }
   out.ignoreValues = normalizeIgnoreValueEntries(config?.ignoreValues || []);
   if (config?.advisoryRules === 'include' || config?.advisoryRules === 'exclude') {
     out.advisoryRules = config.advisoryRules;
   }
-  if (config?.designSystem && typeof config.designSystem === 'object' && !Array.isArray(config.designSystem)) {
+  if (
+    config?.designSystem &&
+    typeof config.designSystem === 'object' &&
+    !Array.isArray(config.designSystem)
+  ) {
     out.designSystem = {
       enabled: config.designSystem.enabled === false ? false : true,
     };
@@ -186,7 +208,9 @@ export function normalizeIgnoreValue(value) {
 }
 
 function normalizeIgnoreRule(rule) {
-  return String(rule || '').trim().toLowerCase();
+  return String(rule || '')
+    .trim()
+    .toLowerCase();
 }
 
 function colorIgnoreKey(value) {
@@ -196,7 +220,9 @@ function colorIgnoreKey(value) {
 }
 
 function parseIgnoreColor(value) {
-  const text = String(value || '').trim().toLowerCase();
+  const text = String(value || '')
+    .trim()
+    .toLowerCase();
   if (!text) return null;
 
   const hex = text.match(/^#([0-9a-f]{3,4}|[0-9a-f]{6}|[0-9a-f]{8})$/i);
@@ -210,7 +236,7 @@ function parseIgnoreColor(value) {
     const g = parseRgbChannel(parts[1]);
     const b = parseRgbChannel(parts[2]);
     const a = parts[3] === undefined ? 1 : parseAlphaChannel(parts[3]);
-    if ([r, g, b, a].some((v) => v === null)) return null;
+    if ([r, g, b, a].some(v => v === null)) return null;
     return { r, g, b, a };
   }
 
@@ -222,7 +248,7 @@ function parseIgnoreColor(value) {
     const s = parsePercentChannel(parts[1]);
     const l = parsePercentChannel(parts[2]);
     const a = parts[3] === undefined ? 1 : parseAlphaChannel(parts[3]);
-    if ([h, s, l, a].some((v) => v === null)) return null;
+    if ([h, s, l, a].some(v => v === null)) return null;
     return hslToRgb(h, s, l, a);
   }
 
@@ -248,15 +274,24 @@ function splitColorArgs(body) {
   const text = String(body || '').trim();
   if (!text) return [];
   if (text.includes(',')) {
-    const parts = text.split(',').map((part) => part.trim()).filter(Boolean);
+    const parts = text
+      .split(',')
+      .map(part => part.trim())
+      .filter(Boolean);
     const last = parts[parts.length - 1];
     if (last && last.includes('/')) {
-      const split = last.split('/').map((part) => part.trim()).filter(Boolean);
+      const split = last
+        .split('/')
+        .map(part => part.trim())
+        .filter(Boolean);
       return [...parts.slice(0, -1), ...split];
     }
     return parts;
   }
-  return text.replace(/\s*\/\s*/g, ' / ').split(/\s+/).filter((part) => part && part !== '/');
+  return text
+    .replace(/\s*\/\s*/g, ' / ')
+    .split(/\s+/)
+    .filter(part => part && part !== '/');
 }
 
 function parseRgbChannel(raw) {
@@ -308,11 +343,12 @@ function hslToRgb(hue, saturation, lightness, alpha) {
     const gray = clampByte(Math.round(lightness * 255));
     return { r: gray, g: gray, b: gray, a: alpha };
   }
-  const q = lightness < 0.5
-    ? lightness * (1 + saturation)
-    : lightness + saturation - lightness * saturation;
+  const q =
+    lightness < 0.5
+      ? lightness * (1 + saturation)
+      : lightness + saturation - lightness * saturation;
   const p = 2 * lightness - q;
-  const toRgb = (t) => {
+  const toRgb = t => {
     let channel = t;
     if (channel < 0) channel += 1;
     if (channel > 1) channel -= 1;
@@ -351,7 +387,9 @@ export function normalizeIgnoreValueEntries(entries) {
     const normalized = { rule, value };
     const files = uniqueStrings([
       ...(typeof entry.file === 'string' && entry.file.trim() ? [entry.file.trim()] : []),
-      ...(Array.isArray(entry.files) ? entry.files.filter(v => typeof v === 'string' && v.trim()).map(v => v.trim()) : []),
+      ...(Array.isArray(entry.files)
+        ? entry.files.filter(v => typeof v === 'string' && v.trim()).map(v => v.trim())
+        : []),
     ]);
     if (files.length > 0) normalized.files = files;
     // Key order is rule, value, files, createdAt, reason and must stay that way:
@@ -406,8 +444,15 @@ function globToRegex(glob) {
       i += 1;
     } else if (c === '{') {
       const end = glob.indexOf('}', i);
-      if (end === -1) { re += '\\{'; i += 1; continue; }
-      const parts = glob.slice(i + 1, end).split(',').map((p) => p.replace(/[.+^$()|[\]\\]/g, '\\$&'));
+      if (end === -1) {
+        re += '\\{';
+        i += 1;
+        continue;
+      }
+      const parts = glob
+        .slice(i + 1, end)
+        .split(',')
+        .map(p => p.replace(/[.+^$()|[\]\\]/g, '\\$&'));
       re += `(?:${parts.join('|')})`;
       i = end + 1;
     } else if (/[.+^$()|[\]\\]/.test(c)) {
@@ -424,7 +469,9 @@ function globToRegex(glob) {
 
 export function matchesAnyGlob(filePath, globs) {
   if (!Array.isArray(globs) || globs.length === 0) return false;
-  const normalized = String(filePath || '').split(sep).join('/');
+  const normalized = String(filePath || '')
+    .split(sep)
+    .join('/');
   for (const glob of globs) {
     try {
       const re = globToRegex(String(glob));
@@ -460,9 +507,9 @@ export function shouldIgnoreDetectionFile(filePath, root, config) {
 
 export function filterDetectionFindings(findings, config) {
   if (!Array.isArray(findings) || findings.length === 0) return [];
-  const ignoreRules = new Set((config?.ignoreRules || []).map((rule) => normalizeIgnoreRule(rule)));
+  const ignoreRules = new Set((config?.ignoreRules || []).map(rule => normalizeIgnoreRule(rule)));
   const ignoreValues = normalizeIgnoreValueEntries(config?.ignoreValues || []);
-  return findings.filter((finding) => {
+  return findings.filter(finding => {
     if (!finding || typeof finding !== 'object') return false;
     if (ignoreRules.has(normalizeIgnoreRule(finding.antipattern))) return false;
     if (isIgnoredFindingValue(finding, ignoreValues)) return false;
@@ -476,7 +523,7 @@ function isIgnoredFindingValue(finding, ignoreValues) {
   if (!rule) return false;
   // File-scoped wildcards suppress rules with no extractable value, such as side-tab.
   const value = extractFindingIgnoreValue(finding);
-  return ignoreValues.some((entry) => {
+  return ignoreValues.some(entry => {
     if (entry.rule !== rule) return false;
     const wildcardValue = entry.value === '*';
     if (!wildcardValue && (!value || !ignoreValueMatches(rule, entry.value, value))) return false;
@@ -518,7 +565,7 @@ function extractFindingIgnoreValueRaw(finding, rule = normalizeIgnoreRule(findin
   const direct = cleanIgnoreValueDisplay(finding.ignoreValue || finding.value || '');
   if (direct) return direct;
 
-  const candidates = [finding.detail, finding.snippet].filter((v) => typeof v === 'string' && v);
+  const candidates = [finding.detail, finding.snippet].filter(v => typeof v === 'string' && v);
   for (const text of candidates) {
     if (rule === 'bounce-easing') {
       const motion = extractMotionIgnoreValue(text);
@@ -559,7 +606,7 @@ function extractMotionIgnoreValue(text) {
   if (animation) {
     const token = animation[1]
       .split(/[,\s]+/)
-      .find((part) => /bounce|elastic|wobble|jiggle|spring/i.test(part));
+      .find(part => /bounce|elastic|wobble|jiggle|spring/i.test(part));
     if (token) return cleanIgnoreValueDisplay(token);
   }
 
@@ -582,7 +629,8 @@ export function getHookConsent(root) {
   let consent;
   for (const filePath of [getConfigPath(root), getLocalConfigPath(root)]) {
     const hook = hookSection(safeReadJson(filePath));
-    if (hook && (hook.consent === 'accepted' || hook.consent === 'declined')) consent = hook.consent;
+    if (hook && (hook.consent === 'accepted' || hook.consent === 'declined'))
+      consent = hook.consent;
   }
   return consent;
 }
@@ -618,12 +666,15 @@ export function ensureConfigGitExclude(root) {
     const target = join(gitDir, 'info', 'exclude');
     const existing = existsSync(target) ? readFileSync(target, 'utf-8') : '';
     const block = [EXCLUDE_OPEN, ...EXCLUDE_PATTERNS, EXCLUDE_CLOSE].join('\n');
-    const markerRe = new RegExp(`${escapeRegExp(EXCLUDE_OPEN)}[\\s\\S]*?${escapeRegExp(EXCLUDE_CLOSE)}`);
+    const markerRe = new RegExp(
+      `${escapeRegExp(EXCLUDE_OPEN)}[\\s\\S]*?${escapeRegExp(EXCLUDE_CLOSE)}`,
+    );
     let updated;
     if (markerRe.test(existing)) {
       updated = existing.replace(markerRe, block);
     } else {
-      const prefix = existing.length === 0 ? '' : existing.endsWith('\n') ? existing : `${existing}\n`;
+      const prefix =
+        existing.length === 0 ? '' : existing.endsWith('\n') ? existing : `${existing}\n`;
       updated = `${prefix}${block}\n`;
     }
     if (updated !== existing) {

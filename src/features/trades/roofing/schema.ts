@@ -82,7 +82,9 @@ const RoofPriceSchema = z.looseObject({
   area_m2: z.number(),
   effective_rate_per_m2: z.number(),
   tiers: z.tuple([RoofTierSchema, RoofTierSchema, RoofTierSchema]),
-  loadings_applied: z.array(z.looseObject({ code: z.string(), pct: z.number(), detail: z.string() })),
+  loadings_applied: z.array(
+    z.looseObject({ code: z.string(), pct: z.number(), detail: z.string() }),
+  ),
   routing: RoofRoutingSchema,
   call_out_minimum_applied: z.boolean().optional(),
 });
@@ -126,7 +128,12 @@ export const MeasureAllResponseSchema = z.union([
 export type MeasureAllResponse = z.infer<typeof MeasureAllResponseSchema>;
 
 export const SaveRoofResponseSchema = z.union([
-  z.looseObject({ ok: z.literal(true), id: z.string(), public_token: z.string(), measure_token: z.string() }),
+  z.looseObject({
+    ok: z.literal(true),
+    id: z.string(),
+    public_token: z.string(),
+    measure_token: z.string(),
+  }),
   z.looseObject({ ok: z.literal(false), error: z.string(), detail: z.string().optional() }),
 ]);
 export type SaveRoofResponse = z.infer<typeof SaveRoofResponseSchema>;
@@ -157,7 +164,12 @@ export type SaveRoofRequest = {
     buildingId: string | null;
     role: 'primary' | 'secondary';
     label: string;
-    inputs: { material: string; pitch: string; intent: string; building_year_built?: number | null };
+    inputs: {
+      material: string;
+      pitch: string;
+      intent: string;
+      building_year_built?: number | null;
+    };
   }[];
   quote: unknown;
   included_indices: number[];

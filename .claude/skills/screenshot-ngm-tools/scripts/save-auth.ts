@@ -31,7 +31,7 @@ async function main() {
     '\n  Log in with a PROFESSIONAL or ADMIN account in the opened browser.\n' +
       '  When the Longevity Intelligence tools are visible, come back here and press Enter.\n',
   );
-  await new Promise<void>((resolve) => process.stdin.once('data', () => resolve()));
+  await new Promise<void>(resolve => process.stdin.once('data', () => resolve()));
 
   fs.mkdirSync(path.dirname(path.resolve(storagePath)), { recursive: true });
   await context.storageState({ path: storagePath });
@@ -39,7 +39,7 @@ async function main() {
   await browser.close();
 }
 
-main().catch((e) => {
+main().catch(e => {
   console.error(e);
   process.exit(1);
 });

@@ -2,7 +2,7 @@
 name: get-output-build
 description: Fetch VectorShift pipeline outputs by task_id (or span_id) and pass them to a builder skill
 user_invocable: true
-arguments: "<task_id> [<task_id2> ...] --builder <skill_command>"
+arguments: '<task_id> [<task_id2> ...] --builder <skill_command>'
 allowed-tools: Read, Write, Edit, Shell, Glob, Grep
 ---
 
@@ -19,12 +19,14 @@ Fetches completed VectorShift pipeline outputs using task_id(s) and chains them 
 ```
 
 **Examples:**
+
 - `/get-output-build 6961e088862a01eeb682196b --builder "/process-ngm-lectures 1-OeTj2AseENWJFN-0jKz8tZqFDkLsFR2 --module-id module-1"`
 - `/get-output-build task1 task2 task3 --builder "/process-ngm-lectures 1ABC123 --module-id foundations"`
 
 ## Required Configuration
 
 ### Environment Variables
+
 ```bash
 VECTORSHIFT_API_KEY=sk_6L1cRGLL5qN2d9rjViLVAFr6ATqE1OAE78L5bgYltWBkryoE
 ```
@@ -34,6 +36,7 @@ VECTORSHIFT_API_KEY=sk_6L1cRGLL5qN2d9rjViLVAFr6ATqE1OAE78L5bgYltWBkryoE
 ### Step 1: Fetch Pipeline Output
 
 For each `task_id`, make a GET request to:
+
 ```
 GET https://api.vectorshift.ai/v1/pipeline/6961308d6fdec16163ee0e2f/run/status/{task_id}
 Authorization: Bearer {VECTORSHIFT_API_KEY}
@@ -42,6 +45,7 @@ Authorization: Bearer {VECTORSHIFT_API_KEY}
 **Note:** `task_id` (from job submission) works interchangeably with `span_id` for status queries.
 
 **Response (completed):**
+
 ```json
 {
   "task_id": "...",
@@ -60,7 +64,7 @@ Authorization: Bearer {VECTORSHIFT_API_KEY}
 
 The pipeline returns multiple outputs. The key output for lecture building is `lecture_json`.
 
-```python
+````python
 import json
 import re
 
@@ -73,16 +77,17 @@ def extract_json(raw_output):
         content = content[3:]
     if content.endswith('```'):
         content = content[:-3]
-    
+
     match = re.search(r'\{[\s\S]*\}', content)
     if match:
         return json.loads(match.group())
     return None
-```
+````
 
 ### Step 3: Pass to Builder Skill
 
 The fetched outputs are passed to the builder skill command. The builder skill receives:
+
 - The extracted `lecture_json` data
 - Any additional parameters from the original command
 
@@ -120,13 +125,13 @@ This creates JSON files for each task_id in the output directory.
 
 ## Error Handling
 
-| Status | Action |
-|--------|--------|
-| `completed` | Extract `result` and continue |
+| Status        | Action                          |
+| ------------- | ------------------------------- |
+| `completed`   | Extract `result` and continue   |
 | `in_progress` | Wait and retry (poll every 10s) |
-| `failed` | Log error and skip this task_id |
-| HTTP 404 | Invalid task_id, skip |
-| HTTP 401 | Invalid API key |
+| `failed`      | Log error and skip this task_id |
+| HTTP 404      | Invalid task_id, skip           |
+| HTTP 401      | Invalid API key                 |
 
 ## Integration with process-ngm-lectures
 
@@ -140,27 +145,28 @@ When using with `/process-ngm-lectures`, the workflow becomes:
 ### Bypassing Google Drive
 
 This skill is useful when:
+
 - Pipeline jobs were submitted earlier and you have the task_ids
 - You want to resume a failed run using cached task_ids
 - Pipeline outputs are ready but weren't processed
 
 ## File Locations
 
-| File | Purpose |
-|------|---------|
-| `.claude/skills/get-output-build/SKILL.md` | This documentation |
-| `.claude/skills/get-output-build/fetch_outputs.py` | Output fetching script |
-| `content/ngm-lectures/{module-id}/` | Where lecture JSONs are saved |
-| `content/ngm-lectures/registry.ts` | Module/lecture registry |
+| File                                               | Purpose                       |
+| -------------------------------------------------- | ----------------------------- |
+| `.claude/skills/get-output-build/SKILL.md`         | This documentation            |
+| `.claude/skills/get-output-build/fetch_outputs.py` | Output fetching script        |
+| `content/ngm-lectures/{module-id}/`                | Where lecture JSONs are saved |
+| `content/ngm-lectures/registry.ts`                 | Module/lecture registry       |
 
 ## API Details
 
-| Property | Value |
-|----------|-------|
-| Base URL | `https://api.vectorshift.ai/v1` |
-| Pipeline ID | `6961308d6fdec16163ee0e2f` |
+| Property        | Value                                     |
+| --------------- | ----------------------------------------- |
+| Base URL        | `https://api.vectorshift.ai/v1`           |
+| Pipeline ID     | `6961308d6fdec16163ee0e2f`                |
 | Status Endpoint | `GET /pipeline/{id}/run/status/{task_id}` |
-| Auth | `Authorization: Bearer {api_key}` |
+| Auth            | `Authorization: Bearer {api_key}`         |
 
 **Note:** `task_id` and `span_id` are interchangeable in the status endpoint.
 
@@ -182,11 +188,11 @@ Step 2: Extracting lecture JSON data...
 
 Step 3: Executing builder command...
   Running: /process-ngm-lectures (skip to Phase 4)
-  
+
   Saving lecture JSON files...
     Saved: content/ngm-lectures/module-1/cellular-senescence-and-the-sasp.json
     Saved: content/ngm-lectures/module-1/the-shift-framework.json
-  
+
   Updating registry.ts...
     Added 2 imports
     Updated module-1 entry

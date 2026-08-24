@@ -228,13 +228,13 @@ Do NOT search the skill library for other design guidance — everything is here
 
 Then route to the FUNCTIONAL reference for the task:
 
-| Task | Read |
-|---|---|
+| Task                                                                                                 | Read                                                                                                       |
+| ---------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- |
 | Scrollable world / continuous camera journey / diorama fly-through / browse-through-an-industry site | `references/scroll-scrub.md` — seam-locked media pipeline + React/CSS Markdown assets + mobile/QA contract |
-| TanStack Start routes, SSR, server functions, Cloudflare Worker runtime | `references/runtime-and-infra.md` |
-| Cover / OG image ("cover", "обложка", "OG image", publish prep) | `references/app-cover.md` — branded 3:2 cover + capsule OG mask |
-| SEO: meta tags, OG/Twitter cards, robots/sitemap, JSON-LD, entity, GEO, audit | `references/seo.md` |
-| Security: Worker hardening, OWASP audit, threat modeling | `references/security.md` |
+| TanStack Start routes, SSR, server functions, Cloudflare Worker runtime                              | `references/runtime-and-infra.md`                                                                          |
+| Cover / OG image ("cover", "обложка", "OG image", publish prep)                                      | `references/app-cover.md` — branded 3:2 cover + capsule OG mask                                            |
+| SEO: meta tags, OG/Twitter cards, robots/sitemap, JSON-LD, entity, GEO, audit                        | `references/seo.md`                                                                                        |
+| Security: Worker hardening, OWASP audit, threat modeling                                             | `references/security.md`                                                                                   |
 
 ## Stack
 
@@ -251,7 +251,6 @@ Then route to the FUNCTIONAL reference for the task:
   functions** (`createServerFn`) and **server routes**. App-local API routes are
   allowed when a platform contract requires them (for example a webhook
   receiver or a JSON endpoint the site's own client fetches).
-
 
 ## Hard rules
 
@@ -296,18 +295,22 @@ the community feed is separate: do NOT run `higgsfield website publish` unless
 the user explicitly asks to publish, list, or share the site. Never hard-code
 `HF_DESIGN_INSPECTOR=1` into the `build` script and never hand-edit the build
 script to toggle it — the deploy build is CI-owned.
+
 ### 1. SSR-safe rendering
+
 Every route renders on the server per request. NEVER touch browser-only globals
 (`window`, `document`, `localStorage`, `navigator`) at module top level or during
 render — only inside `useEffect`/event handlers, or guarded with
 `typeof window !== "undefined"`. A top-level `window` reference crashes SSR.
 
 ### 2. Server-only code stays server-only
+
 Put server logic in `createServerFn(...).handler(...)` or a `*.server.ts` module
 (the `.server.ts` suffix keeps it out of the client bundle). Secrets and
 bindings are read **server-side, per request** — never shipped to the browser.
 
 ### 3. No Higgsfield integration — but a REAL backend of the site's own
+
 A `type: "website"` product never calls `https://fnf.internal/*`, never shows
 "Sign in with Higgsfield", and never imports the fnf SDK. It still gets a real
 backend wherever the product needs one: server functions (`createServerFn`),
@@ -318,6 +321,7 @@ website's own routes/storage. If the request needs generation or Higgsfield
 accounts, it is a `type: "app"` — switch to `references/app-flow.md`.
 
 ### 4. Cloudflare bindings via `cloudflare:workers`
+
 Any infra you opt into (D1 `DB`, R2 `STORAGE`, KV `KV`) is read server-side
 through `app/src/lib/bindings.server.ts` (`import { env } from "cloudflare:workers"`).
 Each binding is present ONLY if declared in `app/app.manifest.json`, so the typed
@@ -325,9 +329,11 @@ accessors are optional — guard before use. Do not thread `env` through React
 props or read it at module top level.
 
 ### 5. Opted-in storage is LIVE — one deploy, one database
+
 If you opt into D1, R2, or KV, each is a SINGLE instance backing the ONE live
 deploy. There is no staging copy: every migration and data change hits **live
 production data** directly.
+
 - `env.HF_ENV` is always `"production"` on deployed builds; there is no
   separate database/bucket to test against.
 - A destructive migration you run "just to test" destroys **production data**.
@@ -335,8 +341,10 @@ production data** directly.
   get explicit user approval before any destructive change.
 
 ### 6. `app/app.manifest.json` declares infra — NOTHING is provisioned by default
+
 A new website gets **no D1, no R2, no KV, no Durable Object**. Opt in only when
 the website actually needs it:
+
 - `"db": true` → a D1 database, bound `env.DB`
 - `"r2": true` → an R2 bucket, bound `env.STORAGE`
 - `"kv": true` → a KV namespace, bound `env.KV`
@@ -364,6 +372,7 @@ Dockerfile, the platform-fixed `AppContainer` class, keep-alive + 3-hour-deadlin
 pattern, fnf via container token). Containers are **off by default**.
 
 ## Editing map
+
 - Pages / routing → `app/src/routes/**` (file-based; `__root.tsx` is the shell).
 - Server logic → `createServerFn` (see `app/src/lib/api/example.functions.ts`) or
   `*.server.ts`.
@@ -437,12 +446,14 @@ separate credit decision; only the cover VIDEO (6) needs permission.)
 WITHOUT a feed listing.
 
 **Run the local checks only when you actually need them** — from `app/`:
+
 ```bash
 cd app
 bun install          # only when you changed dependencies / package.json
 bun run typecheck    # tsc --noEmit — only to chase a type error on deploy
 bun run build        # local build — only to chase a build error on deploy
 ```
+
 Run them when: you changed dependencies or build/runtime config, you're debugging
 a build/type error, or a command genuinely needs `node_modules`.
 

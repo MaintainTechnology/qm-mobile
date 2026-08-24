@@ -1,8 +1,8 @@
 # Lift-Test Templates
 
 Stage 5b of `SKILL.md` requires a concrete measurement plan for any paid spend. Platforms
-report *attributed* conversions — conversions correlated with an ad view. What the user
-needs is *incremental* conversions — conversions that would not have happened without
+report _attributed_ conversions — conversions correlated with an ad view. What the user
+needs is _incremental_ conversions — conversions that would not have happened without
 the ad. The gap between these two numbers is often the entire ad spend.
 
 ## Why platform ROAS cannot be trusted
@@ -14,7 +14,7 @@ person scrolled past an ad in the last N days. This is why meta-analyses of ad-e
 experiments consistently show that attributed ROAS overstates incremental ROAS by 2–10×.
 
 The academic evidence is sharper still. Lewis & Rao's "The Unfavorable Economics of
-Measuring the Returns to Advertising" (*Quarterly Journal of Economics*, 2015) ran 25
+Measuring the Returns to Advertising" (_Quarterly Journal of Economics_, 2015) ran 25
 large-scale digital ad field experiments and showed that even well-powered tests often
 cannot statistically distinguish the campaign's true ROI from zero — the confidence
 intervals are wider than the effect sizes almost every advertiser wants to claim. In
@@ -23,7 +23,7 @@ work better than not running them. The dashboard showing "4.2× ROAS" is describ
 activity, not causality.
 
 Platforms know this. Both Meta (Conversion Lift, Brand Lift) and Google (Conversion Lift,
-Search Lift) ship holdout-based experimentation tools *themselves*. The fact that the
+Search Lift) ship holdout-based experimentation tools _themselves_. The fact that the
 platforms distinguish "attributed" from "incremental" in their own product naming is the
 tacit admission. Use their tools, or build your own (Templates 1–3 below). When a user
 pushes back on the discipline — "my ads are working, I can see the numbers" — cite Lewis
@@ -46,7 +46,7 @@ natural geographic segmentation.
 3. **Run the paid campaign only in the test region for at least 4 weeks.** Shorter
    durations produce noisy results; longer durations confound with seasonality.
 4. **Measure the outcome metric in both regions before, during, and after the
-   campaign.** Outcome metric should be *real* (sales, signups, donations, votes, attendance),
+   campaign.** Outcome metric should be _real_ (sales, signups, donations, votes, attendance),
    not platform-reported (clicks, impressions, attributed conversions).
 5. **Compute the lift.** Lift = (test region post-campaign − test region baseline) −
    (holdout region post-campaign − holdout region baseline). This difference-in-differences
@@ -137,7 +137,7 @@ underpowered.
 
 - Budgets too small for statistical lift tests.
 - Campaigns where the downside of a noisy estimate is acceptable.
-- As a *supplementary* signal alongside a formal test, not a replacement.
+- As a _supplementary_ signal alongside a formal test, not a replacement.
 
 ## Anti-patterns to refuse
 
@@ -158,8 +158,8 @@ The skill should refuse to accept these as measurement plans and explain why:
 The organic-traction gate from `channel-tier-stack.md` (do not boost a post until it has
 demonstrated organic signal) and the lift tests here are complementary, not redundant.
 
-- The **organic gate** decides *what to boost* — only proven winners.
-- The **lift test** decides *whether boosting works at all* at meaningful scale.
+- The **organic gate** decides _what to boost_ — only proven winners.
+- The **lift test** decides _whether boosting works at all_ at meaningful scale.
 
 A campaign running both disciplines will burn less budget on ineffective spend than a
 campaign running either alone.
@@ -170,6 +170,7 @@ In Stage 5b of `SKILL.md`, produce a specific, named experiment from one of thes
 Not "set up some form of lift testing." A template like:
 
 > **Geo-holdout: 4-week experiment**
+>
 > - Test region: Budapest (run all paid Meta spend here)
 > - Holdout region: Debrecen (no paid spend)
 > - Metric: newsletter signups (daily count pulled from Supabase)
@@ -193,7 +194,7 @@ result directly below it anyway. Brand-keyword ad spend was substantially cannib
 free traffic — paying for clicks that would have happened for free.
 
 This is one of the single most reliable ways established brands waste paid budget.
-Platform-reported ROAS on brand keywords is always excellent *because* the traffic would
+Platform-reported ROAS on brand keywords is always excellent _because_ the traffic would
 have converted regardless. The lift vs. no-ad condition is the honest number.
 
 ### Design
@@ -206,7 +207,7 @@ have converted regardless. The lift vs. no-ad condition is the honest number.
 3. **Pause brand-keyword bidding in the test region for 4 weeks.** Keep all other paid
    campaigns running identically in both regions. Keep all organic SEO identical.
 4. **Measure total conversions** (signups, purchases, whatever matters) in both regions —
-   *not* just paid conversions. The question is whether total business output changes, not
+   _not_ just paid conversions. The question is whether total business output changes, not
    whether paid-attributed conversions change (of course they will, to zero).
 5. **Compare the difference-in-differences.** Did total conversions drop in the test
    region relative to the control region?
@@ -253,7 +254,7 @@ measurement is still mandatory. Without source-level attribution, the user canno
 whether LinkedIn is driving the campaign or the newsletter is, which means they cannot
 cut the weakest channel or redouble on the strongest one.
 
-This template substitutes *between-channel* comparison for *with-vs-without* comparison.
+This template substitutes _between-channel_ comparison for _with-vs-without_ comparison.
 It is directionally useful, not causally conclusive. Say that out loud — the user
 should not treat these numbers as proof of lift, only as proof of relative organic channel
 strength.
@@ -264,7 +265,7 @@ strength.
    newsletter link, every podcast-show-notes mention, every QR code on a flyer, every
    referral link. Naming scheme: `utm_source=<channel>` (linkedin, newsletter, podcast-
    <show-slug>, referral-<advocate>), `utm_medium=organic`, `utm_campaign=<campaign-
-   name>`.
+name>`.
 2. **Set up segmented landing-page analytics.** The conversion (application submitted,
    newsletter signup, event registration, donation) must be tracked by UTM source. Most
    analytics tools (Plausible, PostHog, Simple Analytics, Supabase + custom) handle this
@@ -291,7 +292,7 @@ strength.
 
 ### Caveat — this is directional, not causal
 
-Without a randomized holdout, you cannot prove any channel *caused* its conversions
+Without a randomized holdout, you cannot prove any channel _caused_ its conversions
 versus correlating with a user who would have converted anyway. Someone who signed up
 via the newsletter link may have first heard about the event on LinkedIn and later
 clicked through an email — multi-touch attribution is underspecified in this template.

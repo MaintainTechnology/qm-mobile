@@ -13,9 +13,7 @@ Data tables are one of the most common UI patterns in enterprise and admin appli
   <thead>
     <tr>
       <th scope="col" aria-sort="ascending">
-        <button class="sort-button">
-          Name <span class="sort-icon">↑</span>
-        </button>
+        <button class="sort-button">Name <span class="sort-icon">↑</span></button>
       </th>
       <th scope="col">Email</th>
       <th scope="col">Role</th>
@@ -88,7 +86,7 @@ function initColumnResize(table) {
 
     let startX, startWidth;
 
-    resizer.addEventListener('mousedown', (e) => {
+    resizer.addEventListener('mousedown', e => {
       startX = e.clientX;
       startWidth = header.offsetWidth;
       document.addEventListener('mousemove', handleMouseMove);
@@ -127,12 +125,12 @@ function initColumnResize(table) {
 
 ### Responsive Table Strategies
 
-| Strategy | When to Use |
-|----------|-------------|
-| Horizontal scroll | Many columns, data must stay tabular |
-| Column hiding | Secondary columns can be hidden on mobile |
-| Card layout | Reflow rows into stacked cards below breakpoint |
-| Priority columns | Show only high-priority columns, expand for more |
+| Strategy          | When to Use                                      |
+| ----------------- | ------------------------------------------------ |
+| Horizontal scroll | Many columns, data must stay tabular             |
+| Column hiding     | Secondary columns can be hidden on mobile        |
+| Card layout       | Reflow rows into stacked cards below breakpoint  |
+| Priority columns  | Show only high-priority columns, expand for more |
 
 #### Card Reflow Pattern
 
@@ -186,12 +184,12 @@ function initColumnResize(table) {
 
 #### Sort State Indicators
 
-| Symbol | Meaning |
-|--------|---------|
-| ↑ | Sorted ascending |
-| ↓ | Sorted descending |
-| ↕ | Sortable (click to sort) |
-| (none) | Not sortable |
+| Symbol | Meaning                  |
+| ------ | ------------------------ |
+| ↑      | Sorted ascending         |
+| ↓      | Sorted descending        |
+| ↕      | Sortable (click to sort) |
+| (none) | Not sortable             |
 
 #### Best Practices
 
@@ -218,14 +216,14 @@ function initColumnResize(table) {
 
 ### Filter Types by Data
 
-| Data Type | Filter UI |
-|-----------|-----------|
-| Text | Search input (debounced, 300ms) |
-| Enum/Category | Dropdown or checkbox group |
-| Boolean | Toggle switch |
-| Date | Date range picker |
-| Number | Range slider or min/max inputs |
-| Tags | Multi-select with typeahead |
+| Data Type     | Filter UI                       |
+| ------------- | ------------------------------- |
+| Text          | Search input (debounced, 300ms) |
+| Enum/Category | Dropdown or checkbox group      |
+| Boolean       | Toggle switch                   |
+| Date          | Date range picker               |
+| Number        | Range slider or min/max inputs  |
+| Tags          | Multi-select with typeahead     |
 
 ### Filter Placement
 
@@ -278,6 +276,7 @@ How should users navigate through data?
 ```
 
 **Pagination best practices:**
+
 - Show current range ("Showing 1-25 of 156")
 - Allow page size selection (10, 25, 50, 100)
 - Show first/last page links for long ranges
@@ -288,18 +287,19 @@ How should users navigate through data?
 
 ```javascript
 const observer = new IntersectionObserver(
-  (entries) => {
+  entries => {
     if (entries[0].isIntersecting) {
       loadNextPage();
     }
   },
-  { rootMargin: '200px' } // Trigger 200px before reaching end
+  { rootMargin: '200px' }, // Trigger 200px before reaching end
 );
 
 observer.observe(document.querySelector('.load-trigger'));
 ```
 
 **Infinite scroll best practices:**
+
 - Show loading indicator at bottom during fetch
 - Preserve scroll position on back navigation
 - Provide "Back to top" button after scrolling
@@ -314,21 +314,19 @@ Only render rows visible in the viewport.
 // Virtual scroll concept
 function getVisibleRows(scrollTop, viewportHeight, rowHeight, totalRows) {
   const startIndex = Math.floor(scrollTop / rowHeight);
-  const endIndex = Math.min(
-    startIndex + Math.ceil(viewportHeight / rowHeight) + 1,
-    totalRows
-  );
+  const endIndex = Math.min(startIndex + Math.ceil(viewportHeight / rowHeight) + 1, totalRows);
 
   return {
     startIndex,
     endIndex,
     offsetY: startIndex * rowHeight,
-    totalHeight: totalRows * rowHeight
+    totalHeight: totalRows * rowHeight,
   };
 }
 ```
 
 **Virtual scrolling best practices:**
+
 - Keep row height consistent or measure dynamically
 - Render buffer rows above and below viewport (5-10 rows)
 - Show scroll position indicator for long lists
@@ -354,12 +352,12 @@ function getVisibleRows(scrollTop, viewportHeight, rowHeight, totalRows) {
 
 ### Selection Interactions
 
-| Action | Behavior |
-|--------|----------|
-| Click checkbox | Toggle individual row |
-| Shift + Click | Select range from last selected |
+| Action          | Behavior                            |
+| --------------- | ----------------------------------- |
+| Click checkbox  | Toggle individual row               |
+| Shift + Click   | Select range from last selected     |
 | Header checkbox | Select/deselect all on current page |
-| "Select all N" | Select across all pages |
+| "Select all N"  | Select across all pages             |
 
 ### Bulk Action Bar
 
@@ -378,6 +376,7 @@ function getVisibleRows(scrollTop, viewportHeight, rowHeight, totalRows) {
 ```
 
 **Best practices:**
+
 - Show bulk action bar only when items are selected
 - Display count of selected items
 - Require confirmation for destructive bulk actions
@@ -404,6 +403,7 @@ function getVisibleRows(scrollTop, viewportHeight, rowHeight, totalRows) {
 ```
 
 **Best practices:**
+
 - Use chevron (▶/▼) to indicate expandability
 - Expand only one row at a time (accordion) or allow multiple
 - Keep expanded content visually connected to the parent row
@@ -423,7 +423,7 @@ function enableInlineEdit(cell) {
   input.select();
 
   input.addEventListener('blur', () => saveEdit(cell, input.value, currentValue));
-  input.addEventListener('keydown', (e) => {
+  input.addEventListener('keydown', e => {
     if (e.key === 'Enter') input.blur();
     if (e.key === 'Escape') {
       input.value = currentValue;
@@ -445,6 +445,7 @@ function enableInlineEdit(cell) {
 ```
 
 **Inline edit guidelines:**
+
 - Double-click or click edit icon to activate
 - Show clear visual change (border, background) when in edit mode
 - Save on blur or Enter, cancel on Escape
@@ -471,12 +472,12 @@ function enableInlineEdit(cell) {
 └──────────────────────────────────────────────────────────────┘
 ```
 
-| Empty State Type | Message Pattern |
-|-----------------|-----------------|
-| No data yet | Explain what will appear + CTA to create first item |
-| No search results | Acknowledge query + suggest adjustments |
-| Filtered to empty | Show active filters + "Clear filters" button |
-| Error loading | Explain what happened + "Retry" button |
+| Empty State Type  | Message Pattern                                     |
+| ----------------- | --------------------------------------------------- |
+| No data yet       | Explain what will appear + CTA to create first item |
+| No search results | Acknowledge query + suggest adjustments             |
+| Filtered to empty | Show active filters + "Clear filters" button        |
+| Error loading     | Explain what happened + "Retry" button              |
 
 ### Loading Skeletons
 
@@ -494,17 +495,29 @@ function enableInlineEdit(cell) {
   border-radius: 4px;
 }
 
-.skeleton-cell--name { width: 150px; }
-.skeleton-cell--email { width: 200px; }
-.skeleton-cell--status { width: 80px; }
+.skeleton-cell--name {
+  width: 150px;
+}
+.skeleton-cell--email {
+  width: 200px;
+}
+.skeleton-cell--status {
+  width: 80px;
+}
 
 @keyframes skeleton-pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.4; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.4;
+  }
 }
 ```
 
 **Loading best practices:**
+
 - Show skeleton that matches table structure (column widths)
 - Show 5-10 skeleton rows regardless of expected count
 - Transition smoothly from skeleton to real data
@@ -563,27 +576,27 @@ function enableInlineEdit(cell) {
 
 ### Keyboard Navigation
 
-| Key | Action |
-|-----|--------|
-| Tab | Move to next interactive element |
-| Shift + Tab | Move to previous interactive element |
-| Enter / Space | Activate button, toggle checkbox, start inline edit |
-| Escape | Cancel inline edit, close dropdown |
-| Arrow keys | Navigate within dropdowns or between rows (if using `role="grid"`) |
+| Key           | Action                                                             |
+| ------------- | ------------------------------------------------------------------ |
+| Tab           | Move to next interactive element                                   |
+| Shift + Tab   | Move to previous interactive element                               |
+| Enter / Space | Activate button, toggle checkbox, start inline edit                |
+| Escape        | Cancel inline edit, close dropdown                                 |
+| Arrow keys    | Navigate within dropdowns or between rows (if using `role="grid"`) |
 
 ---
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Rows per page default | 25 | Balance between scanning and loading |
-| Max visible columns | 7-10 | Before horizontal scroll or hiding |
-| Search debounce | 300ms | Delay before triggering search |
-| Skeleton rows | 5-10 | During initial load |
-| Column min width | 60px | Minimum resizable width |
-| Row height | 40-52px | Comfortable click/tap target |
-| Bulk action confirm | Always | For destructive operations |
+| Metric                | Value   | Context                              |
+| --------------------- | ------- | ------------------------------------ |
+| Rows per page default | 25      | Balance between scanning and loading |
+| Max visible columns   | 7-10    | Before horizontal scroll or hiding   |
+| Search debounce       | 300ms   | Delay before triggering search       |
+| Skeleton rows         | 5-10    | During initial load                  |
+| Column min width      | 60px    | Minimum resizable width              |
+| Row height            | 40-52px | Comfortable click/tap target         |
+| Bulk action confirm   | Always  | For destructive operations           |
 
 ---
 

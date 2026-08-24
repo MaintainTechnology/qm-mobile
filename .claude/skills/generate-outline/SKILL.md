@@ -16,28 +16,29 @@ Generate a comprehensive course outline and research dossier from a topic and re
 ```
 
 **Examples:**
+
 - `/generate-outline "Cardiovascular Longevity" --materials "course materials/"`
 - `/generate-outline "Peptide Therapy Fundamentals" --materials "/path/to/materials/" --dry-run`
 - `/generate-outline "Topic" --materials "/materials/" --outline existing_outline.md`
 
 ## Supported File Types
 
-| Extension | Type | Processing |
-|-----------|------|------------|
-| `.pdf` | PDF | Compress only |
-| `.pptx`, `.ppt` | PowerPoint | Convert to PDF, then compress |
-| `.docx`, `.doc` | Word | Convert to PDF, then compress |
-| `.xlsx`, `.xls` | Excel | Convert to PDF, then compress |
-| `.odt` | OpenDocument Text | Convert to PDF, then compress |
-| `.odp` | OpenDocument Presentation | Convert to PDF, then compress |
-| `.ods` | OpenDocument Spreadsheet | Convert to PDF, then compress |
+| Extension       | Type                      | Processing                    |
+| --------------- | ------------------------- | ----------------------------- |
+| `.pdf`          | PDF                       | Compress only                 |
+| `.pptx`, `.ppt` | PowerPoint                | Convert to PDF, then compress |
+| `.docx`, `.doc` | Word                      | Convert to PDF, then compress |
+| `.xlsx`, `.xls` | Excel                     | Convert to PDF, then compress |
+| `.odt`          | OpenDocument Text         | Convert to PDF, then compress |
+| `.odp`          | OpenDocument Presentation | Convert to PDF, then compress |
+| `.ods`          | OpenDocument Spreadsheet  | Convert to PDF, then compress |
 
 ## Requirements
 
-| Tool | Install Command | Purpose |
-|------|-----------------|---------|
+| Tool        | Install Command                   | Purpose                         |
+| ----------- | --------------------------------- | ------------------------------- |
 | LibreOffice | `brew install --cask libreoffice` | Convert PPTX, DOCX, etc. to PDF |
-| Ghostscript | `brew install ghostscript` | Compress PDFs >5MB |
+| Ghostscript | `brew install ghostscript`        | Compress PDFs >5MB              |
 
 ## Execution Instructions
 
@@ -60,6 +61,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/outline_creator_runner
 ## When to Use This Skill
 
 Use this skill when the user:
+
 - Wants to create a course outline from reference materials
 - Has PowerPoint presentations, Word docs, or PDFs to process
 - Has large files (>5MB) that need compression before upload
@@ -69,14 +71,15 @@ Use this skill when the user:
 
 ## Pipeline Information
 
-| Property | Value |
-|----------|-------|
-| Pipeline ID | `695f56da724cd19d980e4f1d` |
+| Property      | Value                                                 |
+| ------------- | ----------------------------------------------------- |
+| Pipeline ID   | `695f56da724cd19d980e4f1d`                            |
 | Pipeline Name | Course Outline Creator v3 (Parallel Batch Processing) |
-| Module | `vs_pipelines/course_outline_creator_v3.py` |
-| CLI Helper | `cli/outline_creator_runner.py` |
+| Module        | `vs_pipelines/course_outline_creator_v3.py`           |
+| CLI Helper    | `cli/outline_creator_runner.py`                       |
 
 ### Architecture
+
 ```
 Materials → [4 Parallel Extractors] → [Combiner] → [Perplexity] → [Outline]
 ```
@@ -94,6 +97,7 @@ Files are automatically split into 4 batches for parallel processing, preventing
 ### Step 1: Gather Information
 
 Ask the user for:
+
 - Course topic (required)
 - Path to materials folder (required)
 - Existing outline file to revise (optional)
@@ -111,6 +115,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/outline_creator_runner
 ```
 
 This shows:
+
 - Total number of files found
 - File sizes and what will happen to each (convert, compress, or both)
 - Tool availability (LibreOffice, Ghostscript)
@@ -126,6 +131,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/outline_creator_runner
 ```
 
 Options:
+
 - `--outline <file>` - Existing outline to revise
 - `--output <folder>` - Custom output folder
 - `--pipeline-id <id>` - Override pipeline ID
@@ -133,6 +139,7 @@ Options:
 ### Step 4: Report Results
 
 After completion, show the user:
+
 - Location of output files
 - Duration
 - Any errors or warnings
@@ -141,11 +148,11 @@ After completion, show the user:
 
 Generated files are saved to `outputs/outlines/{topic_name}/`:
 
-| File | Content |
-|------|---------|
+| File                  | Content                                                 |
+| --------------------- | ------------------------------------------------------- |
 | `extracted_topics.md` | Research brief extracted from materials (for debugging) |
-| `course_dossier.md` | Deep research dossier from Perplexity |
-| `course_outline.md` | Structured 10-15 lecture curriculum |
+| `course_dossier.md`   | Deep research dossier from Perplexity                   |
+| `course_outline.md`   | Structured 10-15 lecture curriculum                     |
 
 ## File Processing Pipeline
 
@@ -157,23 +164,23 @@ PPTX/DOCX/etc. ──[LibreOffice]──> PDF ──[Ghostscript]──> Compres
 ### Compression Stats
 
 | Original Size | Typical Compressed Size |
-|--------------|------------------------|
-| 10MB | 3-5MB |
-| 50MB | 10-20MB |
-| 100MB | 20-40MB |
+| ------------- | ----------------------- |
+| 10MB          | 3-5MB                   |
+| 50MB          | 10-20MB                 |
+| 100MB         | 20-40MB                 |
 
 **Compression quality:** `ebook` (150dpi) - balances quality and size
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Materials folder not found | Ask user for correct path |
-| No supported files found | Warn and ask if they want to proceed |
-| LibreOffice not found | Warn, skip conversion for non-PDFs |
-| Ghostscript not found | Warn about large uploads, proceed without compression |
-| API timeout | Retry 3x with 30s delay |
-| API rate limit (429) | Wait and retry with backoff |
+| Error                      | Action                                                |
+| -------------------------- | ----------------------------------------------------- |
+| Materials folder not found | Ask user for correct path                             |
+| No supported files found   | Warn and ask if they want to proceed                  |
+| LibreOffice not found      | Warn, skip conversion for non-PDFs                    |
+| Ghostscript not found      | Warn about large uploads, proceed without compression |
+| API timeout                | Retry 3x with 30s delay                               |
+| API rate limit (429)       | Wait and retry with backoff                           |
 
 ## Output Retrieval Fallback
 
@@ -202,6 +209,7 @@ See [vectorshift-pipeline-deployment.md](../vectorshift-pipeline-deployment.md#o
 ## Example Usage
 
 **Via slash command:**
+
 ```
 /generate-outline "Cardiovascular Longevity" --materials "course materials/"
 /generate-outline "Topic" --materials "/materials/" --dry-run

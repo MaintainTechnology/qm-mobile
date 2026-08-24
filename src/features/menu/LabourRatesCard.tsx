@@ -132,7 +132,10 @@ export function LabourRatesCard({
       saving={save.isPending}
       error={
         save.isError
-          ? apiErrorMessage(save.error, 'Couldn’t reach QuoteMax — check your connection and try again.')
+          ? apiErrorMessage(
+              save.error,
+              'Couldn’t reach QuoteMax — check your connection and try again.',
+            )
           : save.data?.ok === false
             ? 'That didn’t save — try again.'
             : null

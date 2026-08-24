@@ -5,6 +5,7 @@ A Claude Code skill for writing educational sales content that teaches first and
 ## What is EduSales?
 
 EduSales content combines genuine education with native product promotion. Instead of pushy sales copy, you create content that:
+
 - Delivers real value through teaching
 - Builds trust and authority
 - Positions your product as the natural solution

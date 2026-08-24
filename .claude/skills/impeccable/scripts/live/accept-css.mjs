@@ -38,7 +38,9 @@ export function parseStylesheet(css, offset = 0) {
   const nodes = [];
   let i = 0;
 
-  const skipWs = () => { while (i < text.length && /\s/.test(text[i])) i++; };
+  const skipWs = () => {
+    while (i < text.length && /\s/.test(text[i])) i++;
+  };
 
   while (i < text.length) {
     skipWs();
@@ -48,7 +50,12 @@ export function parseStylesheet(css, offset = 0) {
       const start = i;
       const close = text.indexOf('*/', i + 2);
       i = close === -1 ? text.length : close + 2;
-      nodes.push({ type: 'comment', text: text.slice(start, i), start: offset + start, end: offset + i });
+      nodes.push({
+        type: 'comment',
+        text: text.slice(start, i),
+        start: offset + start,
+        end: offset + i,
+      });
       continue;
     }
 
@@ -192,9 +199,12 @@ export function serializeNodes(nodes, indent = '') {
 function formatBody(body, indent) {
   const trimmed = String(body || '').trim();
   if (!trimmed) return ' ';
-  const lines = trimmed.split('\n').map((l) => l.trim()).filter(Boolean);
+  const lines = trimmed
+    .split('\n')
+    .map(l => l.trim())
+    .filter(Boolean);
   if (lines.length === 1 && lines[0].length < 60) return ` ${lines[0]} `;
-  return '\n' + lines.map((l) => `${indent}  ${l}`).join('\n') + `\n${indent}`;
+  return '\n' + lines.map(l => `${indent}  ${l}`).join('\n') + `\n${indent}`;
 }
 
 export function normalizeSelector(prelude) {
@@ -252,7 +262,7 @@ export function reconcileCss(existingCss, variantCss) {
           // cascade over the stylesheet's earlier responsive overrides and
           // silently weakens the mobile styles for any still-shared class.
           const appendedNode = { ...node };
-          const firstAt = existingNodes.findIndex((n) => n.type === 'at' && n.children);
+          const firstAt = existingNodes.findIndex(n => n.type === 'at' && n.children);
           if (firstAt === -1) existingNodes.push(appendedNode);
           else existingNodes.splice(firstAt, 0, appendedNode);
           index.set(key, appendedNode);
@@ -296,7 +306,10 @@ export function substituteParamVar(css, id, value) {
   let i = 0;
   while (i < text.length) {
     const idx = text.indexOf(needle, i);
-    if (idx === -1) { out += text.slice(i); break; }
+    if (idx === -1) {
+      out += text.slice(i);
+      break;
+    }
     const after = idx + needle.length;
     // Must be end of the var name: `)` or `,`.
     if (after < text.length && text[after] !== ')' && text[after] !== ',') {
@@ -318,7 +331,9 @@ export function substituteParamVar(css, id, value) {
 }
 
 function normalizeToggleForVar(value) {
-  return value === true || value === 'true' || value === 1 || value === '1' || value === 'on' ? '1' : '0';
+  return value === true || value === 'true' || value === 1 || value === '1' || value === 'on'
+    ? '1'
+    : '0';
 }
 
 function isToggleOn(value) {
@@ -385,7 +400,7 @@ export function bakeParamValues(css, params = [], values = {}) {
     if (!chosen.has(id)) chosen.set(id, { kind: 'range', value });
   }
 
-  const bakeBody = (body) => {
+  const bakeBody = body => {
     let out = String(body || '');
     for (const [id, { kind, value }] of chosen) {
       const literal = kind === 'toggle' ? normalizeToggleForVar(value) : String(value);
@@ -399,7 +414,7 @@ export function bakeParamValues(css, params = [], values = {}) {
       .replace(/^\s*;\s*/, '');
   };
 
-  const transform = (list) => {
+  const transform = list => {
     const result = [];
     for (const node of list) {
       if (node.type === 'at' && node.children) {
@@ -420,7 +435,10 @@ export function bakeParamValues(css, params = [], values = {}) {
           if (kind !== 'steps' && kind !== 'toggle') continue;
           if (!selector.includes(`data-p-${id}`)) continue;
           const next = stripParamSelector(selector, id, kind, value);
-          if (next == null) { alive = false; break; }
+          if (next == null) {
+            alive = false;
+            break;
+          }
           selector = next;
         }
         if (alive && selector.trim()) kept.push(selector.trim());
@@ -462,7 +480,7 @@ export function splitSelectorList(prelude) {
     }
   }
   selectors.push(text.slice(start));
-  return selectors.map((s) => s.trim()).filter(Boolean);
+  return selectors.map(s => s.trim()).filter(Boolean);
 }
 
 // ---------------------------------------------------------------------------
@@ -480,11 +498,16 @@ export function splitSelectorList(prelude) {
 export function collectUnusedSelectors(componentSource, compileFn) {
   try {
     const { warnings } = compileFn(String(componentSource || ''), { generate: false });
-    return new Set((warnings || [])
-      .filter((w) => w.code === 'css_unused_selector'
-        && Number.isInteger(w.start?.character)
-        && Number.isInteger(w.end?.character))
-      .map((w) => String(componentSource).slice(w.start.character, w.end.character).trim()));
+    return new Set(
+      (warnings || [])
+        .filter(
+          w =>
+            w.code === 'css_unused_selector' &&
+            Number.isInteger(w.start?.character) &&
+            Number.isInteger(w.end?.character),
+        )
+        .map(w => String(componentSource).slice(w.start.character, w.end.character).trim()),
+    );
   } catch {
     return new Set();
   }
@@ -502,10 +525,13 @@ export function pruneUnusedSelectors(componentSource, compileFn, { skipSelectors
       return { source, removed }; // never let pruning break an accept
     }
     const unused = (warnings || [])
-      .filter((w) => w.code === 'css_unused_selector'
-        && Number.isInteger(w.start?.character)
-        && Number.isInteger(w.end?.character))
-      .filter((w) => !skip.has(source.slice(w.start.character, w.end.character).trim()))
+      .filter(
+        w =>
+          w.code === 'css_unused_selector' &&
+          Number.isInteger(w.start?.character) &&
+          Number.isInteger(w.end?.character),
+      )
+      .filter(w => !skip.has(source.slice(w.start.character, w.end.character).trim()))
       .sort((a, b) => b.start.character - a.start.character);
     if (unused.length === 0) break;
 
@@ -543,10 +569,16 @@ function removeSelectorAt(source, start, end) {
   let preludeStart = start;
   for (let i = start - 1; i >= 0; i--) {
     const ch = source[i];
-    if (ch === '}' || ch === '{' || ch === ';') { preludeStart = i + 1; break; }
+    if (ch === '}' || ch === '{' || ch === ';') {
+      preludeStart = i + 1;
+      break;
+    }
     if (ch === '>') {
       const styleOpen = source.lastIndexOf('<style', i);
-      if (styleOpen !== -1 && source.indexOf('>', styleOpen) === i) { preludeStart = i + 1; break; }
+      if (styleOpen !== -1 && source.indexOf('>', styleOpen) === i) {
+        preludeStart = i + 1;
+        break;
+      }
       continue; // child combinator inside the prelude
     }
     if (i === 0) preludeStart = 0;
@@ -554,7 +586,7 @@ function removeSelectorAt(source, start, end) {
   const prelude = source.slice(preludeStart, braceIdx);
   const selectors = splitSelectorList(prelude);
   const target = selector.trim();
-  const kept = selectors.filter((s) => s !== target);
+  const kept = selectors.filter(s => s !== target);
 
   if (kept.length === selectors.length) {
     // Offsets did not line up with a full selector in the list; be safe.
@@ -566,15 +598,25 @@ function removeSelectorAt(source, start, end) {
     let ruleEnd = Math.min(source.length, bodyEnd + 1);
     while (ruleEnd < source.length && source[ruleEnd] === '\n') ruleEnd++;
     let ruleStart = preludeStart;
-    while (ruleStart > 0 && (source[ruleStart - 1] === ' ' || source[ruleStart - 1] === '\t')) ruleStart--;
-    return { changed: true, selector: target, source: source.slice(0, ruleStart) + source.slice(ruleEnd) };
+    while (ruleStart > 0 && (source[ruleStart - 1] === ' ' || source[ruleStart - 1] === '\t'))
+      ruleStart--;
+    return {
+      changed: true,
+      selector: target,
+      source: source.slice(0, ruleStart) + source.slice(ruleEnd),
+    };
   }
 
   const indent = (prelude.match(/^\s*/) || [''])[0];
   return {
     changed: true,
     selector: target,
-    source: source.slice(0, preludeStart) + indent + kept.join(', ') + ' ' + source.slice(braceIdx, source.length),
+    source:
+      source.slice(0, preludeStart) +
+      indent +
+      kept.join(', ') +
+      ' ' +
+      source.slice(braceIdx, source.length),
   };
 }
 
@@ -596,7 +638,8 @@ export function collectAllSelectors(css, out = new Set()) {
     } else if (node.type === 'at' && node.children) {
       for (const child of node.children) {
         if (child.type === 'rule') {
-          for (const selector of splitSelectorList(child.prelude)) out.add(normalizeSelector(selector));
+          for (const selector of splitSelectorList(child.prelude))
+            out.add(normalizeSelector(selector));
         } else if (child.type === 'at' && child.children) {
           collectSelectorsFromNodes(child.children, out);
         }

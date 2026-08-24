@@ -58,7 +58,7 @@ When the skill detects a blocker, output something like:
 >      playerRef.current?.pause();
 >      window.__hfRemotion = window.__hfRemotion || [];
 >      window.__hfRemotion.push({
->        seekTo: (f) => playerRef.current?.seekTo(f),
+>        seekTo: f => playerRef.current?.seekTo(f),
 >        pause: () => playerRef.current?.pause(),
 >        durationInFrames,
 >        fps,

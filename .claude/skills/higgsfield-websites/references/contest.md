@@ -18,7 +18,7 @@ user wants to enter (or asks what the contest is), this is the reference.
 - **Timeline (this round):** submissions open **Jul 8, 2026**, close **Jul 22,
   2026 (8:00 AM PT)**; judging Jul 22–29; winners announced **Jul 29, 2026**.
   Rankings refresh every 24h during the contest.
-- **No fixed theme** — build anything that gives people a reason to *create* on
+- **No fixed theme** — build anything that gives people a reason to _create_ on
   Higgsfield (productivity tools, games, image/video generators, novelty apps).
 
 ## How entering shapes what you build (bake this in from the start)

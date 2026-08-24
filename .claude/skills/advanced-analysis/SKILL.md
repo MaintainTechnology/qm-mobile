@@ -54,44 +54,44 @@ Stage 1: Base Report Generator
 
 ## Environment Variables
 
-| Variable | Required | Description |
-|----------|----------|-------------|
-| `ANTHROPIC_API_KEY_VS_ADVANCED_ANALYSIS` | Yes* | Anthropic API key for Claude Opus 4.6 |
-| `ANTHROPIC_API_KEY` | Fallback | Used if VS-specific key not set |
-| `VECTORSHIFT_API_KEY` | Yes | VectorShift API key for KB enrichment |
+| Variable                                 | Required | Description                           |
+| ---------------------------------------- | -------- | ------------------------------------- |
+| `ANTHROPIC_API_KEY_VS_ADVANCED_ANALYSIS` | Yes*     | Anthropic API key for Claude Opus 4.6 |
+| `ANTHROPIC_API_KEY`                      | Fallback | Used if VS-specific key not set       |
+| `VECTORSHIFT_API_KEY`                    | Yes      | VectorShift API key for KB enrichment |
 
 ## Pipeline Inputs
 
-| Field | Type | Default | Description |
-|-------|------|---------|-------------|
-| `primary_input` | str | required | Lab results text |
-| `language` | str | "English" | Target output language |
-| `overall_instructions` | str | "" | Clinic instructions, patient goals, intake data |
-| `other_files` | list[str] | [] | Parsed text from supplementary files |
+| Field                  | Type      | Default   | Description                                     |
+| ---------------------- | --------- | --------- | ----------------------------------------------- |
+| `primary_input`        | str       | required  | Lab results text                                |
+| `language`             | str       | "English" | Target output language                          |
+| `overall_instructions` | str       | ""        | Clinic instructions, patient goals, intake data |
+| `other_files`          | list[str] | []        | Parsed text from supplementary files            |
 
 ## Pipeline Outputs
 
-| Field | Type | Description |
-|-------|------|-------------|
-| `translated_report` | str | Full clinical report in target language |
-| `visual_html` | str | Visual HTML executive summary |
-| `base_report` | str | Raw Stage 1 output (for debugging) |
-| `enriched_report` | str | Stage 2 output (for debugging) |
-| `stage1_usage` | StageUsage | Token counts for base report |
-| `stage3a_usage` | StageUsage | Token counts for translation |
-| `stage3b_usage` | StageUsage | Token counts for visual report |
-| `success` | bool | Whether pipeline completed successfully |
-| `error` | str | Error message if failed |
+| Field               | Type       | Description                             |
+| ------------------- | ---------- | --------------------------------------- |
+| `translated_report` | str        | Full clinical report in target language |
+| `visual_html`       | str        | Visual HTML executive summary           |
+| `base_report`       | str        | Raw Stage 1 output (for debugging)      |
+| `enriched_report`   | str        | Stage 2 output (for debugging)          |
+| `stage1_usage`      | StageUsage | Token counts for base report            |
+| `stage3a_usage`     | StageUsage | Token counts for translation            |
+| `stage3b_usage`     | StageUsage | Token counts for visual report          |
+| `success`           | bool       | Whether pipeline completed successfully |
+| `error`             | str        | Error message if failed                 |
 
 ## Cost Estimate
 
-| Stage | Model | Est. Cost |
-|-------|-------|-----------|
-| Stage 1 | Claude Opus 4.6 | $1.50–$3.00 |
-| Stage 2 | VectorShift KB | ~$0.10 |
-| Stage 3a | Claude Opus 4.6 | $0.50–$1.50 |
-| Stage 3b | Claude Opus 4.6 | $1.00–$3.00 |
-| **Total** | | **$3.10–$7.60** |
+| Stage     | Model           | Est. Cost       |
+| --------- | --------------- | --------------- |
+| Stage 1   | Claude Opus 4.6 | $1.50–$3.00     |
+| Stage 2   | VectorShift KB  | ~$0.10          |
+| Stage 3a  | Claude Opus 4.6 | $0.50–$1.50     |
+| Stage 3b  | Claude Opus 4.6 | $1.00–$3.00     |
+| **Total** |                 | **$3.10–$7.60** |
 
 ## Module Structure
 

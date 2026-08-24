@@ -17,7 +17,7 @@ Fill in every section. Omit a section only if it genuinely does not apply, and i
 
 ## 1. Objective
 
-(The *why*. State the problem being solved, the goal, and who it is for. Two to four sentences. A reader should understand the point of this work without reading further.)
+(The _why_. State the problem being solved, the goal, and who it is for. Two to four sentences. A reader should understand the point of this work without reading further.)
 
 ## 2. Background & context
 
@@ -26,35 +26,43 @@ Fill in every section. Omit a section only if it genuinely does not apply, and i
 ## 3. Scope
 
 **In scope:**
+
 - (What this build will do.)
 
 **Out of scope:**
+
 - (What this build will explicitly NOT do — deferred or nice-to-have items. This prevents scope creep and clarifies the definition of done.)
 
 ## 4. Requirements
 
-(The *exact* requirements. Number them so they can be referenced. Each must be specific and testable. Mark must-haves; list nice-to-haves separately or under Open Questions.)
+(The _exact_ requirements. Number them so they can be referenced. Each must be specific and testable. Mark must-haves; list nice-to-haves separately or under Open Questions.)
 
 ### Functional requirements
+
 - **R1.** <requirement> — (e.g. "User can upload a PDF up to 25 MB via the dashboard.")
 - **R2.** <requirement>
 - ...
 
 ### Non-functional requirements
+
 (Only those that genuinely apply: performance, security, privacy, accessibility, scale, cost, reliability. Give numbers where possible.)
+
 - **N1.** <requirement> — (e.g. "p95 end-to-end response under 2s for a 10-page document.")
 - ...
 
 ### Inputs & outputs
+
 - **Inputs:** (shape, source, format, validation rules)
 - **Outputs:** (shape, destination, format)
 
 ## 5. Constraints & assumptions
 
 **Constraints:**
+
 - (Required/forbidden tech, frameworks, APIs; deadlines; dependencies on other work or people; environment limits.)
 
 **Assumptions:**
+
 - (What is taken as already true or already in place. Each was confirmed during the interview.)
 
 ## 6. Edge cases & failure handling
@@ -83,5 +91,6 @@ Fill in every section. Omit a section only if it genuinely does not apply, and i
 ## 8. Open questions
 
 (Anything unresolved or deferred. If none, write "None.")
+
 - ...
 ```

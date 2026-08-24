@@ -34,14 +34,15 @@ the one matching the project (look for `playwright.config.ts`/`package.json` →
 Node; `requirements.txt`/`pyproject.toml` + `pytest` → Python) and don't cross
 them.
 
-| Task | Node / TypeScript | Python |
-|---|---|---|
-| Install lib | `npm i -D @playwright/test` | `pip install playwright pytest-playwright` |
-| CLI form | **`npx playwright <cmd>`** | **`playwright <cmd>`** or **`python -m playwright <cmd>`** |
-| Run tests | **`npx playwright test`** (built-in runner) | **`pytest`** (via the pytest plugin) |
-| Install browsers | `npx playwright install` | `playwright install` |
+| Task             | Node / TypeScript                           | Python                                                     |
+| ---------------- | ------------------------------------------- | ---------------------------------------------------------- |
+| Install lib      | `npm i -D @playwright/test`                 | `pip install playwright pytest-playwright`                 |
+| CLI form         | **`npx playwright <cmd>`**                  | **`playwright <cmd>`** or **`python -m playwright <cmd>`** |
+| Run tests        | **`npx playwright test`** (built-in runner) | **`pytest`** (via the pytest plugin)                       |
+| Install browsers | `npx playwright install`                    | `playwright install`                                       |
 
 Rules to keep straight:
+
 - `npx playwright …` ⇒ **Node only.** `playwright …` / `python -m playwright …` ⇒ **Python only.**
 - **There is no `playwright test` in Python** — Python runs `pytest`. Writing
   `npx playwright test` in a Python repo (or `pytest` in a Node repo) is the
@@ -146,7 +147,7 @@ Plugin fixtures: `page` (fresh per test), `context` (isolated per test), `browse
 See [reference.md](reference.md) for the full flag tables (codegen, test, pytest),
 device/auth recipes, and the new agent CLI.
 
-## Heads-up: the new `@playwright/cli` agent CLI (2026) is a *different* tool
+## Heads-up: the new `@playwright/cli` agent CLI (2026) is a _different_ tool
 
 There is now a separate, agent-oriented CLI — install `npm i -g @playwright/cli`,
 invoked as **`playwright-cli`** (note: not `npx playwright`). It is daemon-based

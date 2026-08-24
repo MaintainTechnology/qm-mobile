@@ -47,7 +47,7 @@ playback; missing it triggers a lint warning).
 ## `<AbsoluteFill>` → positioned div
 
 ```tsx
-<AbsoluteFill style={{ backgroundColor: "#0a0a0a" }}>...children...</AbsoluteFill>
+<AbsoluteFill style={{ backgroundColor: '#0a0a0a' }}>...children...</AbsoluteFill>
 ```
 
 ```html
@@ -158,7 +158,7 @@ HF doesn't have a `<Loop>` primitive. Translate to a GSAP timeline with
 
 ```js
 const spinTl = gsap.timeline({ paused: true, repeat: -1, repeatRefresh: false });
-spinTl.to(spinner, { rotate: 360, duration: 1.0, ease: "none" });
+spinTl.to(spinner, { rotate: 360, duration: 1.0, ease: 'none' });
 // Embed in the main composition timeline at the right offset:
 mainTl.add(spinTl, 3);
 ```

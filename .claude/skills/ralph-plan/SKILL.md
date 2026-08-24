@@ -17,11 +17,13 @@ Generate a Product Requirements Document (PRD) with prioritized user stories fro
 ```
 
 **Arguments:**
+
 - `<requirements>` - Feature description (inline text, file path, or URL)
 - `--branch NAME` - Branch name (default: auto-generated with `ralph/` prefix)
 - `--max-stories N` - Maximum stories to generate (default: 10)
 
 **Examples:**
+
 ```bash
 /ralph-plan "Build a user authentication system with login and registration"
 /ralph-plan ./requirements.md --branch ralph/auth-system
@@ -35,6 +37,7 @@ Generate a Product Requirements Document (PRD) with prioritized user stories fro
 #### Step 1.1: Parse Input
 
 If `<requirements>` is:
+
 - **File path**: Read the file contents
 - **URL**: Fetch and extract requirements
 - **Inline text**: Use directly
@@ -51,6 +54,7 @@ cat package.json 2>/dev/null
 ```
 
 Look for:
+
 - Existing patterns in the codebase
 - UI component library in use
 - State management approach
@@ -61,24 +65,26 @@ Look for:
 
 Read `package.json` scripts section and determine available commands:
 
-| Check | Preferred Command | Fallback |
-|-------|-------------------|----------|
-| TypeScript | `npm run check` or `npm run typecheck` | `npx tsc --noEmit` |
-| Lint | `npm run lint` | `npx eslint .` |
-| Test | `npm run test` | Skip if not configured |
-| Build | `npm run build` | Skip (optional gate) |
+| Check      | Preferred Command                      | Fallback               |
+| ---------- | -------------------------------------- | ---------------------- |
+| TypeScript | `npm run check` or `npm run typecheck` | `npx tsc --noEmit`     |
+| Lint       | `npm run lint`                         | `npx eslint .`         |
+| Test       | `npm run test`                         | Skip if not configured |
+| Build      | `npm run build`                        | Skip (optional gate)   |
 
 ### Phase 2: Ask Clarifying Questions
 
 **CRITICAL**: Before generating stories, ask 3-5 clarifying questions with lettered options.
 
 Use the AskUserQuestion tool to get clarity on:
+
 1. Scope and approach decisions
 2. UI/UX preferences
 3. Technical constraints
 4. Priority trade-offs
 
 **Example Questions:**
+
 ```
 Before I generate stories, I need to clarify a few things:
 
@@ -108,6 +114,7 @@ Please respond like "1A, 2A, 3C" with your choices.
 Transform requirements into atomic, testable user stories following these rules:
 
 **Story Sizing Rules:**
+
 - ✅ Add database column with default value
 - ✅ Create single UI component
 - ✅ Add one API endpoint
@@ -118,6 +125,7 @@ Transform requirements into atomic, testable user stories following these rules:
 **Each story MUST fit in one context window (~5-15 minutes implementation)**
 
 **Story Template:**
+
 ```json
 {
   "id": "US-001",
@@ -127,12 +135,12 @@ Transform requirements into atomic, testable user stories following these rules:
     "Component renders without errors",
     "TypeScript compiles with no errors",
     "Follows existing patterns in src/components/",
-    "Verify in browser using visual-polish-inspector"  // For UI stories
+    "Verify in browser using visual-polish-inspector" // For UI stories
   ],
   "priority": 1,
   "status": "pending",
   "failureCount": 0,
-  "requiresBrowserVerification": true  // true for UI stories
+  "requiresBrowserVerification": true // true for UI stories
 }
 ```
 
@@ -246,16 +254,17 @@ Run `/ralph-execute --dry-run` to preview the first story.
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Cannot parse requirements | Ask user to clarify or provide structured input |
-| No package.json found | Ask about project type, suggest manual quality gate config |
-| Branch already exists | Ask to reuse or create new name |
-| .ralph/ already exists | Ask to overwrite, append stories, or abort |
+| Error                     | Action                                                     |
+| ------------------------- | ---------------------------------------------------------- |
+| Cannot parse requirements | Ask user to clarify or provide structured input            |
+| No package.json found     | Ask about project type, suggest manual quality gate config |
+| Branch already exists     | Ask to reuse or create new name                            |
+| .ralph/ already exists    | Ask to overwrite, append stories, or abort                 |
 
 ## Quality Checklist
 
 Before completing, verify:
+
 - [ ] Asked 3-5 clarifying questions
 - [ ] Stories are small enough (1-3 files each)
 - [ ] Stories are ordered by dependency
@@ -275,6 +284,7 @@ Before completing, verify:
 ## Output Files
 
 After successful execution:
+
 1. `.ralph/prd.json` - Complete PRD with stories
 2. `.ralph/progress.txt` - Initialized log with codebase analysis
 3. Git branch created/checked out

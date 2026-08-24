@@ -27,6 +27,7 @@ Rewrite the user's raw input into a clear, well-structured prompt that preserves
 ### Step 1: Identify the User's Intent
 
 Read the raw prompt and extract:
+
 1. **Primary goal** — What do they actually want done?
 2. **Implicit context** — What are they assuming you know?
 3. **Constraints** — Any limits on format, scope, tools, or approach?
@@ -34,13 +35,13 @@ Read the raw prompt and extract:
 
 ### Step 2: Rewrite Using the CLEAR Framework
 
-| Element | Description | Example |
-|---------|-------------|---------|
-| **C**ontext | Set the scene — who, what, where | "In this Next.js 14 project..." |
-| **L**ead action | Single clear verb for the primary task | "Refactor the authentication middleware to..." |
-| **E**xpectations | Define output format and quality | "Return the updated file with inline comments explaining changes" |
-| **A**ssumptions | State what you're assuming so Claude can correct | "Assuming we want to keep backward compatibility..." |
-| **R**estraints | Boundaries — what NOT to do, limits | "Do not modify the database schema or existing tests" |
+| Element          | Description                                      | Example                                                           |
+| ---------------- | ------------------------------------------------ | ----------------------------------------------------------------- |
+| **C**ontext      | Set the scene — who, what, where                 | "In this Next.js 14 project..."                                   |
+| **L**ead action  | Single clear verb for the primary task           | "Refactor the authentication middleware to..."                    |
+| **E**xpectations | Define output format and quality                 | "Return the updated file with inline comments explaining changes" |
+| **A**ssumptions  | State what you're assuming so Claude can correct | "Assuming we want to keep backward compatibility..."              |
+| **R**estraints   | Boundaries — what NOT to do, limits              | "Do not modify the database schema or existing tests"             |
 
 ### Step 3: Apply Prompt Engineering Best Practices
 
@@ -64,6 +65,7 @@ Output the polished prompt in a clearly marked block:
 ```
 
 Then briefly note what changed:
+
 - Grammar/spelling fixes
 - Clarified ambiguous intent
 - Added missing context or constraints
@@ -71,21 +73,23 @@ Then briefly note what changed:
 
 ## Quick Reference: Common Rewrites
 
-| Raw Pattern | Polished Pattern |
-|-------------|-----------------|
-| "fix the bug" | "Debug and fix [specific symptom] in [file/component]. The expected behavior is [X] but currently [Y] happens." |
-| "make it look better" | "Improve the visual design of [component]: [specific issues like spacing, alignment, color contrast]." |
-| "add a feature" | "Implement [feature name] that [does what] in [where]. Requirements: [1, 2, 3]. Constraints: [limits]." |
-| "it doesn't work" | "Diagnose why [specific action] produces [error/wrong result] instead of [expected result]. Relevant files: [paths]." |
-| "clean up the code" | "Refactor [file/module] to [specific goal: reduce duplication / improve readability / extract shared logic]. Do not change external behavior." |
-| "help me with X" | "[Specific action verb] X. Context: [relevant details]. Output: [desired format]." |
+| Raw Pattern           | Polished Pattern                                                                                                                               |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| "fix the bug"         | "Debug and fix [specific symptom] in [file/component]. The expected behavior is [X] but currently [Y] happens."                                |
+| "make it look better" | "Improve the visual design of [component]: [specific issues like spacing, alignment, color contrast]."                                         |
+| "add a feature"       | "Implement [feature name] that [does what] in [where]. Requirements: [1, 2, 3]. Constraints: [limits]."                                        |
+| "it doesn't work"     | "Diagnose why [specific action] produces [error/wrong result] instead of [expected result]. Relevant files: [paths]."                          |
+| "clean up the code"   | "Refactor [file/module] to [specific goal: reduce duplication / improve readability / extract shared logic]. Do not change external behavior." |
+| "help me with X"      | "[Specific action verb] X. Context: [relevant details]. Output: [desired format]."                                                             |
 
 ## Example
 
 **Raw user input:**
+
 > can you like change the homepage so it looks more professional and also maybe add some animations and fix the mobile thing where the nav is broken
 
 **Polished prompt:**
+
 > Improve the homepage (`src/pages/index.tsx`) with three changes:
 >
 > 1. **Professional styling** — Update typography, spacing, and color palette to match a modern SaaS landing page aesthetic
@@ -98,10 +102,10 @@ Then briefly note what changed:
 
 ## Common Mistakes
 
-| Mistake | Fix |
-|---------|-----|
-| Over-polishing casual requests | If intent is obvious, light touch only — fix grammar, keep it short |
-| Adding assumptions the user didn't imply | Only surface assumptions when the original is genuinely ambiguous |
-| Making the prompt longer than necessary | Concise > comprehensive. Remove anything that doesn't add clarity |
-| Changing the user's actual intent | Preserve what they want. Clarify HOW they said it, not WHAT they asked for |
-| Being overly formal | Match the user's tone. Technical users want direct prompts, not essays |
+| Mistake                                  | Fix                                                                        |
+| ---------------------------------------- | -------------------------------------------------------------------------- |
+| Over-polishing casual requests           | If intent is obvious, light touch only — fix grammar, keep it short        |
+| Adding assumptions the user didn't imply | Only surface assumptions when the original is genuinely ambiguous          |
+| Making the prompt longer than necessary  | Concise > comprehensive. Remove anything that doesn't add clarity          |
+| Changing the user's actual intent        | Preserve what they want. Clarify HOW they said it, not WHAT they asked for |
+| Being overly formal                      | Match the user's tone. Technical users want direct prompts, not essays     |

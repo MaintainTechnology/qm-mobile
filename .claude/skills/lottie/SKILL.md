@@ -24,11 +24,11 @@ The adapter seeks `lottie-web` with `goToAndStop(timeMs, false)` and dotLottie w
 <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
 <script>
   const anim = lottie.loadAnimation({
-    container: document.getElementById("logo-lottie"),
-    renderer: "svg",
+    container: document.getElementById('logo-lottie'),
+    renderer: 'svg',
     loop: false,
     autoplay: false,
-    path: "assets/logo-reveal.json",
+    path: 'assets/logo-reveal.json',
   });
 
   window.__hfLottie = window.__hfLottie || [];
@@ -50,8 +50,8 @@ The adapter seeks `lottie-web` with `goToAndStop(timeMs, false)` and dotLottie w
 <script src="https://unpkg.com/@lottiefiles/dotlottie-web"></script>
 <script>
   const player = new DotLottie({
-    canvas: document.getElementById("product-lottie"),
-    src: "assets/product-flow.lottie",
+    canvas: document.getElementById('product-lottie'),
+    src: 'assets/product-flow.lottie',
     autoplay: false,
     loop: false,
   });

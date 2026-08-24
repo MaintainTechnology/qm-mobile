@@ -34,18 +34,28 @@ game.zip
     `isGameOver`, `viewFor`; **no imports, no timers**. The platform composes it with a
     trusted room kernel (rooms, WebSockets, seats, reconnects are provided).
   - `server.js` — a custom real-time server: **`export class GameServer extends
-    DurableObject`**, imports only from `'cloudflare:workers'`; timers allowed. Use only for
+DurableObject`**, imports only from `'cloudflare:workers'`; timers allowed. Use only for
     continuous-movement games (see `multiplayer.md`).
 - **Solo / local-multiplayer games need no server logic** — ship this stub `logic.js` (a code
   module is required by the platform):
 
   ```js
-  export const meta = { game: "my-game", minPlayers: 1, maxPlayers: 1 };
-  export function setup() { return {}; }
-  export function validateAction() { return { ok: true }; }
-  export function applyAction(state) { return state; }
-  export function isGameOver() { return { over: false }; }
-  export function viewFor(state) { return state; }
+  export const meta = { game: 'my-game', minPlayers: 1, maxPlayers: 1 };
+  export function setup() {
+    return {};
+  }
+  export function validateAction() {
+    return { ok: true };
+  }
+  export function applyAction(state) {
+    return state;
+  }
+  export function isGameOver() {
+    return { over: false };
+  }
+  export function viewFor(state) {
+    return state;
+  }
   ```
 
 - **Online multiplayer** — the code module comes from `multiplayer.md` (+
@@ -88,72 +98,152 @@ Plumbing complete; replace `update`/`render` and the bindings table with the gam
 ```html
 <!doctype html>
 <html>
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-<title>My Game</title>
-<style>html,body{margin:0;height:100%;overflow:hidden;background:#0f1117}canvas{display:block}
-#dev{position:fixed;top:4px;left:4px;color:#0f0;font:12px monospace;display:none}</style></head>
-<body>
-<canvas id="c"></canvas><div id="dev"></div>
-<script type="module">
-import { STR } from "./strings.js";          // all player-visible text — zero literals below
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>My Game</title>
+    <style>
+      html,
+      body {
+        margin: 0;
+        height: 100%;
+        overflow: hidden;
+        background: #0f1117;
+      }
+      canvas {
+        display: block;
+      }
+      #dev {
+        position: fixed;
+        top: 4px;
+        left: 4px;
+        color: #0f0;
+        font: 12px monospace;
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="c"></canvas>
+    <div id="dev"></div>
+    <script type="module">
+      import { STR } from './strings.js'; // all player-visible text — zero literals below
 
-// --- input: everything becomes a command object; bindings reference event.code ---
-const BIND = { KeyW:"up", KeyS:"down", KeyA:"left", KeyD:"right", Space:"action",
-               ArrowUp:"up", ArrowDown:"down", ArrowLeft:"left", ArrowRight:"right" };
-const PAD  = { 0:"action", 12:"up", 13:"down", 14:"left", 15:"right" }; // standard mapping
-const held = new Set();
-addEventListener("keydown", e => { const c = BIND[e.code]; if (c) { held.add(c); e.preventDefault(); } });
-addEventListener("keyup",   e => { const c = BIND[e.code]; if (c) held.delete(c); });
-// touch zones: left half = stick, right half = action (replace with the game's own zones)
-const touch = new Set();
-addEventListener("touchstart", e => { for (const t of e.changedTouches)
-  touch.add(t.clientX < innerWidth/2 ? "left-zone" : "action"); e.preventDefault(); }, {passive:false});
-addEventListener("touchend",   e => { touch.clear(); e.preventDefault(); }, {passive:false});
-function padCommands() {
-  const out = new Set();
-  for (const gp of navigator.getGamepads?.() ?? []) if (gp)
-    gp.buttons.forEach((b, i) => { if (b.pressed && PAD[i]) out.add(PAD[i]); });
-  return out;
-}
-const commands = () => new Set([...held, ...touch, ...padCommands()]);
+      // --- input: everything becomes a command object; bindings reference event.code ---
+      const BIND = {
+        KeyW: 'up',
+        KeyS: 'down',
+        KeyA: 'left',
+        KeyD: 'right',
+        Space: 'action',
+        ArrowUp: 'up',
+        ArrowDown: 'down',
+        ArrowLeft: 'left',
+        ArrowRight: 'right',
+      };
+      const PAD = { 0: 'action', 12: 'up', 13: 'down', 14: 'left', 15: 'right' }; // standard mapping
+      const held = new Set();
+      addEventListener('keydown', e => {
+        const c = BIND[e.code];
+        if (c) {
+          held.add(c);
+          e.preventDefault();
+        }
+      });
+      addEventListener('keyup', e => {
+        const c = BIND[e.code];
+        if (c) held.delete(c);
+      });
+      // touch zones: left half = stick, right half = action (replace with the game's own zones)
+      const touch = new Set();
+      addEventListener(
+        'touchstart',
+        e => {
+          for (const t of e.changedTouches)
+            touch.add(t.clientX < innerWidth / 2 ? 'left-zone' : 'action');
+          e.preventDefault();
+        },
+        { passive: false },
+      );
+      addEventListener(
+        'touchend',
+        e => {
+          touch.clear();
+          e.preventDefault();
+        },
+        { passive: false },
+      );
+      function padCommands() {
+        const out = new Set();
+        for (const gp of navigator.getGamepads?.() ?? [])
+          if (gp)
+            gp.buttons.forEach((b, i) => {
+              if (b.pressed && PAD[i]) out.add(PAD[i]);
+            });
+        return out;
+      }
+      const commands = () => new Set([...held, ...touch, ...padCommands()]);
 
-// --- canvas: responsive, DPR capped per the §7.5 performance law ---
-const canvas = document.getElementById("c"), ctx = canvas.getContext("2d");
-const DPR_CAP = 1.5;
-function resize() {
-  const dpr = Math.min(devicePixelRatio || 1, DPR_CAP);
-  canvas.width = innerWidth * dpr; canvas.height = innerHeight * dpr;
-  canvas.style.width = innerWidth + "px"; canvas.style.height = innerHeight + "px";
-  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-}
-addEventListener("resize", resize); addEventListener("orientationchange", resize); resize();
+      // --- canvas: responsive, DPR capped per the §7.5 performance law ---
+      const canvas = document.getElementById('c'),
+        ctx = canvas.getContext('2d');
+      const DPR_CAP = 1.5;
+      function resize() {
+        const dpr = Math.min(devicePixelRatio || 1, DPR_CAP);
+        canvas.width = innerWidth * dpr;
+        canvas.height = innerHeight * dpr;
+        canvas.style.width = innerWidth + 'px';
+        canvas.style.height = innerHeight + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+      addEventListener('resize', resize);
+      addEventListener('orientationchange', resize);
+      resize();
 
-// --- fixed-timestep loop; pause on blur ---
-const STEP = 1000 / 60;
-let acc = 0, last = performance.now(), paused = false, frames = 0, fpsAt = last, fps = 0;
-addEventListener("blur", () => paused = true);
-addEventListener("focus", () => { paused = false; last = performance.now(); });
+      // --- fixed-timestep loop; pause on blur ---
+      const STEP = 1000 / 60;
+      let acc = 0,
+        last = performance.now(),
+        paused = false,
+        frames = 0,
+        fpsAt = last,
+        fps = 0;
+      addEventListener('blur', () => (paused = true));
+      addEventListener('focus', () => {
+        paused = false;
+        last = performance.now();
+      });
 
-function update(dt, cmds) { /* game simulation — deterministic, seeded RNG */ }
-function render(alpha)    { ctx.clearRect(0, 0, innerWidth, innerHeight); /* draw */ }
+      function update(dt, cmds) {
+        /* game simulation — deterministic, seeded RNG */
+      }
+      function render(alpha) {
+        ctx.clearRect(0, 0, innerWidth, innerHeight); /* draw */
+      }
 
-const dev = new URLSearchParams(location.search).has("dev");
-if (dev) document.getElementById("dev").style.display = "block";
-function frame(now) {
-  requestAnimationFrame(frame);
-  if (paused) return;
-  acc += now - last; last = now;
-  const cmds = commands();
-  while (acc >= STEP) { update(STEP, cmds); acc -= STEP; }
-  render(acc / STEP);
-  if (dev && (frames++, now - fpsAt >= 500)) {
-    fps = Math.round(frames * 1000 / (now - fpsAt)); frames = 0; fpsAt = now;
-    document.getElementById("dev").textContent = fps + " fps";
-  }
-}
-requestAnimationFrame(frame);
-</script>
-</body>
+      const dev = new URLSearchParams(location.search).has('dev');
+      if (dev) document.getElementById('dev').style.display = 'block';
+      function frame(now) {
+        requestAnimationFrame(frame);
+        if (paused) return;
+        acc += now - last;
+        last = now;
+        const cmds = commands();
+        while (acc >= STEP) {
+          update(STEP, cmds);
+          acc -= STEP;
+        }
+        render(acc / STEP);
+        if (dev && (frames++, now - fpsAt >= 500)) {
+          fps = Math.round((frames * 1000) / (now - fpsAt));
+          frames = 0;
+          fpsAt = now;
+          document.getElementById('dev').textContent = fps + ' fps';
+        }
+      }
+      requestAnimationFrame(frame);
+    </script>
+  </body>
 </html>
 ```
 

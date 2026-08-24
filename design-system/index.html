@@ -1,710 +1,2380 @@
 <!doctype html>
 <html lang="en-AU" data-theme="dark">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>QuoteMax Mobile Design System</title>
-<meta name="theme-color" content="#16120F">
-<link rel="icon" type="image/svg+xml" href="assets/logo/quotemax-mark-on-dark.svg">
-<link rel="stylesheet" href="assets/fonts/fonts.css">
-<link rel="stylesheet" href="tokens.css">
-<style>
-  *,*::before,*::after{box-sizing:border-box;margin:0}
-  html{scroll-behavior:smooth}
-  body{
-    font-family:var(--font-sans);color:var(--text-sec);background:var(--ink-deep);
-    line-height:1.6;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility;
-  }
-  .wrap{max-width:1140px;margin-inline:auto;padding-inline:24px}
-  h1,h2{font-weight:800;letter-spacing:-0.04em;line-height:0.98;text-transform:uppercase;color:var(--text-pri)}
-  h3{font-weight:700;letter-spacing:-0.02em;color:var(--text-pri);font-size:18px;line-height:1.3}
-  section{padding-block:96px}
-  section+section{border-top:1px solid var(--ink-line)}
-  .lead{max-width:62ch;font-size:17px;margin-top:16px}
-  a{color:var(--accent);text-decoration-thickness:1px;text-underline-offset:3px}
-  code{font-family:var(--font-mono);font-size:.85em;background:rgba(255,255,255,.07);padding:.15em .45em;border-radius:4px}
-  .accent-word{color:var(--accent);white-space:nowrap}
-  .mono{font-family:var(--font-mono)}
-  .tk{font-family:var(--font-mono);font-size:12px;letter-spacing:.04em;color:var(--text-dim)}
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>QuoteMax Mobile Design System</title>
+    <meta name="theme-color" content="#16120F" />
+    <link rel="icon" type="image/svg+xml" href="assets/logo/quotemax-mark-on-dark.svg" />
+    <link rel="stylesheet" href="assets/fonts/fonts.css" />
+    <link rel="stylesheet" href="tokens.css" />
+    <style>
+      *,
+      *::before,
+      *::after {
+        box-sizing: border-box;
+        margin: 0;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: var(--font-sans);
+        color: var(--text-sec);
+        background: var(--ink-deep);
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+        text-rendering: optimizeLegibility;
+      }
+      .wrap {
+        max-width: 1140px;
+        margin-inline: auto;
+        padding-inline: 24px;
+      }
+      h1,
+      h2 {
+        font-weight: 800;
+        letter-spacing: -0.04em;
+        line-height: 0.98;
+        text-transform: uppercase;
+        color: var(--text-pri);
+      }
+      h3 {
+        font-weight: 700;
+        letter-spacing: -0.02em;
+        color: var(--text-pri);
+        font-size: 18px;
+        line-height: 1.3;
+      }
+      section {
+        padding-block: 96px;
+      }
+      section + section {
+        border-top: 1px solid var(--ink-line);
+      }
+      .lead {
+        max-width: 62ch;
+        font-size: 17px;
+        margin-top: 16px;
+      }
+      a {
+        color: var(--accent);
+        text-decoration-thickness: 1px;
+        text-underline-offset: 3px;
+      }
+      code {
+        font-family: var(--font-mono);
+        font-size: 0.85em;
+        background: rgba(255, 255, 255, 0.07);
+        padding: 0.15em 0.45em;
+        border-radius: 4px;
+      }
+      .accent-word {
+        color: var(--accent);
+        white-space: nowrap;
+      }
+      .mono {
+        font-family: var(--font-mono);
+      }
+      .tk {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.04em;
+        color: var(--text-dim);
+      }
 
-  /* ── nav ─────────────────────────────────────────────── */
-  .nav{position:sticky;top:0;z-index:40;background:rgba(22,18,15,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--ink-line)}
-  .nav .wrap{display:flex;align-items:center;gap:24px;height:64px}
-  .lockup{display:flex;align-items:center;gap:10px;text-decoration:none}
-  .lockup svg{height:28px;width:auto;flex:none}
-  .lockup .wm{display:flex;flex-direction:column;font-weight:800;text-transform:uppercase;line-height:.82;letter-spacing:-0.02em;font-size:17px;color:var(--logo-body)}
-  .nav .links{margin-left:auto;display:flex;gap:20px;flex-wrap:wrap}
-  .nav .links a{color:var(--text-sec);text-decoration:none;font-size:14px;font-weight:500;transition:color 180ms var(--ease-out)}
-  .nav .links a:hover{color:var(--text-pri)}
-  @media(max-width:860px){.nav .links{display:none}}
+      /* ── nav ─────────────────────────────────────────────── */
+      .nav {
+        position: sticky;
+        top: 0;
+        z-index: 40;
+        background: rgba(22, 18, 15, 0.85);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid var(--ink-line);
+      }
+      .nav .wrap {
+        display: flex;
+        align-items: center;
+        gap: 24px;
+        height: 64px;
+      }
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-decoration: none;
+      }
+      .lockup svg {
+        height: 28px;
+        width: auto;
+        flex: none;
+      }
+      .lockup .wm {
+        display: flex;
+        flex-direction: column;
+        font-weight: 800;
+        text-transform: uppercase;
+        line-height: 0.82;
+        letter-spacing: -0.02em;
+        font-size: 17px;
+        color: var(--logo-body);
+      }
+      .nav .links {
+        margin-left: auto;
+        display: flex;
+        gap: 20px;
+        flex-wrap: wrap;
+      }
+      .nav .links a {
+        color: var(--text-sec);
+        text-decoration: none;
+        font-size: 14px;
+        font-weight: 500;
+        transition: color 180ms var(--ease-out);
+      }
+      .nav .links a:hover {
+        color: var(--text-pri);
+      }
+      @media (max-width: 860px) {
+        .nav .links {
+          display: none;
+        }
+      }
 
-  /* ── hero ────────────────────────────────────────────── */
-  .hero{position:relative;overflow:hidden;border-bottom:1px solid var(--ink-line);background:var(--ink-deep)}
-  .hero .photo{position:absolute;inset:0;z-index:0;
-    background:url("assets/photos/hero_main_tradie_tech.jpg") right center/cover no-repeat;
-    filter:grayscale(1) contrast(1.05) brightness(.62) sepia(.28) hue-rotate(-12deg);
-    opacity:.5;
-    -webkit-mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.14) 45%,rgba(0,0,0,.95) 82%);
-    mask-image:linear-gradient(90deg,transparent 0%,rgba(0,0,0,.14) 45%,rgba(0,0,0,.95) 82%)}
-  .hero .ridges{position:absolute;inset:0;z-index:0;opacity:.5}
-  .hero .glow{position:absolute;inset:0;z-index:0;background:radial-gradient(52% 72% at 78% 8%,var(--glow-warm),transparent 62%)}
-  .hero .wrap{position:relative;z-index:2;padding-block:96px}
-  .hero h1{font-size:clamp(2.6rem,6.5vw,5.5rem);max-width:14ch}
-  .hero .lead{font-size:18px;color:var(--text-sec)}
-  .hero .meta{margin-top:32px;display:flex;gap:12px;flex-wrap:wrap}
-  .chiplet{font-family:var(--font-mono);font-size:11px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;color:var(--text-dim);border:1px solid var(--ink-line);border-radius:6px;padding:.5em 1em;background:rgba(22,18,15,.6)}
+      /* ── hero ────────────────────────────────────────────── */
+      .hero {
+        position: relative;
+        overflow: hidden;
+        border-bottom: 1px solid var(--ink-line);
+        background: var(--ink-deep);
+      }
+      .hero .photo {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: url('assets/photos/hero_main_tradie_tech.jpg') right center/cover no-repeat;
+        filter: grayscale(1) contrast(1.05) brightness(0.62) sepia(0.28) hue-rotate(-12deg);
+        opacity: 0.5;
+        -webkit-mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.14) 45%,
+          rgba(0, 0, 0, 0.95) 82%
+        );
+        mask-image: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(0, 0, 0, 0.14) 45%,
+          rgba(0, 0, 0, 0.95) 82%
+        );
+      }
+      .hero .ridges {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        opacity: 0.5;
+      }
+      .hero .glow {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+        background: radial-gradient(52% 72% at 78% 8%, var(--glow-warm), transparent 62%);
+      }
+      .hero .wrap {
+        position: relative;
+        z-index: 2;
+        padding-block: 96px;
+      }
+      .hero h1 {
+        font-size: clamp(2.6rem, 6.5vw, 5.5rem);
+        max-width: 14ch;
+      }
+      .hero .lead {
+        font-size: 18px;
+        color: var(--text-sec);
+      }
+      .hero .meta {
+        margin-top: 32px;
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+      }
+      .chiplet {
+        font-family: var(--font-mono);
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+        border: 1px solid var(--ink-line);
+        border-radius: 6px;
+        padding: 0.5em 1em;
+        background: rgba(22, 18, 15, 0.6);
+      }
 
-  .head{margin-bottom:48px}
-  .head h2{font-size:clamp(2rem,4vw,3.25rem)}
+      .head {
+        margin-bottom: 48px;
+      }
+      .head h2 {
+        font-size: clamp(2rem, 4vw, 3.25rem);
+      }
 
-  /* ── swatches ────────────────────────────────────────── */
-  .swgroup{margin-bottom:48px}
-  .swgroup h3{margin-bottom:20px}
-  .swatches{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:16px}
-  .sw{border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:var(--ink-card);box-shadow:var(--lift)}
-  .sw .chip{height:88px;display:flex;align-items:flex-end;justify-content:flex-end;padding:8px}
-  .sw .chip b{font-family:var(--font-mono);font-weight:600;font-size:11px;padding:.25em .55em;border-radius:4px;background:rgba(11,9,7,.55);color:#F6F1EA;letter-spacing:.02em}
-  .sw .chip.on-light b{background:rgba(250,248,244,.8);color:#241E1B}
-  .sw .cap{padding:12px;border-top:1px solid var(--ink-line)}
-  .sw .cap .role{font-size:12px;color:var(--text-sec);margin-top:.35em;line-height:1.45}
+      /* ── swatches ────────────────────────────────────────── */
+      .swgroup {
+        margin-bottom: 48px;
+      }
+      .swgroup h3 {
+        margin-bottom: 20px;
+      }
+      .swatches {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 16px;
+      }
+      .sw {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .sw .chip {
+        height: 88px;
+        display: flex;
+        align-items: flex-end;
+        justify-content: flex-end;
+        padding: 8px;
+      }
+      .sw .chip b {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 11px;
+        padding: 0.25em 0.55em;
+        border-radius: 4px;
+        background: rgba(11, 9, 7, 0.55);
+        color: #f6f1ea;
+        letter-spacing: 0.02em;
+      }
+      .sw .chip.on-light b {
+        background: rgba(250, 248, 244, 0.8);
+        color: #241e1b;
+      }
+      .sw .cap {
+        padding: 12px;
+        border-top: 1px solid var(--ink-line);
+      }
+      .sw .cap .role {
+        font-size: 12px;
+        color: var(--text-sec);
+        margin-top: 0.35em;
+        line-height: 1.45;
+      }
 
-  .rules{border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-card);box-shadow:var(--lift)}
-  .rules>div{padding:24px}
-  .rules>div+div{border-top:1px solid var(--ink-line)}
-  .rules b{display:block;color:var(--text-pri);font-weight:700;letter-spacing:-0.01em;margin-bottom:.35em}
-  .rules p{font-size:14px;max-width:75ch}
+      .rules {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .rules > div {
+        padding: 24px;
+      }
+      .rules > div + div {
+        border-top: 1px solid var(--ink-line);
+      }
+      .rules b {
+        display: block;
+        color: var(--text-pri);
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        margin-bottom: 0.35em;
+      }
+      .rules p {
+        font-size: 14px;
+        max-width: 75ch;
+      }
 
-  /* ── type specimen ───────────────────────────────────── */
-  .spec .row{display:grid;grid-template-columns:190px 1fr;gap:24px;align-items:baseline;border-top:1px solid var(--ink-line);padding-block:20px}
-  .spec .row:last-child{border-bottom:1px solid var(--ink-line)}
-  .spec small{color:var(--text-dim);font-size:11px;font-family:var(--font-mono);letter-spacing:.06em;line-height:1.8}
-  @media(max-width:640px){.spec .row{grid-template-columns:1fr;gap:8px}}
-  .t-display{font-weight:800;font-size:34px;line-height:36px;letter-spacing:-.04em;text-transform:uppercase;color:var(--text-pri)}
-  .t-headline{font-weight:800;font-size:26px;line-height:28px;letter-spacing:-.04em;text-transform:uppercase;color:var(--text-pri)}
-  .t-title{font-weight:700;font-size:18px;line-height:24px;letter-spacing:-.02em;color:var(--text-pri)}
-  .t-body{font-size:16px;line-height:24px;color:var(--text-sec);max-width:70ch}
-  .t-bodysm{font-size:14px;line-height:20px;color:var(--text-sec)}
-  .t-label{font-family:var(--font-mono);font-weight:600;font-size:12px;line-height:16px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim)}
-  .t-price{font-family:var(--font-mono);font-weight:700;font-size:28px;line-height:32px;color:var(--text-pri);font-variant-numeric:tabular-nums}
+      /* ── type specimen ───────────────────────────────────── */
+      .spec .row {
+        display: grid;
+        grid-template-columns: 190px 1fr;
+        gap: 24px;
+        align-items: baseline;
+        border-top: 1px solid var(--ink-line);
+        padding-block: 20px;
+      }
+      .spec .row:last-child {
+        border-bottom: 1px solid var(--ink-line);
+      }
+      .spec small {
+        color: var(--text-dim);
+        font-size: 11px;
+        font-family: var(--font-mono);
+        letter-spacing: 0.06em;
+        line-height: 1.8;
+      }
+      @media (max-width: 640px) {
+        .spec .row {
+          grid-template-columns: 1fr;
+          gap: 8px;
+        }
+      }
+      .t-display {
+        font-weight: 800;
+        font-size: 34px;
+        line-height: 36px;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: var(--text-pri);
+      }
+      .t-headline {
+        font-weight: 800;
+        font-size: 26px;
+        line-height: 28px;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: var(--text-pri);
+      }
+      .t-title {
+        font-weight: 700;
+        font-size: 18px;
+        line-height: 24px;
+        letter-spacing: -0.02em;
+        color: var(--text-pri);
+      }
+      .t-body {
+        font-size: 16px;
+        line-height: 24px;
+        color: var(--text-sec);
+        max-width: 70ch;
+      }
+      .t-bodysm {
+        font-size: 14px;
+        line-height: 20px;
+        color: var(--text-sec);
+      }
+      .t-label {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
+        line-height: 16px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+      .t-price {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 28px;
+        line-height: 32px;
+        color: var(--text-pri);
+        font-variant-numeric: tabular-nums;
+      }
 
-  /* ── logo ────────────────────────────────────────────── */
-  .lockups{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-  .lock{border:1px solid var(--ink-line);border-radius:14px;padding:32px;display:flex;align-items:center;justify-content:center;min-height:150px;position:relative;overflow:hidden}
-  .lock svg{height:44px;width:auto}
-  .lock.dark{background:var(--ink-deep)}
-  .lock .ridgebg{position:absolute;inset:0;width:100%;height:100%}
-  .lock.card{background:var(--ink-card);box-shadow:var(--lift)}
-  .lock.paper{background:#FAF8F4}
-  .lock.yellow{background:var(--accent)}
-  .lock .lockup .wm{font-size:20px}
-  .locknote{margin-top:16px;font-size:14px;max-width:75ch}
+      /* ── logo ────────────────────────────────────────────── */
+      .lockups {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .lock {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        padding: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        min-height: 150px;
+        position: relative;
+        overflow: hidden;
+      }
+      .lock svg {
+        height: 44px;
+        width: auto;
+      }
+      .lock.dark {
+        background: var(--ink-deep);
+      }
+      .lock .ridgebg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .lock.card {
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .lock.paper {
+        background: #faf8f4;
+      }
+      .lock.yellow {
+        background: var(--accent);
+      }
+      .lock .lockup .wm {
+        font-size: 20px;
+      }
+      .locknote {
+        margin-top: 16px;
+        font-size: 14px;
+        max-width: 75ch;
+      }
 
-  /* ── depth & texture ─────────────────────────────────── */
-  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}
-  .tile{height:190px;border-radius:14px;border:1px solid var(--ink-line);position:relative;overflow:hidden;display:flex;align-items:flex-end;padding:12px;background:var(--ink-card)}
-  .tile span{position:relative;z-index:2;font-family:var(--font-mono);font-size:11px;letter-spacing:.06em;color:var(--text-pri);background:rgba(11,9,7,.55);padding:.3em .6em;border-radius:4px}
-  .tile.lit{box-shadow:var(--lift)}
-  .tile.ridge svg{position:absolute;inset:0;width:100%;height:100%}
-  .tile.duo-1::before,.tile.duo-2::before{content:"";position:absolute;inset:0;
-    filter:grayscale(1) contrast(1.05) brightness(.7) sepia(.3) hue-rotate(-14deg)}
-  .tile.duo-1::before{background:url("assets/photos/hero_main_tradie_tech.jpg") center/cover}
-  .tile.duo-2::before{background:url("assets/photos/electrician_hero.jpg") center/cover}
+      /* ── depth & texture ─────────────────────────────────── */
+      .tiles {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+      }
+      .tile {
+        height: 190px;
+        border-radius: 14px;
+        border: 1px solid var(--ink-line);
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+        padding: 12px;
+        background: var(--ink-card);
+      }
+      .tile span {
+        position: relative;
+        z-index: 2;
+        font-family: var(--font-mono);
+        font-size: 11px;
+        letter-spacing: 0.06em;
+        color: var(--text-pri);
+        background: rgba(11, 9, 7, 0.55);
+        padding: 0.3em 0.6em;
+        border-radius: 4px;
+      }
+      .tile.lit {
+        box-shadow: var(--lift);
+      }
+      .tile.ridge svg {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+      }
+      .tile.duo-1::before,
+      .tile.duo-2::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        filter: grayscale(1) contrast(1.05) brightness(0.7) sepia(0.3) hue-rotate(-14deg);
+      }
+      .tile.duo-1::before {
+        background: url('assets/photos/hero_main_tradie_tech.jpg') center/cover;
+      }
+      .tile.duo-2::before {
+        background: url('assets/photos/electrician_hero.jpg') center/cover;
+      }
 
-  /* ── shape & space ───────────────────────────────────── */
-  .shapes{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:16px;margin-bottom:48px}
-  .shape{border:1px solid var(--ink-line);background:var(--ink-card);box-shadow:var(--lift);height:110px;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:6px}
-  .shape .tk{color:var(--text-sec)}
-  .sp-scale{display:flex;flex-direction:column;gap:10px;margin-bottom:48px}
-  .sp-row{display:grid;grid-template-columns:64px 1fr;align-items:center;gap:16px}
-  .sp-bar{height:16px;background:var(--accent);border-radius:2px;opacity:.92}
-  .targets{display:flex;gap:24px;flex-wrap:wrap;align-items:flex-end}
-  .target{display:flex;flex-direction:column;gap:8px;align-items:center}
-  .target .box{border:1px dashed var(--edge-glow);border-radius:9px;display:flex;align-items:center;justify-content:center;color:var(--text-dim);font-family:var(--font-mono);font-size:11px}
+      /* ── shape & space ───────────────────────────────────── */
+      .shapes {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 16px;
+        margin-bottom: 48px;
+      }
+      .shape {
+        border: 1px solid var(--ink-line);
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+        height: 110px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .shape .tk {
+        color: var(--text-sec);
+      }
+      .sp-scale {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 48px;
+      }
+      .sp-row {
+        display: grid;
+        grid-template-columns: 64px 1fr;
+        align-items: center;
+        gap: 16px;
+      }
+      .sp-bar {
+        height: 16px;
+        background: var(--accent);
+        border-radius: 2px;
+        opacity: 0.92;
+      }
+      .targets {
+        display: flex;
+        gap: 24px;
+        flex-wrap: wrap;
+        align-items: flex-end;
+      }
+      .target {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        align-items: center;
+      }
+      .target .box {
+        border: 1px dashed var(--edge-glow);
+        border-radius: 9px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--text-dim);
+        font-family: var(--font-mono);
+        font-size: 11px;
+      }
 
-  /* ── components: shared control styles ───────────────── */
-  .panelgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(340px,1fr));gap:20px}
-  .panel{border:1px solid var(--ink-line);border-radius:14px;padding:24px;background:var(--ink-card);box-shadow:var(--lift);position:relative;overflow:hidden}
-  .panel::before{content:"";position:absolute;top:0;left:0;height:2px;width:0;background:var(--accent);transition:width 240ms var(--ease-out)}
-  .panel:hover::before{width:100%}
-  .panel h3{margin-bottom:20px}
-  .panel .note{font-size:13px;color:var(--text-dim);margin-top:16px;line-height:1.5}
+      /* ── components: shared control styles ───────────────── */
+      .panelgrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+        gap: 20px;
+      }
+      .panel {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        padding: 24px;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+        position: relative;
+        overflow: hidden;
+      }
+      .panel::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        height: 2px;
+        width: 0;
+        background: var(--accent);
+        transition: width 240ms var(--ease-out);
+      }
+      .panel:hover::before {
+        width: 100%;
+      }
+      .panel h3 {
+        margin-bottom: 20px;
+      }
+      .panel .note {
+        font-size: 13px;
+        color: var(--text-dim);
+        margin-top: 16px;
+        line-height: 1.5;
+      }
 
-  .btn{display:inline-flex;align-items:center;justify-content:center;font-family:var(--font-sans);font-weight:700;font-size:14px;letter-spacing:.05em;text-transform:uppercase;border-radius:9px;border:1px solid transparent;cursor:pointer;transition:transform 120ms var(--ease-out),background 120ms var(--ease-out),border-color 120ms var(--ease-out),color 120ms var(--ease-out)}
-  .btn:active{transform:scale(.97)}
-  .btn-primary{background:var(--accent);color:var(--accent-ink);height:56px;padding:0 24px}
-  .btn-primary:hover,.btn-primary:active{background:var(--accent-press)}
-  .btn-primary:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px}
-  .btn-primary[aria-disabled="true"]{opacity:.4;pointer-events:none}
-  .btn-ghost{background:transparent;border-color:var(--ink-line);color:var(--text-pri);height:48px;padding:0 20px}
-  .btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
-  .btn-danger{background:transparent;border-color:var(--danger-bright);color:var(--danger-bright);height:48px;padding:0 20px}
-  .btnrow{display:flex;gap:12px;flex-wrap:wrap;align-items:center}
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        font-family: var(--font-sans);
+        font-weight: 700;
+        font-size: 14px;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        border-radius: 9px;
+        border: 1px solid transparent;
+        cursor: pointer;
+        transition:
+          transform 120ms var(--ease-out),
+          background 120ms var(--ease-out),
+          border-color 120ms var(--ease-out),
+          color 120ms var(--ease-out);
+      }
+      .btn:active {
+        transform: scale(0.97);
+      }
+      .btn-primary {
+        background: var(--accent);
+        color: var(--accent-ink);
+        height: 56px;
+        padding: 0 24px;
+      }
+      .btn-primary:hover,
+      .btn-primary:active {
+        background: var(--accent-press);
+      }
+      .btn-primary:focus-visible {
+        outline: 2px solid var(--accent-soft);
+        outline-offset: 2px;
+      }
+      .btn-primary[aria-disabled='true'] {
+        opacity: 0.4;
+        pointer-events: none;
+      }
+      .btn-ghost {
+        background: transparent;
+        border-color: var(--ink-line);
+        color: var(--text-pri);
+        height: 48px;
+        padding: 0 20px;
+      }
+      .btn-ghost:hover {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .btn-danger {
+        background: transparent;
+        border-color: var(--danger-bright);
+        color: var(--danger-bright);
+        height: 48px;
+        padding: 0 20px;
+      }
+      .btnrow {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+        align-items: center;
+      }
 
-  .field{display:flex;flex-direction:column;gap:8px;margin-bottom:20px}
-  .field label{font-family:var(--font-mono);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase;color:var(--text-dim)}
-  .field input{font-family:var(--font-sans);font-size:16px;color:var(--text-pri);background:var(--ink);border:1px solid var(--ctl-line);border-radius:9px;height:48px;padding:0 16px;width:100%}
-  .field input:focus-visible{outline:2px solid var(--accent-soft);outline-offset:2px;border-color:var(--accent)}
-  .field.focused input{outline:2px solid var(--accent-soft);outline-offset:2px;border-color:var(--accent)}
-  .field.error input{border-color:var(--danger-bright)}
-  .field .err{font-size:14px;color:var(--danger-bright)}
-  .field input.money{font-family:var(--font-mono);text-align:right;font-variant-numeric:tabular-nums}
-  .moneywrap{position:relative}
-  .moneywrap .cur{position:absolute;left:16px;top:50%;transform:translateY(-50%);font-family:var(--font-mono);font-size:16px;color:var(--text-dim);pointer-events:none}
-  .moneywrap input{padding-left:48px}
+      .field {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        margin-bottom: 20px;
+      }
+      .field label {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        color: var(--text-dim);
+      }
+      .field input {
+        font-family: var(--font-sans);
+        font-size: 16px;
+        color: var(--text-pri);
+        background: var(--ink);
+        border: 1px solid var(--ctl-line);
+        border-radius: 9px;
+        height: 48px;
+        padding: 0 16px;
+        width: 100%;
+      }
+      .field input:focus-visible {
+        outline: 2px solid var(--accent-soft);
+        outline-offset: 2px;
+        border-color: var(--accent);
+      }
+      .field.focused input {
+        outline: 2px solid var(--accent-soft);
+        outline-offset: 2px;
+        border-color: var(--accent);
+      }
+      .field.error input {
+        border-color: var(--danger-bright);
+      }
+      .field .err {
+        font-size: 14px;
+        color: var(--danger-bright);
+      }
+      .field input.money {
+        font-family: var(--font-mono);
+        text-align: right;
+        font-variant-numeric: tabular-nums;
+      }
+      .moneywrap {
+        position: relative;
+      }
+      .moneywrap .cur {
+        position: absolute;
+        left: 16px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-family: var(--font-mono);
+        font-size: 16px;
+        color: var(--text-dim);
+        pointer-events: none;
+      }
+      .moneywrap input {
+        padding-left: 48px;
+      }
 
-  .chips{display:flex;gap:8px;flex-wrap:wrap}
-  .chip-s{display:inline-flex;align-items:center;height:24px;padding:0 8px;border-radius:6px;border:1px solid;font-family:var(--font-mono);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;background:transparent}
-  .c-draft{border-color:var(--warning-bright);color:var(--warning-bright)}
-  .c-sent{border-color:var(--text-sec);color:var(--text-sec)}
-  .c-paid{border-color:var(--success-bright);color:var(--success-bright)}
-  .c-failed{border-color:var(--danger-bright);color:var(--danger-bright)}
-  .c-visit{border-color:var(--accent);color:var(--accent)}
-  .paper-scope .c-visit{color:var(--accent-ink);border-color:var(--accent-press)}
+      .chips {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .chip-s {
+        display: inline-flex;
+        align-items: center;
+        height: 24px;
+        padding: 0 8px;
+        border-radius: 6px;
+        border: 1px solid;
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        background: transparent;
+      }
+      .c-draft {
+        border-color: var(--warning-bright);
+        color: var(--warning-bright);
+      }
+      .c-sent {
+        border-color: var(--text-sec);
+        color: var(--text-sec);
+      }
+      .c-paid {
+        border-color: var(--success-bright);
+        color: var(--success-bright);
+      }
+      .c-failed {
+        border-color: var(--danger-bright);
+        color: var(--danger-bright);
+      }
+      .c-visit {
+        border-color: var(--accent);
+        color: var(--accent);
+      }
+      .paper-scope .c-visit {
+        color: var(--accent-ink);
+        border-color: var(--accent-press);
+      }
 
-  .rowlist{border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:var(--ink-card);box-shadow:var(--lift)}
-  .rowitem{min-height:56px;display:flex;align-items:center;gap:12px;padding:10px 16px}
-  .rowitem+.rowitem{border-top:1px solid var(--ink-line)}
-  .rowitem .who{flex:1;min-width:0}
-  .rowitem .who b{display:block;font-size:16px;font-weight:700;letter-spacing:-0.01em;color:var(--text-pri);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rowitem .who span{display:block;font-size:14px;color:var(--text-sec);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  .rowitem .amt{text-align:right}
-  .rowitem .amt b{display:block;font-family:var(--font-mono);font-weight:700;font-size:16px;color:var(--text-pri);font-variant-numeric:tabular-nums}
-  .rowitem .amt span{font-family:var(--font-mono);font-size:12px;letter-spacing:.08em;color:var(--text-dim)}
+      .rowlist {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .rowitem {
+        min-height: 56px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 10px 16px;
+      }
+      .rowitem + .rowitem {
+        border-top: 1px solid var(--ink-line);
+      }
+      .rowitem .who {
+        flex: 1;
+        min-width: 0;
+      }
+      .rowitem .who b {
+        display: block;
+        font-size: 16px;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+        color: var(--text-pri);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .rowitem .who span {
+        display: block;
+        font-size: 14px;
+        color: var(--text-sec);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .rowitem .amt {
+        text-align: right;
+      }
+      .rowitem .amt b {
+        display: block;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 16px;
+        color: var(--text-pri);
+        font-variant-numeric: tabular-nums;
+      }
+      .rowitem .amt span {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        color: var(--text-dim);
+      }
 
-  /* ── phone frames ────────────────────────────────────── */
-  .phones{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:24px;justify-items:center;margin-bottom:48px}
-  .phonecol{width:100%;max-width:380px}
-  .phonecol>p{margin-top:16px;font-size:13px;color:var(--text-dim);line-height:1.5}
-  .phone{border:1px solid var(--ink-line);border-radius:28px;overflow:hidden;background:var(--ink-deep);display:flex;flex-direction:column;min-height:560px}
-  .phone .appbar{padding:20px 20px 12px;border-bottom:1px solid var(--ink-line)}
-  .phone .appbar .ref{font-family:var(--font-mono);font-weight:600;font-size:12px;letter-spacing:.18em;color:var(--text-dim)}
-  .phone .appbar h4{font-weight:800;font-size:26px;line-height:28px;letter-spacing:-.04em;text-transform:uppercase;color:var(--text-pri);margin-top:6px}
-  .phone .body{flex:1;padding:16px 16px 0;display:flex;flex-direction:column;gap:16px}
-  .qcard{border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-card);box-shadow:var(--lift);padding:20px}
-  .qcard .items{display:flex;flex-direction:column;gap:10px}
-  .qitem{display:flex;align-items:baseline;gap:8px;font-size:14px;color:var(--text-sec)}
-  .qitem .dots{flex:1;border-bottom:1px dotted var(--ink-line);transform:translateY(-3px)}
-  .qitem b{font-family:var(--font-mono);font-weight:600;font-size:14px;color:var(--text-pri);font-variant-numeric:tabular-nums}
-  .qcard .totals{margin-top:16px;padding-top:14px;border-top:1px solid var(--ink-line)}
-  .qcard .gst{display:flex;justify-content:space-between;font-family:var(--font-mono);font-size:12px;letter-spacing:.1em;color:var(--text-dim);text-transform:uppercase}
-  .qcard .sum{display:flex;justify-content:space-between;align-items:baseline;margin-top:8px}
-  .qcard .sum span{font-family:var(--font-mono);font-size:12px;letter-spacing:.18em;color:var(--text-dim);text-transform:uppercase}
-  .qcard .sum b{font-family:var(--font-mono);font-weight:700;font-size:28px;line-height:32px;color:var(--text-pri);font-variant-numeric:tabular-nums}
-  .phone .spacer{flex:1}
-  .approvebar{border-top:1px solid var(--ink-line);background:var(--ink-deep);padding:12px 16px 20px;display:flex;align-items:center;gap:12px}
-  .approvebar .total{flex:1}
-  .approvebar .total b{display:block;font-family:var(--font-mono);font-weight:700;font-size:18px;color:var(--text-pri);font-variant-numeric:tabular-nums}
-  .approvebar .total span{font-family:var(--font-mono);font-size:12px;letter-spacing:.14em;color:var(--text-dim);text-transform:uppercase}
-  .approvebar .btn-primary{flex:none;height:56px}
+      /* ── phone frames ────────────────────────────────────── */
+      .phones {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 24px;
+        justify-items: center;
+        margin-bottom: 48px;
+      }
+      .phonecol {
+        width: 100%;
+        max-width: 380px;
+      }
+      .phonecol > p {
+        margin-top: 16px;
+        font-size: 13px;
+        color: var(--text-dim);
+        line-height: 1.5;
+      }
+      .phone {
+        border: 1px solid var(--ink-line);
+        border-radius: 28px;
+        overflow: hidden;
+        background: var(--ink-deep);
+        display: flex;
+        flex-direction: column;
+        min-height: 560px;
+      }
+      .phone .appbar {
+        padding: 20px 20px 12px;
+        border-bottom: 1px solid var(--ink-line);
+      }
+      .phone .appbar .ref {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+      }
+      .phone .appbar h4 {
+        font-weight: 800;
+        font-size: 26px;
+        line-height: 28px;
+        letter-spacing: -0.04em;
+        text-transform: uppercase;
+        color: var(--text-pri);
+        margin-top: 6px;
+      }
+      .phone .body {
+        flex: 1;
+        padding: 16px 16px 0;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+      }
+      .qcard {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+        padding: 20px;
+      }
+      .qcard .items {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .qitem {
+        display: flex;
+        align-items: baseline;
+        gap: 8px;
+        font-size: 14px;
+        color: var(--text-sec);
+      }
+      .qitem .dots {
+        flex: 1;
+        border-bottom: 1px dotted var(--ink-line);
+        transform: translateY(-3px);
+      }
+      .qitem b {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 14px;
+        color: var(--text-pri);
+        font-variant-numeric: tabular-nums;
+      }
+      .qcard .totals {
+        margin-top: 16px;
+        padding-top: 14px;
+        border-top: 1px solid var(--ink-line);
+      }
+      .qcard .gst {
+        display: flex;
+        justify-content: space-between;
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.1em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+      .qcard .sum {
+        display: flex;
+        justify-content: space-between;
+        align-items: baseline;
+        margin-top: 8px;
+      }
+      .qcard .sum span {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.18em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+      .qcard .sum b {
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 28px;
+        line-height: 32px;
+        color: var(--text-pri);
+        font-variant-numeric: tabular-nums;
+      }
+      .phone .spacer {
+        flex: 1;
+      }
+      .approvebar {
+        border-top: 1px solid var(--ink-line);
+        background: var(--ink-deep);
+        padding: 12px 16px 20px;
+        display: flex;
+        align-items: center;
+        gap: 12px;
+      }
+      .approvebar .total {
+        flex: 1;
+      }
+      .approvebar .total b {
+        display: block;
+        font-family: var(--font-mono);
+        font-weight: 700;
+        font-size: 18px;
+        color: var(--text-pri);
+        font-variant-numeric: tabular-nums;
+      }
+      .approvebar .total span {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+      .approvebar .btn-primary {
+        flex: none;
+        height: 56px;
+      }
 
-  /* paper scope: the same components on the warm-paper theme */
-  .paper-scope{--ink-deep:#FAF8F4;--ink:#F3EEE7;--ink-card:#FFFFFF;--ink-line:#CFC2B0;
-    --ctl-line:#8A7D6A;--accent-soft:#2B2422;
-    --text-pri:#241E1B;--text-sec:#5E544E;--text-dim:#6E645C;--accent-ink:#2B2422;
-    --success-bright:#15803D;--warning-bright:#B45309;--danger-bright:#B91C1C;
-    --logo-body:#16120F;--lift:0 1px 2px rgba(43,36,34,.06)}
-  .paper-scope .sw .chip b{background:rgba(250,248,244,.8);color:#241E1B}
+      /* paper scope: the same components on the warm-paper theme */
+      .paper-scope {
+        --ink-deep: #faf8f4;
+        --ink: #f3eee7;
+        --ink-card: #ffffff;
+        --ink-line: #cfc2b0;
+        --ctl-line: #8a7d6a;
+        --accent-soft: #2b2422;
+        --text-pri: #241e1b;
+        --text-sec: #5e544e;
+        --text-dim: #6e645c;
+        --accent-ink: #2b2422;
+        --success-bright: #15803d;
+        --warning-bright: #b45309;
+        --danger-bright: #b91c1c;
+        --logo-body: #16120f;
+        --lift: 0 1px 2px rgba(43, 36, 34, 0.06);
+      }
+      .paper-scope .sw .chip b {
+        background: rgba(250, 248, 244, 0.8);
+        color: #241e1b;
+      }
 
-  /* ── tab bar demo ────────────────────────────────────── */
-  .tabbar{display:flex;border:1px solid var(--ink-line);border-radius:14px;overflow:hidden;background:var(--ink-card);box-shadow:var(--lift)}
-  .tab{flex:1;min-height:56px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;color:var(--text-dim);font-family:var(--font-mono);font-size:12px;letter-spacing:.06em;text-transform:uppercase}
-  .tab svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
-  .tab.active{color:var(--accent)}
-  .paper-scope .tab.active{color:var(--accent-ink)}
-  .paper-scope .tab.active svg{stroke:var(--accent-ink)}
-  .paper-scope .tab.active .pip{background:var(--accent)}
-  .tab .pip{width:16px;height:3px;border-radius:2px;background:transparent}
-  .tab.active .pip{background:var(--accent)}
+      /* ── tab bar demo ────────────────────────────────────── */
+      .tabbar {
+        display: flex;
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        overflow: hidden;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .tab {
+        flex: 1;
+        min-height: 56px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 4px;
+        color: var(--text-dim);
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+      }
+      .tab svg {
+        width: 22px;
+        height: 22px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+      .tab.active {
+        color: var(--accent);
+      }
+      .paper-scope .tab.active {
+        color: var(--accent-ink);
+      }
+      .paper-scope .tab.active svg {
+        stroke: var(--accent-ink);
+      }
+      .paper-scope .tab.active .pip {
+        background: var(--accent);
+      }
+      .tab .pip {
+        width: 16px;
+        height: 3px;
+        border-radius: 2px;
+        background: transparent;
+      }
+      .tab.active .pip {
+        background: var(--accent);
+      }
 
-  /* ── sms thread ──────────────────────────────────────── */
-  .thread{display:flex;flex-direction:column;gap:10px}
-  .bubble{max-width:85%;padding:10px 14px;border-radius:14px;font-size:14px;line-height:1.5}
-  .bubble.in{align-self:flex-start;background:var(--ink);border:1px solid var(--ink-line);color:var(--text-pri);border-bottom-left-radius:6px}
-  .bubble.out{align-self:flex-end;background:var(--ink-card);border:1px solid var(--ink-line);box-shadow:var(--lift);color:var(--text-pri);border-bottom-right-radius:6px}
-  .stamp{font-family:var(--font-mono);font-size:12px;letter-spacing:.12em;color:var(--text-dim);text-transform:uppercase}
-  .stamp.right{align-self:flex-end}
-  .typing{display:inline-flex;gap:4px;align-items:center;padding:12px 14px}
-  .typing i{width:6px;height:6px;border-radius:50%;background:var(--text-dim)}
-  @media (prefers-reduced-motion: no-preference){
-    .typing i{animation:tbounce 1.1s infinite var(--ease-in-out)}
-    .typing i:nth-child(2){animation-delay:.15s}
-    .typing i:nth-child(3){animation-delay:.3s}
-    @keyframes tbounce{0%,60%,100%{transform:translateY(0);opacity:.5}30%{transform:translateY(-4px);opacity:1}}
-  }
+      /* ── sms thread ──────────────────────────────────────── */
+      .thread {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .bubble {
+        max-width: 85%;
+        padding: 10px 14px;
+        border-radius: 14px;
+        font-size: 14px;
+        line-height: 1.5;
+      }
+      .bubble.in {
+        align-self: flex-start;
+        background: var(--ink);
+        border: 1px solid var(--ink-line);
+        color: var(--text-pri);
+        border-bottom-left-radius: 6px;
+      }
+      .bubble.out {
+        align-self: flex-end;
+        background: var(--ink-card);
+        border: 1px solid var(--ink-line);
+        box-shadow: var(--lift);
+        color: var(--text-pri);
+        border-bottom-right-radius: 6px;
+      }
+      .stamp {
+        font-family: var(--font-mono);
+        font-size: 12px;
+        letter-spacing: 0.12em;
+        color: var(--text-dim);
+        text-transform: uppercase;
+      }
+      .stamp.right {
+        align-self: flex-end;
+      }
+      .typing {
+        display: inline-flex;
+        gap: 4px;
+        align-items: center;
+        padding: 12px 14px;
+      }
+      .typing i {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: var(--text-dim);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .typing i {
+          animation: tbounce 1.1s infinite var(--ease-in-out);
+        }
+        .typing i:nth-child(2) {
+          animation-delay: 0.15s;
+        }
+        .typing i:nth-child(3) {
+          animation-delay: 0.3s;
+        }
+        @keyframes tbounce {
+          0%,
+          60%,
+          100% {
+            transform: translateY(0);
+            opacity: 0.5;
+          }
+          30% {
+            transform: translateY(-4px);
+            opacity: 1;
+          }
+        }
+      }
 
-  /* ── offline, loading, empty ─────────────────────────── */
-  .banner{display:flex;flex-direction:column;gap:2px;border:1px solid var(--warning-bright);border-radius:9px;padding:10px 14px;margin-bottom:16px}
-  .banner b{font-family:var(--font-mono);font-weight:600;font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--warning-bright)}
-  .banner span{font-size:14px;color:var(--text-sec)}
-  .skelrow{display:flex;align-items:center;gap:12px;margin-bottom:10px}
-  .skel{background:var(--ink);border-radius:6px;height:14px}
-  @media (prefers-reduced-motion: no-preference){
-    .skel{animation:skelpulse 1.4s var(--ease-in-out) infinite}
-    @keyframes skelpulse{0%,100%{opacity:1}50%{opacity:.55}}
-  }
+      /* ── offline, loading, empty ─────────────────────────── */
+      .banner {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+        border: 1px solid var(--warning-bright);
+        border-radius: 9px;
+        padding: 10px 14px;
+        margin-bottom: 16px;
+      }
+      .banner b {
+        font-family: var(--font-mono);
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--warning-bright);
+      }
+      .banner span {
+        font-size: 14px;
+        color: var(--text-sec);
+      }
+      .skelrow {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+      .skel {
+        background: var(--ink);
+        border-radius: 6px;
+        height: 14px;
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .skel {
+          animation: skelpulse 1.4s var(--ease-in-out) infinite;
+        }
+        @keyframes skelpulse {
+          0%,
+          100% {
+            opacity: 1;
+          }
+          50% {
+            opacity: 0.55;
+          }
+        }
+      }
 
-  /* ── motion ──────────────────────────────────────────── */
-  .motiongrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:20px}
-  .press-demo{border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-card);box-shadow:var(--lift);padding:24px;display:flex;flex-direction:column;gap:16px;align-items:flex-start}
-  .durbar{height:8px;border-radius:2px;background:var(--ink);position:relative;overflow:hidden;width:100%}
-  .durbar i{position:absolute;inset:0;width:0;background:var(--accent)}
-  @media (prefers-reduced-motion: no-preference){
-    .motion-play .d120 i{animation:fill 120ms var(--ease-out) forwards}
-    .motion-play .d180 i{animation:fill 180ms var(--ease-out) forwards}
-    .motion-play .d240 i{animation:fill 240ms var(--ease-out) forwards}
-    @keyframes fill{to{width:100%}}
-  }
-  .durrow{display:grid;grid-template-columns:130px 1fr;gap:16px;align-items:center;margin-bottom:14px}
+      /* ── motion ──────────────────────────────────────────── */
+      .motiongrid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+      .press-demo {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+        padding: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 16px;
+        align-items: flex-start;
+      }
+      .durbar {
+        height: 8px;
+        border-radius: 2px;
+        background: var(--ink);
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+      }
+      .durbar i {
+        position: absolute;
+        inset: 0;
+        width: 0;
+        background: var(--accent);
+      }
+      @media (prefers-reduced-motion: no-preference) {
+        .motion-play .d120 i {
+          animation: fill 120ms var(--ease-out) forwards;
+        }
+        .motion-play .d180 i {
+          animation: fill 180ms var(--ease-out) forwards;
+        }
+        .motion-play .d240 i {
+          animation: fill 240ms var(--ease-out) forwards;
+        }
+        @keyframes fill {
+          to {
+            width: 100%;
+          }
+        }
+      }
+      .durrow {
+        display: grid;
+        grid-template-columns: 130px 1fr;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 14px;
+      }
 
-  /* ── do / don't ──────────────────────────────────────── */
-  .dd{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:20px}
-  .ddcol{border:1px solid var(--ink-line);border-radius:14px;background:var(--ink-card);box-shadow:var(--lift)}
-  .ddcol h3{padding:20px 24px;border-bottom:1px solid var(--ink-line)}
-  .ddcol h3.no{color:var(--danger-bright)}
-  .ddcol ul{list-style:none;padding:8px 0}
-  .ddcol li{padding:12px 24px;font-size:14px;line-height:1.55;border-top:1px solid transparent}
-  .ddcol li+li{border-top:1px solid var(--ink-line)}
-  .ddcol li b{color:var(--text-pri);font-weight:700}
+      /* ── do / don't ──────────────────────────────────────── */
+      .dd {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 20px;
+      }
+      .ddcol {
+        border: 1px solid var(--ink-line);
+        border-radius: 14px;
+        background: var(--ink-card);
+        box-shadow: var(--lift);
+      }
+      .ddcol h3 {
+        padding: 20px 24px;
+        border-bottom: 1px solid var(--ink-line);
+      }
+      .ddcol h3.no {
+        color: var(--danger-bright);
+      }
+      .ddcol ul {
+        list-style: none;
+        padding: 8px 0;
+      }
+      .ddcol li {
+        padding: 12px 24px;
+        font-size: 14px;
+        line-height: 1.55;
+        border-top: 1px solid transparent;
+      }
+      .ddcol li + li {
+        border-top: 1px solid var(--ink-line);
+      }
+      .ddcol li b {
+        color: var(--text-pri);
+        font-weight: 700;
+      }
 
-  footer{border-top:1px solid var(--ink-line);background:var(--ink)}
-  footer .wrap{padding-block:48px;display:grid;gap:24px;grid-template-columns:1.4fr 1fr;align-items:start}
-  footer p{font-size:14px;color:var(--text-dim);max-width:48ch}
-  footer .filelist{display:grid;gap:8px;font-size:14px}
-  footer .filelist a{color:var(--text-sec)}
-  footer .filelist a:hover{color:var(--accent)}
-  @media(max-width:640px){footer .wrap{grid-template-columns:1fr}}
-</style>
-</head>
-<body>
-
-<svg xmlns="http://www.w3.org/2000/svg" style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
-  <!-- QuoteMax mark: verbatim geometry from the website's BrandMark. Two fills only:
+      footer {
+        border-top: 1px solid var(--ink-line);
+        background: var(--ink);
+      }
+      footer .wrap {
+        padding-block: 48px;
+        display: grid;
+        gap: 24px;
+        grid-template-columns: 1.4fr 1fr;
+        align-items: start;
+      }
+      footer p {
+        font-size: 14px;
+        color: var(--text-dim);
+        max-width: 48ch;
+      }
+      footer .filelist {
+        display: grid;
+        gap: 8px;
+        font-size: 14px;
+      }
+      footer .filelist a {
+        color: var(--text-sec);
+      }
+      footer .filelist a:hover {
+        color: var(--accent);
+      }
+      @media (max-width: 640px) {
+        footer .wrap {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      style="position: absolute; width: 0; height: 0; overflow: hidden"
+      aria-hidden="true"
+    >
+      <!-- QuoteMax mark: verbatim geometry from the website's BrandMark. Two fills only:
        body = var(--logo-body), notch = #E3C13C source gold (never the accent). -->
-  <symbol id="qm-mark" viewBox="151 214 397 270">
-    <path d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z" fill="var(--logo-body)"/>
-    <path d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z" fill="#E3C13C"/>
-  </symbol>
-  <!-- Tab icons: authored set, 24 grid, stroke 2, round caps. One family only. -->
-  <symbol id="i-leads" viewBox="0 0 24 24"><path d="M3 13l4 0 2 3 6 0 2-3 4 0"/><path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z"/></symbol>
-  <symbol id="i-quotes" viewBox="0 0 24 24"><path d="M7 3h7l4 4v14H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z"/><path d="M14 3v4h4"/><path d="M9 12h6M9 16h4"/></symbol>
-  <symbol id="i-book" viewBox="0 0 24 24"><path d="M12 6c-1.8-1.4-4.2-2-8-2v14c3.8 0 6.2.6 8 2 1.8-1.4 4.2-2 8-2V4c-3.8 0-6.2.6-8 2z"/><path d="M12 6v14"/></symbol>
-  <symbol id="i-jobs" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 10h18"/><path d="M9 15l2 2 4-4"/></symbol>
-  <symbol id="i-settings" viewBox="0 0 24 24"><path d="M4 8h10M18 8h2M4 16h4M12 16h8"/><circle cx="16" cy="8" r="2"/><circle cx="10" cy="16" r="2"/></symbol>
-</svg>
+      <symbol id="qm-mark" viewBox="151 214 397 270">
+        <path
+          d="M324 214C324 214 280.454 210.115 253 214C246.325 214.945 236 217 236 217C236 217 225.42 220.111 219 223C211.182 226.519 206.972 229.01 200 234C195.71 237.071 193.283 238.823 189.5 242.5C188.906 243.077 188.582 243.411 188 244C182.165 249.906 178.83 253.247 174 260C171.7 263.216 170.56 265.125 168.5 268.5L168.44 268.598C167.884 269.509 167.554 270.05 167 271C160.826 281.588 155 300 155 300C155 300 151.645 314.52 151 324C150.55 330.624 150.562 334.376 151 341C151.733 352.083 152.738 358.382 156 369C159.132 379.196 161.526 384.845 167 394C169.168 397.626 170.499 399.596 173 403C180.032 412.572 184.727 417.579 194 425C198.821 428.858 201.701 430.831 207 434C207 434 216.522 439.385 223 442C232.751 445.936 238.598 447.461 249 449C262.135 450.943 269.869 450.967 283 449C288.53 448.172 291.606 447.471 297 446C302.5 444.5 304 444 312 439L271 398C271 398 262.432 398.623 257 398C253.043 397.546 250.827 397.103 247 396C241.284 394.353 238.185 392.914 233 390C229.318 387.93 227.278 386.665 224 384C217.985 379.11 215.113 375.57 211 369C206.728 362.176 205.043 357.787 203 350C201.892 345.777 201.41 343.347 201 339C200.303 331.603 200.717 327.319 202 320C203.195 313.184 204.167 309.314 207 303C209.221 298.05 210.795 295.377 214 291C217.104 286.761 219.069 284.486 223 281C229.164 275.534 233.376 273.121 241 270C246.262 267.846 249.4 266.985 255 266C260.782 264.983 264.133 264.785 270 265C279.567 265.351 286.571 266.461 295 271C301.5 274.5 319 289.455 324 294C364.55 330.864 419 384 419 384L492 314H494V450H548V214H513L466.5 258.5L420 303H418L371 258.5L324 214Z"
+          fill="var(--logo-body)"
+        />
+        <path
+          d="M373 362L329 319L329.269 325.462C329.753 337.065 328.211 348.664 324.714 359.738L324 362L300 338L282.5 355L264.5 372.5L376 484L411 450L359 398L361.406 393.723C365.782 385.943 369.097 377.611 371.262 368.951L373 362Z"
+          fill="#E3C13C"
+        />
+      </symbol>
+      <!-- Tab icons: authored set, 24 grid, stroke 2, round caps. One family only. -->
+      <symbol id="i-leads" viewBox="0 0 24 24">
+        <path d="M3 13l4 0 2 3 6 0 2-3 4 0" />
+        <path d="M5 5h14a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2z" />
+      </symbol>
+      <symbol id="i-quotes" viewBox="0 0 24 24">
+        <path d="M7 3h7l4 4v14H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1z" />
+        <path d="M14 3v4h4" />
+        <path d="M9 12h6M9 16h4" />
+      </symbol>
+      <symbol id="i-book" viewBox="0 0 24 24">
+        <path
+          d="M12 6c-1.8-1.4-4.2-2-8-2v14c3.8 0 6.2.6 8 2 1.8-1.4 4.2-2 8-2V4c-3.8 0-6.2.6-8 2z"
+        />
+        <path d="M12 6v14" />
+      </symbol>
+      <symbol id="i-jobs" viewBox="0 0 24 24">
+        <rect x="3" y="5" width="18" height="16" rx="2" />
+        <path d="M8 3v4M16 3v4M3 10h18" />
+        <path d="M9 15l2 2 4-4" />
+      </symbol>
+      <symbol id="i-settings" viewBox="0 0 24 24">
+        <path d="M4 8h10M18 8h2M4 16h4M12 16h8" />
+        <circle cx="16" cy="8" r="2" />
+        <circle cx="10" cy="16" r="2" />
+      </symbol>
+    </svg>
 
-<nav class="nav"><div class="wrap">
-  <a class="lockup" href="#top" aria-label="QuoteMax">
-    <svg viewBox="0 0 397 270" role="img" aria-hidden="true"><use href="#qm-mark"/></svg>
-    <span class="wm"><span>Quote</span><span>Max</span></span>
-  </a>
-  <div class="links">
-    <a href="#colour">Colours</a><a href="#type">Type</a><a href="#logo">Logo</a>
-    <a href="#depth">Depth</a><a href="#shape">Shape</a><a href="#components">Components</a>
-    <a href="#motion">Motion</a><a href="#rules">Rules</a>
-  </div>
-</div></nav>
+    <nav class="nav">
+      <div class="wrap">
+        <a class="lockup" href="#top" aria-label="QuoteMax">
+          <svg viewBox="0 0 397 270" role="img" aria-hidden="true"><use href="#qm-mark" /></svg>
+          <span class="wm"><span>Quote</span><span>Max</span></span>
+        </a>
+        <div class="links">
+          <a href="#colour">Colours</a><a href="#type">Type</a><a href="#logo">Logo</a>
+          <a href="#depth">Depth</a><a href="#shape">Shape</a><a href="#components">Components</a>
+          <a href="#motion">Motion</a><a href="#rules">Rules</a>
+        </div>
+      </div>
+    </nav>
 
-<header class="hero qm-grain" id="top">
-  <div class="photo" aria-hidden="true"></div>
-  <svg class="ridges" viewBox="0 0 1200 560" preserveAspectRatio="xMidYMid slice" aria-hidden="true">
-    <path d="M-20 430 L180 300 L340 380 L560 210 L760 330 L980 170 L1220 300" fill="none" stroke="#4A4136" stroke-width="1.5"/>
-    <path d="M-20 480 L200 360 L360 430 L580 270 L780 380 L1000 230 L1220 350" fill="none" stroke="#6E6354" stroke-width="1" opacity=".6"/>
-    <path d="M-20 530 L220 420 L380 480 L600 330 L800 430 L1020 290 L1220 400" fill="none" stroke="#4A4136" stroke-width="1" opacity=".45"/>
-  </svg>
-  <div class="glow" aria-hidden="true"></div>
-  <div class="wrap">
-    <h1>The command centre, <span class="accent-word">one-handed</span></h1>
-    <p class="lead">The QuoteMax mobile design system, tailored from quotemax.com.au for the app in a tradie's pocket. Same warm charcoal, same single yellow signal, same honest mono numbers, now with 48dp touch floors, both themes on every screen, and platform-native structure. The app consumes <code>src/lib/theme.ts</code>; this page is the human-readable source.</p>
-    <div class="meta">
-      <span class="chiplet">One yellow signal</span>
-      <span class="chiplet">Manrope · JetBrains Mono</span>
-      <span class="chiplet">48dp touch floors</span>
-      <span class="chiplet">WCAG AA · both themes</span>
-    </div>
-  </div>
-</header>
+    <header class="hero qm-grain" id="top">
+      <div class="photo" aria-hidden="true"></div>
+      <svg
+        class="ridges"
+        viewBox="0 0 1200 560"
+        preserveAspectRatio="xMidYMid slice"
+        aria-hidden="true"
+      >
+        <path
+          d="M-20 430 L180 300 L340 380 L560 210 L760 330 L980 170 L1220 300"
+          fill="none"
+          stroke="#4A4136"
+          stroke-width="1.5"
+        />
+        <path
+          d="M-20 480 L200 360 L360 430 L580 270 L780 380 L1000 230 L1220 350"
+          fill="none"
+          stroke="#6E6354"
+          stroke-width="1"
+          opacity=".6"
+        />
+        <path
+          d="M-20 530 L220 420 L380 480 L600 330 L800 430 L1020 290 L1220 400"
+          fill="none"
+          stroke="#4A4136"
+          stroke-width="1"
+          opacity=".45"
+        />
+      </svg>
+      <div class="glow" aria-hidden="true"></div>
+      <div class="wrap">
+        <h1>The command centre, <span class="accent-word">one-handed</span></h1>
+        <p class="lead">
+          The QuoteMax mobile design system, tailored from quotemax.com.au for the app in a tradie's
+          pocket. Same warm charcoal, same single yellow signal, same honest mono numbers, now with
+          48dp touch floors, both themes on every screen, and platform-native structure. The app
+          consumes <code>src/lib/theme.ts</code>; this page is the human-readable source.
+        </p>
+        <div class="meta">
+          <span class="chiplet">One yellow signal</span>
+          <span class="chiplet">Manrope · JetBrains Mono</span>
+          <span class="chiplet">48dp touch floors</span>
+          <span class="chiplet">WCAG AA · both themes</span>
+        </div>
+      </div>
+    </header>
 
-<main>
-<section id="colour"><div class="wrap">
-  <div class="head"><h2>Colours</h2>
-  <p class="lead">A warm charcoal monochrome lit by one hi-vis signal. Components consume semantic roles from <code>theme.ts</code>, never raw hex. Everything leans warm; a blue-black or cool grey anywhere is a defect.</p></div>
+    <main>
+      <section id="colour">
+        <div class="wrap">
+          <div class="head">
+            <h2>Colours</h2>
+            <p class="lead">
+              A warm charcoal monochrome lit by one hi-vis signal. Components consume semantic roles
+              from <code>theme.ts</code>, never raw hex. Everything leans warm; a blue-black or cool
+              grey anywhere is a defect.
+            </p>
+          </div>
 
-  <div class="swgroup">
-    <h3>The signal</h3>
-    <div class="swatches">
-      <div class="sw"><div class="chip" style="background:#FFC400"><b>#FFC400</b></div><div class="cap"><div class="tk">accent</div><div class="role">Caterpillar yellow. The one signal per screen: the approve CTA, the active tab, the highlighted word.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#E6AC00"><b>#E6AC00</b></div><div class="cap"><div class="tk">accentPress</div><div class="role">Pressed state of any accent fill. A colour step, paired with the 0.97 scale.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#FFD23D"><b>#FFD23D</b></div><div class="cap"><div class="tk">accentSoft</div><div class="role">Focus rings and selection ticks, dark theme only. On paper the ring is ink #2B2422; soft yellow vanishes on cream.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#1C1812"><b>#1C1812</b></div><div class="cap"><div class="tk">accentInk</div><div class="role">Text and icons on a yellow fill. White on yellow is forbidden.</div></div></div>
-    </div>
-  </div>
-
-  <div class="swgroup">
-    <h3>Command charcoal, the dark theme</h3>
-    <div class="swatches">
-      <div class="sw"><div class="chip" style="background:#16120F"><b>#16120F</b></div><div class="cap"><div class="tk">inkDeep</div><div class="role">Screen canvas. Warm near-black, never blue-black.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#1E1813"><b>#1E1813</b></div><div class="cap"><div class="tk">ink</div><div class="role">Sunken surfaces: inputs, insets, grouped lists.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#2B2422"><b>#2B2422</b></div><div class="cap"><div class="tk">inkCard</div><div class="role">Cards, sheets, the tab bar. The surface that lifts.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#3A322C"><b>#3A322C</b></div><div class="cap"><div class="tk">inkLine</div><div class="role">The 1px warm hairline that draws every edge.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#7A6E5E"><b>#7A6E5E</b></div><div class="cap"><div class="tk">ctlLine</div><div class="role">Input and control boundary. Paper value #8A7D6A. Stronger than the hairline so a field edge holds in sun.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#F6F1EA"><b>#F6F1EA</b></div><div class="cap"><div class="tk">textPri</div><div class="role">Bone. Headlines and primary copy.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#C3B8AC"><b>#C3B8AC</b></div><div class="cap"><div class="tk">textSec</div><div class="role">Body and secondary copy.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#A2968A"><b>#A2968A</b></div><div class="cap"><div class="tk">textDim</div><div class="role">Mono labels and captions. Tuned to 4.5:1 on cards.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#4A4136"><b>#4A4136</b></div><div class="cap"><div class="tk">edgeDeep · edgeGlow</div><div class="role">Ridge-line neutrals for the topographic texture. Never an accent.</div></div></div>
-    </div>
-  </div>
-
-  <div class="swgroup">
-    <h3>Warm paper, the sunlight theme</h3>
-    <div class="swatches">
-      <div class="sw"><div class="chip on-light" style="background:#FAF8F4"><b>#FAF8F4</b></div><div class="cap"><div class="tk">inkDeep · light</div><div class="role">Cream canvas. The theme a tradie reads in full sun.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#F3EEE7"><b>#F3EEE7</b></div><div class="cap"><div class="tk">ink · light</div><div class="role">Sunken paper: inputs and insets.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#FFFFFF"><b>#FFFFFF</b></div><div class="cap"><div class="tk">inkCard · light</div><div class="role">White cards on cream.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#CFC2B0"><b>#CFC2B0</b></div><div class="cap"><div class="tk">inkLine · light</div><div class="role">Warm taupe hairline.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#241E1B"><b>#241E1B</b></div><div class="cap"><div class="tk">textPri · light</div><div class="role">Ink. Yellow is never used as text on cream; highlights become underlines.</div></div></div>
-      <div class="sw"><div class="chip on-light" style="background:#5E544E"><b>#5E544E</b></div><div class="cap"><div class="tk">textSec · light</div><div class="role">Secondary ink.</div></div></div>
-    </div>
-  </div>
-
-  <div class="swgroup">
-    <h3>Quote lifecycle states</h3>
-    <div class="swatches">
-      <div class="sw"><div class="chip" style="background:#34D27B"><b>#34D27B</b></div><div class="cap"><div class="tk">successBright</div><div class="role">Deposit paid, job booked. Text and borders on dark; fill #15803D behind white only.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#F59E0B"><b>#F59E0B</b></div><div class="cap"><div class="tk">warningBright</div><div class="role">Draft waiting on approval, expiring quote.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#F0816B"><b>#F0816B</b></div><div class="cap"><div class="tk">dangerBright</div><div class="role">Failed send, declined payment, destructive confirm.</div></div></div>
-      <div class="sw"><div class="chip" style="background:#E3C13C"><b>#E3C13C</b></div><div class="cap"><div class="tk">logoNotch</div><div class="role">Mark gold, the literal source-art value. The one sanctioned second yellow; never "corrected" to accent.</div></div></div>
-    </div>
-  </div>
-
-  <div class="rules">
-    <div><b>The One Signal Rule</b><p>Yellow is the only accent. On any screen it marks the single thing that matters next. If two elements are yellow, one of them is wrong. Keep it under roughly 10% of the surface.</p></div>
-    <div><b>The Dark-on-Yellow Rule</b><p>Text and icons on a yellow fill are always dark charcoal. White on yellow sits near 1.4:1 and is forbidden.</p></div>
-    <div><b>The Warm-Not-Blue Rule</b><p>Canvas, borders and neutrals all lean warm, including themed platform components. Default Material blue-greys and iOS system greys get themed out.</p></div>
-  </div>
-</div></section>
-
-<section id="type"><div class="wrap">
-  <div class="head"><h2>Typography</h2>
-  <p class="lead">Manrope, heavy and tight, against JetBrains Mono for anything instrumented: labels, refs, timestamps and every price. Sizes are dp and follow the OS font-size setting; only display caps its multiplier. Weights ship at 400 to 800 sans and 400 to 700 mono, nothing synthesised.</p></div>
-  <div class="spec">
-    <div class="row"><small>DISPLAY<br>MANROPE 800 · 34/36<br>-0.04EM · CAPS</small><div class="t-display">Approve it, stay on the tools</div></div>
-    <div class="row"><small>HEADLINE<br>MANROPE 800 · 26/28<br>-0.04EM · CAPS</small><div class="t-headline">Today's leads</div></div>
-    <div class="row"><small>TITLE<br>MANROPE 700 · 18/24</small><div class="t-title">Switchboard upgrade, Sharon McAllister</div></div>
-    <div class="row"><small>BODY<br>MANROPE 400 · 16/24</small><div class="t-body">QuoteMax answered the call, priced it from your book and drafted the quote. Read it once, approve it, and the deposit link goes out by text.</div></div>
-    <div class="row"><small>BODY-SM<br>MANROPE 400 · 14/20</small><div class="t-bodysm">Priced from your book · nothing invented, nothing estimated.</div></div>
-    <div class="row"><small>LABEL<br>JETBRAINS MONO 600 · 12/16<br>+0.18EM · CAPS</small><div class="t-label">Quote ref · QM-2418</div></div>
-    <div class="row"><small>PRICE<br>JETBRAINS MONO 700 · 28/32<br>TABULAR-NUMS</small><div class="t-price">A$1,842.50</div></div>
-  </div>
-  <div class="rules" style="margin-top:48px">
-    <div><b>The All-Caps Display Rule</b><p>Display and headline are ALL CAPS Manrope 800, left-aligned, never centred, with at most one accent word. Line height stays at 1.05 or above on native; the web's 0.95 clips glyphs in React Native.</p></div>
-    <div><b>The Mono-Money Rule</b><p>Every price, ref and timestamp is JetBrains Mono with tabular figures, formatted by <code>formatAud</code> from integer cents. A price set in Manrope is a defect, not a style choice.</p></div>
-  </div>
-</div></section>
-
-<section id="logo"><div class="wrap">
-  <div class="head"><h2>Logo</h2>
-  <p class="lead">The two-tone M mark, cropped tight at 1.47:1. Body flips white on charcoal to charcoal on paper; the notch keeps the source gold <code>#E3C13C</code> in both themes. Ship it inline so it themes; size it by height and let width follow.</p></div>
-  <div class="lockups">
-    <div class="lock dark"><svg viewBox="0 0 397 270" role="img" aria-label="Mark on canvas"><use href="#qm-mark"/></svg></div>
-    <div class="lock card"><span class="lockup"><svg viewBox="0 0 397 270" aria-hidden="true" style="height:44px;width:auto"><use href="#qm-mark"/></svg><span class="wm" style="font-size:22px"><span>Quote</span><span>Max</span></span></span></div>
-    <div class="lock paper paper-scope"><svg viewBox="0 0 397 270" role="img" aria-label="Mark on paper"><use href="#qm-mark"/></svg></div>
-    <div class="lock dark qm-grain"><svg class="ridgebg" viewBox="0 0 300 150" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 115 L55 70 L100 98 L160 42 L215 80 L265 30 L310 68" fill="none" stroke="#4A4136" stroke-width="1.2"/><path d="M-10 138 L65 95 L110 120 L170 70 L225 105 L275 58 L310 90" fill="none" stroke="#6E6354" stroke-width="1" opacity=".55"/></svg><svg viewBox="0 0 397 270" role="img" aria-label="Mark on textured canvas" style="position:relative;z-index:2"><use href="#qm-mark"/></svg></div>
-  </div>
-  <p class="locknote">Files: <code>assets/logo/quotemax-mark-on-dark.svg</code> · <code>assets/logo/quotemax-mark-on-paper.svg</code>. In-app the mark is an inline SVG component sized <code>h-* w-auto</code>; a square box letterboxes the landscape glyph. The wordmark stacks QUOTE over MAX at 0.82 leading and inherits the mark's body colour, so the lockup is always one colour and cannot drift. Clear space at least half the mark's height on all sides.</p>
-</div></section>
-
-<section id="depth"><div class="wrap">
-  <div class="head"><h2>Depth &amp; texture</h2>
-  <p class="lead">Flat by intent. Structure is drawn with a 1px warm hairline and a lit top edge; cast shadows exist only for true overlays, tinted warm. Film grain earns its battery cost on hero surfaces only, and trade photography ships through the duotone pass so it reads as native to the palette.</p></div>
-  <div class="tiles">
-    <div class="tile lit"><span>hairline + lit edge · every resting surface</span></div>
-    <div class="tile qm-grain"><span>film grain · 4.5% · hero surfaces only</span></div>
-    <div class="tile ridge"><svg viewBox="0 0 400 190" preserveAspectRatio="none" aria-hidden="true"><path d="M-10 150 L70 90 L130 125 L210 55 L280 105 L350 40 L410 90" fill="none" stroke="#6E6354" stroke-width="1.5"/><path d="M-10 175 L80 120 L140 150 L220 90 L290 135 L360 75 L410 115" fill="none" stroke="#4A4136" stroke-width="1"/></svg><span>topographic ridges · edgeGlow neutrals</span></div>
-    <div class="tile duo-1"><span>duotone pass · hero_main_tradie_tech.jpg</span></div>
-    <div class="tile duo-2"><span>duotone pass · electrician_hero.jpg</span></div>
-    <div class="tile" style="box-shadow:0 24px 60px -12px rgba(11,9,7,.7);background:var(--ink-card)"><span>overlay shadow · sheets and dialogs only</span></div>
-  </div>
-</div></section>
-
-<section id="shape"><div class="wrap">
-  <div class="head"><h2>Shape, space &amp; touch</h2>
-  <p class="lead">The product radii: 14 for cards, 9 for controls, 6 for chips, 16 for sheet tops. Spacing runs a 4dp base scale. Touch floors assume gloves: 48dp minimum, 56dp for rows and the primary CTA.</p></div>
-  <div class="shapes">
-    <div class="shape" style="border-radius:14px"><span class="tk">radius.card</span><span class="tk" style="color:var(--text-pri)">14</span></div>
-    <div class="shape" style="border-radius:9px"><span class="tk">radius.control</span><span class="tk" style="color:var(--text-pri)">9</span></div>
-    <div class="shape" style="border-radius:6px"><span class="tk">radius.chip</span><span class="tk" style="color:var(--text-pri)">6</span></div>
-    <div class="shape" style="border-radius:16px 16px 0 0"><span class="tk">radius.sheet</span><span class="tk" style="color:var(--text-pri)">16 · top</span></div>
-  </div>
-  <div class="sp-scale">
-    <div class="sp-row"><span class="tk">4</span><div class="sp-bar" style="width:4px"></div></div>
-    <div class="sp-row"><span class="tk">8</span><div class="sp-bar" style="width:8px"></div></div>
-    <div class="sp-row"><span class="tk">12</span><div class="sp-bar" style="width:12px"></div></div>
-    <div class="sp-row"><span class="tk">16</span><div class="sp-bar" style="width:16px"></div></div>
-    <div class="sp-row"><span class="tk">20</span><div class="sp-bar" style="width:20px"></div></div>
-    <div class="sp-row"><span class="tk">24</span><div class="sp-bar" style="width:24px"></div></div>
-    <div class="sp-row"><span class="tk">32</span><div class="sp-bar" style="width:32px"></div></div>
-    <div class="sp-row"><span class="tk">48</span><div class="sp-bar" style="width:48px"></div></div>
-    <div class="sp-row"><span class="tk">64</span><div class="sp-bar" style="width:64px"></div></div>
-  </div>
-  <div class="targets">
-    <div class="target"><div class="box" style="width:48px;height:48px">48</div><span class="tk">minimum target</span></div>
-    <div class="target"><div class="box" style="width:200px;height:56px">56</div><span class="tk">list row</span></div>
-    <div class="target"><div class="box" style="width:160px;height:56px">56</div><span class="tk">primary CTA</span></div>
-  </div>
-</div></section>
-
-<section id="components"><div class="wrap">
-  <div class="head"><h2>Components</h2>
-  <p class="lead">The quote screen is the product. Both themes ship on every screen from the first commit; the paper column is the same component tree with the light tokens applied, nothing redesigned.</p></div>
-
-  <div class="phones">
-    <div class="phonecol">
-      <div class="phone">
-        <div class="appbar"><span class="ref">Quote ref · QM-2418</span><h4>Sharon McAllister</h4></div>
-        <div class="body">
-          <div class="qcard">
-            <div class="items">
-              <div class="qitem"><span>Switchboard upgrade</span><span class="dots"></span><b>A$1,240.00</b></div>
-              <div class="qitem"><span>Safety switch install × 2</span><span class="dots"></span><b>A$360.00</b></div>
-              <div class="qitem"><span>Test and tag</span><span class="dots"></span><b>A$242.50</b></div>
-            </div>
-            <div class="totals">
-              <div class="gst"><span>GST included</span><span>A$167.50</span></div>
-              <div class="sum"><span>Total</span><b>A$1,842.50</b></div>
+          <div class="swgroup">
+            <h3>The signal</h3>
+            <div class="swatches">
+              <div class="sw">
+                <div class="chip" style="background: #ffc400"><b>#FFC400</b></div>
+                <div class="cap">
+                  <div class="tk">accent</div>
+                  <div class="role">
+                    Caterpillar yellow. The one signal per screen: the approve CTA, the active tab,
+                    the highlighted word.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #e6ac00"><b>#E6AC00</b></div>
+                <div class="cap">
+                  <div class="tk">accentPress</div>
+                  <div class="role">
+                    Pressed state of any accent fill. A colour step, paired with the 0.97 scale.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #ffd23d"><b>#FFD23D</b></div>
+                <div class="cap">
+                  <div class="tk">accentSoft</div>
+                  <div class="role">
+                    Focus rings and selection ticks, dark theme only. On paper the ring is ink
+                    #2B2422; soft yellow vanishes on cream.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #1c1812"><b>#1C1812</b></div>
+                <div class="cap">
+                  <div class="tk">accentInk</div>
+                  <div class="role">
+                    Text and icons on a yellow fill. White on yellow is forbidden.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="chips"><span class="chip-s c-draft">Draft</span><span class="chip-s c-sent">30% deposit · A$552.75</span></div>
-          <div class="spacer"></div>
-        </div>
-        <div class="approvebar">
-          <div class="total"><b>A$1,842.50</b><span>Inc GST · from your book</span></div>
-          <button class="btn btn-primary" type="button">Approve</button>
-        </div>
-      </div>
-      <p>Command charcoal. The approve bar is the one place yellow always lives on this screen; the total renders from integer cents through <code>formatAud</code>.</p>
-    </div>
-    <div class="phonecol paper-scope">
-      <div class="phone">
-        <div class="appbar"><span class="ref">Quote ref · QM-2418</span><h4>Sharon McAllister</h4></div>
-        <div class="body">
-          <div class="qcard">
-            <div class="items">
-              <div class="qitem"><span>Switchboard upgrade</span><span class="dots"></span><b>A$1,240.00</b></div>
-              <div class="qitem"><span>Safety switch install × 2</span><span class="dots"></span><b>A$360.00</b></div>
-              <div class="qitem"><span>Test and tag</span><span class="dots"></span><b>A$242.50</b></div>
-            </div>
-            <div class="totals">
-              <div class="gst"><span>GST included</span><span>A$167.50</span></div>
-              <div class="sum"><span>Total</span><b>A$1,842.50</b></div>
+
+          <div class="swgroup">
+            <h3>Command charcoal, the dark theme</h3>
+            <div class="swatches">
+              <div class="sw">
+                <div class="chip" style="background: #16120f"><b>#16120F</b></div>
+                <div class="cap">
+                  <div class="tk">inkDeep</div>
+                  <div class="role">Screen canvas. Warm near-black, never blue-black.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #1e1813"><b>#1E1813</b></div>
+                <div class="cap">
+                  <div class="tk">ink</div>
+                  <div class="role">Sunken surfaces: inputs, insets, grouped lists.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #2b2422"><b>#2B2422</b></div>
+                <div class="cap">
+                  <div class="tk">inkCard</div>
+                  <div class="role">Cards, sheets, the tab bar. The surface that lifts.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #3a322c"><b>#3A322C</b></div>
+                <div class="cap">
+                  <div class="tk">inkLine</div>
+                  <div class="role">The 1px warm hairline that draws every edge.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #7a6e5e"><b>#7A6E5E</b></div>
+                <div class="cap">
+                  <div class="tk">ctlLine</div>
+                  <div class="role">
+                    Input and control boundary. Paper value #8A7D6A. Stronger than the hairline so a
+                    field edge holds in sun.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #f6f1ea"><b>#F6F1EA</b></div>
+                <div class="cap">
+                  <div class="tk">textPri</div>
+                  <div class="role">Bone. Headlines and primary copy.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #c3b8ac"><b>#C3B8AC</b></div>
+                <div class="cap">
+                  <div class="tk">textSec</div>
+                  <div class="role">Body and secondary copy.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #a2968a"><b>#A2968A</b></div>
+                <div class="cap">
+                  <div class="tk">textDim</div>
+                  <div class="role">Mono labels and captions. Tuned to 4.5:1 on cards.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #4a4136"><b>#4A4136</b></div>
+                <div class="cap">
+                  <div class="tk">edgeDeep · edgeGlow</div>
+                  <div class="role">
+                    Ridge-line neutrals for the topographic texture. Never an accent.
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
-          <div class="chips"><span class="chip-s c-draft">Draft</span><span class="chip-s c-sent">30% deposit · A$552.75</span></div>
-          <div class="spacer"></div>
+
+          <div class="swgroup">
+            <h3>Warm paper, the sunlight theme</h3>
+            <div class="swatches">
+              <div class="sw">
+                <div class="chip on-light" style="background: #faf8f4"><b>#FAF8F4</b></div>
+                <div class="cap">
+                  <div class="tk">inkDeep · light</div>
+                  <div class="role">Cream canvas. The theme a tradie reads in full sun.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #f3eee7"><b>#F3EEE7</b></div>
+                <div class="cap">
+                  <div class="tk">ink · light</div>
+                  <div class="role">Sunken paper: inputs and insets.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #ffffff"><b>#FFFFFF</b></div>
+                <div class="cap">
+                  <div class="tk">inkCard · light</div>
+                  <div class="role">White cards on cream.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #cfc2b0"><b>#CFC2B0</b></div>
+                <div class="cap">
+                  <div class="tk">inkLine · light</div>
+                  <div class="role">Warm taupe hairline.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #241e1b"><b>#241E1B</b></div>
+                <div class="cap">
+                  <div class="tk">textPri · light</div>
+                  <div class="role">
+                    Ink. Yellow is never used as text on cream; highlights become underlines.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip on-light" style="background: #5e544e"><b>#5E544E</b></div>
+                <div class="cap">
+                  <div class="tk">textSec · light</div>
+                  <div class="role">Secondary ink.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="swgroup">
+            <h3>Quote lifecycle states</h3>
+            <div class="swatches">
+              <div class="sw">
+                <div class="chip" style="background: #34d27b"><b>#34D27B</b></div>
+                <div class="cap">
+                  <div class="tk">successBright</div>
+                  <div class="role">
+                    Deposit paid, job booked. Text and borders on dark; fill #15803D behind white
+                    only.
+                  </div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #f59e0b"><b>#F59E0B</b></div>
+                <div class="cap">
+                  <div class="tk">warningBright</div>
+                  <div class="role">Draft waiting on approval, expiring quote.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #f0816b"><b>#F0816B</b></div>
+                <div class="cap">
+                  <div class="tk">dangerBright</div>
+                  <div class="role">Failed send, declined payment, destructive confirm.</div>
+                </div>
+              </div>
+              <div class="sw">
+                <div class="chip" style="background: #e3c13c"><b>#E3C13C</b></div>
+                <div class="cap">
+                  <div class="tk">logoNotch</div>
+                  <div class="role">
+                    Mark gold, the literal source-art value. The one sanctioned second yellow; never
+                    "corrected" to accent.
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="rules">
+            <div>
+              <b>The One Signal Rule</b>
+              <p>
+                Yellow is the only accent. On any screen it marks the single thing that matters
+                next. If two elements are yellow, one of them is wrong. Keep it under roughly 10% of
+                the surface.
+              </p>
+            </div>
+            <div>
+              <b>The Dark-on-Yellow Rule</b>
+              <p>
+                Text and icons on a yellow fill are always dark charcoal. White on yellow sits near
+                1.4:1 and is forbidden.
+              </p>
+            </div>
+            <div>
+              <b>The Warm-Not-Blue Rule</b>
+              <p>
+                Canvas, borders and neutrals all lean warm, including themed platform components.
+                Default Material blue-greys and iOS system greys get themed out.
+              </p>
+            </div>
+          </div>
         </div>
-        <div class="approvebar">
-          <div class="total"><b>A$1,842.50</b><span>Inc GST · from your book</span></div>
-          <button class="btn btn-primary" type="button">Approve</button>
+      </section>
+
+      <section id="type">
+        <div class="wrap">
+          <div class="head">
+            <h2>Typography</h2>
+            <p class="lead">
+              Manrope, heavy and tight, against JetBrains Mono for anything instrumented: labels,
+              refs, timestamps and every price. Sizes are dp and follow the OS font-size setting;
+              only display caps its multiplier. Weights ship at 400 to 800 sans and 400 to 700 mono,
+              nothing synthesised.
+            </p>
+          </div>
+          <div class="spec">
+            <div class="row">
+              <small>DISPLAY<br />MANROPE 800 · 34/36<br />-0.04EM · CAPS</small>
+              <div class="t-display">Approve it, stay on the tools</div>
+            </div>
+            <div class="row">
+              <small>HEADLINE<br />MANROPE 800 · 26/28<br />-0.04EM · CAPS</small>
+              <div class="t-headline">Today's leads</div>
+            </div>
+            <div class="row">
+              <small>TITLE<br />MANROPE 700 · 18/24</small>
+              <div class="t-title">Switchboard upgrade, Sharon McAllister</div>
+            </div>
+            <div class="row">
+              <small>BODY<br />MANROPE 400 · 16/24</small>
+              <div class="t-body">
+                QuoteMax answered the call, priced it from your book and drafted the quote. Read it
+                once, approve it, and the deposit link goes out by text.
+              </div>
+            </div>
+            <div class="row">
+              <small>BODY-SM<br />MANROPE 400 · 14/20</small>
+              <div class="t-bodysm">
+                Priced from your book · nothing invented, nothing estimated.
+              </div>
+            </div>
+            <div class="row">
+              <small>LABEL<br />JETBRAINS MONO 600 · 12/16<br />+0.18EM · CAPS</small>
+              <div class="t-label">Quote ref · QM-2418</div>
+            </div>
+            <div class="row">
+              <small>PRICE<br />JETBRAINS MONO 700 · 28/32<br />TABULAR-NUMS</small>
+              <div class="t-price">A$1,842.50</div>
+            </div>
+          </div>
+          <div class="rules" style="margin-top: 48px">
+            <div>
+              <b>The All-Caps Display Rule</b>
+              <p>
+                Display and headline are ALL CAPS Manrope 800, left-aligned, never centred, with at
+                most one accent word. Line height stays at 1.05 or above on native; the web's 0.95
+                clips glyphs in React Native.
+              </p>
+            </div>
+            <div>
+              <b>The Mono-Money Rule</b>
+              <p>
+                Every price, ref and timestamp is JetBrains Mono with tabular figures, formatted by
+                <code>formatAud</code> from integer cents. A price set in Manrope is a defect, not a
+                style choice.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="logo">
+        <div class="wrap">
+          <div class="head">
+            <h2>Logo</h2>
+            <p class="lead">
+              The two-tone M mark, cropped tight at 1.47:1. Body flips white on charcoal to charcoal
+              on paper; the notch keeps the source gold <code>#E3C13C</code> in both themes. Ship it
+              inline so it themes; size it by height and let width follow.
+            </p>
+          </div>
+          <div class="lockups">
+            <div class="lock dark">
+              <svg viewBox="0 0 397 270" role="img" aria-label="Mark on canvas">
+                <use href="#qm-mark" />
+              </svg>
+            </div>
+            <div class="lock card">
+              <span class="lockup"
+                ><svg viewBox="0 0 397 270" aria-hidden="true" style="height: 44px; width: auto">
+                  <use href="#qm-mark" /></svg
+                ><span class="wm" style="font-size: 22px"
+                  ><span>Quote</span><span>Max</span></span
+                ></span
+              >
+            </div>
+            <div class="lock paper paper-scope">
+              <svg viewBox="0 0 397 270" role="img" aria-label="Mark on paper">
+                <use href="#qm-mark" />
+              </svg>
+            </div>
+            <div class="lock dark qm-grain">
+              <svg
+                class="ridgebg"
+                viewBox="0 0 300 150"
+                preserveAspectRatio="none"
+                aria-hidden="true"
+              >
+                <path
+                  d="M-10 115 L55 70 L100 98 L160 42 L215 80 L265 30 L310 68"
+                  fill="none"
+                  stroke="#4A4136"
+                  stroke-width="1.2"
+                />
+                <path
+                  d="M-10 138 L65 95 L110 120 L170 70 L225 105 L275 58 L310 90"
+                  fill="none"
+                  stroke="#6E6354"
+                  stroke-width="1"
+                  opacity=".55"
+                /></svg
+              ><svg
+                viewBox="0 0 397 270"
+                role="img"
+                aria-label="Mark on textured canvas"
+                style="position: relative; z-index: 2"
+              >
+                <use href="#qm-mark" />
+              </svg>
+            </div>
+          </div>
+          <p class="locknote">
+            Files: <code>assets/logo/quotemax-mark-on-dark.svg</code> ·
+            <code>assets/logo/quotemax-mark-on-paper.svg</code>. In-app the mark is an inline SVG
+            component sized <code>h-* w-auto</code>; a square box letterboxes the landscape glyph.
+            The wordmark stacks QUOTE over MAX at 0.82 leading and inherits the mark's body colour,
+            so the lockup is always one colour and cannot drift. Clear space at least half the
+            mark's height on all sides.
+          </p>
+        </div>
+      </section>
+
+      <section id="depth">
+        <div class="wrap">
+          <div class="head">
+            <h2>Depth &amp; texture</h2>
+            <p class="lead">
+              Flat by intent. Structure is drawn with a 1px warm hairline and a lit top edge; cast
+              shadows exist only for true overlays, tinted warm. Film grain earns its battery cost
+              on hero surfaces only, and trade photography ships through the duotone pass so it
+              reads as native to the palette.
+            </p>
+          </div>
+          <div class="tiles">
+            <div class="tile lit"><span>hairline + lit edge · every resting surface</span></div>
+            <div class="tile qm-grain"><span>film grain · 4.5% · hero surfaces only</span></div>
+            <div class="tile ridge">
+              <svg viewBox="0 0 400 190" preserveAspectRatio="none" aria-hidden="true">
+                <path
+                  d="M-10 150 L70 90 L130 125 L210 55 L280 105 L350 40 L410 90"
+                  fill="none"
+                  stroke="#6E6354"
+                  stroke-width="1.5"
+                />
+                <path
+                  d="M-10 175 L80 120 L140 150 L220 90 L290 135 L360 75 L410 115"
+                  fill="none"
+                  stroke="#4A4136"
+                  stroke-width="1"
+                /></svg
+              ><span>topographic ridges · edgeGlow neutrals</span>
+            </div>
+            <div class="tile duo-1"><span>duotone pass · hero_main_tradie_tech.jpg</span></div>
+            <div class="tile duo-2"><span>duotone pass · electrician_hero.jpg</span></div>
+            <div
+              class="tile"
+              style="box-shadow: 0 24px 60px -12px rgba(11, 9, 7, 0.7); background: var(--ink-card)"
+            >
+              <span>overlay shadow · sheets and dialogs only</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="shape">
+        <div class="wrap">
+          <div class="head">
+            <h2>Shape, space &amp; touch</h2>
+            <p class="lead">
+              The product radii: 14 for cards, 9 for controls, 6 for chips, 16 for sheet tops.
+              Spacing runs a 4dp base scale. Touch floors assume gloves: 48dp minimum, 56dp for rows
+              and the primary CTA.
+            </p>
+          </div>
+          <div class="shapes">
+            <div class="shape" style="border-radius: 14px">
+              <span class="tk">radius.card</span
+              ><span class="tk" style="color: var(--text-pri)">14</span>
+            </div>
+            <div class="shape" style="border-radius: 9px">
+              <span class="tk">radius.control</span
+              ><span class="tk" style="color: var(--text-pri)">9</span>
+            </div>
+            <div class="shape" style="border-radius: 6px">
+              <span class="tk">radius.chip</span
+              ><span class="tk" style="color: var(--text-pri)">6</span>
+            </div>
+            <div class="shape" style="border-radius: 16px 16px 0 0">
+              <span class="tk">radius.sheet</span
+              ><span class="tk" style="color: var(--text-pri)">16 · top</span>
+            </div>
+          </div>
+          <div class="sp-scale">
+            <div class="sp-row">
+              <span class="tk">4</span>
+              <div class="sp-bar" style="width: 4px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">8</span>
+              <div class="sp-bar" style="width: 8px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">12</span>
+              <div class="sp-bar" style="width: 12px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">16</span>
+              <div class="sp-bar" style="width: 16px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">20</span>
+              <div class="sp-bar" style="width: 20px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">24</span>
+              <div class="sp-bar" style="width: 24px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">32</span>
+              <div class="sp-bar" style="width: 32px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">48</span>
+              <div class="sp-bar" style="width: 48px"></div>
+            </div>
+            <div class="sp-row">
+              <span class="tk">64</span>
+              <div class="sp-bar" style="width: 64px"></div>
+            </div>
+          </div>
+          <div class="targets">
+            <div class="target">
+              <div class="box" style="width: 48px; height: 48px">48</div>
+              <span class="tk">minimum target</span>
+            </div>
+            <div class="target">
+              <div class="box" style="width: 200px; height: 56px">56</div>
+              <span class="tk">list row</span>
+            </div>
+            <div class="target">
+              <div class="box" style="width: 160px; height: 56px">56</div>
+              <span class="tk">primary CTA</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="components">
+        <div class="wrap">
+          <div class="head">
+            <h2>Components</h2>
+            <p class="lead">
+              The quote screen is the product. Both themes ship on every screen from the first
+              commit; the paper column is the same component tree with the light tokens applied,
+              nothing redesigned.
+            </p>
+          </div>
+
+          <div class="phones">
+            <div class="phonecol">
+              <div class="phone">
+                <div class="appbar">
+                  <span class="ref">Quote ref · QM-2418</span>
+                  <h4>Sharon McAllister</h4>
+                </div>
+                <div class="body">
+                  <div class="qcard">
+                    <div class="items">
+                      <div class="qitem">
+                        <span>Switchboard upgrade</span><span class="dots"></span><b>A$1,240.00</b>
+                      </div>
+                      <div class="qitem">
+                        <span>Safety switch install × 2</span><span class="dots"></span
+                        ><b>A$360.00</b>
+                      </div>
+                      <div class="qitem">
+                        <span>Test and tag</span><span class="dots"></span><b>A$242.50</b>
+                      </div>
+                    </div>
+                    <div class="totals">
+                      <div class="gst"><span>GST included</span><span>A$167.50</span></div>
+                      <div class="sum"><span>Total</span><b>A$1,842.50</b></div>
+                    </div>
+                  </div>
+                  <div class="chips">
+                    <span class="chip-s c-draft">Draft</span
+                    ><span class="chip-s c-sent">30% deposit · A$552.75</span>
+                  </div>
+                  <div class="spacer"></div>
+                </div>
+                <div class="approvebar">
+                  <div class="total"><b>A$1,842.50</b><span>Inc GST · from your book</span></div>
+                  <button class="btn btn-primary" type="button">Approve</button>
+                </div>
+              </div>
+              <p>
+                Command charcoal. The approve bar is the one place yellow always lives on this
+                screen; the total renders from integer cents through <code>formatAud</code>.
+              </p>
+            </div>
+            <div class="phonecol paper-scope">
+              <div class="phone">
+                <div class="appbar">
+                  <span class="ref">Quote ref · QM-2418</span>
+                  <h4>Sharon McAllister</h4>
+                </div>
+                <div class="body">
+                  <div class="qcard">
+                    <div class="items">
+                      <div class="qitem">
+                        <span>Switchboard upgrade</span><span class="dots"></span><b>A$1,240.00</b>
+                      </div>
+                      <div class="qitem">
+                        <span>Safety switch install × 2</span><span class="dots"></span
+                        ><b>A$360.00</b>
+                      </div>
+                      <div class="qitem">
+                        <span>Test and tag</span><span class="dots"></span><b>A$242.50</b>
+                      </div>
+                    </div>
+                    <div class="totals">
+                      <div class="gst"><span>GST included</span><span>A$167.50</span></div>
+                      <div class="sum"><span>Total</span><b>A$1,842.50</b></div>
+                    </div>
+                  </div>
+                  <div class="chips">
+                    <span class="chip-s c-draft">Draft</span
+                    ><span class="chip-s c-sent">30% deposit · A$552.75</span>
+                  </div>
+                  <div class="spacer"></div>
+                </div>
+                <div class="approvebar">
+                  <div class="total"><b>A$1,842.50</b><span>Inc GST · from your book</span></div>
+                  <button class="btn btn-primary" type="button">Approve</button>
+                </div>
+              </div>
+              <p>
+                Warm paper, the sunlight theme. Same tree, light tokens. Yellow stays a fill; on
+                paper its label ink deepens to <code>#2B2422</code>.
+              </p>
+            </div>
+          </div>
+
+          <div class="panelgrid">
+            <div class="panel">
+              <h3>Buttons</h3>
+              <div class="btnrow" style="margin-bottom: 16px">
+                <button class="btn btn-primary" type="button">Approve quote</button>
+                <button class="btn btn-primary" type="button" aria-disabled="true">
+                  Approve quote
+                </button>
+              </div>
+              <div class="btnrow">
+                <button class="btn btn-ghost" type="button">View quote page</button>
+                <button class="btn btn-danger" type="button">Decline</button>
+              </div>
+              <p class="note">
+                Primary is 56dp, uppercase 700, dark ink on yellow. Press = colour step to
+                <code>accentPress</code> plus 0.97 scale, together, 120ms. One primary per screen.
+                Destructive stays a ghost; never a red fill.
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>Inputs</h3>
+              <div class="field">
+                <label for="f1">Line item</label
+                ><input id="f1" type="text" value="Safety switch install" />
+              </div>
+              <div class="field focused">
+                <label for="f2">Suburb</label><input id="f2" type="text" value="Cheltenham" />
+              </div>
+              <div class="field error">
+                <label for="f3">Customer mobile</label
+                ><input id="f3" type="tel" value="04 12" /><span class="err"
+                  >Enter the full mobile, 04XX XXX XXX.</span
+                >
+              </div>
+              <div class="field">
+                <label for="f4">Unit price</label>
+                <div class="moneywrap">
+                  <span class="cur" aria-hidden="true">A$</span
+                  ><input id="f4" class="money" type="text" inputmode="decimal" value="180.00" />
+                </div>
+              </div>
+              <p class="note">
+                Sunken surface with the control-hairline boundary, mono label above, 48dp tall.
+                Focus is an accent border plus the 2px ring: soft yellow on dark, ink on paper.
+                Money inputs take the numeric keypad only; the A$ prefix and separators are rendered
+                by the field, never typed. State is integer cents through <code>formatAud</code>.
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>Status chips</h3>
+              <div class="chips" style="margin-bottom: 20px">
+                <span class="chip-s c-draft">Draft</span>
+                <span class="chip-s c-sent">Sent</span>
+                <span class="chip-s c-paid">Paid</span>
+                <span class="chip-s c-failed">Failed</span>
+                <span class="chip-s c-visit">Site visit</span>
+              </div>
+              <div
+                class="paper-scope"
+                style="
+                  background: var(--ink-deep);
+                  border: 1px solid var(--ink-line);
+                  border-radius: 9px;
+                  padding: 16px;
+                "
+              >
+                <div class="chips">
+                  <span class="chip-s c-draft">Draft</span>
+                  <span class="chip-s c-sent">Sent</span>
+                  <span class="chip-s c-paid">Paid</span>
+                  <span class="chip-s c-failed">Failed</span>
+                  <span class="chip-s c-visit" style="border-color: #e6ac00">Site visit</span>
+                </div>
+              </div>
+              <p class="note">
+                24dp, bordered, never filled. The word is always present; colour is never the only
+                signal. On paper the bright shades fall back to their base fills and the site-visit
+                chip takes ink text.
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>Lead rows</h3>
+              <div class="rowlist">
+                <div class="rowitem">
+                  <div class="who">
+                    <b>Sharon McAllister</b><span>Switchboard upgrade · Cheltenham</span>
+                  </div>
+                  <span class="chip-s c-draft">Draft</span>
+                  <div class="amt"><b>A$1,842.50</b><span>9:42 AM</span></div>
+                </div>
+                <div class="rowitem">
+                  <div class="who">
+                    <b>Dave Okafor</b><span>Hot water, no pressure · Padstow</span>
+                  </div>
+                  <span class="chip-s c-paid">Paid</span>
+                  <div class="amt"><b>A$486.20</b><span>TUE</span></div>
+                </div>
+                <div class="rowitem">
+                  <div class="who">
+                    <b>Minh Tran</b><span>Strata rewire, complex · Engadine</span>
+                  </div>
+                  <span class="chip-s c-visit">Site visit</span>
+                  <div class="amt"><b>A$99.00</b><span>MON</span></div>
+                </div>
+              </div>
+              <p class="note">
+                56dp minimum, hairline separators, mono money right-aligned. Row amounts are always
+                GST-inclusive totals; the quote screen still shows the INC GST label. Anything
+                longer than a screen renders on FlashList. Complex jobs never show a guessed price;
+                they show the A$99 site visit (a customer price, GST-inclusive).
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>Tab bar</h3>
+              <div class="tabbar" style="margin-bottom: 16px">
+                <div class="tab active">
+                  <svg aria-hidden="true"><use href="#i-leads" /></svg>Leads<span
+                    class="pip"
+                  ></span>
+                </div>
+                <div class="tab">
+                  <svg aria-hidden="true"><use href="#i-quotes" /></svg>Quotes<span
+                    class="pip"
+                  ></span>
+                </div>
+                <div class="tab">
+                  <svg aria-hidden="true"><use href="#i-book" /></svg>Book<span class="pip"></span>
+                </div>
+                <div class="tab">
+                  <svg aria-hidden="true"><use href="#i-jobs" /></svg>Jobs<span class="pip"></span>
+                </div>
+                <div class="tab">
+                  <svg aria-hidden="true"><use href="#i-settings" /></svg>Settings<span
+                    class="pip"
+                  ></span>
+                </div>
+              </div>
+              <div class="paper-scope">
+                <div class="tabbar">
+                  <div class="tab active">
+                    <svg aria-hidden="true"><use href="#i-leads" /></svg>Leads<span
+                      class="pip"
+                    ></span>
+                  </div>
+                  <div class="tab">
+                    <svg aria-hidden="true"><use href="#i-quotes" /></svg>Quotes<span
+                      class="pip"
+                    ></span>
+                  </div>
+                  <div class="tab">
+                    <svg aria-hidden="true"><use href="#i-book" /></svg>Book<span
+                      class="pip"
+                    ></span>
+                  </div>
+                  <div class="tab">
+                    <svg aria-hidden="true"><use href="#i-jobs" /></svg>Jobs<span
+                      class="pip"
+                    ></span>
+                  </div>
+                  <div class="tab">
+                    <svg aria-hidden="true"><use href="#i-settings" /></svg>Settings<span
+                      class="pip"
+                    ></span>
+                  </div>
+                </div>
+              </div>
+              <p class="note">
+                Stock platform bars, themed: charcoal surface, hairline top, active section in
+                accent. Sections, never actions. Icons are one authored family, 24 grid, stroke 2.
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>SMS thread</h3>
+              <div class="thread">
+                <span class="stamp">Mon 4:18 PM</span>
+                <div class="bubble in">
+                  Hey mate, power trips every time the oven comes on. Can someone look this week?
+                </div>
+                <div class="bubble out">
+                  G'day, QuoteMax here for Reilly Electrical. Can you text a photo of your
+                  switchboard and your suburb?
+                </div>
+                <div class="bubble in">Cheltenham. Photo coming now.</div>
+                <div class="bubble out typing" aria-label="QuoteMax is drafting a reply">
+                  <i></i><i></i><i></i>
+                </div>
+              </div>
+              <p class="note">
+                The lead detail shows the conversation verbatim; it is the product proving itself.
+                Inbound sits on sunken ink, replies on card with the lit edge. Typing dots collapse
+                to a static label under reduced motion.
+              </p>
+            </div>
+
+            <div class="panel">
+              <h3>Offline &amp; loading</h3>
+              <div class="banner">
+                <b>Offline · changes will sync</b
+                ><span>Approvals queue and send when you're back in range.</span>
+              </div>
+              <div class="skelrow">
+                <div class="skel" style="width: 45%"></div>
+                <div class="skel" style="width: 64px; margin-left: auto"></div>
+              </div>
+              <div class="skelrow">
+                <div class="skel" style="width: 60%"></div>
+                <div class="skel" style="width: 64px; margin-left: auto"></div>
+              </div>
+              <div class="skelrow">
+                <div class="skel" style="width: 38%"></div>
+                <div class="skel" style="width: 64px; margin-left: auto"></div>
+              </div>
+              <p class="note">
+                Poor signal is the default scene. Skeletons are sunken blocks that reserve the
+                widest expected figure, never A$0.00 and never a spinner. The offline banner is
+                persistent, not a toast. An offline approval queues honestly: "QUEUED · SENDS WHEN
+                BACK ONLINE", and the chip stays DRAFT until the backend confirms.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="motion">
+        <div class="wrap">
+          <div class="head">
+            <h2>Motion</h2>
+            <p class="lead">
+              Fast, purposeful, and under 300ms in-app. Entries use a strong ease-out; nothing
+              animates on a keyboard or system trigger, and Reduce Motion collapses everything to a
+              crossfade or an instant cut.
+            </p>
+          </div>
+          <div class="motiongrid">
+            <div class="press-demo motion-host">
+              <h3>Durations</h3>
+              <div style="width: 100%">
+                <div class="durrow">
+                  <span class="tk">fast · 120ms</span>
+                  <div class="durbar d120"><i></i></div>
+                </div>
+                <div class="durrow">
+                  <span class="tk">base · 180ms</span>
+                  <div class="durbar d180"><i></i></div>
+                </div>
+                <div class="durrow">
+                  <span class="tk">slow · 240ms</span>
+                  <div class="durbar d240"><i></i></div>
+                </div>
+              </div>
+              <button class="btn btn-ghost" type="button" id="playMotion">Replay</button>
+            </div>
+            <div class="press-demo">
+              <h3>Press feedback</h3>
+              <button class="btn btn-primary" type="button">Hold me down</button>
+              <p class="note" style="margin-top: 0">
+                Every pressable answers in 120ms: scale to 0.97 and one colour step, together.
+                Ease-out <code>cubic-bezier(0.23, 1, 0.32, 1)</code>; ease-in is never used.
+              </p>
+            </div>
+            <div class="press-demo">
+              <h3>Rules</h3>
+              <p class="note" style="margin-top: 0">
+                Screen transitions belong to the platform: push, sheet rise, predictive back,
+                unrestyled. Chips and reveals take base 180. Sheets take slow 240. Anything a tradie
+                triggers dozens of times a day does not animate at all.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="rules">
+        <div class="wrap">
+          <div class="head">
+            <h2>Do and don't</h2>
+            <p class="lead">
+              The lines that keep the system honest. The full authority lives in
+              <code>DESIGN.md</code>; these are the ones a reviewer checks first.
+            </p>
+          </div>
+          <div class="dd">
+            <div class="ddcol">
+              <h3>Do</h3>
+              <ul>
+                <li>
+                  <b>Consume theme.ts roles.</b> Both themes on every screen from the first commit.
+                </li>
+                <li><b>One yellow signal per screen,</b> dark ink on every yellow fill.</li>
+                <li>
+                  <b>Draw structure:</b> hairline plus lit edge, elevation 0 on resting surfaces.
+                </li>
+                <li>
+                  <b>Set money in mono</b> with tabular figures, from integer cents via
+                  <code>formatAud</code>.
+                </li>
+                <li>
+                  <b>Keep targets at 48dp or better,</b> rows and the primary CTA at 56dp. Test in
+                  sun, with gloves, in both themes.
+                </li>
+                <li><b>Use stock platform navigation and controls,</b> themed warm.</li>
+                <li><b>Run photography through the duotone pass</b> before it ships in-app.</li>
+              </ul>
+            </div>
+            <div class="ddcol">
+              <h3 class="no">Don't</h3>
+              <ul>
+                <li>
+                  <b>No navy and orange.</b> The old Maintain identity is retired and must not creep
+                  back.
+                </li>
+                <li><b>No pill buttons, glassmorphism, purple, gradients or emoji.</b> Ever.</li>
+                <li>
+                  <b>No white text on yellow,</b> no yellow text on cream, no state colour as a
+                  large fill.
+                </li>
+                <li>
+                  <b>No shadows on resting surfaces,</b> and no Material tonal tints cooling the
+                  charcoal.
+                </li>
+                <li>
+                  <b>No animation over 300ms in-app,</b> none at all on high-frequency actions.
+                </li>
+                <li>
+                  <b>No invented prices.</b> If the book has no price, the screen shows a skeleton
+                  or the A$99 site visit, never A$0.00.
+                </li>
+                <li>
+                  <b>No exclamation marks and no em-dashes</b> in customer-visible copy. Full stop,
+                  comma, or middot.
+                </li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="wrap">
+        <div>
+          <a class="lockup" href="#top" aria-label="QuoteMax">
+            <svg
+              viewBox="0 0 397 270"
+              role="img"
+              aria-hidden="true"
+              style="height: 32px; width: auto"
+            >
+              <use href="#qm-mark" />
+            </svg>
+            <span class="wm"><span>Quote</span><span>Max</span></span>
+          </a>
+          <p style="margin-top: 16px">
+            The tradie approves every quote. Prices come from their book, complex jobs route to a
+            paid site visit, and QuoteMax never takes a cut of a job.
+          </p>
+        </div>
+        <div class="filelist">
+          <span class="tk">Sources</span>
+          <a href="../DESIGN.md">DESIGN.md · the authority</a>
+          <a href="../PRODUCT.md">PRODUCT.md · product truth</a>
+          <a href="tokens.css">tokens.css</a> <a href="tokens.json">tokens.json</a>
+          <a href="../src/lib/theme.ts">src/lib/theme.ts · app tokens</a>
+          <a href="assets/logo/quotemax-mark-on-dark.svg">assets/logo/</a>
         </div>
       </div>
-      <p>Warm paper, the sunlight theme. Same tree, light tokens. Yellow stays a fill; on paper its label ink deepens to <code>#2B2422</code>.</p>
-    </div>
-  </div>
+    </footer>
 
-  <div class="panelgrid">
-    <div class="panel">
-      <h3>Buttons</h3>
-      <div class="btnrow" style="margin-bottom:16px">
-        <button class="btn btn-primary" type="button">Approve quote</button>
-        <button class="btn btn-primary" type="button" aria-disabled="true">Approve quote</button>
-      </div>
-      <div class="btnrow">
-        <button class="btn btn-ghost" type="button">View quote page</button>
-        <button class="btn btn-danger" type="button">Decline</button>
-      </div>
-      <p class="note">Primary is 56dp, uppercase 700, dark ink on yellow. Press = colour step to <code>accentPress</code> plus 0.97 scale, together, 120ms. One primary per screen. Destructive stays a ghost; never a red fill.</p>
-    </div>
-
-    <div class="panel">
-      <h3>Inputs</h3>
-      <div class="field"><label for="f1">Line item</label><input id="f1" type="text" value="Safety switch install"></div>
-      <div class="field focused"><label for="f2">Suburb</label><input id="f2" type="text" value="Cheltenham"></div>
-      <div class="field error"><label for="f3">Customer mobile</label><input id="f3" type="tel" value="04 12"><span class="err">Enter the full mobile, 04XX XXX XXX.</span></div>
-      <div class="field"><label for="f4">Unit price</label><div class="moneywrap"><span class="cur" aria-hidden="true">A$</span><input id="f4" class="money" type="text" inputmode="decimal" value="180.00"></div></div>
-      <p class="note">Sunken surface with the control-hairline boundary, mono label above, 48dp tall. Focus is an accent border plus the 2px ring: soft yellow on dark, ink on paper. Money inputs take the numeric keypad only; the A$ prefix and separators are rendered by the field, never typed. State is integer cents through <code>formatAud</code>.</p>
-    </div>
-
-    <div class="panel">
-      <h3>Status chips</h3>
-      <div class="chips" style="margin-bottom:20px">
-        <span class="chip-s c-draft">Draft</span>
-        <span class="chip-s c-sent">Sent</span>
-        <span class="chip-s c-paid">Paid</span>
-        <span class="chip-s c-failed">Failed</span>
-        <span class="chip-s c-visit">Site visit</span>
-      </div>
-      <div class="paper-scope" style="background:var(--ink-deep);border:1px solid var(--ink-line);border-radius:9px;padding:16px">
-        <div class="chips">
-          <span class="chip-s c-draft">Draft</span>
-          <span class="chip-s c-sent">Sent</span>
-          <span class="chip-s c-paid">Paid</span>
-          <span class="chip-s c-failed">Failed</span>
-          <span class="chip-s c-visit" style="border-color:#E6AC00">Site visit</span>
-        </div>
-      </div>
-      <p class="note">24dp, bordered, never filled. The word is always present; colour is never the only signal. On paper the bright shades fall back to their base fills and the site-visit chip takes ink text.</p>
-    </div>
-
-    <div class="panel">
-      <h3>Lead rows</h3>
-      <div class="rowlist">
-        <div class="rowitem">
-          <div class="who"><b>Sharon McAllister</b><span>Switchboard upgrade · Cheltenham</span></div>
-          <span class="chip-s c-draft">Draft</span>
-          <div class="amt"><b>A$1,842.50</b><span>9:42 AM</span></div>
-        </div>
-        <div class="rowitem">
-          <div class="who"><b>Dave Okafor</b><span>Hot water, no pressure · Padstow</span></div>
-          <span class="chip-s c-paid">Paid</span>
-          <div class="amt"><b>A$486.20</b><span>TUE</span></div>
-        </div>
-        <div class="rowitem">
-          <div class="who"><b>Minh Tran</b><span>Strata rewire, complex · Engadine</span></div>
-          <span class="chip-s c-visit">Site visit</span>
-          <div class="amt"><b>A$99.00</b><span>MON</span></div>
-        </div>
-      </div>
-      <p class="note">56dp minimum, hairline separators, mono money right-aligned. Row amounts are always GST-inclusive totals; the quote screen still shows the INC GST label. Anything longer than a screen renders on FlashList. Complex jobs never show a guessed price; they show the A$99 site visit (a customer price, GST-inclusive).</p>
-    </div>
-
-    <div class="panel">
-      <h3>Tab bar</h3>
-      <div class="tabbar" style="margin-bottom:16px">
-        <div class="tab active"><svg aria-hidden="true"><use href="#i-leads"/></svg>Leads<span class="pip"></span></div>
-        <div class="tab"><svg aria-hidden="true"><use href="#i-quotes"/></svg>Quotes<span class="pip"></span></div>
-        <div class="tab"><svg aria-hidden="true"><use href="#i-book"/></svg>Book<span class="pip"></span></div>
-        <div class="tab"><svg aria-hidden="true"><use href="#i-jobs"/></svg>Jobs<span class="pip"></span></div>
-        <div class="tab"><svg aria-hidden="true"><use href="#i-settings"/></svg>Settings<span class="pip"></span></div>
-      </div>
-      <div class="paper-scope">
-        <div class="tabbar">
-          <div class="tab active"><svg aria-hidden="true"><use href="#i-leads"/></svg>Leads<span class="pip"></span></div>
-          <div class="tab"><svg aria-hidden="true"><use href="#i-quotes"/></svg>Quotes<span class="pip"></span></div>
-          <div class="tab"><svg aria-hidden="true"><use href="#i-book"/></svg>Book<span class="pip"></span></div>
-          <div class="tab"><svg aria-hidden="true"><use href="#i-jobs"/></svg>Jobs<span class="pip"></span></div>
-          <div class="tab"><svg aria-hidden="true"><use href="#i-settings"/></svg>Settings<span class="pip"></span></div>
-        </div>
-      </div>
-      <p class="note">Stock platform bars, themed: charcoal surface, hairline top, active section in accent. Sections, never actions. Icons are one authored family, 24 grid, stroke 2.</p>
-    </div>
-
-    <div class="panel">
-      <h3>SMS thread</h3>
-      <div class="thread">
-        <span class="stamp">Mon 4:18 PM</span>
-        <div class="bubble in">Hey mate, power trips every time the oven comes on. Can someone look this week?</div>
-        <div class="bubble out">G'day, QuoteMax here for Reilly Electrical. Can you text a photo of your switchboard and your suburb?</div>
-        <div class="bubble in">Cheltenham. Photo coming now.</div>
-        <div class="bubble out typing" aria-label="QuoteMax is drafting a reply"><i></i><i></i><i></i></div>
-      </div>
-      <p class="note">The lead detail shows the conversation verbatim; it is the product proving itself. Inbound sits on sunken ink, replies on card with the lit edge. Typing dots collapse to a static label under reduced motion.</p>
-    </div>
-
-    <div class="panel">
-      <h3>Offline &amp; loading</h3>
-      <div class="banner"><b>Offline · changes will sync</b><span>Approvals queue and send when you're back in range.</span></div>
-      <div class="skelrow"><div class="skel" style="width:45%"></div><div class="skel" style="width:64px;margin-left:auto"></div></div>
-      <div class="skelrow"><div class="skel" style="width:60%"></div><div class="skel" style="width:64px;margin-left:auto"></div></div>
-      <div class="skelrow"><div class="skel" style="width:38%"></div><div class="skel" style="width:64px;margin-left:auto"></div></div>
-      <p class="note">Poor signal is the default scene. Skeletons are sunken blocks that reserve the widest expected figure, never A$0.00 and never a spinner. The offline banner is persistent, not a toast. An offline approval queues honestly: "QUEUED · SENDS WHEN BACK ONLINE", and the chip stays DRAFT until the backend confirms.</p>
-    </div>
-  </div>
-</div></section>
-
-<section id="motion"><div class="wrap">
-  <div class="head"><h2>Motion</h2>
-  <p class="lead">Fast, purposeful, and under 300ms in-app. Entries use a strong ease-out; nothing animates on a keyboard or system trigger, and Reduce Motion collapses everything to a crossfade or an instant cut.</p></div>
-  <div class="motiongrid">
-    <div class="press-demo motion-host">
-      <h3>Durations</h3>
-      <div style="width:100%">
-        <div class="durrow"><span class="tk">fast · 120ms</span><div class="durbar d120"><i></i></div></div>
-        <div class="durrow"><span class="tk">base · 180ms</span><div class="durbar d180"><i></i></div></div>
-        <div class="durrow"><span class="tk">slow · 240ms</span><div class="durbar d240"><i></i></div></div>
-      </div>
-      <button class="btn btn-ghost" type="button" id="playMotion">Replay</button>
-    </div>
-    <div class="press-demo">
-      <h3>Press feedback</h3>
-      <button class="btn btn-primary" type="button">Hold me down</button>
-      <p class="note" style="margin-top:0">Every pressable answers in 120ms: scale to 0.97 and one colour step, together. Ease-out <code>cubic-bezier(0.23, 1, 0.32, 1)</code>; ease-in is never used.</p>
-    </div>
-    <div class="press-demo">
-      <h3>Rules</h3>
-      <p class="note" style="margin-top:0">Screen transitions belong to the platform: push, sheet rise, predictive back, unrestyled. Chips and reveals take base 180. Sheets take slow 240. Anything a tradie triggers dozens of times a day does not animate at all.</p>
-    </div>
-  </div>
-</div></section>
-
-<section id="rules"><div class="wrap">
-  <div class="head"><h2>Do and don't</h2>
-  <p class="lead">The lines that keep the system honest. The full authority lives in <code>DESIGN.md</code>; these are the ones a reviewer checks first.</p></div>
-  <div class="dd">
-    <div class="ddcol">
-      <h3>Do</h3>
-      <ul>
-        <li><b>Consume theme.ts roles.</b> Both themes on every screen from the first commit.</li>
-        <li><b>One yellow signal per screen,</b> dark ink on every yellow fill.</li>
-        <li><b>Draw structure:</b> hairline plus lit edge, elevation 0 on resting surfaces.</li>
-        <li><b>Set money in mono</b> with tabular figures, from integer cents via <code>formatAud</code>.</li>
-        <li><b>Keep targets at 48dp or better,</b> rows and the primary CTA at 56dp. Test in sun, with gloves, in both themes.</li>
-        <li><b>Use stock platform navigation and controls,</b> themed warm.</li>
-        <li><b>Run photography through the duotone pass</b> before it ships in-app.</li>
-      </ul>
-    </div>
-    <div class="ddcol">
-      <h3 class="no">Don't</h3>
-      <ul>
-        <li><b>No navy and orange.</b> The old Maintain identity is retired and must not creep back.</li>
-        <li><b>No pill buttons, glassmorphism, purple, gradients or emoji.</b> Ever.</li>
-        <li><b>No white text on yellow,</b> no yellow text on cream, no state colour as a large fill.</li>
-        <li><b>No shadows on resting surfaces,</b> and no Material tonal tints cooling the charcoal.</li>
-        <li><b>No animation over 300ms in-app,</b> none at all on high-frequency actions.</li>
-        <li><b>No invented prices.</b> If the book has no price, the screen shows a skeleton or the A$99 site visit, never A$0.00.</li>
-        <li><b>No exclamation marks and no em-dashes</b> in customer-visible copy. Full stop, comma, or middot.</li>
-      </ul>
-    </div>
-  </div>
-</div></section>
-</main>
-
-<footer><div class="wrap">
-  <div>
-    <a class="lockup" href="#top" aria-label="QuoteMax">
-      <svg viewBox="0 0 397 270" role="img" aria-hidden="true" style="height:32px;width:auto"><use href="#qm-mark"/></svg>
-      <span class="wm"><span>Quote</span><span>Max</span></span>
-    </a>
-    <p style="margin-top:16px">The tradie approves every quote. Prices come from their book, complex jobs route to a paid site visit, and QuoteMax never takes a cut of a job.</p>
-  </div>
-  <div class="filelist">
-    <span class="tk">Sources</span>
-    <a href="../DESIGN.md">DESIGN.md · the authority</a>
-    <a href="../PRODUCT.md">PRODUCT.md · product truth</a>
-    <a href="tokens.css">tokens.css</a> <a href="tokens.json">tokens.json</a>
-    <a href="../src/lib/theme.ts">src/lib/theme.ts · app tokens</a>
-    <a href="assets/logo/quotemax-mark-on-dark.svg">assets/logo/</a>
-  </div>
-</div></footer>
-
-<script>
-  // Replay the duration bars; runs once on load too.
-  const host = document.querySelector('.motion-host');
-  const play = () => {
-    host.classList.remove('motion-play');
-    void host.offsetWidth;
-    host.classList.add('motion-play');
-  };
-  document.getElementById('playMotion').addEventListener('click', play);
-  play();
-</script>
-</body>
+    <script>
+      // Replay the duration bars; runs once on load too.
+      const host = document.querySelector('.motion-host');
+      const play = () => {
+        host.classList.remove('motion-play');
+        void host.offsetWidth;
+        host.classList.add('motion-play');
+      };
+      document.getElementById('playMotion').addEventListener('click', play);
+      play();
+    </script>
+  </body>
 </html>

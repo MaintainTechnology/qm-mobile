@@ -1,6 +1,7 @@
 # Lens 3: Knowledge Base Cross-Referencing & Citation Extraction
 
 You are cross-referencing **{{product_name}}** against the local KBV2 knowledge base (`kb-v2-all/`) to:
+
 1. Surface related interventions and mechanism alignment
 2. **Extract peer-reviewed citations (PMIDs/DOIs) to enrich the final output**
 3. Build actionability mapping from findings to interventions
@@ -11,6 +12,7 @@ You are cross-referencing **{{product_name}}** against the local KBV2 knowledge 
 **The KB is a source aggregator, NOT a citable source.**
 
 When you find relevant data in the KB files:
+
 - **EXTRACT** the PMIDs and DOIs from the Verifiable Citations and Structured Appendix sections
 - **CITE** those papers directly in the final output
 - **NEVER** cite "the KB" or "internal knowledge base"
@@ -25,14 +27,15 @@ When you find relevant data in the KB files:
 **Location:** `kb-v2-all/`
 **Total:** 1,165 curated markdown documents
 
-| Category | Count | File Pattern | Content |
-|----------|-------|-------------|---------|
-| `pathways/` | 152 | `pathway_{name}.md` | Signaling cascades, metabolic axes, crosstalk tables |
-| `interventions/` | 413 | `intervention-{slug}.md` | Supplements, drugs, diets with dosing & evidence |
-| `biomarkers/` | 297 | `BIOMARKER_{NAME}_001.md` | Clinical markers with interpretation & reference ranges |
-| `conflicts/` | 303 | `{descriptive_slug}.md` | Unresolved debates, assay limitations, evidence gaps |
+| Category         | Count | File Pattern              | Content                                                 |
+| ---------------- | ----- | ------------------------- | ------------------------------------------------------- |
+| `pathways/`      | 152   | `pathway_{name}.md`       | Signaling cascades, metabolic axes, crosstalk tables    |
+| `interventions/` | 413   | `intervention-{slug}.md`  | Supplements, drugs, diets with dosing & evidence        |
+| `biomarkers/`    | 297   | `BIOMARKER_{NAME}_001.md` | Clinical markers with interpretation & reference ranges |
+| `conflicts/`     | 303   | `{descriptive_slug}.md`   | Unresolved debates, assay limitations, evidence gaps    |
 
 Each file contains:
+
 - **Summary** — Quick overview
 - **Mechanistic Context** — Detailed molecular/systems biology
 - **Clinical/Practical Use Patterns** — How practitioners use this
@@ -64,6 +67,7 @@ This implicit knowledge should inform the **voice and perspective** of the entir
 ## Starting from the KBV2 Dossier
 
 The KBV2 deep review (Phase 0.5) has already:
+
 - Identified and read relevant pathway, intervention, biomarker, and conflict files
 - Harvested PMIDs/DOIs from structured appendices
 - Built an intervention landscape with relationship classifications
@@ -72,6 +76,7 @@ The KBV2 deep review (Phase 0.5) has already:
 - Integrated conflict file insights for evidence calibration
 
 **Use `lens_priming.for_lens_3` from the dossier** which contains:
+
 - `intervention_landscape` — Full list of related interventions with relationships
 - `actionability_map_seed` — Pre-built Finding → Intervention mappings
 - Files still worth reading that weren't in the Tier 1/2 pass
@@ -104,6 +109,7 @@ cat kb-v2-all/interventions/intervention-{{product_slug}}.md
 ```
 
 From the file, extract:
+
 - Mechanism claims with confidence levels
 - Dosing protocols and implementation patterns
 - Contraindications and monitoring parameters
@@ -126,20 +132,21 @@ cat kb-v2-all/interventions/intervention-{{actionable_intervention}}.md
 ```
 
 **For each file read, extract:**
+
 1. PMIDs/DOIs from Verifiable Citations and Structured Appendix
 2. Mechanism claims that explain WHY the biomarker matters
 3. Actionable interventions that test results inform
 4. Interpretation patterns (what high/low values mean clinically)
 5. Monitoring recommendations
 
-| KB File Section | What to Extract |
-|-----------------|----------------|
-| Summary | Quick framing of clinical relevance |
-| Mechanistic Context | Molecular targets, pathway positions, upstream/downstream effects |
-| Clinical/Practical Use Patterns | How practitioners interpret and act |
-| Dosing and Implementation | Specific protocols informed by this biomarker |
-| Evidence and Uncertainty | Confidence levels, what's debated |
-| Lossless Structured Appendix | Machine-readable PMIDs, targets, confidence scores |
+| KB File Section                 | What to Extract                                                   |
+| ------------------------------- | ----------------------------------------------------------------- |
+| Summary                         | Quick framing of clinical relevance                               |
+| Mechanistic Context             | Molecular targets, pathway positions, upstream/downstream effects |
+| Clinical/Practical Use Patterns | How practitioners interpret and act                               |
+| Dosing and Implementation       | Specific protocols informed by this biomarker                     |
+| Evidence and Uncertainty        | Confidence levels, what's debated                                 |
+| Lossless Structured Appendix    | Machine-readable PMIDs, targets, confidence scores                |
 
 ### Step 2: Related Intervention Discovery
 
@@ -154,6 +161,7 @@ cat kb-v2-all/conflicts/{{relevant_conflict}}.md
 ```
 
 For each related intervention file, extract:
+
 - How it relates mechanistically to the product
 - What clinical context it serves
 - What this reveals about the decision landscape
@@ -163,20 +171,26 @@ For each related intervention file, extract:
 From the files read, synthesize:
 
 #### A. The Practitioner's Mental Model
+
 How do clinicians think about this category? What questions do they ask? What tradeoffs do they weigh?
 
 #### B. The Intervention Landscape
+
 What KB interventions does this product/category connect to? Map the full network.
 
 #### C. The Practical Wisdom
+
 What do experienced practitioners know that isn't in the literature?
+
 - Monitoring that matters most
 - Timing considerations
 - Patient populations where this shines
 - Realistic expectations
 
 #### D. Conflict-Informed Framing
+
 What do the conflict files tell us about:
+
 - Biomarker measurement limitations to surface
 - Clinical claims to moderate
 - Evidence gaps to acknowledge honestly
@@ -186,10 +200,12 @@ What do the conflict files tell us about:
 For vendor/product comparisons, extract what makes each option **distinctive** rather than ranking them:
 
 **DO:**
+
 - "Notable for its metatranscriptomic approach, which captures functional activity"
 - "Distinctive in offering personalized supplement recommendations"
 
 **DON'T:**
+
 - "Best for..." or "Better than..."
 - "Weakness is..." or "Lacks..."
 
@@ -202,6 +218,7 @@ Map this product/category to **actionable next steps** from the KB files:
 ```
 
 Example:
+
 ```
 Microbiome test → reveals → low butyrate producers → informs → resistant starch + prebiotic fiber (kb-v2-all/interventions/intervention-resistant-starch.md)
 Microbiome test → reveals → low diversity → informs → dietary fiber diversity (kb-v2-all/interventions/intervention-mediterranean-diet.md)
@@ -325,6 +342,6 @@ You must pass 5/6 criteria.
 1. **Read the files directly** — The KB's value is in the depth of its documents. Read them, don't summarize from memory.
 2. **Extract perspective, not just facts** — The KB's value is the clinical wisdom encoded in how things are framed
 3. **"Notable for" over "better than"** — Position positively, never compare negatively
-4. **Actionability is the story** — Connect everything to what clinicians *do*
+4. **Actionability is the story** — Connect everything to what clinicians _do_
 5. **Weave, don't silo** — This output should inform the entire narrative, not live in a box
 6. **Conflicts calibrate tone** — Use conflict files to avoid overclaiming

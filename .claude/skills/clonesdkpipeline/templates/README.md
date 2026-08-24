@@ -3,17 +3,17 @@
 Copy-paste starter files referenced by `SKILL.md`. Each `.template` file is a
 drop-in replacement — just rename and fill in the placeholders.
 
-| File | Target location | Purpose |
-|---|---|---|
-| `package.json.template`         | `<repo>/package.json`         | Base dependencies (Anthropic, Google, Express, Swagger UI, uuid) |
-| `railway.json.template`         | `<repo>/railway.json`         | Railway build + deploy config |
-| `nixpacks.toml.template`        | `<repo>/nixpacks.toml`        | Node 22 LTS pin + install command |
-| `Procfile.template`             | `<repo>/Procfile`             | Fallback start command |
-| `.nvmrc.template`               | `<repo>/.nvmrc`               | Local + CI Node version |
-| `.railwayignore.template`       | `<repo>/.railwayignore`       | Keep secrets + tests out of Railway build |
-| `.gitignore.template`           | `<repo>/.gitignore`           | Don't commit .env or data/api-keys.json |
-| `preflight.js.template`         | `<repo>/scripts/preflight.js` | Env validator — customize REQUIRED array |
-| `sdk-parity.test.js.template`   | `<repo>/tests/sdk-parity.test.js` | 100+ assertion scaffold — fill in SDK values |
+| File                          | Target location                   | Purpose                                                          |
+| ----------------------------- | --------------------------------- | ---------------------------------------------------------------- |
+| `package.json.template`       | `<repo>/package.json`             | Base dependencies (Anthropic, Google, Express, Swagger UI, uuid) |
+| `railway.json.template`       | `<repo>/railway.json`             | Railway build + deploy config                                    |
+| `nixpacks.toml.template`      | `<repo>/nixpacks.toml`            | Node 22 LTS pin + install command                                |
+| `Procfile.template`           | `<repo>/Procfile`                 | Fallback start command                                           |
+| `.nvmrc.template`             | `<repo>/.nvmrc`                   | Local + CI Node version                                          |
+| `.railwayignore.template`     | `<repo>/.railwayignore`           | Keep secrets + tests out of Railway build                        |
+| `.gitignore.template`         | `<repo>/.gitignore`               | Don't commit .env or data/api-keys.json                          |
+| `preflight.js.template`       | `<repo>/scripts/preflight.js`     | Env validator — customize REQUIRED array                         |
+| `sdk-parity.test.js.template` | `<repo>/tests/sdk-parity.test.js` | 100+ assertion scaffold — fill in SDK values                     |
 
 ## Placeholder conventions
 

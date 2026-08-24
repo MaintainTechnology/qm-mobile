@@ -21,7 +21,7 @@ Mandatory preflight on every user-provided reference:
      better geometry, but ONLY if the pose is identical on all panels.
      Different poses across panels ⇒ fall back to the single-view path.
 3. Cropping in the sandbox: use **ffmpeg** (`ffmpeg -i sheet.png -vf
-   "crop=w:h:x:y" view.png`) — PIL is not in the system python.
+"crop=w:h:x:y" view.png`) — PIL is not in the system python.
 
 ## Rule 2 — pose normalization
 
@@ -42,19 +42,19 @@ auto-rig and matches donor skeletons in the local rig-transfer path.
 
 Do not mix them:
 
-| Goal | Params | Caveat |
-|---|---|---|
-| Stylized faceted low-poly LOOK | `"model_type": "lowpoly"` | Meshy IGNORES `topology`, `target_polycount`, `should_remesh`, `ai_model` in this mode — no precise budget control |
-| Precise polygon BUDGET | `"should_remesh": true, "topology": "triangle", "target_polycount": N` | normal high-detail look, decimated |
+| Goal                           | Params                                                                 | Caveat                                                                                                             |
+| ------------------------------ | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ |
+| Stylized faceted low-poly LOOK | `"model_type": "lowpoly"`                                              | Meshy IGNORES `topology`, `target_polycount`, `should_remesh`, `ai_model` in this mode — no precise budget control |
+| Precise polygon BUDGET         | `"should_remesh": true, "topology": "triangle", "target_polycount": N` | normal high-detail look, decimated                                                                                 |
 
 Polycount budgets (game-ready guidance):
 
-| Asset class | target_polycount |
-|---|---|
-| Hero / player character | 15 000 – 30 000 |
-| NPC | 5 000 – 15 000 |
-| Mob / prop | 1 000 – 5 000 |
-| Background filler | 300 – 1 500 |
+| Asset class             | target_polycount |
+| ----------------------- | ---------------- |
+| Hero / player character | 15 000 – 30 000  |
+| NPC                     | 5 000 – 15 000   |
+| Mob / prop              | 1 000 – 5 000    |
+| Background filler       | 300 – 1 500      |
 
 Valid API range: **100 – 300 000**.
 
@@ -114,6 +114,7 @@ Multi-view (character sheet split into same-pose panels):
   "target_formats": ["glb"]
 }
 ```
+
 (endpoint: `POST /openapi/v1/multi-image-to-3d`)
 
 ## Preflight checklist (run through it verbatim)

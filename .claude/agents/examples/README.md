@@ -6,7 +6,7 @@ This directory contains example outputs demonstrating how the agency's agents ca
 
 The agency-agents repo defines dozens of specialized agents across engineering, design, marketing, product, support, spatial computing, and project management. But agent definitions alone don't show what happens when you **deploy them all at once** on a single mission.
 
-These examples answer the question: *"What does it actually look like when the full agency collaborates?"*
+These examples answer the question: _"What does it actually look like when the full agency collaborates?"_
 
 ## Contents
 
@@ -26,16 +26,17 @@ These examples answer the question: *"What does it actually look like when the f
 - Spatial interface architecture specification
 
 **Agents used:**
-| Agent | Role |
-|-------|------|
-| Product Trend Researcher | Market validation, competitive landscape |
-| Backend Architect | System architecture, data model, API design |
-| Brand Guardian | Positioning, visual identity, naming |
-| Growth Hacker | GTM strategy, pricing, launch plan |
-| Support Responder | Support tiers, onboarding, community |
-| UX Researcher | Personas, journey maps, design principles |
-| Project Shepherd | Phase plan, sprints, risk register |
-| XR Interface Architect | Spatial UI specification |
+
+| Agent                    | Role                                        |
+| ------------------------ | ------------------------------------------- |
+| Product Trend Researcher | Market validation, competitive landscape    |
+| Backend Architect        | System architecture, data model, API design |
+| Brand Guardian           | Positioning, visual identity, naming        |
+| Growth Hacker            | GTM strategy, pricing, launch plan          |
+| Support Responder        | Support tiers, onboarding, community        |
+| UX Researcher            | Personas, journey maps, design principles   |
+| Project Shepherd         | Phase plan, sprints, risk register          |
+| XR Interface Architect   | Spatial UI specification                    |
 
 **Key takeaway:** All 8 agents ran in parallel and produced coherent, cross-referencing plans without coordination overhead. The output demonstrates the agency's ability to go from "find an opportunity" to "here's the full blueprint" in a single session.
 

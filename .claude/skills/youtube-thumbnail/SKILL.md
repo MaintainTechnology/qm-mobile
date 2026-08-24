@@ -11,6 +11,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Bash
 **Thumbnails are NOT slides.** They are tiny images competing for attention in a feed. Everything about this skill is designed around that constraint.
 
 What makes a thumbnail work:
+
 - **Faces** — large, expressive, recognizable
 - **Few words** — 3-5 words max, readable at phone size
 - **Contrast** — dark backgrounds, bright text, bold separation
@@ -18,6 +19,7 @@ What makes a thumbnail work:
 - **Simplicity** — one clear focal point, not a brochure
 
 What kills a thumbnail:
+
 - Paragraphs of text (nobody reads them)
 - Small faces buried in a layout
 - Low contrast (light text on light background)
@@ -39,11 +41,13 @@ The `.canvas` element in the HTML is always exactly 1280×720px.
 Every thumbnail has 3 layers:
 
 ### Layer 1: Background
+
 - Dark gradient, AI-generated abstract, or solid dark color
 - Should create mood but never compete with the face or text
 - Subtle — the background is a stage, not the performer
 
 ### Layer 2: Face(s)
+
 - The dominant visual element
 - Takes up 40-60% of the thumbnail area
 - Positioned right-of-center (for solo) or split left/right (for two people)
@@ -51,6 +55,7 @@ Every thumbnail has 3 layers:
 - Cutout style (no circular crops — use CSS `object-fit` and positioning to show face/upper body)
 
 ### Layer 3: Text
+
 - 3-5 words maximum
 - Positioned opposite the face (left side if face is right, etc.)
 - Large enough to read on a phone screen (minimum 60px, prefer 72-96px)
@@ -62,17 +67,20 @@ Every thumbnail has 3 layers:
 ## Pre-Generation Steps
 
 ### 1. Read Reference Materials
+
 ```
 Read: .claude/skills/youtube-thumbnail/SKILL.md (this file)
 Read: .claude/skills/document-studio/design-system.md (for brand colors)
 ```
 
 ### 2. Check Existing Thumbnails
+
 ```
 Glob: content/graphics/yt-thumb-*.html
 ```
 
 ### 3. Gather Required Inputs
+
 - **Topic** — What is this video about? (used to write the 3-5 word hook)
 - **Face photo(s)** — Path(s) to headshot image files
 - **Guest info** (if applicable) — Guest name, title (for small attribution only)
@@ -81,13 +89,13 @@ Glob: content/graphics/yt-thumb-*.html
 
 ## Required Inputs
 
-| Input | Required? | Example |
-|-------|-----------|---------|
-| Topic/title | Yes | "Spermidine and autophagy" |
-| Host photo path | Yes | `src/assets/anant-profile.jpeg` |
-| Guest photo path | If guest video | `src/assets/melissa-cano.jpg` |
-| Guest name | If guest video | "Melissa Cano, PhD" |
-| Text hook override | No | "Your Cells Are Eating Themselves" |
+| Input              | Required?      | Example                            |
+| ------------------ | -------------- | ---------------------------------- |
+| Topic/title        | Yes            | "Spermidine and autophagy"         |
+| Host photo path    | Yes            | `src/assets/anant-profile.jpeg`    |
+| Guest photo path   | If guest video | `src/assets/melissa-cano.jpg`      |
+| Guest name         | If guest video | "Melissa Cano, PhD"                |
+| Text hook override | No             | "Your Cells Are Eating Themselves" |
 
 ---
 
@@ -98,6 +106,7 @@ content/graphics/yt-thumb-[topic-slug].html
 ```
 
 The HTML file renders at exactly 1280×720px. To export as an image:
+
 1. Open in browser
 2. Screenshot the `.canvas` element
 3. Or use Playwright to capture: `page.locator('.canvas').screenshot()`
@@ -109,6 +118,7 @@ The HTML file renders at exactly 1280×720px. To export as an image:
 The thumbnail text is NOT the video title. It's a **hook** — a short, punchy phrase that creates curiosity or urgency.
 
 ### Rules
+
 - **3-5 words.** Absolutely never more than 6.
 - **Create a curiosity gap.** Make them need to click.
 - **Use power words:** "Secret", "Truth", "Actually", "Wrong", "Hidden", "Real", "Never"
@@ -116,16 +126,18 @@ The thumbnail text is NOT the video title. It's a **hook** — a short, punchy p
 - **Avoid jargon** unless the audience expects it (longevity physicians do)
 
 ### Good Examples
-| Video Topic | Thumbnail Text |
-|-------------|---------------|
+
+| Video Topic                       | Thumbnail Text                  |
+| --------------------------------- | ------------------------------- |
 | Spermidine and cellular recycling | "Your Cells Recycle Themselves" |
-| GLP-1 protocols that work | "GLP-1s Actually Work" |
-| Why most lab panels miss things | "Your Labs Are Wrong" |
-| Hormone optimization masterclass | "Hormones Nobody Tests" |
-| AI in clinical practice | "AI Reads Labs Better" |
-| Longevity medicine for beginners | "Start Living Longer" |
+| GLP-1 protocols that work         | "GLP-1s Actually Work"          |
+| Why most lab panels miss things   | "Your Labs Are Wrong"           |
+| Hormone optimization masterclass  | "Hormones Nobody Tests"         |
+| AI in clinical practice           | "AI Reads Labs Better"          |
+| Longevity medicine for beginners  | "Start Living Longer"           |
 
 ### Bad Examples (too long, too vague)
+
 - "Understanding the Role of Spermidine in Cellular Autophagy" (way too long)
 - "New Research" (too vague, no curiosity)
 - "Watch This Webinar" (not a hook)
@@ -207,16 +219,16 @@ Thumbnails use a subset of the NGM palette optimized for contrast and screen vis
 
 ```css
 /* Backgrounds — always dark */
---bg-primary: #302C27;       /* Pure dark (ink-900) */
---bg-gradient-start: #302C27;
---bg-gradient-end: #1a1d21;  /* Slightly lighter dark */
+--bg-primary: #302c27; /* Pure dark (ink-900) */
+--bg-gradient-start: #302c27;
+--bg-gradient-end: #1a1d21; /* Slightly lighter dark */
 
 /* Text — always high contrast */
---text-primary: #FFFFFF;      /* Main headline text */
---text-accent: #C49A6C;       /* Gold — for emphasis words or underlines */
+--text-primary: #ffffff; /* Main headline text */
+--text-accent: #c49a6c; /* Gold — for emphasis words or underlines */
 
 /* Utility */
---text-muted: rgba(255,255,255,0.6); /* Small labels, names */
+--text-muted: rgba(255, 255, 255, 0.6); /* Small labels, names */
 --divider: rgba(197, 165, 114, 0.3); /* Subtle gold separator lines */
 ```
 
@@ -226,12 +238,12 @@ Thumbnails use a subset of the NGM palette optimized for contrast and screen vis
 /* Headline — the 3-5 word hook */
 .headline {
   font-family: 'DM Sans', system-ui, sans-serif;
-  font-weight: 800;           /* Extra bold for thumbnails */
-  font-size: 80px;            /* Large enough to read on phone */
-  line-height: 0.95;          /* Tight line height */
+  font-weight: 800; /* Extra bold for thumbnails */
+  font-size: 80px; /* Large enough to read on phone */
+  line-height: 0.95; /* Tight line height */
   color: white;
   text-transform: uppercase;
-  letter-spacing: -0.02em;    /* Slightly tighter */
+  letter-spacing: -0.02em; /* Slightly tighter */
 }
 
 /* Accent word — one word in gold for emphasis */
@@ -247,7 +259,9 @@ Thumbnails use a subset of the NGM palette optimized for contrast and screen vis
 When text overlaps a photo edge:
 
 ```css
-text-shadow: 0 2px 20px rgba(0,0,0,0.8), 0 0 40px rgba(0,0,0,0.4);
+text-shadow:
+  0 2px 20px rgba(0, 0, 0, 0.8),
+  0 0 40px rgba(0, 0, 0, 0.4);
 ```
 
 ---
@@ -261,12 +275,12 @@ Photos should feel like the person is "in" the thumbnail, not in a picture frame
 ```css
 .speaker-photo {
   position: absolute;
-  right: 0;              /* Flush against right edge */
-  bottom: 0;             /* Anchored to bottom */
-  width: 55%;            /* Takes up right half */
-  height: 95%;           /* Nearly full height */
+  right: 0; /* Flush against right edge */
+  bottom: 0; /* Anchored to bottom */
+  width: 55%; /* Takes up right half */
+  height: 95%; /* Nearly full height */
   object-fit: cover;
-  object-position: top center;  /* Show face, not torso */
+  object-position: top center; /* Show face, not torso */
 }
 ```
 
@@ -282,7 +296,7 @@ Blend the photo into the dark background on the left edge:
   width: 60%;
   height: 100%;
   background: linear-gradient(to right, var(--bg-primary) 0%, transparent 40%);
-  z-index: 1;           /* Sits on top of photo */
+  z-index: 1; /* Sits on top of photo */
 }
 ```
 
@@ -319,11 +333,13 @@ Each face gets ~35% width, positioned at bottom:
 When a plain dark gradient isn't enough, use Nano Banana Pro to generate an abstract background.
 
 ### When to Use AI Backgrounds
+
 - Topic has a strong visual metaphor (cells, DNA, brain, etc.)
 - You want a textured feel beyond a flat gradient
 - The user requests it
 
 ### When NOT to Use AI Backgrounds
+
 - The face photo provides enough visual interest
 - Simple is better (most of the time)
 - The background would compete with readability
@@ -338,6 +354,7 @@ No text. No people. No faces. Ultra-wide 16:9 format. 2K resolution.
 ```
 
 **Topic-specific examples:**
+
 - Spermidine: "microscopic cellular structures, autophagy vesicles, glowing organelles"
 - GLP-1: "abstract molecular pathways, receptor binding visualization"
 - Lab panels: "flowing data streams, biomarker visualization"
@@ -414,7 +431,7 @@ Keep it tiny. The thumbnail is not the place for prominent branding.
 .brand-mark .logo {
   width: 28px;
   height: 28px;
-  background: rgba(255,255,255,0.15);
+  background: rgba(255, 255, 255, 0.15);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -428,7 +445,7 @@ Keep it tiny. The thumbnail is not the place for prominent branding.
   font-family: 'DM Sans', sans-serif;
   font-size: 11px;
   font-weight: 600;
-  color: rgba(255,255,255,0.4);
+  color: rgba(255, 255, 255, 0.4);
   letter-spacing: 0.05em;
   text-transform: uppercase;
 }
@@ -439,25 +456,31 @@ Keep it tiny. The thumbnail is not the place for prominent branding.
 ## Generation Process
 
 ### Step 1: Write the Hook
+
 Take the video topic and distill it to 3-5 punchy words. Follow the text hook writing rules above.
 
 ### Step 2: Choose the Layout
+
 - Solo speaker → Pattern A
 - Guest interview → Pattern B
 - Provocative claim → Pattern C
 
 ### Step 3: Decide on Background
+
 - Default: dark gradient (fastest, cleanest)
 - Optional: AI-generated abstract (if topic has strong visual metaphor)
 
 ### Step 4: Build the HTML
+
 Use the template at `.claude/skills/youtube-thumbnail/templates/thumbnail-template.html`. Customize:
+
 - Set the headline text (3-5 words)
 - Set the photo `src` paths
 - Choose layout variant
 - Optionally generate and reference an AI background
 
 ### Step 5: Output
+
 Save to `content/graphics/yt-thumb-[topic-slug].html`
 
 ---
@@ -494,12 +517,14 @@ Save to `content/graphics/yt-thumb-[topic-slug].html`
 ## Usage Examples
 
 ### Solo lecture thumbnail
+
 ```
 Create a YouTube thumbnail for my lecture on spermidine and autophagy.
 Photo: src/assets/anant-profile.jpeg
 ```
 
 ### Guest interview thumbnail
+
 ```
 Create a YouTube thumbnail for my interview with Melissa Cano, PhD about spermidine.
 Host photo: src/assets/anant-profile.jpeg
@@ -507,6 +532,7 @@ Guest photo: src/assets/melissa-cano.jpg
 ```
 
 ### Bold statement thumbnail
+
 ```
 Create a YouTube thumbnail with a bold hook "Your Labs Are Wrong" — it's about why standard lab panels miss key longevity markers.
 Photo: src/assets/anant-profile.jpeg
@@ -514,6 +540,7 @@ Use Pattern C (text-dominant).
 ```
 
 ### With AI background
+
 ```
 Create a YouTube thumbnail about mitochondrial health.
 Photo: src/assets/anant-profile.jpeg

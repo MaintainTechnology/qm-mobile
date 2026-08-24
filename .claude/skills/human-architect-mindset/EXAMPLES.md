@@ -11,12 +11,14 @@ Real-world scenarios demonstrating the five pillars in action.
 ### What Happened (Systems Thinking Failure)
 
 **The failure:**
+
 - External dependency changed without warning
 - No monitoring for SDK version changes
 - Breaking change detected only via production errors
 - Time-to-detection: Hours? Days?
 
 **The gap:**
+
 - Treated external SDK as stable
 - No fallback strategy
 - No version pinning strategy communicated
@@ -25,6 +27,7 @@ Real-world scenarios demonstrating the five pillars in action.
 ### Architect Thinking Applied
 
 **Phase 2 (Systems Analysis) would have asked:**
+
 1. "What external systems does this depend on?"
    - Payment provider SDK (external, not controlled)
 2. "What happens when this dependency changes?"
@@ -35,6 +38,7 @@ Real-world scenarios demonstrating the five pillars in action.
    - Missing: SDK version change detection, changelog monitoring
 
 **Phase 3 (Constraints) would have asked:**
+
 1. "What's our contract with this provider?"
    - Do they guarantee backwards compatibility?
    - What's their deprecation policy?
@@ -61,11 +65,13 @@ Better:
 **AI Decomposition for Fix:**
 
 Good task boundaries:
+
 - "Create SDK wrapper interface with current SDK calls"
 - "Add version monitoring that alerts on SDK updates"
 - "Write fallback logic for provider unavailability"
 
 Bad task boundary:
+
 - "Fix the payment system to never break again"
 
 ### Lesson
@@ -106,21 +112,25 @@ External dependencies are external risk. Systems thinking maps this risk BEFORE 
 ### Constraint Navigation
 
 **Technical constraints:**
+
 - Hospital system uses HL7 v2.x (1990s protocol)
 - No REST API, only file-based EDI
 - 24-hour batch processing, not real-time
 
 **Organizational constraints:**
+
 - Hospital IT team reviews all integrations
 - 90-day approval cycle
 - Requires penetration testing
 
 **Compliance constraints:**
+
 - HIPAA Security Rule
 - State-specific healthcare laws
 - Insurance portability requirements
 
 **Political constraints:**
+
 - Hospital's existing vendor has exclusive relationship
 - IT team resistant to new integrations
 - Physician workflow changes require medical director sign-off
@@ -128,6 +138,7 @@ External dependencies are external risk. Systems thinking maps this risk BEFORE 
 ### Architect Thinking Applied
 
 **Phase 1 (Domain Discovery):**
+
 ```
 Q: What problem are we solving?
 A: Patients want their records accessible in our app.
@@ -142,6 +153,7 @@ A: The patient (consent), the hospital (BAA), and
 ```
 
 **Phase 3 (Constraints):**
+
 ```
 Q: What can't we change?
 A: The hospital's HL7 v2.x interface. It's 20 years old.
@@ -156,6 +168,7 @@ A: Hospital IT manager. Previous integration broke their system.
 **The "correct" solution (REST API, real-time sync) is unshippable.**
 
 **The shippable solution:**
+
 - Batch file processing on hospital's terms
 - Their approval cycle factored into timeline
 - Build relationship with IT manager before technical work
@@ -163,11 +176,13 @@ A: Hospital IT manager. Previous integration broke their system.
 ### AI Decomposition
 
 **Good boundaries:**
+
 - "Parse HL7 v2.x ADT message into patient demographics object"
 - "Generate FHIR Patient resource from internal patient model"
 - "Write audit log entry for each data access with required HIPAA fields"
 
 **Bad boundaries:**
+
 - "Build the healthcare integration"
 - "Handle HIPAA compliance"
 
@@ -180,11 +195,13 @@ A: Hospital IT manager. Previous integration broke their system.
 ### Political Constraint Navigation
 
 **The teams:**
+
 - **Backend team:** Owns the API. Busy with their own roadmap.
 - **Mobile team:** Ships every 2 weeks. Behind on bugs.
 - **Data team:** New team. Proving themselves. Eager but inexperienced.
 
 **The politics:**
+
 - Backend team lead doesn't like being told what to do
 - Mobile team is underwater, will resist new work
 - Data team wants to use new technology (Kafka) that others don't trust
@@ -213,11 +230,13 @@ A: Mobile's 2-week release cycle. It's contractual with App Store.
 ```
 
 **The "correct" technical solution:**
+
 - Coordinated release across all three systems
 - Shared schema owned by... someone?
 - Feature flag for gradual rollout
 
 **The shippable solution:**
+
 - Backend API designed to be backwards compatible
 - Mobile can release whenever (no coordination needed)
 - Data team gets small scope to prove themselves
@@ -250,18 +269,22 @@ Better:
 **Task boundaries that respect team ownership:**
 
 For Backend team:
+
 - "Add new endpoint /v2/feature that returns X"
 - "Add feature flag check to existing endpoint"
 
 For Mobile team:
+
 - "Add local feature flag for new feature UI"
 - "Update API client to call v2 endpoint when flag enabled"
 
 For Data team:
+
 - "Create new data pipeline that reads from X, writes to Y"
 - "Add validation that compares old pipeline to new"
 
 **Human checkpoints:**
+
 - Each team verifies their own work
 - Integration test when all ready
 - Director approves rollout
@@ -275,11 +298,13 @@ For Data team:
 ### Why "Refactor This" Fails
 
 **Bad AI task:**
+
 ```
 "Refactor legacy_system.py into clean modules"
 ```
 
 **Why it fails:**
+
 - No clear success criteria
 - Unbounded scope
 - No verification possible
@@ -290,6 +315,7 @@ For Data team:
 **Phase 4 (AI Decomposition Planning):**
 
 **Step 1: Understand the system (human work)**
+
 ```
 Q: What does this file actually do?
 A: Handles user authentication, session management,
@@ -311,6 +337,7 @@ A:
 **Step 2: Define bounded AI tasks**
 
 Task 1: Extract authentication functions
+
 ```
 Input: Lines 100-500 of legacy_system.py (authentication logic)
 Output: auth.py with same interface, passing existing tests
@@ -318,6 +345,7 @@ Verification: All auth_test.py tests pass
 ```
 
 Task 2: Extract session functions
+
 ```
 Input: Lines 501-900 of legacy_system.py (session logic)
 Output: session.py with same interface, passing existing tests
@@ -325,6 +353,7 @@ Verification: All session_test.py tests pass
 ```
 
 Task 3: Extract permission functions
+
 ```
 Input: Lines 901-1500 of legacy_system.py (permission logic)
 Output: permissions.py with same interface, passing existing tests
@@ -334,12 +363,14 @@ Verification: All permission_test.py tests pass
 **Step 3: Human checkpoints**
 
 After each extraction:
+
 - [ ] Tests still pass
 - [ ] Interface unchanged
 - [ ] No subtle behavior changes
 - [ ] Original file still works with extracted module
 
 **Step 4: Integration (human work)**
+
 - Update imports across codebase
 - Verify full system tests pass
 - Remove duplicated code from original file
@@ -347,11 +378,13 @@ After each extraction:
 ### Good vs Bad Task Examples
 
 **Bad:**
+
 - "Make the code better"
 - "Add proper error handling"
 - "Refactor for readability"
 
 **Good:**
+
 - "Extract the `authenticate_user` function and its helpers (lines 100-200) into `auth.py`, maintaining the existing function signature"
 - "Add try/except around the database call on line 150, catching `DatabaseError` and re-raising as `AuthenticationError`"
 - "Rename the variable `x` on line 175 to `user_session` and update all references in this function"
@@ -414,6 +447,7 @@ Q: What depends on User?
 ```
 
 **Cascading effects:**
+
 - Delete user = orphan posts, comments, messages
 - Delete payment methods = might need to keep for tax
 - Delete orders = legal and accounting issues
@@ -422,14 +456,17 @@ Q: What depends on User?
 ### Constraints
 
 **Technical:**
+
 - Foreign key constraints prevent simple delete
 - Analytics pipeline expects user_id to exist
 
 **Business:**
+
 - Legal requires 7-year retention for financial data
 - Support needs to access deleted user history for disputes
 
 **Regulatory:**
+
 - GDPR: Must delete within 30 days of request
 - Tax law: Must retain invoices for 7 years
 
@@ -464,12 +501,14 @@ Account Deletion Architecture:
 ### AI Decomposition
 
 **Good boundaries:**
+
 - "Add `deleted_at` timestamp column to users table"
 - "Update user query to exclude soft-deleted users"
 - "Create anonymization function for user profile fields"
 - "Add deletion request to audit log"
 
 **Bad boundaries:**
+
 - "Implement user deletion"
 - "Handle GDPR compliance"
 
@@ -486,6 +525,7 @@ Account Deletion Architecture:
 ### The Loyalty Analysis
 
 **Commitment inventory:**
+
 - 3 years of React investment
 - Team expertise built in React patterns
 - Component library tailored to React
@@ -493,6 +533,7 @@ Account Deletion Architecture:
 - Third-party integrations assume React
 
 **What migration actually costs:**
+
 - 6+ months of rewriting (not building features)
 - Learning curve productivity loss
 - Risk of HypeJS being abandoned (new frameworks die)
@@ -500,6 +541,7 @@ Account Deletion Architecture:
 - All past architectural decisions need re-evaluation
 
 **The loyalty questions:**
+
 - "Are we solving a problem or chasing a trend?"
 - "Would we consider this if it weren't popular right now?"
 - "Have we invested enough in making React work?"
@@ -508,6 +550,7 @@ Account Deletion Architecture:
 ### The Architect's Response
 
 **Instead of migrating:**
+
 1. Profile actual performance issues (they're probably in YOUR code)
 2. Apply React-specific optimizations (memoization, code splitting)
 3. Upgrade React version for any framework-level gains
@@ -696,22 +739,26 @@ For this legal document app, create a SKILLS.md:
 # Legal Document Assistant - Project Skills
 
 ## Domain Vocabulary
+
 - "Clause" = Numbered paragraph in contract
 - "Red flag" = High-risk term requiring attention
 - "Boilerplate" = Standard language, low risk
 - "Material term" = Key business term (price, dates, scope)
 
 ## AI Patterns
+
 - Always use claude-flow for clause analysis
 - Phi-3 for initial extraction, Claude for reasoning
 - Minimum confidence threshold: 0.8 for auto-accept
 
 ## Testing Requirements
+
 - All extractions must be verified against golden set
 - New clause types require 10+ examples before deployment
 - User feedback must be reviewed weekly
 
 ## Architectural Decisions
+
 - Hybrid local/cloud for privacy flexibility
 - Self-learning enabled, but requires 100+ signals before adaptation
 - Skills exposed to users: /explain, /risk-summary, /draft-response
@@ -721,15 +768,15 @@ For this legal document app, create a SKILLS.md:
 
 **5th Pillar applied:**
 
-| Area | Decision | Reasoning |
-|------|----------|-----------|
-| **Performance** | Rust/WASM for PDF parsing | CPU-intensive, latency-sensitive |
-| **Multi-agent** | claude-flow for parallel clause analysis | Independent tasks, faster processing |
-| **Edge AI** | Phi-3/Gemma for local extraction | Privacy, offline capability |
-| **Cloud AI** | Claude for complex reasoning | Accuracy critical for legal |
-| **Self-learning** | Feedback loops on user actions | Improve over time, per-user/domain |
-| **User skills** | /explain, /risk-summary, /draft-response | Help users act on AI outputs |
-| **Testing** | Golden set + accuracy thresholds | AI behavior must be verifiable |
+| Area              | Decision                                 | Reasoning                            |
+| ----------------- | ---------------------------------------- | ------------------------------------ |
+| **Performance**   | Rust/WASM for PDF parsing                | CPU-intensive, latency-sensitive     |
+| **Multi-agent**   | claude-flow for parallel clause analysis | Independent tasks, faster processing |
+| **Edge AI**       | Phi-3/Gemma for local extraction         | Privacy, offline capability          |
+| **Cloud AI**      | Claude for complex reasoning             | Accuracy critical for legal          |
+| **Self-learning** | Feedback loops on user actions           | Improve over time, per-user/domain   |
+| **User skills**   | /explain, /risk-summary, /draft-response | Help users act on AI outputs         |
+| **Testing**       | Golden set + accuracy thresholds         | AI behavior must be verifiable       |
 
 **The lesson:** AI-First Development is about evaluating which modern patterns genuinely benefit the project, not adopting everything because it's new.
 

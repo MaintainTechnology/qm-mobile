@@ -18,29 +18,30 @@ Generate a comprehensive course outline and research dossier from a topic and re
 ```
 
 **Examples:**
+
 - `/generate-outline-win "Cardiovascular Longevity" --materials "course materials/"`
 - `/generate-outline-win "Peptide Therapy Fundamentals" --materials "C:/path/to/materials/" --dry-run`
 - `/generate-outline-win "Topic" --materials "./materials/" --outline existing_outline.md`
 
 ## Supported File Types
 
-| Extension | Type | Processing |
-|-----------|------|------------|
-| `.pdf` | PDF | Compress only |
-| `.pptx`, `.ppt` | PowerPoint | Convert to PDF, then compress |
-| `.docx`, `.doc` | Word | Convert to PDF, then compress |
-| `.xlsx`, `.xls` | Excel | Convert to PDF, then compress |
-| `.odt` | OpenDocument Text | Convert to PDF, then compress |
-| `.odp` | OpenDocument Presentation | Convert to PDF, then compress |
-| `.ods` | OpenDocument Spreadsheet | Convert to PDF, then compress |
+| Extension       | Type                      | Processing                    |
+| --------------- | ------------------------- | ----------------------------- |
+| `.pdf`          | PDF                       | Compress only                 |
+| `.pptx`, `.ppt` | PowerPoint                | Convert to PDF, then compress |
+| `.docx`, `.doc` | Word                      | Convert to PDF, then compress |
+| `.xlsx`, `.xls` | Excel                     | Convert to PDF, then compress |
+| `.odt`          | OpenDocument Text         | Convert to PDF, then compress |
+| `.odp`          | OpenDocument Presentation | Convert to PDF, then compress |
+| `.ods`          | OpenDocument Spreadsheet  | Convert to PDF, then compress |
 
 ## Requirements (Windows)
 
-| Tool | Install Command | Purpose |
-|------|-----------------|---------|
+| Tool        | Install Command                                    | Purpose                         |
+| ----------- | -------------------------------------------------- | ------------------------------- |
 | LibreOffice | `winget install TheDocumentFoundation.LibreOffice` | Convert PPTX, DOCX, etc. to PDF |
-| Ghostscript | `winget install ArtifexSoftware.GhostScript` | Compress PDFs >5MB |
-| Python 3 | already on PATH via `uv` | Runs the generator |
+| Ghostscript | `winget install ArtifexSoftware.GhostScript`       | Compress PDFs >5MB              |
+| Python 3    | already on PATH via `uv`                           | Runs the generator              |
 
 **Environment variable:** `VECTORSHIFT_API_KEY` must be present in the repo's `.env` file (already configured in this project).
 
@@ -67,6 +68,7 @@ Run from the repo root (`c:\Users\dalig\Desktop\ngm-website-official`).
 ## When to Use This Skill
 
 Use this skill when the user:
+
 - Is on **Windows** and wants to create a course outline from reference materials
 - Has PowerPoint presentations, Word docs, or PDFs to process
 - Has large files (>5MB) that need compression before upload
@@ -77,12 +79,12 @@ Use this skill when the user:
 
 ## Pipeline Information
 
-| Property | Value |
-|----------|-------|
-| Extractor Pipeline ID | `695fe21bfc432bac017b7f45` (File Insight Extractor) |
-| Outline Pipeline ID | `695fe224fc432bac017b870e` (Course Outline Creator v5 Sequential) |
-| Fallback Pipeline ID | `695fb4525cbca10bf6c2ac46` (Course Outline Creator v4 Parallel) |
-| Runner Script | [scripts/outline_creator_runner_win.py](../../../scripts/outline_creator_runner_win.py) |
+| Property              | Value                                                                                   |
+| --------------------- | --------------------------------------------------------------------------------------- |
+| Extractor Pipeline ID | `695fe21bfc432bac017b7f45` (File Insight Extractor)                                     |
+| Outline Pipeline ID   | `695fe224fc432bac017b870e` (Course Outline Creator v5 Sequential)                       |
+| Fallback Pipeline ID  | `695fb4525cbca10bf6c2ac46` (Course Outline Creator v4 Parallel)                         |
+| Runner Script         | [scripts/outline_creator_runner_win.py](../../../scripts/outline_creator_runner_win.py) |
 
 ### Architecture
 
@@ -103,6 +105,7 @@ Phase 1 extracts insights from each file one at a time (more reliable than paral
 ### Step 1: Gather Information
 
 Ask the user for:
+
 - Course topic (required)
 - Path to materials folder (required)
 - Existing outline file to revise (optional)
@@ -120,6 +123,7 @@ uv run python scripts/outline_creator_runner_win.py \
 ```
 
 This shows:
+
 - Total number of files found
 - File sizes and what will happen to each (convert, compress, or both)
 - Tool availability (LibreOffice, Ghostscript)
@@ -135,6 +139,7 @@ uv run python scripts/outline_creator_runner_win.py \
 ```
 
 Options:
+
 - `--outline <file>` - Existing outline to revise
 - `--output <folder>` - Custom output folder
 - `--extractor-pipeline-id <id>` - Override extractor pipeline ID
@@ -143,6 +148,7 @@ Options:
 ### Step 4: Report Results
 
 After completion, show the user:
+
 - Location of output files
 - Duration
 - Any errors or warnings
@@ -151,11 +157,11 @@ After completion, show the user:
 
 Generated files are saved to `outputs/outlines/{topic_name}/` at the repo root:
 
-| File | Content |
-|------|---------|
+| File                      | Content                                           |
+| ------------------------- | ------------------------------------------------- |
 | `accumulated_insights.md` | Combined insights from all files (Phase 1 output) |
-| `course_dossier.md` | Deep research dossier from Perplexity |
-| `course_outline.md` | Structured 10-15 lecture curriculum |
+| `course_dossier.md`       | Deep research dossier from Perplexity             |
+| `course_outline.md`       | Structured 10-15 lecture curriculum               |
 
 ## File Processing Pipeline
 
@@ -167,10 +173,10 @@ PPTX/DOCX/etc. --[LibreOffice]--> PDF --[Ghostscript]--> Compressed PDF --> Uplo
 ### Compression Stats
 
 | Original Size | Typical Compressed Size |
-|--------------|------------------------|
-| 10MB | 3-5MB |
-| 50MB | 10-20MB |
-| 100MB | 20-40MB |
+| ------------- | ----------------------- |
+| 10MB          | 3-5MB                   |
+| 50MB          | 10-20MB                 |
+| 100MB         | 20-40MB                 |
 
 **Compression quality:** `ebook` (150dpi) - balances quality and size
 
@@ -183,19 +189,20 @@ PPTX/DOCX/etc. --[LibreOffice]--> PDF --[Ghostscript]--> Compressed PDF --> Uplo
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Materials folder not found | Ask user for correct path |
-| No supported files found | Warn and ask if they want to proceed |
-| LibreOffice not found | Warn, skip conversion for non-PDFs |
-| Ghostscript not found | Warn about large uploads, proceed without compression |
-| `VECTORSHIFT_API_KEY` missing | Stop and tell user to check `.env` |
-| API timeout | Retry 3x with 30s delay |
-| API rate limit (429) | Wait and retry with backoff |
+| Error                         | Action                                                |
+| ----------------------------- | ----------------------------------------------------- |
+| Materials folder not found    | Ask user for correct path                             |
+| No supported files found      | Warn and ask if they want to proceed                  |
+| LibreOffice not found         | Warn, skip conversion for non-PDFs                    |
+| Ghostscript not found         | Warn about large uploads, proceed without compression |
+| `VECTORSHIFT_API_KEY` missing | Stop and tell user to check `.env`                    |
+| API timeout                   | Retry 3x with 30s delay                               |
+| API rate limit (429)          | Wait and retry with backoff                           |
 
 ## Example Usage
 
 **Via slash command:**
+
 ```
 /generate-outline-win "Cardiovascular Longevity" --materials "course materials/"
 /generate-outline-win "Topic" --materials "C:/materials/" --dry-run

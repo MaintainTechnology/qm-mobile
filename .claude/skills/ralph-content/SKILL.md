@@ -21,6 +21,7 @@ Generate newsletters, lead magnets, LinkedIn posts, and Instagram scripts with i
 ```
 
 **Arguments:**
+
 - `<topic>` - The subject to write about (required)
 - `--type` - Content type: newsletter (default), lead_magnet, linkedin, instagram, regulatory_brief, podcast_roundup
 - `--voice` - Voice style: bryan_johnson (default for `--type linkedin`), av_style (Anant Vinjamoori founder voice: visionary, reframe-driven, mission-close), dan_shipper, tina_he, katie_parrott, klosterman, huberman, attia, daily_stoic, sinclair, miklasz, etc. See `context/every-voice-patterns.md` for the full catalog and per-voice patterns. NOTE: `av_style` deliberately PERMITS the "isn't X, it's Y" reframe (the default `negate_then_assert` ban does not apply to it) and replaces the imperative close with a mission close; em-dashes and semicolons stay at 0.
@@ -34,21 +35,23 @@ Generate newsletters, lead magnets, LinkedIn posts, and Instagram scripts with i
 
 ## Core Principle: Claude Opus 4.8 for Every Step
 
-Every model-powered step runs on **Claude Opus 4.8** via the Vercel AI Gateway — one model, one auth path. The split below is by *task and prompt*, not by model: each step uses its own dedicated, single-objective prompt, so sharing the model never means sharing the prompt.
+Every model-powered step runs on **Claude Opus 4.8** via the Vercel AI Gateway — one model, one auth path. The split below is by _task and prompt_, not by model: each step uses its own dedicated, single-objective prompt, so sharing the model never means sharing the prompt.
 
-| Task type | Model | Provider / ID | Auth | Why |
-|---|---|---|---|---|
-| Prose / copy generation (all content types) | Claude Opus 4.8 | Vercel AI Gateway · `anthropic/claude-opus-4-8` | `AI_GATEWAY_API_KEY` from `.env.local` | Established prose voice baseline; runs the Phase 2 self-critique loop against NGM editorial rubrics |
-| Humanization pass on all approved copy (Phase 2.5) | Claude Opus 4.8 | Vercel AI Gateway · `anthropic/claude-opus-4-8` | `AI_GATEWAY_API_KEY` from `.env.local` | A separate single-objective pass: a dedicated AI-tell-removal prompt sands off surface texture without touching the structure the generation pass locked |
+| Task type                                                                                          | Model           | Provider / ID                                   | Auth                                   | Why                                                                                                                                                           |
+| -------------------------------------------------------------------------------------------------- | --------------- | ----------------------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Prose / copy generation (all content types)                                                        | Claude Opus 4.8 | Vercel AI Gateway · `anthropic/claude-opus-4-8` | `AI_GATEWAY_API_KEY` from `.env.local` | Established prose voice baseline; runs the Phase 2 self-critique loop against NGM editorial rubrics                                                           |
+| Humanization pass on all approved copy (Phase 2.5)                                                 | Claude Opus 4.8 | Vercel AI Gateway · `anthropic/claude-opus-4-8` | `AI_GATEWAY_API_KEY` from `.env.local` | A separate single-objective pass: a dedicated AI-tell-removal prompt sands off surface texture without touching the structure the generation pass locked      |
 | Visual design — SVG diagram generation, self-validation, metaphor design, and any visual iteration | Claude Opus 4.8 | Vercel AI Gateway · `anthropic/claude-opus-4-8` | `AI_GATEWAY_API_KEY` from `.env.local` | A visual-design-specific prompt loaded with the Diagram Style Standard (palette, typography, drawn subjects, polish cues), canvas geometry, and chosen layout |
 
 **Endpoints:**
+
 - Vercel AI Gateway (all generation steps — copy, humanization, visual): `https://ai-gateway.vercel.sh/v1/chat/completions`
 - OpenRouter (Phase 1 Perplexity research only): `https://openrouter.ai/api/v1/chat/completions`
 
 Keep each step's prompt single-objective. Generation locks editorial structure first (Phase 2 self-critique); a separate humanization pass then sands off AI-tell texture (Phase 2.5); visual design runs against the Diagram Style Standard (Phase 4). Run them as distinct passes — same model, different prompts — so each objective stays clean: do not fold humanization into the generation pass, and do not generate SVG with the prose prompt.
 
 There is NO:
+
 - Regex parsing of outputs
 - Hard-coded iteration limits
 - Deterministic state machines
@@ -63,6 +66,7 @@ Claude reads the context files, understands the quality criteria, constructs pro
 ### Phase 0: Load Context
 
 Before starting, read:
+
 1. `.ralph-content/progress.txt` - Prior learnings (if exists)
 2. The context files in this skill's `context/` directory (already loaded via skill)
 
@@ -75,6 +79,7 @@ Note any patterns or gotchas from previous runs.
 **When:** This phase is MANDATORY for any `weekly_roundup` format content (e.g., "This Week in Longevity"). Skip for all other content types.
 
 **Actions:**
+
 1. **Find all previous issues:** Glob for `content/social-content/newsletters/*this-week-in-longevity*.json` (or the relevant series slug)
 2. **Read the most recent 2-3 issues' JSON files** — the `textContent` and `beats[].stories[].headline` fields contain all covered stories
 3. **Build an exclusion list** of all topics, companies, studies, people, and regulatory actions already covered:
@@ -86,6 +91,7 @@ Note any patterns or gotchas from previous runs.
 5. **Document the exclusion list** in your working notes before starting Phase 1 research
 
 **Exclusion rules:**
+
 - If a story was the Editor's Pick in a previous issue, it CANNOT appear anywhere in the new issue unless there is a material new development (e.g., new funding announced, trial results published, regulatory decision made)
 - If a story appeared as a beat story, it cannot be repeated. A genuinely new development on the same topic (e.g., "Klotho Clock" was covered → new: "Klotho Clock receives FDA Breakthrough designation") IS allowed as a new story
 - Quick Hits from previous issues should not be promoted to full stories without new data
@@ -100,6 +106,7 @@ Note any patterns or gotchas from previous runs.
 **IMPORTANT:** Use Perplexity via OpenRouter for deep research, NOT the basic WebSearch tool.
 
 **How to call Perplexity:**
+
 ```bash
 API_KEY=$(grep OPENROUTER_API_KEY .env | cut -d'=' -f2)
 curl -s https://openrouter.ai/api/v1/chat/completions \
@@ -112,6 +119,7 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
 ```
 
 **Actions:**
+
 1. Formulate a comprehensive research query that covers:
    - Molecular/mechanistic details
    - Clinical data with study citations (author, journal, year, n, findings)
@@ -125,12 +133,14 @@ curl -s https://openrouter.ai/api/v1/chat/completions \
 5. Track sources for later citation
 
 **Why Perplexity Deep Research:**
+
 - Returns comprehensive, well-sourced academic content
 - Includes specific study citations (author, journal, year)
 - Provides mechanistic depth not available from basic web search
 - Single query can return 10,000+ words of research synthesis
 
 **Quality Check (you decide):**
+
 - Do I have specific names, numbers, and timeframes?
 - Do I have 3+ examples for evidence cascades?
 - Do I have mechanism details, not just surface claims?
@@ -157,6 +167,7 @@ Each entity doc is richly structured. A pathway doc (e.g. `pathway_pi3k_akt_mtor
 #### Drive MCP tools
 
 Use the Google Drive connector (the hosted Drive connector — NOT the local `google-drive` server, which lacks full-text search). If these tools are not already available, load them with `ToolSearch` (query `"google drive search files read content"`):
+
 - `search_files` — query with `fullText contains '...'` and/or `title contains '...'`. Returns `id`, `title`, `parentId`, `modifiedTime`, `owner`, `mimeType`.
 - `read_file_content` — returns the full natural-language text of a doc by `fileId`. This is how you read whole entity docs.
 - `get_file_metadata` — fetch `parentId`/lineage for a file when you need to confirm which copy it is.
@@ -223,7 +234,7 @@ Reading a single entity doc (the most relevant pathway or intervention) is usual
 
 ### Phase 1.6: Editorial Angle Audit (MANDATORY before drafting)
 
-**Goal:** Surface the *sharpest* finding inside the source paper, not the abstract headline. Authors optimize abstracts for citation pull. NGM optimizes for what changes how a thoughtful clinician thinks. These are different optimization functions.
+**Goal:** Surface the _sharpest_ finding inside the source paper, not the abstract headline. Authors optimize abstracts for citation pull. NGM optimizes for what changes how a thoughtful clinician thinks. These are different optimization functions.
 
 **The failure mode this phase prevents:** Defaulting to the paper's abstract headline as the editorial anchor. Most longevity content does this. NGM's differentiation lives in surfacing the buried-but-sharp finding that the abstract treats as a sub-result.
 
@@ -234,7 +245,7 @@ Reading a single entity doc (the most relevant pathway or intervention) is usual
 1. **Enumerate 3–5 candidate findings from the source.** Read the paper end-to-end (not just the abstract). List the candidate findings explicitly. Each candidate must be statable in one sentence with at least one specific number, named comparison, or measurable contrast.
 
 2. **Score each candidate on the 5-criterion sharpness rubric.** Score 1–5 on each:
-   - **Counter-intuitive coefficient:** Does this finding violate what a thoughtful clinician would expect *before* reading the paper? (1 = confirms expectation; 5 = forces a reframe)
+   - **Counter-intuitive coefficient:** Does this finding violate what a thoughtful clinician would expect _before_ reading the paper? (1 = confirms expectation; 5 = forces a reframe)
    - **Practical decision-changing:** Does this change how a clinician answers a real patient question or designs a protocol? (1 = no clinical implication; 5 = changes a specific decision tomorrow)
    - **Mechanism-richness:** Does this raise a "why" question worth answering, where the answer would be educational? (1 = mechanism is obvious; 5 = mechanism is genuinely puzzling)
    - **Differentiation from default coverage:** How much of the longevity content ecosystem will lead with this finding? (1 = everyone leads with this; 5 = almost nobody surfaces this)
@@ -259,7 +270,7 @@ When two or more of these tells apply, the finding is almost certainly sharper t
 
 **Worked examples:** See `examples/sharpest-finding-audits/` for two reference cases (Lancet exercise meta-analysis 2026 and Cell Reports Medicine mRPG paper 2026) showing the candidate enumeration, scoring, and resulting editorial anchors.
 
-**Quality bar:** A reader of the finished post should be able to articulate the central finding in one sentence — and that sentence should be different from the abstract's stated conclusion. If the post's central finding *is* the abstract conclusion, the audit was either skipped or the justification was weak.
+**Quality bar:** A reader of the finished post should be able to articulate the central finding in one sentence — and that sentence should be different from the abstract's stated conclusion. If the post's central finding _is_ the abstract conclusion, the audit was either skipped or the justification was weak.
 
 ### Phase 2: Draft via Opus 4.8 + Self-Critique Loop
 
@@ -268,6 +279,7 @@ When two or more of these tells apply, the finding is almost certainly sharper t
 **Copywriting Model:** All prose/copy generation is done by **Claude Opus 4.8** via the Vercel AI Gateway.
 
 **How to call Opus 4.8:**
+
 ```bash
 AI_GATEWAY_KEY=$(grep AI_GATEWAY_API_KEY .env.local | cut -d'=' -f2)
 curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
@@ -282,6 +294,7 @@ curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
 ```
 
 **Tip:** For long prompts, write the prompt to a temp file first, then use `jq` to construct the JSON safely:
+
 ```bash
 cat > /tmp/prompt.txt << 'EOF'
 Your prompt here...
@@ -295,27 +308,30 @@ curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
 ```
 
 **Actions:**
+
 1. **Hook Architecture (MANDATORY for ALL content types):** The default hook architecture is the Curiosity-Driven Hook Architecture documented in `context/every-voice-patterns.md`. Apply one of the six templates (Results-Just-Came-In, Superlative-Plus-Contradiction, Specific-Metric-With-Population-Reference, Industry-Reframe-Plus-Alternative, Unexpected-Finding-With-Implication, Tension-Between-Belief-And-Data). Pick the template that best fits the topic; do not default to the same template every time.
    - **Self-audit before continuing:** Apply the test from `every-voice-patterns.md`: "If I removed the rest of the post, would the hook alone make a knowledgeable reader feel they learned something specific?" If no, the hook is too vague or hedged — rewrite before drafting the body.
    - **Hook anti-patterns to avoid (mandatory):** No hedging in the hook (may/might/could/potentially); no generic claims ("studies show X is important"); no listicle openings; no academic throat-clearing ("Recent research has begun to..."); no citation-first framing; no artificial urgency.
    - **Opening Variety Check (newsletters specifically):** Glob the 3 most recent newsletter JSON files in `content/social-content/newsletters/` and read their opening paragraphs. Even within the curiosity-driven architecture, vary which template you use. The clinical vignette pattern should appear in no more than 1 in 5 newsletters.
    - **Legacy fallback:** The older "Opening Constructions" patterns (Concrete Scenario, Counterintuitive Claim, etc.) remain available but should only be used when the curiosity-driven templates do not fit the content shape.
 
-1a. **LinkedIn Body Voice — Bryan-Johnson-Adapted (DEFAULT for `--type linkedin`):** Once the hook is locked, the body of every LinkedIn post defaults to the Bryan-Johnson-Adapted Voice in `context/every-voice-patterns.md`. This is the *default* voice and applies unless `--voice` overrides it (with `klosterman`, `attia`, etc.).
-   - **Body cadence:** Period-heavy declarative. Average sentence length 10–18 words. Fewer than 20% of sentences may exceed 25 words. Each significant claim gets its own sentence. Use periods where most writers would use semicolons or em-dashes.
-   - **Numerical specificity throughout:** Every paragraph in the body contains at least one specific number, named study, or measurable comparison. No "many," "several," "studies suggest." Always cite β / OR / HR with 95% CI when reporting effect sizes.
-   - **Confident-but-falsifiable:** Cut "may," "might," "could," "potentially," "in some cases," "appears to" except where genuine clinical uncertainty exists. Make the strongest defensible claim and accept reputational risk.
-   - **Asymmetric honesty:** Every LinkedIn post acknowledges at least one limitation, null result, or open question — embedded in the analysis, not appended as a closing disclaimer. This is the signature NGM editorial move.
-   - **Imperative close:** The last line is a 2–6 word clinical instruction or calibration directive. Examples: "Prescribe the exercise. Calibrate the language." / "Show me your system, not your shelf." / "Write the prescription."
-   - **Off-brand patterns to NOT import (mandatory):** Zero personal n=1 framing of Anant's biomarkers; zero "Don't Die" / civilizational-scale stakes; zero supplement-stack disclosures; zero listicle structures as the spine of the argument; zero aggressive contrarianism untethered to specific data.
-   - **BJ-Voice Self-Audit:** Before submitting the draft to Phase 2.5 humanization, run the six-item checklist from `every-voice-patterns.md` → "The BJ-Voice Self-Audit." All six must pass. If any fail, rewrite the body.
-   - **Voice override rules:** If `--voice` is set to a non-default voice (e.g., `klosterman`), that voice's body patterns take precedence over the BJ defaults, but the BJ-derived hook architecture and asymmetric-honesty requirement still apply. `bryan_johnson` and `sinclair` and `attia` compose well; `klosterman` does not (Klosterman's winding sentences cut against BJ's period-heavy cadence — drop the BJ body cadence requirement when invoking Klosterman).
+1a. **LinkedIn Body Voice — Bryan-Johnson-Adapted (DEFAULT for `--type linkedin`):** Once the hook is locked, the body of every LinkedIn post defaults to the Bryan-Johnson-Adapted Voice in `context/every-voice-patterns.md`. This is the _default_ voice and applies unless `--voice` overrides it (with `klosterman`, `attia`, etc.).
+
+- **Body cadence:** Period-heavy declarative. Average sentence length 10–18 words. Fewer than 20% of sentences may exceed 25 words. Each significant claim gets its own sentence. Use periods where most writers would use semicolons or em-dashes.
+- **Numerical specificity throughout:** Every paragraph in the body contains at least one specific number, named study, or measurable comparison. No "many," "several," "studies suggest." Always cite β / OR / HR with 95% CI when reporting effect sizes.
+- **Confident-but-falsifiable:** Cut "may," "might," "could," "potentially," "in some cases," "appears to" except where genuine clinical uncertainty exists. Make the strongest defensible claim and accept reputational risk.
+- **Asymmetric honesty:** Every LinkedIn post acknowledges at least one limitation, null result, or open question — embedded in the analysis, not appended as a closing disclaimer. This is the signature NGM editorial move.
+- **Imperative close:** The last line is a 2–6 word clinical instruction or calibration directive. Examples: "Prescribe the exercise. Calibrate the language." / "Show me your system, not your shelf." / "Write the prescription."
+- **Off-brand patterns to NOT import (mandatory):** Zero personal n=1 framing of Anant's biomarkers; zero "Don't Die" / civilizational-scale stakes; zero supplement-stack disclosures; zero listicle structures as the spine of the argument; zero aggressive contrarianism untethered to specific data.
+- **BJ-Voice Self-Audit:** Before submitting the draft to Phase 2.5 humanization, run the six-item checklist from `every-voice-patterns.md` → "The BJ-Voice Self-Audit." All six must pass. If any fail, rewrite the body.
+- **Voice override rules:** If `--voice` is set to a non-default voice (e.g., `klosterman`), that voice's body patterns take precedence over the BJ defaults, but the BJ-derived hook architecture and asymmetric-honesty requirement still apply. `bryan_johnson` and `sinclair` and `attia` compose well; `klosterman` does not (Klosterman's winding sentences cut against BJ's period-heavy cadence — drop the BJ body cadence requirement when invoking Klosterman).
+
 2. Construct a detailed prompt and call Opus 4.8 via the Vercel AI Gateway, applying:
    - Voice and style guidelines from `context/every-voice-patterns.md`
    - **Banned Patterns (MANDATORY):** Never use the 'Zero Echo' device (stating a fact then repeating the number alone on its own line for emphasis, e.g. 'Zero trials.\n\nZero.'). Never use 'let that sink in,' 'read that again,' or 'I'll say it again.' When evidence is absent, state it once and move immediately to implications, adjacent evidence, or what would need to be true. The absence is one sentence in a paragraph, not a standalone dramatic beat.
    - **Approachability Rules (MANDATORY for newsletters and lead magnets):** These pieces are teaching a clinician who skims. Every section must feel walkable, not dense. Apply all six rules:
      1. **Short paragraphs.** 1–3 sentences max. If a paragraph is 4+ sentences, split it. Four-sentence paragraphs are the density smell.
-     2. **Analogy before mechanism.** Every time you introduce a molecular detail, pathway, or unfamiliar term, lead with a plain-English analogy or comparison ("Think of it like…", "This works similarly to…", "Imagine…"). The mechanism comes *after* the analogy, not before it.
+     2. **Analogy before mechanism.** Every time you introduce a molecular detail, pathway, or unfamiliar term, lead with a plain-English analogy or comparison ("Think of it like…", "This works similarly to…", "Imagine…"). The mechanism comes _after_ the analogy, not before it.
      3. **Signpost why-this-matters.** Between every two sections, add a short bridge sentence or phrase that tells the reader what they're about to learn and why it matters clinically. Use phrases like "Here's why this matters for practice:", "The clinical implication:", "What this changes:". These are not filler — they are navigation.
      4. **One-sentence emphasis beats.** Aim for 4–8 one-sentence paragraphs in a newsletter (more than the Every 3–6 range) and 6–12 in a lead magnet. These break dense prose into breathable beats. They land the insight. They give the reader's eye a rest. Never place two in a row.
      5. **Walk-through transitional phrasing.** Use active teaching phrases that guide the reader through complexity: "Let me walk you through this.", "Here's the key idea:", "Let's unpack that.", "Stay with me — this matters.", "Here's what that looks like in practice.", "Picture it this way.". Use 3–6 per newsletter, 6–10 per lead magnet.
@@ -336,7 +352,7 @@ curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
 
 ### Phase 2.5: Humanization Pass (Opus 4.8)
 
-**Goal:** Take the rubric-approved Opus 4.8 draft and rewrite it to remove residual AI-tell patterns. Preserve every fact, citation, name, number, and structural section. Rewrite *only* voice and rhythm.
+**Goal:** Take the rubric-approved Opus 4.8 draft and rewrite it to remove residual AI-tell patterns. Preserve every fact, citation, name, number, and structural section. Rewrite _only_ voice and rhythm.
 
 **When this runs:** MANDATORY for every copy type — newsletter, lead magnet, LinkedIn, Instagram, podcast roundup, regulatory brief, weekly roundup. Runs AFTER Phase 2 passes the quality rubric and BEFORE Phase 3 fact verification (so verification operates on the final humanized text).
 
@@ -453,9 +469,11 @@ Return ONLY the rewritten copy. No preamble. No explanation of what you changed.
 **Actions:**
 
 #### 3A. Source Credibility Audit
+
 Before verifying claims, audit ALL cited sources for credibility:
 
 **ACCEPTABLE sources:**
+
 - Peer-reviewed journals (PubMed, PMC, MDPI, Nature, Science, etc.)
 - Official regulatory bodies (FDA.gov, EMA.europa.eu, WHO)
 - Academic institutions (.edu domains)
@@ -464,6 +482,7 @@ Before verifying claims, audit ALL cited sources for credibility:
 - Wikipedia (for general/regulatory reference only, note as such)
 
 **REJECT and replace:**
+
 - Ecommerce sites selling the product being discussed
 - Supplement/peptide vendor sites (e.g., peptidesciences.com, cosmicnootropic.com)
 - Biased commercial sources
@@ -473,18 +492,22 @@ Before verifying claims, audit ALL cited sources for credibility:
 If a rejected source is found, search for a peer-reviewed alternative that supports the same claim.
 
 #### 3B. Citation Accuracy Validation
+
 For each citation, verify:
+
 1. **Author attribution** - Correct authors listed (not misattributed)
 2. **Year** - Publication year is accurate
 3. **Journal/Source** - Correct journal name
 4. **Claim mapping** - Citation actually supports the claim it's attached to
 
 Common errors to catch:
+
 - Wrong author (study may have multiple related papers)
 - Wrong year (confusing similar studies)
 - Citation supports a different claim than stated
 
 #### 3C. Claim Verification
+
 1. Identify the 3-5 most significant claims in the content
 2. For each claim, use `WebSearch` to cross-verify with primary sources
 3. If a claim is inaccurate:
@@ -494,7 +517,9 @@ Common errors to catch:
    - Either remove it or mark it as "preliminary" with appropriate hedging
 
 #### 3D. Reasoning Consistency Check (for multi-document sets)
+
 When creating related documents (e.g., multiple safety briefs), ensure:
+
 1. **Consistent evidence weighting** - Same types of evidence receive similar weight across documents
 2. **Explicit reasoning** - If conclusions differ, the justification is explicit
 3. **Proportional conclusions** - Stronger evidence → stronger conclusions
@@ -526,6 +551,7 @@ When creating related documents (e.g., multiple safety briefs), ensure:
 **Visual Design Model:** All visual-design steps in this phase run on **Claude Opus 4.8** via the Vercel AI Gateway — SVG generation, metaphor selection, self-validation, and any iteration/refinement. Use the visual-design-specific prompt template below, NOT the prose-generation prompt: load it with the Diagram Style Standard constraints, canvas geometry, and the chosen layout so the model optimizes for SVG path fidelity rather than prose cadence.
 
 **How to call Opus 4.8 for visual steps:**
+
 ```bash
 AI_GATEWAY_KEY=$(grep AI_GATEWAY_API_KEY .env.local | cut -d'=' -f2 | tr -d '"')
 cat > /tmp/visual_prompt.txt << 'EOF'
@@ -544,13 +570,14 @@ curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
   -d @- | jq -r '.choices[0].message.content'
 ```
 
-**Canonical quality benchmark:** `content/graphics/garlic-linkedin/garlic-longevity-hub.html` is the *quality bar*, not a template to clone. What makes it ship-worthy is the **style** (palette, typography, drawn subjects, plain-English-over-mechanism labels, polished rendering, editorial framing), which applies to every diagram. The specific radial layout is one of several valid layouts — pick the layout that fits the content, not the one that matches garlic.
+**Canonical quality benchmark:** `content/graphics/garlic-linkedin/garlic-longevity-hub.html` is the _quality bar_, not a template to clone. What makes it ship-worthy is the **style** (palette, typography, drawn subjects, plain-English-over-mechanism labels, polished rendering, editorial framing), which applies to every diagram. The specific radial layout is one of several valid layouts — pick the layout that fits the content, not the one that matches garlic.
 
 **Read before creating any diagram:** `context/diagram-guidelines.md` → "Diagram Style Standard (UNIVERSAL)". Those six style qualities apply to every diagram regardless of layout. Then consult "Diagram Types," "Visual Metaphor Library," and "Hub Layout" for layout-specific conventions.
 
 **Validation:** Every diagram must pass the Style Standard criteria (11–17 in `context/quality-rubrics.md` → "Diagram Validation Criteria"). Hub-layout diagrams additionally must pass H1–H5. Other layouts carry their own structural rules from "Diagram Types" in the guidelines.
 
 **Layout selection:** Pick based on content shape.
+
 - Central concept with 3–10 parallel downstream outcomes, shared valence → Hub Layout
 - Sequential steps or causal chain → Process Flow / Mechanism Pathway
 - Before/after, A/B, two-paradigm contrast → Comparison panel
@@ -559,11 +586,11 @@ curl -s -X POST "https://ai-gateway.vercel.sh/v1/chat/completions" \
 - Two-variable position → Quadrant/Positioning Chart
 - Physical-world scene teaching a mechanism → Visual Metaphor
 
-Variability in layout is expected. Variability in *style* is not — every diagram shares the editorial palette, typography, drawn-subject bias, label hierarchy, polish cues, and framing.
+Variability in layout is expected. Variability in _style_ is not — every diagram shares the editorial palette, typography, drawn-subject bias, label hierarchy, polish cues, and framing.
 
 **Actions:**
 
-*Every numbered step below that produces or evaluates visual output MUST route through Opus 4.8 (`anthropic/claude-opus-4-8`) on the Vercel AI Gateway, using the visual-design prompt template above — never the prose-generation prompt.*
+_Every numbered step below that produces or evaluates visual output MUST route through Opus 4.8 (`anthropic/claude-opus-4-8`) on the Vercel AI Gateway, using the visual-design prompt template above — never the prose-generation prompt._
 
 1. Identify concepts that would benefit from visualization. Choose the layout that fits the content shape, not a default.
 2. **[Opus 4.8] For each diagram, select a visual metaphor FIRST** (especially for lead magnets):
@@ -577,15 +604,15 @@ Variability in layout is expected. Variability in *style* is not — every diagr
    b. **[Opus 4.8]** Select a visual metaphor from the library or invent a new one that fits
    c. **[Opus 4.8]** Generate SVG code following `context/diagram-guidelines.md` — call Opus 4.8 via the gateway using the template at the top of this phase. Include the Style Standard constraints and the chosen layout in the prompt.
    d. **[Opus 4.8] Self-validate the SVG:**
-      - Parse the SVG mentally—check text positions vs container bounds
-      - Verify viewBox has sufficient size for content
-      - Confirm text has 40px+ padding from edges
-      - Check that text inside containers is FULLY contained
-      - Verify color palette compliance with the NGM editorial palette
-      - Verify Diagram Style Standard criteria (11–17 in `context/quality-rubrics.md`)
-      - If the layout is Hub, additionally verify H1–H5
-      - **Check metaphor clarity:** Would someone who hasn't read the article understand the visual story?
-   e. **[Opus 4.8]** If validation fails, call Opus 4.8 again with specific fixes to regenerate.
+   - Parse the SVG mentally—check text positions vs container bounds
+   - Verify viewBox has sufficient size for content
+   - Confirm text has 40px+ padding from edges
+   - Check that text inside containers is FULLY contained
+   - Verify color palette compliance with the NGM editorial palette
+   - Verify Diagram Style Standard criteria (11–17 in `context/quality-rubrics.md`)
+   - If the layout is Hub, additionally verify H1–H5
+   - **Check metaphor clarity:** Would someone who hasn't read the article understand the visual story?
+     e. **[Opus 4.8]** If validation fails, call Opus 4.8 again with specific fixes to regenerate.
 
 **Metaphor Selection Example:**
 "This section explains how bacterial DPP-4 degrades host GLP-1. The metaphor: a pac-man pathogen devouring fragile molecules. Top scene shows the devouring (without drug). Bottom scene shows an armored molecule soaring past the predator (with drug). Title: 'The Hungry Pathogen'."
@@ -599,14 +626,15 @@ Variability in layout is expected. Variability in *style* is not — every diagr
 
 **CRITICAL — Template Selection:**
 
-| Content Type | Delivery | Font Import | Styling | Width |
-|-------------|----------|-------------|---------|-------|
-| Lead magnet | Web page | Google Fonts `<link>` | `<style>` block + CSS classes + `:root` vars | 820px |
-| Newsletter  | Email    | None (email clients ignore) | Inline styles on every element | 600px table |
-| LinkedIn    | Plain text | N/A | N/A | N/A |
-| Instagram   | Script   | N/A | N/A | N/A |
+| Content Type | Delivery   | Font Import                 | Styling                                      | Width       |
+| ------------ | ---------- | --------------------------- | -------------------------------------------- | ----------- |
+| Lead magnet  | Web page   | Google Fonts `<link>`       | `<style>` block + CSS classes + `:root` vars | 820px       |
+| Newsletter   | Email      | None (email clients ignore) | Inline styles on every element               | 600px table |
+| LinkedIn     | Plain text | N/A                         | N/A                                          | N/A         |
+| Instagram    | Script     | N/A                         | N/A                                          | N/A         |
 
 Both HTML types use the SAME font families:
+
 - Display: `'Zen Old Mincho', 'Noto Serif JP', Georgia, serif`
 - Body + UI/Labels: `'Familjen Grotesk', system-ui, sans-serif` (lead magnet) / `'Familjen Grotesk', Arial, sans-serif` (email fallback)
 
@@ -615,6 +643,7 @@ Both HTML types use the SAME font families:
 **Wrong-template diagnostic:** If a lead magnet HTML has zero `class="..."` attributes or no `<style>` block — it's using the email template by mistake. Regenerate.
 
 **Actions:**
+
 1. For lead magnet: Use the "Lead Magnet HTML Template" from `context/ngm-style-guide.md` — full `<style>` block with CSS classes, Google Fonts `<link>`, semantic HTML
 2. For newsletter: Use the "Newsletter HTML (Editorial Email)" from `context/ngm-style-guide.md` — inline styles with editorial font families, table-based layout
 3. For LinkedIn: Format as plain text with appropriate line breaks
@@ -681,7 +710,7 @@ Both HTML types use the SAME font families:
 >    ```javascript
 >    (() => {
 >      window.location.href = 'http://localhost:8092/<your-slug>.html';
->    })()
+>    })();
 >    ```
 >
 > 3. After navigation completes, `preview_eval` this validation:
@@ -692,16 +721,22 @@ Both HTML types use the SAME font families:
 >      const failures = [];
 >      figures.forEach((fig, idx) => {
 >        const svg = fig.querySelector('svg');
->        if (!svg) { failures.push({idx, reason: 'no <svg> in <figure>'}); return; }
+>        if (!svg) {
+>          failures.push({ idx, reason: 'no <svg> in <figure>' });
+>          return;
+>        }
 >        if (svg.children.length < 3) {
->          failures.push({idx, reason: `svg has only ${svg.children.length} child element(s) — likely empty/fragmented`});
+>          failures.push({
+>            idx,
+>            reason: `svg has only ${svg.children.length} child element(s) — likely empty/fragmented`,
+>          });
 >        }
 >        if (fig.querySelector('p')) {
->          failures.push({idx, reason: 'figure contains stray <p> — fragmentation'});
+>          failures.push({ idx, reason: 'figure contains stray <p> — fragmentation' });
 >        }
 >      });
->      return JSON.stringify({figureCount: figures.length, failures}, null, 2);
->    })()
+>      return JSON.stringify({ figureCount: figures.length, failures }, null, 2);
+>    })();
 >    ```
 >
 > 4. If `failures` is non-empty, the gate fails. Diagnose, fix the assembly logic, re-write the HTML, reload, re-validate. Do NOT proceed to commit or progress.txt updates until `failures` is `[]` AND `figureCount` matches the expected diagram count.
@@ -713,6 +748,7 @@ Both HTML types use the SAME font families:
 > **The same gate applies to bundle mode.** When generating a `--bundle`, the bundle is not complete until the lead magnet portion passes BOTH parts of this gate. The newsletter, LinkedIn post, and Instagram script can be assembled and saved independently, but the bundle as a whole is incomplete until the lead magnet has its diagrams confirmed rendering in a real browser.
 
 **Actions:**
+
 1. Save the content:
    - Newsletter: `content/social-content/newsletters/YYYY-MM-DD-{slug}.html`
    - Lead magnet: `content/learn-platform/lead-magnets/{slug}.html` + `.json`
@@ -766,6 +802,7 @@ Both HTML types use the SAME font families:
    - Raw GIF saves to `~/Downloads/`
 
 5. **Post-process with gifsicle:**
+
    ```bash
    gifsicle -d15 ~/Downloads/{raw-gif-name}.gif \
      --resize 1200x627 \
@@ -783,6 +820,7 @@ Both HTML types use the SAME font families:
 **Output:** `~/Downloads/{slug}-linkedin.gif` — ready for LinkedIn/social media upload.
 
 **Key learnings:**
+
 - The GIF recorder only captures `computer` tool actions (screenshot, scroll, click) — NOT `javascript_tool` actions
 - macOS Retina displays capture at 2x resolution, so gifsicle resize is essential
 - Scroll speed must be fast enough that viewers can't read the full content (they should need to download the actual guide)
@@ -806,7 +844,7 @@ Bundle mode modifies the standard workflow to share research and avoid redundant
    - Apply Opening Variety Check
    - Run through 8-point newsletter rubric
    - This draft establishes the core argument, evidence cascade, and key insights
-   - **Run Phase 2.5 humanization on the approved draft before drafting the lead magnet.** The lead magnet should be derived from the *humanized* newsletter, not the raw Opus 4.8 output, so editorial voice flows consistently across the bundle.
+   - **Run Phase 2.5 humanization on the approved draft before drafting the lead magnet.** The lead magnet should be derived from the _humanized_ newsletter, not the raw Opus 4.8 output, so editorial voice flows consistently across the bundle.
 
 2. **Lead magnet second**
    - Derive from the humanized newsletter's research and restructure for the lead magnet format
@@ -842,14 +880,14 @@ Bundle mode modifies the standard workflow to share research and avoid redundant
 
 ### Bundle Defaults
 
-| Setting | Bundle Default |
-|---------|---------------|
-| Newsletter diagrams | 2 |
-| Lead magnet diagrams | 5 |
-| LinkedIn diagrams | 0 |
-| Instagram diagrams | 0 |
-| KB enrichment | Follows `--kb` flag (not auto-enabled) |
-| Verification | Follows `--verify` flag (not auto-enabled) |
+| Setting              | Bundle Default                             |
+| -------------------- | ------------------------------------------ |
+| Newsletter diagrams  | 2                                          |
+| Lead magnet diagrams | 5                                          |
+| LinkedIn diagrams    | 0                                          |
+| Instagram diagrams   | 0                                          |
+| KB enrichment        | Follows `--kb` flag (not auto-enabled)     |
+| Verification         | Follows `--verify` flag (not auto-enabled) |
 
 ### Bundle Commit Message
 
@@ -872,6 +910,7 @@ Co-authored-by: factory-droid[bot] <138933559+factory-droid[bot]@users.noreply.g
 ```
 
 Produces:
+
 - `content/social-content/newsletters/YYYY-MM-DD-cold-exposure-bat.html` + `.json`
 - `content/learn-platform/lead-magnets/cold-exposure-bat.html` + `.json`
 - `content/social-content/linkedin-posts/YYYY-MM-DD-cold-exposure-bat.json`
@@ -884,6 +923,7 @@ All from one command with shared research.
 ## Content Type Specifics
 
 ### Newsletter
+
 - **Format:** Email-ready HTML
 - **Length:** 1200-2000 words
 - **Diagrams:** 2-3 SVG
@@ -891,6 +931,7 @@ All from one command with shared research.
 - **Voice:** Select based on content (Dan Shipper, Tina He, etc.)
 
 ### Lead Magnet
+
 - **Format:** Full HTML document
 - **Length:** ~1000 words
 - **Diagrams:** 3-7 SVG
@@ -898,18 +939,21 @@ All from one command with shared research.
 - **Voice:** Andrew Huberman style
 
 ### LinkedIn
+
 - **Format:** Plain text with line breaks
 - **Length:** 200-300 words
 - **Diagrams:** 1 SVG (for image post)
 - **Quality rubric:** 14-point LinkedIn rubric
 
 ### Instagram
+
 - **Format:** Script with sections
 - **Duration:** 30-90 seconds spoken
 - **Diagrams:** None (video format)
 - **Quality rubric:** 10-point script rubric
 
 ### Podcast Roundup
+
 - **Format:** Email-ready HTML (NGM editorial design)
 - **Length:** 1500-2500 words
 - **Diagrams:** 0 (text-driven format)
@@ -934,6 +978,7 @@ All from one command with shared research.
    - Source attribution: podcaster, show, episode, date
 
 **Structure:**
+
 ```
 HEADER: Title, subtitle, date range, byline
 THE BOTTOM LINE: 2-3 sentence executive summary
@@ -947,6 +992,7 @@ WHAT TO LISTEN TO: Top 3 episode recommendations with reasons
 ```
 
 **What NOT to do:**
+
 - Do NOT group findings into forced themes (e.g., "The Exercise Prescription Is Being Rewritten")
 - Do NOT write 4-5 paragraph mini-essays per finding — keep it tight
 - Do NOT summarize episodes — extract the single most interesting claim and enrich it
@@ -955,6 +1001,7 @@ WHAT TO LISTEN TO: Top 3 episode recommendations with reasons
 **Output location:** `content/social-content/newsletters/YYYY-MM-DD-podcast-roundup.html` (+ `.json`)
 
 ### Regulatory Brief (NEW)
+
 - **Format:** Print-optimized HTML (8.5" × 11", 0.75" margins)
 - **Length:** One page (~600-800 words)
 - **Diagrams:** 0-1 (tables preferred)
@@ -963,6 +1010,7 @@ WHAT TO LISTEN TO: Top 3 episode recommendations with reasons
 - **Voice:** Formal, objective, evidence-based
 
 **Structure for regulatory briefs:**
+
 1. **Header** - Document type, subject, key identifiers (MW, sequence, CAS#)
 2. **Section 1: Safety Data Summary**
    - Clinical trials (with n, design, key findings)
@@ -1000,7 +1048,7 @@ PHASE 1: RESEARCH
   [WebSearch results with studies]
 - Query 2: "BAT thermogenesis UCP1 clinical applications"
   [WebSearch results with mechanism details]
-- Evaluating: I have Hanssen et al. 2015, Cypess et al. 2009, specific activation 
+- Evaluating: I have Hanssen et al. 2015, Cypess et al. 2009, specific activation
   temperatures, and metabolic rate increases. Sufficient for newsletter.
 
 PHASE 2: DRAFT + CRITIQUE
@@ -1110,6 +1158,7 @@ PHASE 6: PUBLISH
 ## Quality Over Speed
 
 This skill prioritizes quality over speed. It's acceptable to:
+
 - Run 4-5 research queries if needed
 - Iterate on content 3+ times
 - Regenerate diagrams multiple times
@@ -1162,6 +1211,7 @@ The goal is content that meets Every.to editorial standards—content the team w
 ```
 
 **Required fields for display:**
+
 - `id` - Unique identifier
 - `createdAt` - ISO 8601 timestamp (used for sorting)
 - `content` - Full post text
@@ -1206,6 +1256,7 @@ The goal is content that meets Every.to editorial standards—content the team w
 ```
 
 **Required fields for display:**
+
 - `id` - Unique identifier
 - `createdAt` - ISO 8601 timestamp
 - `title` - **Used as title in content pipeline**
@@ -1234,10 +1285,7 @@ The content pipeline supports **two formats**. Use the **new format** for all ne
       "content": ["paragraph 1", "paragraph 2"]
     }
   ],
-  "unexpectedDiscoveries": [
-    "Discovery 1",
-    "Discovery 2"
-  ],
+  "unexpectedDiscoveries": ["Discovery 1", "Discovery 2"],
   "frameworks": [
     {
       "name": "Framework Name",
@@ -1262,22 +1310,20 @@ The content pipeline supports **two formats**. Use the **new format** for all ne
   "slug": "unique-slug",
   "created_at": "2026-01-22T00:00:00.000Z",
   "keyword": "KEYWORD",
-  "key_findings": [
-    { "finding": "Finding text", "source": "Source citation" }
-  ],
-  "mechanisms": [
-    { "mechanism": "Mechanism name", "clinical_takeaway": "Clinical takeaway" }
-  ],
+  "key_findings": [{ "finding": "Finding text", "source": "Source citation" }],
+  "mechanisms": [{ "mechanism": "Mechanism name", "clinical_takeaway": "Clinical takeaway" }],
   "references": ["Reference 1 as string", "Reference 2 as string"]
 }
 ```
 
 **Required fields for display:**
+
 - `id` - Unique identifier
 - `createdAt` OR `created_at` - ISO 8601 timestamp
 - `title` - **Used as title in content pipeline**
 
 **Content fields (use one set):**
+
 - New: `sections`, `frameworks`, `unexpectedDiscoveries`
 - Legacy: `key_findings`, `mechanisms`
 
@@ -1288,6 +1334,7 @@ The content pipeline supports **two formats**. Use the **new format** for all ne
 **Note:** The "View HTML Lead Magnet" button always appears for lead magnets (HTML file must exist with same base name as JSON).
 
 **Diagram PDF Export:** Lead magnets support diagram-only PDF export via the "Download Diagram PDF" button. Features:
+
 - **Cover page** with scroll-stopping hook (auto-generated from title), Zen Old Mincho/serif typography, and NGM branding
 - **Access keyword** displayed prominently with "Comment below to get the full analysis" CTA—auto-generated from title if not provided in JSON (`accessKeyword` or `keyword` field)
 - **One diagram per page**, scaled to maximize page real estate
@@ -1318,6 +1365,7 @@ The hook is auto-generated using pattern matching on the title/subtitle (e.g., "
 ```
 
 **Required fields for display:**
+
 - `id` - Unique identifier
 - `createdAt` - ISO 8601 timestamp
 - `meta.topic` - **Used as title in content pipeline**
@@ -1329,19 +1377,23 @@ The hook is auto-generated using pattern matching on the title/subtitle (e.g., "
 ## Files
 
 ### Output Locations
+
 - Newsletters: `content/social-content/newsletters/` (both `.html` AND `.json`)
 - Lead Magnets: `content/learn-platform/lead-magnets/` (both `.html` AND `.json`)
 - LinkedIn: `content/social-content/linkedin-posts/` (`.json` only)
 - Instagram: `content/social-content/instagram-scripts/` (`.json` only)
 
 ### API Endpoints
+
 - View Lead Magnet HTML: `GET /api/lead-magnet-html/[slug]`
 - Download Diagram PDF: `GET /api/lead-magnet-diagrams-pdf/[slug]` - Generates LinkedIn-optimized PDF with cover page + diagrams (uses puppeteer + jspdf)
 
 ### Learning Persistence
+
 - Progress: `.ralph-content/progress.txt`
 
 ### Context (Read at Start)
+
 - `context/every-voice-patterns.md` - Voice patterns and techniques
 - `context/quality-rubrics.md` - All quality criteria
 - `context/diagram-guidelines.md` - SVG generation rules

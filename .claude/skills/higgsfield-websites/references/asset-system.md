@@ -78,9 +78,9 @@ same-origin. Downscale: hero ≤2k, cutouts ~800px, icons ~256px.
      when the page has both)
    - Full social block: `og:title/description/image/url/type` +
      `twitter:card=summary_large_image`, absolute image URLs
-   Sanity-check the favicon at 16px: if the mark turns to noise, use a
-   simplified glyph (initial letter on brand ground) for the small sizes
-   rather than shrinking the full logo.
+     Sanity-check the favicon at 16px: if the mark turns to noise, use a
+     simplified glyph (initial letter on brand ground) for the small sizes
+     rather than shrinking the full logo.
 
 **Cinema tier adds:**
 

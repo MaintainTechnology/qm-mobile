@@ -589,9 +589,7 @@ function getRuleEngineSupport(engine) {
 
 // Set of scope tags rules can declare (e.g. 'type', 'layout'). Used by the
 // CLI --scope flag to narrow output to one design domain.
-const RULE_SCOPES = new Set(
-  ANTIPATTERNS.flatMap(rule => rule.scopes || []),
-);
+const RULE_SCOPES = new Set(ANTIPATTERNS.flatMap(rule => rule.scopes || []));
 
 // Keep only findings whose rule declares at least one of the requested
 // scopes. An empty scope list means no filtering (default CLI behavior).

@@ -42,36 +42,41 @@ plain objects, arrays, numbers, strings, booleans, null. No `Map`/`Set`/
 ## Worked example — tic-tac-toe (turn-based, no secrets)
 
 ```js
-export const meta = { game: "tic-tac-toe", minPlayers: 2, maxPlayers: 2 };
+export const meta = { game: 'tic-tac-toe', minPlayers: 2, maxPlayers: 2 };
 
 const LINES = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
 ];
 
 export function setup(players) {
   return {
     board: Array(9).fill(null),
-    marks: { [players[0]]: "X", [players[1]]: "O" },
-    turn: players[0],                    // a playerId, not an index
+    marks: { [players[0]]: 'X', [players[1]]: 'O' },
+    turn: players[0], // a playerId, not an index
   };
 }
 
 export function validateAction(state, playerId, action) {
   if (!action || !Number.isInteger(action.cell)) {
-    return { ok: false, error: "action.cell (0-8) required" };
+    return { ok: false, error: 'action.cell (0-8) required' };
   }
-  if (state.turn !== playerId) return { ok: false, error: "not your turn" };
-  if (action.cell < 0 || action.cell > 8) return { ok: false, error: "cell out of range" };
-  if (state.board[action.cell] !== null) return { ok: false, error: "cell already taken" };
+  if (state.turn !== playerId) return { ok: false, error: 'not your turn' };
+  if (action.cell < 0 || action.cell > 8) return { ok: false, error: 'cell out of range' };
+  if (state.board[action.cell] !== null) return { ok: false, error: 'cell already taken' };
   return { ok: true };
 }
 
 export function applyAction(state, playerId, action) {
   const board = [...state.board];
   board[action.cell] = state.marks[playerId];
-  const next = Object.keys(state.marks).find((id) => id !== playerId);
+  const next = Object.keys(state.marks).find(id => id !== playerId);
   return { ...state, board, turn: next };
 }
 
@@ -82,7 +87,7 @@ export function isGameOver(state) {
       return { over: true, winner, line: [a, b, c] };
     }
   }
-  if (state.board.every((cell) => cell !== null)) return { over: true, draw: true };
+  if (state.board.every(cell => cell !== null)) return { over: true, draw: true };
   return { over: false };
 }
 
@@ -103,9 +108,9 @@ export function applyAction(state, playerId, action) {
   const choices = { ...state.choices, [playerId]: action.choice };
   const [p1, p2] = state.players;
   if (!choices[p1] || !choices[p2]) {
-    return { ...state, choices };               // wait for the other player
+    return { ...state, choices }; // wait for the other player
   }
-  const scores = resolveRound(choices, state);  // both in — resolve
+  const scores = resolveRound(choices, state); // both in — resolve
   return { ...state, choices: {}, scores, lastRound: { choices } };
 }
 
@@ -113,9 +118,9 @@ export function applyAction(state, playerId, action) {
 export function viewFor(state, playerId) {
   const choices = {};
   for (const [pid, c] of Object.entries(state.choices)) {
-    choices[pid] = pid === playerId ? c : "?";
+    choices[pid] = pid === playerId ? c : '?';
   }
-  return { ...state, choices };   // lastRound stays revealed — it's resolved
+  return { ...state, choices }; // lastRound stays revealed — it's resolved
 }
 ```
 

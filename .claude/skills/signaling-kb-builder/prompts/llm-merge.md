@@ -84,7 +84,7 @@ OUTPUT the complete merged biomarker JSON. Return ONLY valid JSON, no other text
 
 ## Implementation
 
-```python
+````python
 async def llm_merge_entity(
     client: OpenRouterClient,
     entity_type: str,
@@ -93,7 +93,7 @@ async def llm_merge_entity(
     tracker: CostTracker
 ) -> dict:
     """Use Haiku 4.5 to intelligently merge new data into existing entity."""
-    
+
     # Select appropriate prompt
     if entity_type == "intervention":
         prompt = MERGE_INTERVENTION_PROMPT
@@ -103,21 +103,21 @@ async def llm_merge_entity(
         prompt = MERGE_BIOMARKER_PROMPT
     else:
         raise ValueError(f"Unknown entity type: {entity_type}")
-    
+
     formatted_prompt = prompt.format(
         existing=json.dumps(existing, indent=2),
         new_data=json.dumps(new_data, indent=2)
     )
-    
+
     messages = [{"role": "user", "content": formatted_prompt}]
-    
+
     response, input_tokens, output_tokens = await client.chat_completion(
         messages=messages,
         model=MERGE_MODEL,  # anthropic/claude-haiku-4.5
         max_tokens=64000,
         temperature=0.0
     )
-    
+
     # Parse JSON response
     text = response.strip()
     if text.startswith("```json"):
@@ -126,10 +126,10 @@ async def llm_merge_entity(
         text = text[3:]
     if text.endswith("```"):
         text = text[:-3]
-    
+
     merged = json.loads(text.strip())
     return merged
-```
+````
 
 ---
 
@@ -153,6 +153,7 @@ new_protocols = [
 ### LLM Merge Advantage
 
 LLM understands semantic equivalence:
+
 - "5mg weekly" ≈ "5-6mg weekly" (same protocol, different precision)
 - "longevity" ≈ "healthspan" (same indication, different terminology)
 - "inhibits MTORC1" ≈ "mTOR complex 1 inhibitor" (same mechanism)
@@ -190,9 +191,9 @@ When sources disagree, BOTH positions are preserved:
 
 ## Cost
 
-| Model | Input | Output | Typical Merge |
-|-------|-------|--------|---------------|
-| Haiku 4.5 | $0.80/M | $4.00/M | ~$0.05-0.15 |
+| Model     | Input   | Output  | Typical Merge |
+| --------- | ------- | ------- | ------------- |
+| Haiku 4.5 | $0.80/M | $4.00/M | ~$0.05-0.15   |
 
 LLM merge adds ~$0.10 per entity merge on average. For a transcript with 20 interventions, 10 pathways, and 10 biomarkers, expect ~$4-5 in merge costs.
 

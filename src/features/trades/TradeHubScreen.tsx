@@ -48,12 +48,21 @@ export function TradeHubScreen() {
         <Text style={[styles.title, { color: colors.textPri }]}>TRADE TOOLS</Text>
       </View>
 
-      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
         <ScrollView
           style={{ flex: 1 }}
           contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + 32 }]}
           keyboardShouldPersistTaps="handled"
-          refreshControl={<RefreshControl refreshing={tenantMe.isFetching} onRefresh={() => void tenantMe.refetch()} tintColor={colors.accent} />}
+          refreshControl={
+            <RefreshControl
+              refreshing={tenantMe.isFetching}
+              onRefresh={() => void tenantMe.refetch()}
+              tintColor={colors.accent}
+            />
+          }
         >
           {tenantMe.isPending ? (
             <Notice tone="accent" label="Loading your trades…" />
@@ -88,7 +97,9 @@ export function TradeHubScreen() {
               ) : null}
 
               {(!hasBoth || section === 'roof') && hasRoofing ? <RoofMeasureScreen /> : null}
-              {(!hasBoth || section === 'job') && hasJobQuoter ? <JobQuoteScreen trades={trades} /> : null}
+              {(!hasBoth || section === 'job') && hasJobQuoter ? (
+                <JobQuoteScreen trades={trades} />
+              ) : null}
             </>
           )}
         </ScrollView>

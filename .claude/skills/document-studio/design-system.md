@@ -19,35 +19,35 @@ The NGM design system creates a consistent, editorial aesthetic across all docum
 ```css
 :root {
   /* Backgrounds */
-  --paper: #FEFDFB;        /* Primary background */
-  --paper-alt: #F5F2EC;    /* Secondary background (cards, sections) */
+  --paper: #fefdfb; /* Primary background */
+  --paper-alt: #f5f2ec; /* Secondary background (cards, sections) */
 
   /* Text */
-  --ink-900: #302C27;      /* Darkest - headings, emphasis */
-  --ink-700: #4A4540;      /* Body text */
-  --ink-500: #706C66;      /* Secondary text */
-  --ink-400: #9C9890;      /* Muted text, captions */
+  --ink-900: #302c27; /* Darkest - headings, emphasis */
+  --ink-700: #4a4540; /* Body text */
+  --ink-500: #706c66; /* Secondary text */
+  --ink-400: #9c9890; /* Muted text, captions */
 
   /* Structural */
-  --line: #E3DFD7;         /* Borders, dividers */
+  --line: #e3dfd7; /* Borders, dividers */
 
   /* Accents */
-  --gold: #C49A6C;         /* Primary accent - use sparingly */
-  --vermillion: #C07050;   /* Alert/urgent - use rarely */
-  --japan-red: #BC002D;    /* Japan-specific contexts only */
+  --gold: #c49a6c; /* Primary accent - use sparingly */
+  --vermillion: #c07050; /* Alert/urgent - use rarely */
+  --japan-red: #bc002d; /* Japan-specific contexts only */
 }
 ```
 
 ### Color Usage Guidelines
 
-| Color | Use For | Avoid |
-|-------|---------|-------|
-| `--ink-900` | Headings, section numbers, logo marks | Large blocks of text |
-| `--ink-700` | Body text, primary content | Headings (use --ink-900) |
-| `--ink-500` | Secondary text, descriptions | Primary content |
-| `--ink-400` | Captions, meta info, subtle text | Important information |
-| `--gold` | Accents, labels, highlights, borders | Large areas, backgrounds |
-| `--vermillion` | CTA buttons on hover, alerts | General decoration |
+| Color          | Use For                               | Avoid                    |
+| -------------- | ------------------------------------- | ------------------------ |
+| `--ink-900`    | Headings, section numbers, logo marks | Large blocks of text     |
+| `--ink-700`    | Body text, primary content            | Headings (use --ink-900) |
+| `--ink-500`    | Secondary text, descriptions          | Primary content          |
+| `--ink-400`    | Captions, meta info, subtle text      | Important information    |
+| `--gold`       | Accents, labels, highlights, borders  | Large areas, backgrounds |
+| `--vermillion` | CTA buttons on hover, alerts          | General decoration       |
 
 ---
 
@@ -69,20 +69,23 @@ font-family: 'DM Sans', system-ui, sans-serif;
 ### Google Fonts Import
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ### Type Scale
 
-| Element | Font | Size | Weight | Line Height |
-|---------|------|------|--------|-------------|
-| H1 | Cormorant Garamond | 32-48px | 500 | 1.1-1.2 |
-| H2 | Cormorant Garamond | 24-32px | 500 | 1.2 |
-| H3 | Cormorant Garamond | 18-24px | 500 | 1.3 |
-| H4 | Cormorant Garamond | 14-18px | 500 | 1.4 |
-| Body | Source Serif 4 | 14-15px | 400 | 1.6 |
-| Small | Source Serif 4 | 11-13px | 400 | 1.5 |
-| Label | DM Sans | 9-11px | 600 | 1.4 |
+| Element | Font               | Size    | Weight | Line Height |
+| ------- | ------------------ | ------- | ------ | ----------- |
+| H1      | Cormorant Garamond | 32-48px | 500    | 1.1-1.2     |
+| H2      | Cormorant Garamond | 24-32px | 500    | 1.2         |
+| H3      | Cormorant Garamond | 18-24px | 500    | 1.3         |
+| H4      | Cormorant Garamond | 14-18px | 500    | 1.4         |
+| Body    | Source Serif 4     | 14-15px | 400    | 1.6         |
+| Small   | Source Serif 4     | 11-13px | 400    | 1.5         |
+| Label   | DM Sans            | 9-11px  | 600    | 1.4         |
 
 ### Label Style
 
@@ -113,15 +116,15 @@ font-family: 'DM Sans', system-ui, sans-serif;
 }
 ```
 
-| Variable | Value | Use For |
-|----------|-------|---------|
-| `--space-1` | 8px | Tight spacing, list items |
-| `--space-2` | 12px | Related elements |
-| `--space-3` | 20px | Paragraphs, standard gap |
-| `--space-4` | 32px | Section breaks, cards |
-| `--space-5` | 48px | Major sections |
-| `--space-6` | 72px | Page sections |
-| `--space-7` | 96px | Hero sections |
+| Variable    | Value | Use For                   |
+| ----------- | ----- | ------------------------- |
+| `--space-1` | 8px   | Tight spacing, list items |
+| `--space-2` | 12px  | Related elements          |
+| `--space-3` | 20px  | Paragraphs, standard gap  |
+| `--space-4` | 32px  | Section breaks, cards     |
+| `--space-5` | 48px  | Major sections            |
+| `--space-6` | 72px  | Page sections             |
+| `--space-7` | 96px  | Hero sections             |
 
 ---
 
@@ -145,7 +148,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: 'Cormorant Garamond', 'Noto Serif JP', Georgia, serif;
   color: var(--ink-900);
   font-weight: 500;
@@ -173,7 +179,8 @@ p {
   margin-bottom: var(--space-3);
 }
 
-ul, ol {
+ul,
+ol {
   margin-bottom: var(--space-3);
   padding-left: var(--space-4);
 }
@@ -204,7 +211,7 @@ strong {
   <div class="header-inner">
     <div class="wordmark">Next Generation Medicine</div>
     <div class="header-meta">
-      December 15, 2025<br>
+      December 15, 2025<br />
       Prepared for [Client Name]
     </div>
   </div>
@@ -361,7 +368,7 @@ strong {
 }
 
 .highlight-box-dark p {
-  color: rgba(255,255,255,0.75);
+  color: rgba(255, 255, 255, 0.75);
 }
 
 .highlight-box-dark .label {
@@ -504,7 +511,7 @@ strong {
 }
 
 .tier-card.featured li {
-  color: rgba(255,255,255,0.7);
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .tier-card.featured .label {
@@ -550,7 +557,9 @@ strong {
 ```html
 <div class="credential-item">
   <span class="credential-icon">→</span>
-  <span><strong>Harvard Medical School:</strong> Clinical foundation in evidence-based medicine</span>
+  <span
+    ><strong>Harvard Medical School:</strong> Clinical foundation in evidence-based medicine</span
+  >
 </div>
 ```
 
@@ -663,7 +672,9 @@ strong {
     <div class="contact-item">
       <div class="name">Dr. Anant Vinjamoori</div>
       <div class="title">Conference Co-Chair</div>
-      <a href="mailto:anant@nextgenerationmedicine.co" class="email">anant@nextgenerationmedicine.co</a>
+      <a href="mailto:anant@nextgenerationmedicine.co" class="email"
+        >anant@nextgenerationmedicine.co</a
+      >
     </div>
   </div>
 </div>
@@ -682,7 +693,7 @@ strong {
 }
 
 .contact-section > p {
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 24px;
 }
 
@@ -702,7 +713,7 @@ strong {
 
 .contact-item .title {
   font-size: 12px;
-  color: rgba(255,255,255,0.6);
+  color: rgba(255, 255, 255, 0.6);
   margin-bottom: 8px;
 }
 
@@ -729,14 +740,16 @@ For documents that will be printed (flyers, packets):
 }
 
 @media print {
-  body { background: white; }
+  body {
+    background: white;
+  }
   .page {
     width: 100%;
     min-height: auto;
     padding: 0.4in;
     page-break-after: always;
   }
-  
+
   .cta-button {
     background: var(--ink-900) !important;
     -webkit-print-color-adjust: exact;
@@ -754,12 +767,12 @@ For documents that will be printed (flyers, packets):
 
 ## Container Widths
 
-| Document Type | Max Width | Padding |
-|---------------|-----------|---------|
-| Proposal | 900px | clamp(20px, 5vw, 48px) |
-| Flyer (print) | 8.5in | 0.5in |
-| Sponsor Packet | 8.5in | 0.5in |
-| One-Pager | 900px | clamp(20px, 5vw, 48px) |
+| Document Type  | Max Width | Padding                |
+| -------------- | --------- | ---------------------- |
+| Proposal       | 900px     | clamp(20px, 5vw, 48px) |
+| Flyer (print)  | 8.5in     | 0.5in                  |
+| Sponsor Packet | 8.5in     | 0.5in                  |
+| One-Pager      | 900px     | clamp(20px, 5vw, 48px) |
 
 ---
 
@@ -775,9 +788,15 @@ For web-based documents:
 }
 
 /* Use clamp for fluid typography */
-h1 { font-size: clamp(32px, 4vw, 42px); }
-h2 { font-size: clamp(24px, 3vw, 32px); }
-h3 { font-size: clamp(18px, 2.5vw, 24px); }
+h1 {
+  font-size: clamp(32px, 4vw, 42px);
+}
+h2 {
+  font-size: clamp(24px, 3vw, 32px);
+}
+h3 {
+  font-size: clamp(18px, 2.5vw, 24px);
+}
 ```
 
 ---
@@ -787,7 +806,9 @@ h3 { font-size: clamp(18px, 2.5vw, 24px); }
 ```html
 <div class="footer">
   <p>Next Generation Medicine</p>
-  <p style="margin-top: 4px;">Turning science into strategy—and strategy into systems that deliver results.</p>
+  <p style="margin-top: 4px;">
+    Turning science into strategy—and strategy into systems that deliver results.
+  </p>
 </div>
 ```
 
@@ -799,4 +820,3 @@ h3 { font-size: clamp(18px, 2.5vw, 24px); }
   font-size: 13px;
 }
 ```
-

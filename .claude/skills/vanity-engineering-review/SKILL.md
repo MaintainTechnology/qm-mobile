@@ -34,6 +34,7 @@ exists to satisfy the builder rather than the user.
 ## When to Apply This Skill
 
 Apply this review to any of:
+
 - Codebase audits (full repo or specific modules)
 - Pull request reviews
 - Architecture proposals or RFCs
@@ -50,6 +51,7 @@ Before examining any code, establish what the system actually needs to do. Witho
 you cannot distinguish necessary complexity from vanity complexity.
 
 Ask (or determine from context):
+
 1. **Who uses this?** (End users, internal team, API consumers, nobody yet)
 2. **What must it do?** (Core user stories / jobs-to-be-done — max 5)
 3. **What scale does it actually operate at?** (Not projected. Actual.)
@@ -129,6 +131,7 @@ These trigger immediate shutdown with no debate. They exist for situations where
 causes escalating damage. No human approval needed — if the condition is met, the thing dies.
 
 Examples:
+
 - Security breach traced to the component
 - Production incident caused by the component with severity >= P1
 - Cost exceeds budget cap for 3 consecutive days
@@ -141,6 +144,7 @@ These do not kill automatically but force a mandatory review with a default-to-k
 The burden of proof is on continuing, not on stopping.
 
 Examples:
+
 - Success metric below threshold for 14 consecutive days
 - Maintenance cost exceeds value delivered (eng-hours/month vs user impact)
 - Three consecutive sprints with unplanned work on the component
@@ -153,6 +157,7 @@ These define what "success" looks like. If these are not met within the defined 
 the default is kill. This inverts the normal dynamic where features survive by default.
 
 30-day evaluation window example:
+
 1. Primary success metric >= target for 7 consecutive days
 2. P95 latency <= defined SLA for 7 consecutive days
 3. Zero security incidents attributable to the component
@@ -165,32 +170,39 @@ the default is kill. This inverts the normal dynamic where features survive by d
 ## Anti-Vanity Diagnostic Lenses
 
 ### 1. The Deletion Test
+
 "If I deleted this, who would notice and when?"
 If the answer is "nobody" or "only the person who built it," it is vanity.
 
 ### 2. The Replacement Test
+
 "Could this be replaced by a simpler thing that does 90% of the job?"
 If yes, the remaining 10% must justify the additional complexity. It rarely does.
 
 ### 3. The New Hire Test
+
 "Could a competent engineer new to this codebase understand this in under an hour?"
 If not, the abstraction serves the author's mental model, not the team's.
 
 ### 4. The Scale Test
+
 "Is this complexity justified by current scale, or by imagined future scale?"
 Building for 10M users when you have 500 is not prudent engineering. It is fantasy.
 
 ### 5. The Resume Test
+
 "Would removing this technology from the stack make the project less interesting
 to talk about in an interview?"
 If yes, that is probably why it is there.
 
 ### 6. The Dependency Test
+
 "Does this dependency earn its keep?"
 Every dependency is a liability. A library that saves 200 lines but adds 50KB
 to the bundle and an upgrade treadmill is not earning its keep.
 
 ### 7. The Abstraction Test
+
 "How many concrete implementations does this abstraction have?"
 One implementation behind an interface is not abstraction. It is indirection.
 Two is suspicious. Three is where abstraction starts to pay off.

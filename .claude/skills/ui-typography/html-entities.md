@@ -9,20 +9,20 @@ existing HTML for incorrect character usage.
 
 When generating HTML/JSX, substitute these characters automatically:
 
-| If you see | Replace with | Entity | Rule |
-|------------|-------------|--------|------|
-| "straight double" | "curly double" | `&ldquo;` `&rdquo;` | Always curly quotes |
-| 'straight single' | 'curly single' | `&lsquo;` `&rsquo;` | Always curly quotes |
-| it's (straight) | it's (curly) | `&rsquo;` | Apostrophe = closing single quote |
-| -- | – | `&ndash;` | En dash for ranges |
-| --- | — | `&mdash;` | Em dash for breaks |
-| ... | … | `&hellip;` | Single ellipsis character |
-| (c) | © | `&copy;` | Real copyright symbol |
-| (TM) | ™ | `&trade;` | Real trademark symbol |
-| (R) | ® | `&reg;` | Real registered symbol |
-| 12 x 34 | 12 × 34 | `&times;` | Real multiplication sign |
-| 56 - 12 (math) | 56 − 12 | `&minus;` | Real minus sign |
-| 6' 10" (curly, in measurements) | 6' 10" (straight) | `&#39;` `&quot;` | Foot/inch must be straight |
+| If you see                      | Replace with      | Entity              | Rule                              |
+| ------------------------------- | ----------------- | ------------------- | --------------------------------- |
+| "straight double"               | "curly double"    | `&ldquo;` `&rdquo;` | Always curly quotes               |
+| 'straight single'               | 'curly single'    | `&lsquo;` `&rsquo;` | Always curly quotes               |
+| it's (straight)                 | it's (curly)      | `&rsquo;`           | Apostrophe = closing single quote |
+| --                              | –                 | `&ndash;`           | En dash for ranges                |
+| ---                             | —                 | `&mdash;`           | Em dash for breaks                |
+| ...                             | …                 | `&hellip;`          | Single ellipsis character         |
+| (c)                             | ©                 | `&copy;`            | Real copyright symbol             |
+| (TM)                            | ™                 | `&trade;`           | Real trademark symbol             |
+| (R)                             | ®                 | `&reg;`             | Real registered symbol            |
+| 12 x 34                         | 12 × 34           | `&times;`           | Real multiplication sign          |
+| 56 - 12 (math)                  | 56 − 12           | `&minus;`           | Real minus sign                   |
+| 6' 10" (curly, in measurements) | 6' 10" (straight) | `&#39;` `&quot;`    | Foot/inch must be straight        |
 
 ---
 
@@ -123,16 +123,19 @@ Always preserve accents in proper names. These are the most frequently needed:
 ## Contextual Usage Patterns
 
 ### Quoted Text
+
 ```html
 <p>&ldquo;She said &lsquo;hello&rsquo; to me,&rdquo; he reported.</p>
 ```
 
 ### Decade Abbreviations (apostrophe pointing down)
+
 ```html
 <p>In the &rsquo;70s, rock &rsquo;n&rsquo; roll dominated.</p>
 ```
 
 ### Ranges and Connections
+
 ```html
 <p>Pages 4&ndash;8</p>
 <p>The Sarbanes&ndash;Oxley Act</p>
@@ -140,32 +143,38 @@ Always preserve accents in proper names. These are the most frequently needed:
 ```
 
 ### Sentence Breaks
+
 ```html
 <p>The em dash puts a nice pause in text&mdash;and is underused.</p>
 ```
 
 ### Legal/Academic References
+
 ```html
 <p>Under &sect;&nbsp;1782, the seller may offer a refund.</p>
 <p>See &para;&nbsp;49 of the contract.</p>
 ```
 
 ### Copyright and Trademark
+
 ```html
 <footer>&copy;&nbsp;2025 MegaCorp&trade;</footer>
 ```
 
 ### Measurements
+
 ```html
 <p>The room is 12&#39;&nbsp;6&quot; &times; 8&#39;&nbsp;10&quot;.</p>
 ```
 
 ### Math
+
 ```html
 <p>12 &times; 34 &minus; 56 = 352</p>
 ```
 
 ### Ellipsis with Nonbreaking Space
+
 ```html
 <p>From A&nbsp;&hellip; to Z</p>
 ```

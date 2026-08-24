@@ -71,17 +71,17 @@ Reference files are loaded on demand when the topic is relevant, keeping context
 
 ## Coverage Areas
 
-| Domain | References |
-|--------|-----------|
-| Foundations | Core principles, Laws of UX, accessibility, visual design |
-| Structure | Information architecture, interaction design, forms |
-| Platform | Mobile UX, design systems |
-| Content | UX writing, user research |
-| Collaboration | Presence/awareness, conflict resolution/sync |
-| Canvas/Spatial | Navigation/interaction, objects/performance |
-| Modern | AI interfaces, ethical design, emotional design |
-| Flows | Onboarding, notifications, search |
-| Data | Data visualization, data tables, performance/loading |
+| Domain         | References                                                |
+| -------------- | --------------------------------------------------------- |
+| Foundations    | Core principles, Laws of UX, accessibility, visual design |
+| Structure      | Information architecture, interaction design, forms       |
+| Platform       | Mobile UX, design systems                                 |
+| Content        | UX writing, user research                                 |
+| Collaboration  | Presence/awareness, conflict resolution/sync              |
+| Canvas/Spatial | Navigation/interaction, objects/performance               |
+| Modern         | AI interfaces, ethical design, emotional design           |
+| Flows          | Onboarding, notifications, search                         |
+| Data           | Data visualization, data tables, performance/loading      |
 
 ## Sources
 

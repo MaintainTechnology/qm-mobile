@@ -17,7 +17,7 @@ description: >
 
 ## Attribution
 
-These rules are distilled from **Matthew Butterick's *Practical Typography*** (https://practicaltypography.com).
+These rules are distilled from **Matthew Butterick's _Practical Typography_** (https://practicaltypography.com).
 Butterick is a typographer, writer, and type designer whose work bridges professional typography and everyday
 digital writing. Thank you, Matthew, for making this knowledge accessible and encyclopedic. If you find this
 skill valuable, consider supporting his work directly.
@@ -33,6 +33,7 @@ correct HTML entities, proper CSS. Do not ask permission. Do not explain. Just p
 **AUDIT:** When reviewing existing code or design, identify violations and provide before/after fixes.
 
 **Reference files** (read when generating CSS or looking up entities):
+
 - `references/css-templates.md` — Full CSS baseline template, responsive patterns, OpenType features
 - `references/html-entities.md` — Complete entity table with all characters and codes
 
@@ -59,19 +60,24 @@ as literal characters — the user sees `\u2019` instead of a curly apostrophe. 
 between tags is treated as string literals by the transpiler, not as JavaScript expressions.
 
 **What fails:**
+
 ```jsx
-{/* WRONG — renders literally as \u2019 */}
-<p>Don\u2019t do this</p>
+{
+  /* WRONG — renders literally as \u2019 */
+}
+<p>Don\u2019t do this</p>;
 ```
 
 **What works (pick one):**
 
 1. **Actual UTF-8 characters (preferred):** Paste the real character directly into the source file.
+
    ```jsx
    <p>Don\u2019t do this</p>  {/* This is the actual curly apostrophe character U+2019 */}
    ```
 
 2. **JSX expression with string literal:** Wrap in curly braces so the JS engine interprets the escape.
+
    ```jsx
    <p>Don{'\u2019'}t do this</p>
    ```
@@ -79,6 +85,7 @@ between tags is treated as string literals by the transpiler, not as JavaScript 
 3. **HTML entity (HTML files only):** Use `&rsquo;` — but this does NOT work in JSX/React.
 
 **For bulk fixes via CLI**, use `sed` with raw UTF-8 bytes (not escape sequences):
+
 ```bash
 CURLY=$(printf '\xe2\x80\x99')  # U+2019 RIGHT SINGLE QUOTATION MARK
 sed -i '' "s/don't/don${CURLY}t/g" file.tsx
@@ -89,11 +96,11 @@ processes the escape. The bug only affects JSX text content between tags.
 
 ### Dashes and Hyphens — Three Distinct Characters
 
-| Character | HTML | Use |
-|-----------|------|-----|
-| - (hyphen) | `-` | Compound words (cost-effective), line breaks |
+| Character   | HTML      | Use                                             |
+| ----------- | --------- | ----------------------------------------------- |
+| - (hyphen)  | `-`       | Compound words (cost-effective), line breaks    |
 | – (en dash) | `&ndash;` | Ranges (1–10), connections (Sarbanes–Oxley Act) |
-| — (em dash) | `&mdash;` | Sentence breaks—like this |
+| — (em dash) | `&mdash;` | Sentence breaks—like this                       |
 
 Never approximate with `--` or `---`. If you open with "from", pair with "to" not en dash. Hyphen for
 compound names (marriage); en dash for joint authorship. Em dash typically flush; add `&thinsp;` if crushed.
@@ -152,14 +159,14 @@ disrupt text balance. The period already contains visual white space.
 
 ### White-Space Characters
 
-| Need | Tool |
-|------|------|
-| Space between words | One word space (spacebar) |
-| Prevent line break | `&nbsp;` |
-| New line, same paragraph | `<br>` |
-| New paragraph | `<p>` tags |
-| New page (print) | `page-break-before: always` |
-| Suggest hyphenation point | `&shy;` |
+| Need                      | Tool                        |
+| ------------------------- | --------------------------- |
+| Space between words       | One word space (spacebar)   |
+| Prevent line break        | `&nbsp;`                    |
+| New line, same paragraph  | `<br>`                      |
+| New paragraph             | `<p>` tags                  |
+| New page (print)          | `page-break-before: always` |
+| Suggest hyphenation point | `&shy;`                     |
 
 Never hold spacebar. Never double carriage returns for spacing. Never tabs for indentation in output.
 HTML collapses all whitespace to single space (except `&nbsp;`).

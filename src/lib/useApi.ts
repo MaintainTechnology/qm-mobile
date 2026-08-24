@@ -6,7 +6,7 @@
  * Retry policy lives ONLY in src/lib/query.ts (no per-call overrides — 4xx never retries there
  * already, and per-endpoint knobs erode the central policy one query at a time).
  */
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/expo';
 import {
   useMutation,
   type UseMutationOptions,

@@ -1,7 +1,5 @@
 function profileNow() {
-  return typeof performance !== 'undefined' && performance.now
-    ? performance.now()
-    : Date.now();
+  return typeof performance !== 'undefined' && performance.now ? performance.now() : Date.now();
 }
 
 function createDetectorProfile() {
@@ -104,7 +102,9 @@ function percentile(sortedValues, pct) {
 function summarizeDetectorProfile(profile) {
   const events = Array.isArray(profile)
     ? profile
-    : (Array.isArray(profile?.events) ? profile.events : []);
+    : Array.isArray(profile?.events)
+      ? profile.events
+      : [];
   const groups = new Map();
   for (const event of events) {
     const key = [

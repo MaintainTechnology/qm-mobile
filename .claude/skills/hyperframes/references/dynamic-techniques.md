@@ -29,7 +29,7 @@ No special wiring is needed. The group loop already iterates over every caption 
 var AUDIO = JSON.parse(audioDataJson); // { fps, totalFrames, frames: [{ bands: [...] }] }
 
 GROUPS.forEach(function (group, gi) {
-  var groupEl = document.getElementById("cg-" + gi);
+  var groupEl = document.getElementById('cg-' + gi);
   if (!groupEl) return;
 
   // Read peak energy for this group's time range
@@ -50,15 +50,15 @@ GROUPS.forEach(function (group, gi) {
     {
       scale: 1 + peakBass * 0.06,
       textShadow:
-        "0 0 " + Math.round(peakTreble * 12) + "px rgba(255,255,255," + peakTreble * 0.4 + ")",
+        '0 0 ' + Math.round(peakTreble * 12) + 'px rgba(255,255,255,' + peakTreble * 0.4 + ')',
       duration: 0.3,
-      ease: "power2.out",
+      ease: 'power2.out',
     },
     group.start,
   );
 
   // Reset at exit so audio-driven values don't persist
-  tl.set(groupEl, { scale: 1, textShadow: "none" }, group.end - 0.15);
+  tl.set(groupEl, { scale: 1, textShadow: 'none' }, group.end - 0.15);
 });
 ```
 

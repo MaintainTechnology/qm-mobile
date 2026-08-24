@@ -41,22 +41,22 @@ The shot shows the tool **mid-use**, framed like a card:
 ```
 
 Roughly 700×850 logical px (1400×1700 @2x). The answer is **deliberately cut off** at the bottom —
-`beforeCapture` resets the message scroller to `scrollTop 0` so the *start* of the answer is in
+`beforeCapture` resets the message scroller to `scrollTop 0` so the _start_ of the answer is in
 frame. Streaming leaves the scroller pinned to the bottom, which framed the answer's tail instead,
 so the reset is explicit.
 
 **Never a blank frame.** The capture asserts a settled, non-trivial answer before it writes a
-file; if no answer renders, it throws and saves nothing. See *How it works*.
+file; if no answer renders, it throws and saves nothing. See _How it works_.
 
 ## Tools supported
 
-| CLI name    | Tool             | Input type            | Auth |
-|-------------|------------------|-----------------------|------|
-| `biomarker` | Biomarker Analysis | a lab file (PDF/image) | yes |
-| `knowledge` | Knowledge Assistant | a clinical question   | yes |
-| `operations`| Business Advisor  | a business question   | yes |
-| `therapy`   | Therapy Explorer  | a clinical hypothesis | yes |
-| `curriculum`| Clinical Academy lesson deck | a lesson slug | **no** |
+| CLI name     | Tool                         | Input type             | Auth   |
+| ------------ | ---------------------------- | ---------------------- | ------ |
+| `biomarker`  | Biomarker Analysis           | a lab file (PDF/image) | yes    |
+| `knowledge`  | Knowledge Assistant          | a clinical question    | yes    |
+| `operations` | Business Advisor             | a business question    | yes    |
+| `therapy`    | Therapy Explorer             | a clinical hypothesis  | yes    |
+| `curriculum` | Clinical Academy lesson deck | a lesson slug          | **no** |
 
 > **"Web Explorer" is intentionally absent.** The workspace has no such tab (verified against
 > `src/views/LongevityIntelligenceCore.tsx` — the tabs are biomarker, advanced, knowledge,
@@ -67,9 +67,11 @@ file; if no answer renders, it throws and saves nothing. See *How it works*.
 
 1. **A logged-in session.** The tools are gated client-side by subscription tier, so the browser
    must be authenticated as a **professional or admin** user. Capture the session once:
+
    ```bash
    npx tsx .claude/skills/screenshot-ngm-tools/scripts/save-auth.ts
    ```
+
    A headed browser opens — log in by hand, wait until the tools are visible, return to the
    terminal and press Enter. The session is saved to `playwright/.auth/ngm-session.json`
    (already gitignored). Automation never types credentials.
@@ -115,13 +117,13 @@ Three things make this work:
 - **`shotFrame`** — the visual report is an `srcDoc` iframe (`#biomarker-visual-report-iframe`), so
   figures are unreachable from the page scope. Shots resolve via `page.frameLocator()`.
 - **`beforeCapture: expandReportFrame`** — the iframe ships at `h-[350px] sm:h-[500px]` and the
-  report scrolls *inside* it. An element screenshot cannot scroll a parent iframe, so any figure
+  report scrolls _inside_ it. An element screenshot cannot scroll a parent iframe, so any figure
   over 500px tall would come out **clipped**. The frame is grown to its `scrollHeight` first.
 - **`outDir`** — output goes to the canonical asset path under the canonical filename, so a
   capture replaces the live image with no code edit.
 
 A shot whose heading is absent from a given report is reported and skipped — one missing figure
-must not discard the other six from a 30-minute run. If *nothing* matches, it throws.
+must not discard the other six from a 30-minute run. If _nothing_ matches, it throws.
 
 ### Heading text is the only stable anchor
 
@@ -160,7 +162,7 @@ modes throw instead of saving:
 2. **Settled answer (`settleText`).** The assistant's `.prose` block must render and its text must
    stop growing at ≥400 chars across 3 polls. This replaced a stop-button-only wait whose every
    check was a swallowed `.catch(() => {})` — when generation hadn't started, `waitFor({state:
-   'detached'})` on a never-existent element resolved *instantly* and the skill saved an empty
+'detached'})` on a never-existent element resolved _instantly_ and the skill saved an empty
    conversation. Checks: `npx tsx --test .claude/skills/screenshot-ngm-tools/scripts/settle.test.ts`
    (5 cases, virtual clock, no browser — `npm test` does not cover `.claude/`).
 

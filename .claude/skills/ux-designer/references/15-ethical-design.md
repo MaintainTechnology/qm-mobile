@@ -7,6 +7,7 @@ Deceptive design patterns face increasing regulatory enforcement with real finan
 ## Dark Pattern Taxonomy
 
 ### 1. Roach Motel
+
 Easy to get into, hard to get out of.
 
 ```
@@ -19,6 +20,7 @@ Easy to get into, hard to get out of.
 - Free trial that auto-converts with no easy cancellation
 
 ### 2. Confirmshaming
+
 Using guilt-laden language to manipulate decisions.
 
 ```
@@ -32,6 +34,7 @@ Using guilt-laden language to manipulate decisions.
 - Emotional manipulation in decline copy
 
 ### 3. Misdirection
+
 Drawing attention away from important information.
 
 ```
@@ -44,6 +47,7 @@ Drawing attention away from important information.
 - Burying important notices in walls of text
 
 ### 4. Forced Continuity
+
 Silently charging after a free trial without adequate notice.
 
 ```
@@ -56,6 +60,7 @@ Silently charging after a free trial without adequate notice.
 - Requiring payment info for "free" trials without clear disclosure
 
 ### 5. Hidden Costs
+
 Revealing unexpected charges late in the checkout process.
 
 ```
@@ -68,6 +73,7 @@ Revealing unexpected charges late in the checkout process.
 - Mandatory add-ons pre-selected in checkout
 
 ### 6. Trick Questions
+
 Confusing wording that causes users to make unintended choices.
 
 ```
@@ -80,6 +86,7 @@ Confusing wording that causes users to make unintended choices.
 - Swapping the expected position of yes/no buttons
 
 ### 7. Bait & Switch
+
 Promising one thing and delivering another.
 
 ```
@@ -92,6 +99,7 @@ Promising one thing and delivering another.
 - "Free" products that require payment for core functionality
 
 ### 8. Disguised Ads
+
 Ads designed to look like content or navigation elements.
 
 ```
@@ -104,6 +112,7 @@ Ads designed to look like content or navigation elements.
 - Content recommendation widgets that mix ads with real content
 
 ### 9. Friend Spam
+
 Using access to contacts for unauthorized messaging.
 
 ```
@@ -116,6 +125,7 @@ Using access to contacts for unauthorized messaging.
 - Social sharing without clear preview of what will be posted
 
 ### 10. Privacy Zuckering
+
 Making privacy settings confusing to encourage maximum data sharing.
 
 ```
@@ -128,6 +138,7 @@ Making privacy settings confusing to encourage maximum data sharing.
 - Confusing privacy policy language
 
 ### 11. Sneak into Basket
+
 Adding extra items to the shopping cart without user consent.
 
 ```
@@ -144,35 +155,41 @@ Adding extra items to the shopping cart without user consent.
 ## Regulatory Landscape
 
 ### FTC (United States)
+
 - **Click-to-Cancel Rule (2024)**: Must be as easy to cancel as to subscribe
 - **Amazon settlement ($25M, 2023)**: Deceptive Prime enrollment/cancellation
 - **Fortnite/Epic ($245M, 2022)**: Dark patterns in children's purchases
 - Enforcement focus: subscriptions, negative option marketing, COPPA violations
 
 ### EU Digital Services Act (DSA)
+
 - Prohibits dark patterns on online platforms
 - Bans: deceptive UI, manipulated choices, repeated nagging, obstruction of cancellation
 - Applies to: all online intermediaries, with stricter rules for very large platforms
 - Effective: February 2024
 
 ### EU Digital Fairness Act (Upcoming)
+
 - Extends dark pattern protections to all digital services
 - Covers addictive design, virtual currencies, influencer marketing
 - Expected proposal: 2025-2026
 
 ### GDPR (EU)
+
 - Consent must be freely given, specific, informed, and unambiguous
 - Pre-checked consent boxes are invalid
 - Withdrawing consent must be as easy as giving it
 - Maximum penalty: 4% of annual global turnover or €20M
 
 ### California CPRA
+
 - Extends CCPA with additional consent requirements
 - "Do Not Sell or Share My Personal Information" link required
 - Equal prominence for opt-out as opt-in
 - Dark pattern consent is not valid consent
 
 ### COPPA (US Children's Privacy)
+
 - Verifiable parental consent for under-13 data collection
 - No behavioral advertising to children
 - FTC actively enforcing against manipulative design targeting minors
@@ -240,6 +257,7 @@ Adding extra items to the shopping cart without user consent.
 ```
 
 **Requirements:**
+
 - Show on first visit only (persist choice)
 - No page interaction tracking before consent
 - "Reject All" must be as prominent as "Accept All"
@@ -383,13 +401,13 @@ Cancellation: Settings → Click "Cancel" → Confirm → Done (3 steps max)
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Consent rejection rate | Monitor (not minimize) | High rejection is honest UX |
-| Cancel completion rate | > 95% | Easy cancellation |
-| Complaint rate | < 0.1% | Billing/consent complaints |
-| Cookie preference usage | Track | Users exercising choice |
-| Time to cancel | ≤ sign-up time | Click-to-cancel compliance |
+| Metric                  | Target                 | Context                     |
+| ----------------------- | ---------------------- | --------------------------- |
+| Consent rejection rate  | Monitor (not minimize) | High rejection is honest UX |
+| Cancel completion rate  | > 95%                  | Easy cancellation           |
+| Complaint rate          | < 0.1%                 | Billing/consent complaints  |
+| Cookie preference usage | Track                  | Users exercising choice     |
+| Time to cancel          | ≤ sign-up time         | Click-to-cancel compliance  |
 
 ---
 

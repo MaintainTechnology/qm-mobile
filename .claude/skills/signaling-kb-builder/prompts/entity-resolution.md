@@ -74,6 +74,7 @@ OUTPUT as JSON:
 ## Example: Synonym Match
 
 **Input:**
+
 ```
 EXTRACTED ENTITY:
 - Name: sirolimus
@@ -87,6 +88,7 @@ EXISTING ENTITIES:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "match",
@@ -103,6 +105,7 @@ EXISTING ENTITIES:
 ## Example: Related but Distinct
 
 **Input:**
+
 ```
 EXTRACTED ENTITY:
 - Name: everolimus
@@ -115,6 +118,7 @@ EXISTING ENTITIES:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "create_new",
@@ -131,6 +135,7 @@ EXISTING ENTITIES:
 ## Example: Abbreviation Match
 
 **Input:**
+
 ```
 EXTRACTED ENTITY:
 - Name: TA1
@@ -144,6 +149,7 @@ EXISTING ENTITIES:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "match",
@@ -160,6 +166,7 @@ EXISTING ENTITIES:
 ## Example: Ambiguous Case
 
 **Input:**
+
 ```
 EXTRACTED ENTITY:
 - Name: GH
@@ -172,6 +179,7 @@ EXISTING ENTITIES:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "match",
@@ -190,21 +198,25 @@ EXISTING ENTITIES:
 When resolving, consider category-specific patterns:
 
 ### Small Molecules
+
 - INN vs trade names (metformin vs Glucophage)
 - Isomer specifications (L-carnitine vs D-carnitine)
 - Salt forms (metformin HCl vs metformin)
 
 ### Peptides
+
 - Abbreviations (BPC-157, TB-500, TA1)
 - Fragment notations (GHK-Cu, AOD-9604)
 - Research codes (PT-141, Melanotan II)
 
 ### Pathways
+
 - Full name vs abbreviation (mTOR vs mechanistic target of rapamycin)
 - Subunit specifications (mTORC1 vs mTORC2)
 - Alternative naming conventions (AMPK vs AMP-activated protein kinase)
 
 ### Biomarkers
+
 - Abbreviations (IGF-1, HOMA-IR, hs-CRP)
 - Assay-specific names (free T3 vs total T3)
 - Calculated indices (HOMA-IR, TG/HDL ratio)

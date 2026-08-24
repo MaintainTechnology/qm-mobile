@@ -76,6 +76,7 @@ Cost observed: **~85 credits for a full character** (image-to-3d + rig +
 stuck at `IN_PROGRESS` `progress: 0` for 1.5 h — a queue jam on Meshy's side.
 
 Recovery recipe:
+
 - refine with `progress: 0` for longer than ~15 min ⇒ stuck forever.
 - `DELETE /openapi/v1/text-to-3d/<id>` the stuck task, re-create with the
   **same** `preview_task_id` — re-ran in ~70 s. Credits for stuck/FAILED
@@ -90,7 +91,7 @@ Recovery recipe:
 
 ```json
 {
-  "input_task_id": "<image-to-3d task id>",   // OR "model_url": "<public GLB url>"
+  "input_task_id": "<image-to-3d task id>", // OR "model_url": "<public GLB url>"
   "height_meters": 1.8
 }
 ```
@@ -182,10 +183,10 @@ done
 
 ## Error cheat-sheet
 
-| Code | Meaning | Action |
-|---|---|---|
-| 400 | bad params / unreachable image URL / >300k faces on rig | fix payload; remesh first |
-| 402 | out of credits | tell user, show balance |
-| 422 (rigging) | pose estimation failed — non-humanoid or unclear limbs | procedural branch / Tripo |
-| 429 | rate limit | back off, retry |
-| refine stuck progress 0 >15 min | Meshy queue jam | DELETE + recreate with same preview_task_id |
+| Code                            | Meaning                                                 | Action                                      |
+| ------------------------------- | ------------------------------------------------------- | ------------------------------------------- |
+| 400                             | bad params / unreachable image URL / >300k faces on rig | fix payload; remesh first                   |
+| 402                             | out of credits                                          | tell user, show balance                     |
+| 422 (rigging)                   | pose estimation failed — non-humanoid or unclear limbs  | procedural branch / Tripo                   |
+| 429                             | rate limit                                              | back off, retry                             |
+| refine stuck progress 0 >15 min | Meshy queue jam                                         | DELETE + recreate with same preview_task_id |

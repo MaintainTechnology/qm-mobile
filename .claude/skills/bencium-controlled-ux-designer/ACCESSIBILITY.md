@@ -5,15 +5,19 @@ Comprehensive guide for implementing accessible interfaces following WCAG 2.1 AA
 ## Core Principles (POUR)
 
 ### Perceivable
+
 Information and UI components must be presentable to users in ways they can perceive.
 
 ### Operable
+
 UI components and navigation must be operable by all users.
 
 ### Understandable
+
 Information and the operation of UI must be understandable.
 
 ### Robust
+
 Content must be robust enough to be interpreted by a wide variety of user agents, including assistive technologies.
 
 ## Semantic HTML
@@ -21,6 +25,7 @@ Content must be robust enough to be interpreted by a wide variety of user agents
 ### Use Appropriate Elements
 
 **Good:**
+
 ```tsx
 <header>
   <nav>
@@ -44,6 +49,7 @@ Content must be robust enough to be interpreted by a wide variety of user agents
 ```
 
 **Bad:**
+
 ```tsx
 <div class="header">
   <div class="nav">
@@ -56,6 +62,7 @@ Content must be robust enough to be interpreted by a wide variety of user agents
 ### Heading Hierarchy
 
 **Correct hierarchy:**
+
 ```tsx
 <h1>Page Title</h1>
   <h2>Section 1</h2>
@@ -66,6 +73,7 @@ Content must be robust enough to be interpreted by a wide variety of user agents
 ```
 
 **Incorrect (skips levels):**
+
 ```tsx
 <h1>Page Title</h1>
   <h4>Section 1</h4>  // ❌ Skips h2 and h3
@@ -594,10 +602,10 @@ function Modal({ isOpen, onClose, children }) {
       modalRef.current?.focus();
 
       // Trap focus within modal
-      const handleTab = (e) => {
+      const handleTab = e => {
         if (e.key === 'Tab') {
           const focusableElements = modalRef.current.querySelectorAll(
-            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+            'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])',
           );
           const firstElement = focusableElements[0];
           const lastElement = focusableElements[focusableElements.length - 1];
@@ -623,23 +631,17 @@ function Modal({ isOpen, onClose, children }) {
   if (!isOpen) return null;
 
   return (
-    <div
-      className="fixed inset-0 bg-black/50 flex items-center justify-center"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center" onClick={onClose}>
       <div
         ref={modalRef}
         role="dialog"
         aria-modal="true"
         tabIndex={-1}
         className="bg-white rounded-lg p-6 max-w-md"
-        onClick={(e) => e.stopPropagation()}
+        onClick={e => e.stopPropagation()}
       >
         {children}
-        <button
-          onClick={onClose}
-          className="mt-4 px-4 py-2 bg-slate-200 rounded-lg"
-        >
+        <button onClick={onClose} className="mt-4 px-4 py-2 bg-slate-200 rounded-lg">
           Close
         </button>
       </div>
@@ -670,6 +672,7 @@ test('should have no accessibility violations', async () => {
 ### Manual Testing
 
 **Keyboard Navigation:**
+
 - [ ] Can navigate entire site using Tab key
 - [ ] Can activate all interactive elements with Enter/Space
 - [ ] Focus indicators are clearly visible
@@ -677,6 +680,7 @@ test('should have no accessibility violations', async () => {
 - [ ] Logical tab order
 
 **Screen Reader Testing:**
+
 - [ ] Test with NVDA (Windows) or VoiceOver (Mac)
 - [ ] All images have appropriate alt text
 - [ ] Headings create logical structure
@@ -684,6 +688,7 @@ test('should have no accessibility violations', async () => {
 - [ ] Dynamic content is announced
 
 **Visual Testing:**
+
 - [ ] Text has sufficient contrast (4.5:1 minimum)
 - [ ] UI works at 200% zoom
 - [ ] Content reflows properly on mobile
@@ -691,6 +696,7 @@ test('should have no accessibility violations', async () => {
 - [ ] Focus indicators are visible
 
 **Tools to Use:**
+
 - Chrome DevTools Lighthouse
 - WAVE browser extension
 - axe DevTools browser extension
@@ -718,16 +724,10 @@ test('should have no accessibility violations', async () => {
       Are you sure you want to proceed?
     </p>
     <div className="flex gap-4">
-      <button
-        onClick={onConfirm}
-        className="px-4 py-2 bg-blue-600 text-white rounded-lg"
-      >
+      <button onClick={onConfirm} className="px-4 py-2 bg-blue-600 text-white rounded-lg">
         Confirm
       </button>
-      <button
-        onClick={onClose}
-        className="px-4 py-2 border border-slate-300 rounded-lg"
-      >
+      <button onClick={onClose} className="px-4 py-2 border border-slate-300 rounded-lg">
         Cancel
       </button>
     </div>
@@ -755,10 +755,7 @@ function Tabs({ tabs }) {
             onClick={() => setActiveTab(index)}
             className={`
               px-4 py-2 border-b-2
-              ${activeTab === index
-                ? 'border-blue-600 font-medium'
-                : 'border-transparent'
-              }
+              ${activeTab === index ? 'border-blue-600 font-medium' : 'border-transparent'}
             `}
           >
             {tab.label}

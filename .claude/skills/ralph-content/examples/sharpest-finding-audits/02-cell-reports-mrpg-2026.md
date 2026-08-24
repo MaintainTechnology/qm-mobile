@@ -2,7 +2,7 @@
 
 **Paper:** "Preserved mitochondrial ribosomal protein gene expression marks a youthful transcriptional state in Chinese nonagenarians and centenarians"
 
-**Source:** *Cell Reports Medicine*, Article 102767. Open access.
+**Source:** _Cell Reports Medicine_, Article 102767. Open access.
 
 **Audit goal:** Identify the editorial anchor for an NGM LinkedIn post and lead magnet.
 
@@ -22,13 +22,13 @@ Read end-to-end. Five candidate findings surface:
 
 ## Step 2 — Sharpness scoring
 
-| Candidate | Counter-int | Practical | Mechanism | Differentiation | Specificity | **Total** |
-|-----------|------------:|----------:|----------:|----------------:|------------:|----------:|
-| 1. Centenarians have younger transcriptional age (abstract headline) | 1 | 1 | 2 | 1 | 4 | **9** |
-| 2. **Selective mRPG preservation vs cRPG decline** | **5** | **3** | **5** | **5** | **5** | **23** |
-| 3. 8-mRPG score senescence-negative after age adjustment | 4 | 2 | 4 | 4 | 4 | **18** |
-| 4. Cross-ancestry replication in Leiden cohort | 2 | 1 | 1 | 3 | 3 | **10** |
-| 5. mRPG drops in age-related pathologies | 3 | 2 | 3 | 3 | 3 | **14** |
+| Candidate                                                            | Counter-int | Practical | Mechanism | Differentiation | Specificity | **Total** |
+| -------------------------------------------------------------------- | ----------: | --------: | --------: | --------------: | ----------: | --------: |
+| 1. Centenarians have younger transcriptional age (abstract headline) |           1 |         1 |         2 |               1 |           4 |     **9** |
+| 2. **Selective mRPG preservation vs cRPG decline**                   |       **5** |     **3** |     **5** |           **5** |       **5** |    **23** |
+| 3. 8-mRPG score senescence-negative after age adjustment             |           4 |         2 |         4 |               4 |           4 |    **18** |
+| 4. Cross-ancestry replication in Leiden cohort                       |           2 |         1 |         1 |               3 |           3 |    **10** |
+| 5. mRPG drops in age-related pathologies                             |           3 |         2 |         3 |               3 |           3 |    **14** |
 
 ## Step 3 — The four "tells" check on the leading candidate
 
@@ -45,7 +45,7 @@ Candidate 2 (selective mRPG vs cRPG split) applies three of four:
 
 **Editorial anchor:** Selective preservation of mitochondrial ribosomal protein genes (mRPGs) while cytoplasmic ribosomal protein genes (cRPGs) follow the typical age-related decline. Score: 23/25.
 
-**Was this the abstract headline?** No. The abstract foregrounds "LLIs maintain a youthful transcriptional state." The mRPG vs cRPG split is the *mechanism* the abstract treats as a sub-result.
+**Was this the abstract headline?** No. The abstract foregrounds "LLIs maintain a youthful transcriptional state." The mRPG vs cRPG split is the _mechanism_ the abstract treats as a sub-result.
 
 **Justification needed?** No. The audit-selected anchor is not the abstract headline.
 
@@ -61,6 +61,6 @@ Candidate 2 (selective mRPG vs cRPG split) applies three of four:
 
 ## Lesson archived
 
-When a paper's abstract foregrounds a confirmation of existing belief ("centenarians age slower"), the buried mechanism finding is almost always sharper. Look for the *substrate-specific* result inside the *general-trend* result. The general trend is what the field expects. The substrate-specific carve-out is what reframes the field.
+When a paper's abstract foregrounds a confirmation of existing belief ("centenarians age slower"), the buried mechanism finding is almost always sharper. Look for the _substrate-specific_ result inside the _general-trend_ result. The general trend is what the field expects. The substrate-specific carve-out is what reframes the field.
 
 This audit also illustrates that the rubric is not hindsight-rationalizing: the actual NGM post on this paper organically arrived at this anchor before the formal audit existed. The audit captures editorial judgment that good writers apply intuitively. Codifying it makes it consistent across runs.

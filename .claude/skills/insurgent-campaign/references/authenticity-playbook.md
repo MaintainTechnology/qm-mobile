@@ -45,7 +45,7 @@ scripted delivery — audiences now interpret these as "someone paid for this," 
 automatically lowers trust. Rough phone footage of a real moment outperforms an agency-produced
 ad in most underdog contexts.
 
-This does *not* mean "be sloppy." It means: let real things look real. Shoot in the kitchen,
+This does _not_ mean "be sloppy." It means: let real things look real. Shoot in the kitchen,
 the workshop, the van, the office — not the studio. Use natural audio. Keep mistakes in when
 they are human, not when they are disqualifying.
 
@@ -124,27 +124,30 @@ the structure.
 ### Examples across contexts
 
 **Startup founder launching a product:**
-- *Self:* "I spent six years watching my team waste 40% of every day on status meetings
+
+- _Self:_ "I spent six years watching my team waste 40% of every day on status meetings
   that could have been a 2-line update."
-- *Us:* "Every engineering team I talk to has the same problem — the ceremonies exist
+- _Us:_ "Every engineering team I talk to has the same problem — the ceremonies exist
   because no one trusts the async layer to work."
-- *Now:* "We're opening the beta for 100 teams this Thursday. If this sounds like your
+- _Now:_ "We're opening the beta for 100 teams this Thursday. If this sounds like your
   problem, the link is in my profile."
 
 **Nonprofit fundraising campaign:**
-- *Self:* "The first night I slept in our shelter, there were four people I'd walked past
+
+- _Self:_ "The first night I slept in our shelter, there were four people I'd walked past
   every day for two years on my commute and never said hello to."
-- *Us:* "Most of us live in a city where we have learned not to see each other. That
+- _Us:_ "Most of us live in a city where we have learned not to see each other. That
   habit is the problem."
-- *Now:* "We need 200 new monthly donors by the end of March to keep the overnight
+- _Now:_ "We need 200 new monthly donors by the end of March to keep the overnight
   program open through next winter. Here is the link."
 
 **Political candidate / cause-led campaign:**
-- *Self:* "I was inside Fidesz. I saw how the money moved. I left because I could not
+
+- _Self:_ "I was inside Fidesz. I saw how the money moved. I left because I could not
   stay."
-- *Us:* "Every Hungarian family has watched the hospital queue get longer and the
+- _Us:_ "Every Hungarian family has watched the hospital queue get longer and the
   teacher's pay stay the same."
-- *Now:* "Come to the Saturday rally. Bring your neighbor. This is the election."
+- _Now:_ "Come to the Saturday rally. Bring your neighbor. This is the election."
 
 ### In Stage 5
 
@@ -163,11 +166,12 @@ Competitor Saturation Map forces the user to name (a) what the competitor satura
 line they commit to holding across the campaign. Treat this section as the reference
 material the Stage 5 step pulls from.
 
-When a competitor saturates a channel with paid content, their saturation *is* your
+When a competitor saturates a channel with paid content, their saturation _is_ your
 signal-cut-through. Audiences develop ad blindness on over-saturated channels. Your
 organic presence cuts through precisely because it does not look like everything else.
 
 Examples:
+
 - Competitor runs nonstop TV ads → your absence from TV becomes a message ("we don't
   waste donor money on ads").
 - Competitor floods paid search → your founder-led LinkedIn content ranks in AI search

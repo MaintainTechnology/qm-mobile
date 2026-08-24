@@ -22,12 +22,12 @@ This example demonstrates how `/ralph-ify` transforms a simple workflow descript
 
 ### Identified Work Units (4)
 
-| ID | Unit Name | Dependencies | Complexity |
-|----|-----------|--------------|------------|
-| EXTRACT | Extract invoice data | None | Medium |
-| VALIDATE | Validate amounts | [EXTRACT] | Low |
-| CATEGORIZE | Categorize expenses | [EXTRACT] | Medium |
-| REMIND | Generate reminders | [VALIDATE] | Medium |
+| ID         | Unit Name            | Dependencies | Complexity |
+| ---------- | -------------------- | ------------ | ---------- |
+| EXTRACT    | Extract invoice data | None         | Medium     |
+| VALIDATE   | Validate amounts     | [EXTRACT]    | Low        |
+| CATEGORIZE | Categorize expenses  | [EXTRACT]    | Medium     |
+| REMIND     | Generate reminders   | [VALIDATE]   | Medium     |
 
 ### Success Criteria
 
@@ -121,49 +121,49 @@ This example demonstrates how `/ralph-ify` transforms a simple workflow descript
 
 #### Gate: EXTRACT
 
-| Check | Criteria | Severity | Failure Suggestion |
-|-------|----------|----------|-------------------|
-| vendor_present | Vendor name is not empty | Critical | "To fix: Check for 'Bill To', 'From', or letterhead for vendor name" |
-| valid_total | Grand total parses as number | Critical | "To fix: Look for 'Total', 'Amount Due', 'Balance' labels" |
-| has_line_items | At least one line item extracted | Standard | "To fix: Look for table structures or itemized lists" |
-| date_valid | Invoice date is parseable | Standard | "To fix: Try multiple date formats (MM/DD/YYYY, DD/MM/YYYY, YYYY-MM-DD)" |
+| Check          | Criteria                         | Severity | Failure Suggestion                                                       |
+| -------------- | -------------------------------- | -------- | ------------------------------------------------------------------------ |
+| vendor_present | Vendor name is not empty         | Critical | "To fix: Check for 'Bill To', 'From', or letterhead for vendor name"     |
+| valid_total    | Grand total parses as number     | Critical | "To fix: Look for 'Total', 'Amount Due', 'Balance' labels"               |
+| has_line_items | At least one line item extracted | Standard | "To fix: Look for table structures or itemized lists"                    |
+| date_valid     | Invoice date is parseable        | Standard | "To fix: Try multiple date formats (MM/DD/YYYY, DD/MM/YYYY, YYYY-MM-DD)" |
 
 **Pass Threshold**: 75%
 **Critical Failures**: vendor_present, valid_total
 
 #### Gate: VALIDATE
 
-| Check | Criteria | Severity | Failure Suggestion |
-|-------|----------|----------|-------------------|
-| line_math | Each line total = qty * price | Critical | "To fix: Recalculate line totals and flag mismatches" |
-| subtotal_sum | Subtotal = sum of line totals | Standard | "To fix: Sum line totals and compare to stated subtotal" |
-| total_correct | Grand total = subtotal + tax | Standard | "To fix: Verify tax calculation and total" |
-| no_negatives | All amounts >= 0 | Standard | "To fix: Flag negative amounts as potential credits" |
+| Check         | Criteria                      | Severity | Failure Suggestion                                       |
+| ------------- | ----------------------------- | -------- | -------------------------------------------------------- |
+| line_math     | Each line total = qty * price | Critical | "To fix: Recalculate line totals and flag mismatches"    |
+| subtotal_sum  | Subtotal = sum of line totals | Standard | "To fix: Sum line totals and compare to stated subtotal" |
+| total_correct | Grand total = subtotal + tax  | Standard | "To fix: Verify tax calculation and total"               |
+| no_negatives  | All amounts >= 0              | Standard | "To fix: Flag negative amounts as potential credits"     |
 
 **Pass Threshold**: 75%
 **Critical Failures**: line_math
 
 #### Gate: CATEGORIZE
 
-| Check | Criteria | Severity | Failure Suggestion |
-|-------|----------|----------|-------------------|
-| all_categorized | Every item has category | Critical | "To fix: Use 'Other' for ambiguous items" |
-| valid_category | Category in allowed list | Critical | "To fix: Map to nearest allowed category" |
-| single_category | No item has multiple | Standard | "To fix: Choose primary category based on amount" |
-| reasonable_match | Category fits description | Standard | "To fix: Re-evaluate based on vendor context" |
+| Check            | Criteria                  | Severity | Failure Suggestion                                |
+| ---------------- | ------------------------- | -------- | ------------------------------------------------- |
+| all_categorized  | Every item has category   | Critical | "To fix: Use 'Other' for ambiguous items"         |
+| valid_category   | Category in allowed list  | Critical | "To fix: Map to nearest allowed category"         |
+| single_category  | No item has multiple      | Standard | "To fix: Choose primary category based on amount" |
+| reasonable_match | Category fits description | Standard | "To fix: Re-evaluate based on vendor context"     |
 
 **Pass Threshold**: 75%
 **Critical Failures**: all_categorized, valid_category
 
 #### Gate: REMIND
 
-| Check | Criteria | Severity | Failure Suggestion |
-|-------|----------|----------|-------------------|
-| only_if_overdue | Reminder only for >30 days | Critical | "To fix: Verify due date calculation" |
-| has_invoice_num | Includes invoice number | Standard | "To fix: Add invoice reference to subject/body" |
-| has_amount | Includes amount due | Standard | "To fix: Add outstanding amount to email body" |
-| professional_tone | No aggressive language | Standard | "To fix: Replace harsh phrases with professional alternatives" |
-| has_cta | Clear payment instructions | Standard | "To fix: Add specific payment method and deadline" |
+| Check             | Criteria                   | Severity | Failure Suggestion                                             |
+| ----------------- | -------------------------- | -------- | -------------------------------------------------------------- |
+| only_if_overdue   | Reminder only for >30 days | Critical | "To fix: Verify due date calculation"                          |
+| has_invoice_num   | Includes invoice number    | Standard | "To fix: Add invoice reference to subject/body"                |
+| has_amount        | Includes amount due        | Standard | "To fix: Add outstanding amount to email body"                 |
+| professional_tone | No aggressive language     | Standard | "To fix: Replace harsh phrases with professional alternatives" |
+| has_cta           | Clear payment instructions | Standard | "To fix: Add specific payment method and deadline"             |
 
 **Pass Threshold**: 80%
 **Critical Failures**: only_if_overdue
@@ -200,6 +200,7 @@ argument-hint: <invoice-path> [--batch] [--output DIR]
 ## Overview
 
 Process customer invoices through a four-stage pipeline:
+
 1. **Extract**: Parse invoice data (vendor, amounts, line items)
 2. **Validate**: Verify mathematical accuracy
 3. **Categorize**: Assign expense categories to line items
@@ -224,6 +225,7 @@ After RALPH-ification, the new skill can be invoked:
 ```
 
 The skill will:
+
 1. Create `.invoice-processor/prd.json` with 4 items
 2. Execute EXTRACT-001, then VALIDATE-001 and CATEGORIZE-001 (in parallel), then REMIND-001
 3. Retry any failed items up to 3 times with feedback
@@ -233,11 +235,11 @@ The skill will:
 
 ## Key Transformations Applied
 
-| Original Concept | RALPH Transformation |
-|------------------|---------------------|
-| "Process invoices" | 4 discrete items with dependencies |
-| "Validate amounts" | Quality gate with 4 specific checks |
-| "Generate reminders" | Conditional item (only if overdue) |
-| Implicit ordering | Explicit dependency graph |
-| No error handling | Retry loop with feedback |
-| No state | prd.json + progress.txt |
+| Original Concept     | RALPH Transformation                |
+| -------------------- | ----------------------------------- |
+| "Process invoices"   | 4 discrete items with dependencies  |
+| "Validate amounts"   | Quality gate with 4 specific checks |
+| "Generate reminders" | Conditional item (only if overdue)  |
+| Implicit ordering    | Explicit dependency graph           |
+| No error handling    | Retry loop with feedback            |
+| No state             | prd.json + progress.txt             |

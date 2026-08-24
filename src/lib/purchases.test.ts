@@ -2,7 +2,7 @@ import { activeEntitlementIds, planCovers, planFromEntitlementIds } from '@/lib/
 
 // The plan helpers are pure; pulling Clerk in for them leaks a worker and prints
 // its deprecation banner on every run. babel-jest hoists this above the import.
-jest.mock('@clerk/clerk-expo', () => ({ useAuth: () => ({ isLoaded: false, userId: null }) }));
+jest.mock('@clerk/expo', () => ({ useAuth: () => ({ isLoaded: false, userId: null }) }));
 
 describe('planFromEntitlementIds', () => {
   it('returns null when the tradie holds nothing', () => {

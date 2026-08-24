@@ -6,11 +6,11 @@ ad-copy decisions, refusal rules.
 
 ## The three levels
 
-| Level | Ratio (competitor : user) | What it looks like | Primary channel stance |
-|---|---|---|---|
-| **Mild** | 1:2 to 1:5 | They spend 2–5× what you spend. Typical incumbent vs. challenger. | Hybrid: full Tier 1–3 stack, selective Tier 4 with lift tests. |
-| **Severe** | 1:5 to 1:50 | They spend 5–50× what you spend. Typical startup vs. well-funded competitor, NGO vs. corporate, challenger party vs. establishment. | Organic-led: Tier 1–2 heavy, targeted Tier 3, avoid broad Tier 4. |
-| **Categorical** | 1:50+ (or non-comparable — state capture, foreign support, infinite pockets) | You cannot be in a spending race at all. Different game entirely. | Full asymmetric: Tier 1–2 only, volunteer/community networks, earned media, counter-positioning. Refuse broad cold-paid. |
+| Level           | Ratio (competitor : user)                                                    | What it looks like                                                                                                                  | Primary channel stance                                                                                                   |
+| --------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| **Mild**        | 1:2 to 1:5                                                                   | They spend 2–5× what you spend. Typical incumbent vs. challenger.                                                                   | Hybrid: full Tier 1–3 stack, selective Tier 4 with lift tests.                                                           |
+| **Severe**      | 1:5 to 1:50                                                                  | They spend 5–50× what you spend. Typical startup vs. well-funded competitor, NGO vs. corporate, challenger party vs. establishment. | Organic-led: Tier 1–2 heavy, targeted Tier 3, avoid broad Tier 4.                                                        |
+| **Categorical** | 1:50+ (or non-comparable — state capture, foreign support, infinite pockets) | You cannot be in a spending race at all. Different game entirely.                                                                   | Full asymmetric: Tier 1–2 only, volunteer/community networks, earned media, counter-positioning. Refuse broad cold-paid. |
 
 ## If the user gave numbers
 
@@ -19,6 +19,7 @@ convert. If the user gave lifetime numbers (e.g., "we have $50k total"), ask for
 runway in months and divide.
 
 Edge cases:
+
 - **User is bootstrapping with $0 ad budget.** Ratio is infinite — treat as categorical.
 - **Competitor's "budget" includes state media, regulatory capture, or foreign support.**
   Treat as categorical regardless of direct spend comparison.
@@ -64,7 +65,7 @@ If "yes" to 3–4, severe. If "yes" to 5–6, categorical.
 - Competitive advantage: authenticity and narrative. You cannot outspend; you can
   outspecify. Concentrate on a narrow audience that the competitor cannot address
   because they are too broad.
-- Measurement: run a lift test before *any* paid spend, not after. Use geo-holdouts.
+- Measurement: run a lift test before _any_ paid spend, not after. Use geo-holdouts.
 
 ## Categorical asymmetry — playbook summary
 

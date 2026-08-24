@@ -46,28 +46,28 @@ export const openapiSpec = {
   components: {
     securitySchemes: {
       ApiKeyHeader: { type: 'apiKey', in: 'header', name: 'x-api-key' },
-      BearerAuth:   { type: 'http', scheme: 'bearer' },
-      AdminKey:     { type: 'apiKey', in: 'header', name: 'x-api-key' },
+      BearerAuth: { type: 'http', scheme: 'bearer' },
+      AdminKey: { type: 'apiKey', in: 'header', name: 'x-api-key' },
     },
-    schemas: { /* PipelineInput, JobProgress, StatusResponse, etc. */ },
+    schemas: {/* PipelineInput, JobProgress, StatusResponse, etc. */},
   },
   security: [{ ApiKeyHeader: [] }, { BearerAuth: [] }],
   paths: {
-    '/api/health':                                { get: { /*...*/ } },
-    '/api/pipeline/run':                          { post: { /*...*/ } },
-    '/api/pipeline/run/async':                    { post: { /*...*/ } },
-    '/api/pipeline/start':                        { post: { /*...*/ } },
-    '/api/pipeline/run/status/{taskId}':          { get: { /*...*/ } },
-    '/api/pipeline/status/{taskId}':              { get: { /*...*/ } },
-    '/api/pipeline/run/result/{taskId}':          { get: { /*...*/ } },
-    '/api/pipeline/run/stream/{taskId}':          { get: { /*...*/ } },
-    '/api/pipeline/run/terminate/{taskId}':       { post: { /*...*/ } },
-    '/api/pipeline/tasks':                        { get: { /*...*/ }, delete: { /*...*/ } },
-    '/api/pipeline/capacity':                     { get: { /*...*/ } },
-    '/api/keys/generate':                         { post: { security: [{ AdminKey: [] }], /*...*/ } },
-    '/api/keys':                                  { get:  { security: [{ AdminKey: [] }], /*...*/ } },
-    '/api/keys/{id}/revoke':                      { post: { security: [{ AdminKey: [] }], /*...*/ } },
-    '/api/keys/{id}':                             { delete: { security: [{ AdminKey: [] }], /*...*/ } },
+    '/api/health': { get: {/*...*/} },
+    '/api/pipeline/run': { post: {/*...*/} },
+    '/api/pipeline/run/async': { post: {/*...*/} },
+    '/api/pipeline/start': { post: {/*...*/} },
+    '/api/pipeline/run/status/{taskId}': { get: {/*...*/} },
+    '/api/pipeline/status/{taskId}': { get: {/*...*/} },
+    '/api/pipeline/run/result/{taskId}': { get: {/*...*/} },
+    '/api/pipeline/run/stream/{taskId}': { get: {/*...*/} },
+    '/api/pipeline/run/terminate/{taskId}': { post: {/*...*/} },
+    '/api/pipeline/tasks': { get: {/*...*/}, delete: {/*...*/} },
+    '/api/pipeline/capacity': { get: {/*...*/} },
+    '/api/keys/generate': { post: { security: [{ AdminKey: [] }] /*...*/ } },
+    '/api/keys': { get: { security: [{ AdminKey: [] }] /*...*/ } },
+    '/api/keys/{id}/revoke': { post: { security: [{ AdminKey: [] }] /*...*/ } },
+    '/api/keys/{id}': { delete: { security: [{ AdminKey: [] }] /*...*/ } },
   },
 };
 ```
@@ -85,17 +85,21 @@ import { openapiSpec } from '../swagger/openapi-spec.js';
 const router = Router();
 const swaggerCustomCss = `/* NGM editorial theme — see below */`;
 
-router.use('/docs', swaggerUi.serve, swaggerUi.setup(openapiSpec, {
-  customCss: swaggerCustomCss,
-  customSiteTitle: '<Pipeline Name> — API Docs',
-  swaggerOptions: {
-    persistAuthorization: true,
-    docExpansion: 'list',
-    defaultModelsExpandDepth: 0,
-    filter: true,
-    tryItOutEnabled: true,
-  },
-}));
+router.use(
+  '/docs',
+  swaggerUi.serve,
+  swaggerUi.setup(openapiSpec, {
+    customCss: swaggerCustomCss,
+    customSiteTitle: '<Pipeline Name> — API Docs',
+    swaggerOptions: {
+      persistAuthorization: true,
+      docExpansion: 'list',
+      defaultModelsExpandDepth: 0,
+      filter: true,
+      tryItOutEnabled: true,
+    },
+  }),
+);
 
 router.get('/openapi.json', (_req, res) => res.json(openapiSpec));
 
@@ -106,12 +110,13 @@ Mount in `index.js`:
 
 ```js
 import docsRoutes from './routes/docs.js';
-app.use('/api', docsRoutes);   // /api/docs + /api/openapi.json
+app.use('/api', docsRoutes); // /api/docs + /api/openapi.json
 ```
 
 ## NGM Editorial design system
 
 **Fonts:**
+
 ```
 Cormorant Garamond   — display headings (400, 500, 600 + italic)
 Source Serif 4       — body (400, 600)
@@ -122,33 +127,36 @@ SF Mono / Fira Code  — code blocks
 Import via Google Fonts:
 
 ```html
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600;700&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 **Color palette (CSS custom properties):**
 
 ```css
 :root {
-  --font-display: "Cormorant Garamond", Georgia, serif;
-  --font-body:    "Source Serif 4", Georgia, serif;
-  --font-ui:      "DM Sans", system-ui, sans-serif;
-  --font-mono:    'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
+  --font-display: 'Cormorant Garamond', Georgia, serif;
+  --font-body: 'Source Serif 4', Georgia, serif;
+  --font-ui: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'SF Mono', 'Fira Code', 'Cascadia Code', Menlo, monospace;
 
-  --paper:       #FEFDFB;   /* warm white */
-  --paper-warm:  #F5F3EE;   /* cream */
-  --ink:         #1A1A1A;
-  --ink-2:       #3A3A3A;
-  --ink-3:       #6A6A6A;
-  --ink-4:       #9A9A9A;
-  --rule:        #D4D0C8;
-  --rule-light:  #E8E5DE;
-  --accent:      #8B7355;   /* warm tan */
-  --green:       #4A7A5A;
-  --blue:        #4A6A7A;
-  --orange:      #B06840;
-  --purple:      #6A5A7A;
+  --paper: #fefdfb; /* warm white */
+  --paper-warm: #f5f3ee; /* cream */
+  --ink: #1a1a1a;
+  --ink-2: #3a3a3a;
+  --ink-3: #6a6a6a;
+  --ink-4: #9a9a9a;
+  --rule: #d4d0c8;
+  --rule-light: #e8e5de;
+  --accent: #8b7355; /* warm tan */
+  --green: #4a7a5a;
+  --blue: #4a6a7a;
+  --orange: #b06840;
+  --purple: #6a5a7a;
 }
 ```
 
@@ -177,20 +185,55 @@ Apply the NGM theme to Swagger UI by passing `customCss` into `swaggerUi.setup`.
 ```css
 @import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Source+Serif+4:wght@400;600&family=DM+Sans:wght@400;500;600;700&display=swap');
 
-html, body { background: #FEFDFB; }
-.swagger-ui { max-width: 960px; margin: 0 auto; padding: 32px 24px; font-family: "Source Serif 4", Georgia, serif; color: #3A3A3A; }
-.swagger-ui .topbar { display: none; }
-.swagger-ui .info .title { font-family: "Cormorant Garamond", Georgia, serif; font-weight: 400; font-size: 2.4rem; color: #1A1A1A; }
-.swagger-ui .opblock-tag { font-family: "Cormorant Garamond", Georgia, serif; font-size: 1.4rem; font-weight: 500; color: #1A1A1A; border-bottom: 1px solid #E8E5DE; }
+html,
+body {
+  background: #fefdfb;
+}
+.swagger-ui {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 32px 24px;
+  font-family: 'Source Serif 4', Georgia, serif;
+  color: #3a3a3a;
+}
+.swagger-ui .topbar {
+  display: none;
+}
+.swagger-ui .info .title {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-weight: 400;
+  font-size: 2.4rem;
+  color: #1a1a1a;
+}
+.swagger-ui .opblock-tag {
+  font-family: 'Cormorant Garamond', Georgia, serif;
+  font-size: 1.4rem;
+  font-weight: 500;
+  color: #1a1a1a;
+  border-bottom: 1px solid #e8e5de;
+}
 
 /* Method color convention */
-.swagger-ui .opblock.opblock-get    .opblock-summary-method { background: #4A6A7A; }
-.swagger-ui .opblock.opblock-post   .opblock-summary-method { background: #4A7A5A; }
-.swagger-ui .opblock.opblock-delete .opblock-summary-method { background: #B06840; }
+.swagger-ui .opblock.opblock-get .opblock-summary-method {
+  background: #4a6a7a;
+}
+.swagger-ui .opblock.opblock-post .opblock-summary-method {
+  background: #4a7a5a;
+}
+.swagger-ui .opblock.opblock-delete .opblock-summary-method {
+  background: #b06840;
+}
 
 /* Execute button */
-.swagger-ui .btn.execute { background: #1A1A1A; border-color: #1A1A1A; color: #FEFDFB; }
-.swagger-ui .btn.authorize { color: #8B7355; border-color: #8B7355; }
+.swagger-ui .btn.execute {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #fefdfb;
+}
+.swagger-ui .btn.authorize {
+  color: #8b7355;
+  border-color: #8b7355;
+}
 ```
 
 Full CSS in the canonical repo's `src/routes/docs.js`.
@@ -213,7 +256,7 @@ app.use('/api/keys', apiKeyRoutes);
 app.use('/api/pipeline', requireApiKey, pipelineRoutes);
 
 // Public health
-app.get('/api/health', (_req, res) => res.json({ /* ... */ }));
+app.get('/api/health', (_req, res) => res.json({/* ... */}));
 
 // 404 catch-all
 app.use((req, res) => {

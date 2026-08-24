@@ -7,6 +7,7 @@ UX writing is the practice of crafting user-facing text that helps people use di
 ## What is Microcopy?
 
 Microcopy refers to the small bits of text throughout an interface:
+
 - Button labels
 - Error messages
 - Form labels and hints
@@ -20,6 +21,7 @@ Microcopy refers to the small bits of text throughout an interface:
 ### The Impact of Microcopy
 
 Good microcopy:
+
 - Reduces user errors
 - Increases conversion rates
 - Builds trust and brand personality
@@ -103,12 +105,12 @@ Tone varies:
 
 Document your voice characteristics:
 
-| Attribute | We are... | We are NOT... |
-|-----------|-----------|---------------|
-| Friendly | Warm, approachable | Overly casual, unprofessional |
-| Helpful | Clear, guiding | Condescending, verbose |
-| Confident | Assured, direct | Arrogant, pushy |
-| Human | Conversational, real | Robotic, corporate |
+| Attribute | We are...            | We are NOT...                 |
+| --------- | -------------------- | ----------------------------- |
+| Friendly  | Warm, approachable   | Overly casual, unprofessional |
+| Helpful   | Clear, guiding       | Condescending, verbose        |
+| Confident | Assured, direct      | Arrogant, pushy               |
+| Human     | Conversational, real | Robotic, corporate            |
 
 ### Adapting Tone
 
@@ -357,11 +359,13 @@ Don't embed variables mid-sentence:
 ### Content Generation
 
 **ChatGPT / Claude:**
+
 - Brainstorm alternative phrasings
 - Generate variation options
 - Check tone consistency
 
 **Writer / Jasper:**
+
 - Brand voice enforcement
 - Style guide compliance
 - Terminology consistency
@@ -369,11 +373,13 @@ Don't embed variables mid-sentence:
 ### Quality Checking
 
 **Grammarly:**
+
 - Grammar and spelling
 - Clarity suggestions
 - Tone detection
 
 **Hemingway Editor:**
+
 - Readability score
 - Sentence complexity
 - Passive voice detection
@@ -381,6 +387,7 @@ Don't embed variables mid-sentence:
 ### Important Note
 
 AI is a co-pilot, not a replacement. Always:
+
 - Review and edit AI suggestions
 - Ensure brand voice consistency
 - Test with real users
@@ -393,6 +400,7 @@ AI is a co-pilot, not a replacement. Always:
 ### A/B Testing
 
 Test button text:
+
 ```
 A: "Sign up free"
 B: "Get started"
@@ -418,30 +426,35 @@ Measure: Click-through rate, completion rate
 ## Content Design Process
 
 ### 1. Research
+
 - Understand user needs and language
 - Analyze existing content
 - Review support tickets and FAQs
 - Conduct user interviews
 
 ### 2. Strategy
+
 - Define voice and tone
 - Create content guidelines
 - Map user journeys
 - Identify content touchpoints
 
 ### 3. Write
+
 - Draft multiple options
 - Collaborate with design
 - Iterate with feedback
 - Consider edge cases
 
 ### 4. Validate
+
 - Usability testing
 - A/B testing
 - Accessibility review
 - Stakeholder review
 
 ### 5. Maintain
+
 - Update as product evolves
 - Track metrics
 - Gather ongoing feedback
@@ -452,16 +465,19 @@ Measure: Click-through rate, completion rate
 ## Resources
 
 ### Books
+
 - "Microcopy: The Complete Guide" - Kinneret Yifrah
 - "Strategic Writing for UX" - Torrey Podmajersky
 - "Conversational Design" - Erika Hall
 
 ### Courses
+
 - UX Content Collective - UX Writing Fundamentals
 - UX Writing Hub - UX Writing Academy
 - Coursera - Microcopy & UX Writing
 
 ### Communities
+
 - UX Writing Hub (Slack)
 - Content Design (Slack)
 - r/UXWriting (Reddit)

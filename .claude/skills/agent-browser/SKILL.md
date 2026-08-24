@@ -155,7 +155,7 @@ destructive actions.
 
 ## The built-in `chat` is optional — and usually not what you want here
 
-`agent-browser chat "<instruction>"` lets the CLI's *own* LLM drive the browser
+`agent-browser chat "<instruction>"` lets the CLI's _own_ LLM drive the browser
 (needs `AI_GATEWAY_API_KEY`, a Vercel AI Gateway key). Inside Claude Code,
 **you are the brain** — use the deterministic commands above (`open`,
 `snapshot`, `click`, …), which need no API key, rather than delegating to `chat`.

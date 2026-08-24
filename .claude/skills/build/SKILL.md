@@ -92,22 +92,27 @@ having to reverse-engineer what you did. Use this structure:
 ## Build coverage — specs/<name>.md
 
 ### Requirements
+
 - [x] R1: <requirement text> — <how/where it's met: file:line or short note>
 - [x] R2: <requirement text> — <how/where>
 - [ ] R3: <requirement text> — NOT done: <reason / blocked on / needs decision>
 
 ### Definition of done
+
 - [x] <done item> — <evidence: passing test, observed behavior, metric>
 - [ ] <done item> — <status>
 
 ### Edge cases
+
 - [x] <case> → <expected behavior> — handled in <where>
 
 ### Verification
+
 - build: <pass/fail + detail>
 - tests: <pass/fail + counts>
 
 ### Out of scope (intentionally NOT built)
+
 - Non-goals respected.
 - Improvements noticed but not implemented (suggestions only): <list, or "none">
 ```

@@ -26,15 +26,17 @@ export function readPackageDeps(cwd) {
 
 export function hasAnyDependency(cwd, names) {
   const deps = readPackageDeps(cwd);
-  return names.some((name) => Boolean(deps[name]));
+  return names.some(name => Boolean(deps[name]));
 }
 
 /** First top-level file name matching `re`, or null. */
 export function findConfigFile(cwd, re) {
   try {
-    return fs.readdirSync(cwd, { withFileTypes: true })
-      .find((entry) => entry.isFile() && re.test(entry.name))
-      ?.name ?? null;
+    return (
+      fs
+        .readdirSync(cwd, { withFileTypes: true })
+        .find(entry => entry.isFile() && re.test(entry.name))?.name ?? null
+    );
   } catch {
     return null;
   }

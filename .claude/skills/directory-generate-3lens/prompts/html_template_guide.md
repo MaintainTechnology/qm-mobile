@@ -115,6 +115,7 @@ This is a scientific editorial, not a SaaS landing page. Think: Nature Reviews m
 ## Key Component Patterns
 
 ### The Bottom Line (replaces summary cards)
+
 ```html
 <aside class="bottom-line">
   <span class="bottom-line-label">The Bottom Line</span>
@@ -123,6 +124,7 @@ This is a scientific editorial, not a SaaS landing page. Think: Nature Reviews m
 ```
 
 ### Section Marker (replaces numbered headers)
+
 ```html
 <div class="section-marker">
   <span class="section-num">I</span>
@@ -131,11 +133,15 @@ This is a scientific editorial, not a SaaS landing page. Think: Nature Reviews m
 ```
 
 ### Pull Quote (replaces key-takeaway boxes)
+
 ```html
-<p class="pull-quote">[One-sentence insight — centered, Cormorant italic, thin rules above/below]</p>
+<p class="pull-quote">
+  [One-sentence insight — centered, Cormorant italic, thin rules above/below]
+</p>
 ```
 
 ### Evaluation Criterion (replaces principle cards)
+
 ```html
 <div class="criterion">
   <div class="criterion-header">
@@ -146,9 +152,11 @@ This is a scientific editorial, not a SaaS landing page. Think: Nature Reviews m
   <p>[Brief description in body text]</p>
 </div>
 ```
+
 Status classes: `.established` (green) or `.not-established` (gray).
 
 ### Mechanistic Note (replaces kb-insight boxes)
+
 ```html
 <div class="mechanistic-note">
   <div class="mechanistic-note-label">Mechanistic Insight</div>
@@ -157,6 +165,7 @@ Status classes: `.established` (green) or `.not-established` (gray).
 ```
 
 ### Collapsible Deep Dive (minimal, no container)
+
 ```html
 <details>
   <summary>[Label text]</summary>
@@ -167,6 +176,7 @@ Status classes: `.established` (green) or `.not-established` (gray).
 ```
 
 ### Platform-Types Table (replaces company directory)
+
 ```html
 <table>
   <thead>
@@ -186,7 +196,10 @@ Status classes: `.established` (green) or `.not-established` (gray).
     </tr>
   </tbody>
 </table>
-<p class="directory-note">For specific company evaluations, see our <strong>Featured Partner</strong> profiles, where sponsored companies receive a comprehensive three-lens clinical analysis.</p>
+<p class="directory-note">
+  For specific company evaluations, see our <strong>Featured Partner</strong> profiles, where
+  sponsored companies receive a comprehensive three-lens clinical analysis.
+</p>
 ```
 
 ## SVG Diagram Guidelines
@@ -199,6 +212,7 @@ Each guide should include 3-5 SVG diagrams. Prioritize:
 4. **Concept visualization** — Diverging curves, spectrums, hierarchies rendered as clean data viz.
 
 SVG style rules:
+
 - Font family: `'DM Sans',system-ui,sans-serif`
 - Use the color palette variables (as hex values in SVG)
 - Thin strokes (1-2px), no heavy borders
@@ -235,6 +249,7 @@ Use Article schema with topic tags (NOT a company list):
 Before saving, ALL must pass:
 
 **Editorial Design (v2):**
+
 - [ ] Uses Cormorant Garamond + Source Serif 4 + DM Sans (NOT Inter/Cormorant Garamond)
 - [ ] NO card grids anywhere (no `.principles-grid`, no `.summary-cards`)
 - [ ] "The Bottom Line" callout with left accent border (not cards)
@@ -246,6 +261,7 @@ Before saving, ALL must pass:
 - [ ] NO specific company names in guide body
 
 **Content Quality:**
+
 - [ ] No paragraph exceeds 3 sentences in main flow
 - [ ] First sentence of every paragraph is bold
 - [ ] At least 3 SVG diagrams total
@@ -257,5 +273,6 @@ Before saving, ALL must pass:
 ## Output Files
 
 Save to `{{output_dir}}/{{slug}}/`:
+
 - `guide_content.json` - Structured data with all lens outputs + guide structure
 - `guide_page.html` - Rendered editorial guide

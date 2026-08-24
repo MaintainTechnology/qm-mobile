@@ -17,7 +17,7 @@ description: |
   NOT for: single image/video/audio generation (higgsfield-generate), product
   photos (higgsfield-product-photoshoot), marketplace cards
   (higgsfield-marketplace-cards).
-argument-hint: "[what to build or edit] [--type website|app]"
+argument-hint: '[what to build or edit] [--type website|app]'
 allowed-tools: Bash
 ---
 
@@ -116,10 +116,10 @@ are rejected — if that happens, try a close variant.
    type, including its own references, hard rules, editing map, and
    deploy/publish gates:
 
-| Type | Flow |
-|---|---|
+| Type             | Flow                                                                                                                                                                            |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `--type website` | **`references/website-flow.md`** — phased pipeline: intake → concept → reference boards → asset system → build-to-boards → motion → cover + metadata → mechanical gate → deploy |
-| `--type app` | **`references/app-flow.md`** — the Quanta toolkit, the six code layouts, fnf SDK + auth + D1 contract, launch cover + metadata, publish gate |
+| `--type app`     | **`references/app-flow.md`** — the Quanta toolkit, the six code layouts, fnf SDK + auth + D1 contract, launch cover + metadata, publish gate                                    |
 
 Both flows share the same platform mechanics (SSR Worker, `app.manifest.json`
 infra, a single live deploy via `higgsfield website deploy <website_id>`,
@@ -138,7 +138,7 @@ deferred to `higgsfield website publish`. Hard rules:
 
 - **No "simple app" exception.** A utility tool, a timer, a one-page toy —
   they all get the generated cover. A hand-authored inline-SVG favicon is
-  fine *as a favicon*; it never substitutes for the generated cover.
+  fine _as a favicon_; it never substitutes for the generated cover.
 - **No permission needed** for the cover image — generate it the same way you
   write real copy. Only the optional cover VIDEO (`og_video_url`) is
   permission-gated (video costs credits — offer, never generate unprompted).

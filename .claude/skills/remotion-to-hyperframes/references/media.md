@@ -7,7 +7,7 @@ HF uses relative paths from the composition's `index.html`, conventionally
 `assets/`:
 
 ```tsx
-<Img src={staticFile("logo.png")} />
+<Img src={staticFile('logo.png')} />
 ```
 
 ```html
@@ -21,7 +21,7 @@ see T2's `setup.sh` for an example pattern.
 ## `<Audio>`
 
 ```tsx
-<Audio src={staticFile("music.wav")} volume={0.5} />
+<Audio src={staticFile('music.wav')} volume={0.5} />
 ```
 
 ```html
@@ -41,7 +41,7 @@ didn't specify trim.
 ### Volume ramps
 
 ```tsx
-<Audio src={staticFile("music.wav")} volume={(f) => interpolate(f, [0, 30], [0, 1])} />
+<Audio src={staticFile('music.wav')} volume={f => interpolate(f, [0, 30], [0, 1])} />
 ```
 
 HF supports static `data-volume` only for now. Volume ramps need to be
@@ -51,7 +51,7 @@ ramp is dropped with a translation note.
 ### Trim / playbackRate
 
 ```tsx
-<Audio src={staticFile("music.wav")} startFrom={60} endAt={180} playbackRate={1.5} />
+<Audio src={staticFile('music.wav')} startFrom={60} endAt={180} playbackRate={1.5} />
 ```
 
 ```html
@@ -95,7 +95,7 @@ collapses to a regular `<video>`.
 ## `<Img>`
 
 ```tsx
-<Img src={staticFile("logo.png")} style={{ width: 200, height: 200 }} />
+<Img src={staticFile('logo.png')} style={{ width: 200, height: 200 }} />
 ```
 
 ```html

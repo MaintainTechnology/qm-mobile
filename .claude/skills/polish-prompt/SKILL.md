@@ -30,7 +30,7 @@ These are the levers to pull when polishing. Not every prompt needs all of them 
 5. **Examples when the format is non-obvious.** One worked input/output example beats two paragraphs of description.
 6. **Imperative voice, no filler.** "Extract X" beats "Could you please try to extract X for me?" Politeness tokens cost attention and add nothing.
 7. **Number ordered steps.** When there are multiple sub-tasks, an explicit list beats prose. The model can check off each one.
-8. **State the *why* for judgment calls.** "Use a barrier here because we need to dedup across all results" lets the model handle edge cases the rule didn't anticipate.
+8. **State the _why_ for judgment calls.** "Use a barrier here because we need to dedup across all results" lets the model handle edge cases the rule didn't anticipate.
 9. **Anchor ambiguous terms once.** If "user" could mean end-user or developer, define it up front.
 10. **Tell the model how to handle missing info.** "If the file path is not provided, ask before proceeding" beats silent guessing.
 

@@ -27,12 +27,13 @@ Craft brief, natural responses to LinkedIn DMs and emails that subtly weave in N
 
 Detect sender type from their LinkedIn title, company, or message content:
 
-| Sender Type | Recommend |
-|-------------|-----------|
-| **Clinician, physician, practitioner, or entrepreneur** | Membership programs (LIP) or consulting services |
-| **Vendor, MedTech founder, product company, or B2B service** | NGM Commons (vendor intelligence platform) |
+| Sender Type                                                  | Recommend                                        |
+| ------------------------------------------------------------ | ------------------------------------------------ |
+| **Clinician, physician, practitioner, or entrepreneur**      | Membership programs (LIP) or consulting services |
+| **Vendor, MedTech founder, product company, or B2B service** | NGM Commons (vendor intelligence platform)       |
 
 **Detection signals:**
+
 - Clinician/entrepreneur: MD, DO, NP, PA, "practice," "clinic," "founder" (of non-vendor), health coach, wellness business
 - Vendor: "Co-founder" of product company, MedTech, diagnostics, supplements, SaaS, B2B health tech, "sales," "partnerships"
 
@@ -41,6 +42,7 @@ When unclear, default to membership programs unless they're clearly selling some
 ## Tone Guidelines
 
 **Do:**
+
 - Use contractions (I'm, won't, you're)
 - Start with "Hey [Name]" for LinkedIn
 - Sign off with just your name, no title
@@ -48,6 +50,7 @@ When unclear, default to membership programs unless they're clearly selling some
 - Use periods more than commas for punchy rhythm
 
 **Don't:**
+
 - Use em-dashes (use commas or separate sentences)
 - Include bullet points in DMs
 - Add emojis

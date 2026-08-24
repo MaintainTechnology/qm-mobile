@@ -1,6 +1,6 @@
 # Performance & Loading UX
 
-Perceived performance is often more important than actual performance. Users judge an app's speed not by stopwatch measurements but by how fast it *feels*. This reference covers techniques for making interfaces feel instant, responsive, and reliable.
+Perceived performance is often more important than actual performance. Users judge an app's speed not by stopwatch measurements but by how fast it _feels_. This reference covers techniques for making interfaces feel instant, responsive, and reliable.
 
 ---
 
@@ -8,14 +8,14 @@ Perceived performance is often more important than actual performance. Users jud
 
 ### Response Time Thresholds
 
-| Duration | Perception | UX Treatment |
-|----------|-----------|--------------|
-| < 100ms | Instant | No indicator needed |
-| 100-300ms | Slight delay | Subtle state change (button press) |
-| 300ms-1s | Noticeable | Show spinner or progress hint |
-| 1-5s | Waiting | Skeleton screen or progress bar |
-| 5-10s | Frustrated | Progress bar with estimate + cancel |
-| > 10s | Abandonment risk | Progress steps, background processing option |
+| Duration  | Perception       | UX Treatment                                 |
+| --------- | ---------------- | -------------------------------------------- |
+| < 100ms   | Instant          | No indicator needed                          |
+| 100-300ms | Slight delay     | Subtle state change (button press)           |
+| 300ms-1s  | Noticeable       | Show spinner or progress hint                |
+| 1-5s      | Waiting          | Skeleton screen or progress bar              |
+| 5-10s     | Frustrated       | Progress bar with estimate + cancel          |
+| > 10s     | Abandonment risk | Progress steps, background processing option |
 
 ### Techniques for Feeling Fast
 
@@ -87,8 +87,12 @@ Skeleton screens show a low-fidelity preview of the content layout before data l
 }
 
 @keyframes skeleton-shimmer {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(100%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(100%);
+  }
 }
 ```
 
@@ -118,13 +122,13 @@ Skeleton screens show a low-fidelity preview of the content layout before data l
 
 ### Skeleton Best Practices
 
-| Do | Don't |
-|----|-------|
-| Match the actual content layout | Use generic shapes unrelated to content |
-| Use subtle animation (shimmer) | Use pulsing that draws too much attention |
-| Show for > 300ms loads | Show for instant loads (causes flicker) |
-| Transition smoothly to real content | Pop content in abruptly |
-| Keep skeleton visible while data loads | Replace skeleton with spinner |
+| Do                                     | Don't                                     |
+| -------------------------------------- | ----------------------------------------- |
+| Match the actual content layout        | Use generic shapes unrelated to content   |
+| Use subtle animation (shimmer)         | Use pulsing that draws too much attention |
+| Show for > 300ms loads                 | Show for instant loads (causes flicker)   |
+| Transition smoothly to real content    | Pop content in abruptly                   |
+| Keep skeleton visible while data loads | Replace skeleton with spinner             |
 
 ### Skeleton Transition
 
@@ -184,13 +188,13 @@ async function toggleFavorite(itemId) {
 
 ### When to Use Optimistic Updates
 
-| Use Optimistic | Don't Use |
-|---------------|-----------|
-| Toggles (like, favorite, bookmark) | Financial transactions |
-| Status changes (read/unread) | Destructive actions (delete) |
-| Form field auto-save | Multi-step workflows |
-| Reordering lists | Actions requiring server validation |
-| Adding/removing tags | External system integrations |
+| Use Optimistic                     | Don't Use                           |
+| ---------------------------------- | ----------------------------------- |
+| Toggles (like, favorite, bookmark) | Financial transactions              |
+| Status changes (read/unread)       | Destructive actions (delete)        |
+| Form field auto-save               | Multi-step workflows                |
+| Reordering lists                   | Actions requiring server validation |
+| Adding/removing tags               | External system integrations        |
 
 ### Optimistic Update UX Requirements
 
@@ -228,8 +232,12 @@ For operations where duration is unknown.
 }
 
 @keyframes indeterminate {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(350%); }
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(350%);
+  }
 }
 ```
 
@@ -239,8 +247,13 @@ For operations where progress can be measured.
 
 ```html
 <div class="progress-container">
-  <div class="progress-bar" role="progressbar"
-       aria-valuenow="65" aria-valuemin="0" aria-valuemax="100">
+  <div
+    class="progress-bar"
+    role="progressbar"
+    aria-valuenow="65"
+    aria-valuemin="0"
+    aria-valuemax="100"
+  >
     <div class="progress-bar__fill" style="width: 65%"></div>
   </div>
   <span class="progress-label">65% — Uploading 3 of 5 files</span>
@@ -286,11 +299,14 @@ For operations where progress can be measured.
 }
 
 @keyframes button-spin {
-  to { transform: rotate(360deg); }
+  to {
+    transform: rotate(360deg);
+  }
 }
 ```
 
 **Button loading best practices:**
+
 - Disable the button to prevent double-submit
 - Keep button dimensions constant (no layout shift)
 - Show spinner inside the button, not replacing it
@@ -306,8 +322,7 @@ Only load images when they enter (or approach) the viewport.
 
 ```html
 <!-- Native lazy loading -->
-<img src="photo.jpg" loading="lazy" alt="Description"
-     width="800" height="600">
+<img src="photo.jpg" loading="lazy" alt="Description" width="800" height="600" />
 ```
 
 ### Blur-Up / LQIP (Low Quality Image Placeholder)
@@ -316,12 +331,19 @@ Show a tiny, blurred preview that transitions to the full image.
 
 ```html
 <div class="image-wrapper">
-  <img class="image-placeholder" src="photo-20px.jpg"
-       style="filter: blur(20px); transform: scale(1.1);"
-       aria-hidden="true">
-  <img class="image-full" src="photo-800px.jpg" loading="lazy"
-       alt="Description"
-       onload="this.classList.add('loaded')">
+  <img
+    class="image-placeholder"
+    src="photo-20px.jpg"
+    style="filter: blur(20px); transform: scale(1.1);"
+    aria-hidden="true"
+  />
+  <img
+    class="image-full"
+    src="photo-800px.jpg"
+    loading="lazy"
+    alt="Description"
+    onload="this.classList.add('loaded')"
+  />
 </div>
 ```
 
@@ -353,16 +375,14 @@ Show a tiny, blurred preview that transitions to the full image.
 
 ```html
 <img
-  srcset="photo-400w.jpg 400w,
-          photo-800w.jpg 800w,
-          photo-1200w.jpg 1200w"
+  srcset="photo-400w.jpg 400w, photo-800w.jpg 800w, photo-1200w.jpg 1200w"
   sizes="(max-width: 600px) 400px,
          (max-width: 1000px) 800px,
          1200px"
   src="photo-800w.jpg"
   alt="Description"
   loading="lazy"
->
+/>
 ```
 
 ### Image Loading Decision Tree
@@ -448,13 +468,13 @@ body {
 
 #### Avoid CLS-Causing Patterns
 
-| Pattern | Problem | Solution |
-|---------|---------|----------|
-| Images without dimensions | Jump when loaded | Always set width/height or aspect-ratio |
-| Injected content above viewport | Pushes content down | Insert below or use overlay |
-| Web fonts without fallback | Text reflows | Use font-display: swap + size-adjust |
-| Dynamic ads/banners | Layout shift on load | Reserve fixed space |
-| Late-loading components | Layout reflowing | Use skeleton placeholders |
+| Pattern                         | Problem              | Solution                                |
+| ------------------------------- | -------------------- | --------------------------------------- |
+| Images without dimensions       | Jump when loaded     | Always set width/height or aspect-ratio |
+| Injected content above viewport | Pushes content down  | Insert below or use overlay             |
+| Web fonts without fallback      | Text reflows         | Use font-display: swap + size-adjust    |
+| Dynamic ads/banners             | Layout shift on load | Reserve fixed space                     |
+| Late-loading components         | Layout reflowing     | Use skeleton placeholders               |
 
 ---
 
@@ -494,6 +514,7 @@ body {
 ```
 
 **Stale data guidelines:**
+
 - Show "last updated" timestamp for cached data
 - Provide manual refresh option
 - Auto-refresh when connection restores
@@ -502,13 +523,13 @@ body {
 
 ### Offline-Capable Actions
 
-| Action Type | Offline Behavior |
-|-------------|-----------------|
-| Read cached data | Show with "offline" indicator |
-| Create new items | Queue locally, sync when online |
-| Edit existing items | Queue changes, show "pending sync" |
-| Delete items | Mark as "pending delete", hide from view |
-| Search | Search local cache only, note limitation |
+| Action Type         | Offline Behavior                         |
+| ------------------- | ---------------------------------------- |
+| Read cached data    | Show with "offline" indicator            |
+| Create new items    | Queue locally, sync when online          |
+| Edit existing items | Queue changes, show "pending sync"       |
+| Delete items        | Mark as "pending delete", hide from view |
+| Search              | Search local cache only, note limitation |
 
 ### Sync Status Indicators
 
@@ -529,12 +550,12 @@ body {
 
 ```html
 <!-- Prefetch likely next pages -->
-<link rel="prefetch" href="/dashboard">
-<link rel="prefetch" href="/api/user-data.json">
+<link rel="prefetch" href="/dashboard" />
+<link rel="prefetch" href="/api/user-data.json" />
 
 <!-- Preload critical resources -->
-<link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="preload" href="/hero.jpg" as="image">
+<link rel="preload" href="/fonts/main.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="preload" href="/hero.jpg" as="image" />
 ```
 
 ### Hover Prefetch
@@ -558,29 +579,29 @@ document.querySelectorAll('a[data-prefetch]').forEach(link => {
 
 ### Prefetch Strategy Decision
 
-| Signal | Action |
-|--------|--------|
-| User hovers over link | Prefetch page |
-| User types in search | Prefetch top results |
-| User reaches 80% of list | Prefetch next page |
-| User is on step 2 of 4 | Prefetch step 3 resources |
-| Viewport approaches lazy content | Prefetch images |
+| Signal                           | Action                    |
+| -------------------------------- | ------------------------- |
+| User hovers over link            | Prefetch page             |
+| User types in search             | Prefetch top results      |
+| User reaches 80% of list         | Prefetch next page        |
+| User is on step 2 of 4           | Prefetch step 3 resources |
+| Viewport approaches lazy content | Prefetch images           |
 
 ---
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Instant response | < 100ms | No loading indicator needed |
-| Skeleton threshold | > 300ms | Show skeleton after this delay |
-| Toast error display | >= 5s | Longer than success toasts |
-| CLS target | < 0.1 | Core Web Vitals "good" |
-| LCP target | < 2.5s | Largest Contentful Paint |
-| FID target | < 100ms | First Input Delay |
-| INP target | < 200ms | Interaction to Next Paint |
-| Optimistic rollback | < 5s | Show error if no confirmation |
-| Prefetch hover delay | 65ms | Wait before prefetching |
+| Metric               | Value   | Context                        |
+| -------------------- | ------- | ------------------------------ |
+| Instant response     | < 100ms | No loading indicator needed    |
+| Skeleton threshold   | > 300ms | Show skeleton after this delay |
+| Toast error display  | >= 5s   | Longer than success toasts     |
+| CLS target           | < 0.1   | Core Web Vitals "good"         |
+| LCP target           | < 2.5s  | Largest Contentful Paint       |
+| FID target           | < 100ms | First Input Delay              |
+| INP target           | < 200ms | Interaction to Next Paint      |
+| Optimistic rollback  | < 5s    | Show error if no confirmation  |
+| Prefetch hover delay | 65ms    | Wait before prefetching        |
 
 ---
 

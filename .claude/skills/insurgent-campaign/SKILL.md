@@ -34,9 +34,9 @@ Empirical spine:
 
 - Academic field experiments show digital ad ROI confidence intervals are so wide that most
   campaigns cannot be statistically distinguished from zero lift (Lewis & Rao, "The
-  Unfavorable Economics of Measuring the Returns to Advertising," *Quarterly Journal of
-  Economics* 2015). Meta and Google both ship Conversion Lift / Brand Lift tools precisely
-  because *they* distinguish attributed conversions from incremental conversions — the
+  Unfavorable Economics of Measuring the Returns to Advertising," _Quarterly Journal of
+  Economics_ 2015). Meta and Google both ship Conversion Lift / Brand Lift tools precisely
+  because _they_ distinguish attributed conversions from incremental conversions — the
   platforms' own tooling is the tacit admission that dashboard ROAS is not causal.
 - Across 18,000+ brands, CPA rose in 13/14 industries in 2025; ROAS fell in 13/14; conversion
   rates fell in 13/14. More money is buying fewer results.
@@ -48,8 +48,8 @@ Empirical spine:
   communications apparatus with foreign support), the side with near-zero paid media won a
   parliamentary supermajority in Hungary in April 2026 — see `references/hungarian-case-study.md`.
 
-The same curve bends commercial advertising. The skill treats paid as an *amplifier of proven
-organic winners*, never as a standalone channel.
+The same curve bends commercial advertising. The skill treats paid as an _amplifier of proven
+organic winners_, never as a standalone channel.
 
 ## When to Apply This Skill
 
@@ -99,6 +99,7 @@ fires, take the declared action rather than improvising.
 ### Stage 1 — Interview / Brief Capture
 
 **Contract**
+
 - Inputs: user's initial brief (free text, any length).
 - Outputs: Section 0 (Assumptions table) under Mode C; mode-tag (A/B/C) and the 8 fields captured in working memory for downstream stages.
 - Preconditions: none (entry stage).
@@ -153,24 +154,24 @@ Instead:
    surfaced in an **Assumptions table** at the top of the final deliverable (Stage
    5 output). The user can confirm or adjust inline after reading the plan:
 
-   | Field | Default under terse brief |
-   |---|---|
-   | Competition (specifics) | Abstract — "cohort-based courses in the category," "mid-size SaaS competitors," etc. Use the heuristic questions in `references/asymmetry-audit-table.md` to classify asymmetry qualitatively. Never invent specific competitor names. |
-   | Existing channels / traction | "Starting from zero" unless the user's brief, working directory, or CLAUDE.md clearly indicates an existing newsletter, community, or follower base. |
-   | Bottleneck | Trust (the 2025–2026 default for almost every underdog campaign). |
-   | Time window | 60 days to a single dated anchor moment (event, launch, election), then recurring cadence. |
-   | Capacity | 6h/week. |
+   | Field                        | Default under terse brief                                                                                                                                                                                                              |
+   | ---------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+   | Competition (specifics)      | Abstract — "cohort-based courses in the category," "mid-size SaaS competitors," etc. Use the heuristic questions in `references/asymmetry-audit-table.md` to classify asymmetry qualitatively. Never invent specific competitor names. |
+   | Existing channels / traction | "Starting from zero" unless the user's brief, working directory, or CLAUDE.md clearly indicates an existing newsletter, community, or follower base.                                                                                   |
+   | Bottleneck                   | Trust (the 2025–2026 default for almost every underdog campaign).                                                                                                                                                                      |
+   | Time window                  | 60 days to a single dated anchor moment (event, launch, election), then recurring cadence.                                                                                                                                             |
+   | Capacity                     | 6h/week.                                                                                                                                                                                                                               |
 
 3. **Escalation rule.** If a missing field would materially change the Stage 3
-   asymmetry classification *or* the Stage 4 primary-function choice, do not
+   asymmetry classification _or_ the Stage 4 primary-function choice, do not
    default it — add it to the question batch. Example: if the user mentions
    "our whole team is posting already" but does not specify which channels,
    ask, because it changes the channel stack.
 
 4. **Assumptions table is mandatory under Mode C.** Open the final deliverable
    with a table listing every defaulted field and its assumed value. End the
-   deliverable with: *"Confirm or adjust any row in the Assumptions table and I
-   will re-run the affected stages."*
+   deliverable with: _"Confirm or adjust any row in the Assumptions table and I
+   will re-run the affected stages."_
 
 #### The 8 Fields
 
@@ -181,7 +182,7 @@ Regardless of mode, the campaign plan is grounded in these 8 fields:
    ask-once in Mode C.)
 2. **Audience** — who is the target, with enough specificity to picture them.
    (Ask-once in Mode C.)
-3. **Competition / incumbent** — name 3–5 specific competitors, *or* say "unknown"
+3. **Competition / incumbent** — name 3–5 specific competitors, _or_ say "unknown"
    / "I'll describe them abstractly." If unknown, stay at category level and use
    `references/asymmetry-audit-table.md` heuristics. Never invent names.
    (Defaults in Mode C; user can sharpen in the Assumptions confirmation.)
@@ -201,6 +202,7 @@ Regardless of mode, the campaign plan is grounded in these 8 fields:
 ### Stage 2 — Ideation (generate 5+ campaign concepts across archetypes)
 
 **Contract**
+
 - Inputs: 8 fields from Stage 1 (especially sector, audience, competition descriptor).
 - Outputs: Section 1 (Campaign Ideas) with ≥5 concepts across distinct archetypes; an explicit ask to the user to pick one or more.
 - Preconditions: Stage 1 complete; sector field has a value (named or `other`).
@@ -217,8 +219,8 @@ early. The point is to give the user a shaped menu to choose from.
 For each concept, produce:
 
 - **Name** — short, memorable, in the user's voice.
-- **One-line thesis** — why this campaign works for *this* user against *this* competitor
-  *right now*.
+- **One-line thesis** — why this campaign works for _this_ user against _this_ competitor
+  _right now_.
 - **Archetype** — which archetype it draws from (e.g., founder-story arc, counter-narrative,
   earned-media stunt, referral flywheel, community-build, coalition play).
 - **Primary channel tier** — which tier from `references/channel-tier-stack.md` this
@@ -239,7 +241,7 @@ from the category description rather than the brief — violate the Stage 1 anti
 rule and must not appear in Stage 2 output. This applies equally to SEO keyword lists,
 earned-media pitch hooks, and any downstream section that inherits the concept name.
 
-**Industry-peer rule.** The anti-fabrication rule covers *any* competitor name absent
+**Industry-peer rule.** The anti-fabrication rule covers _any_ competitor name absent
 from the brief — not only invented names, but widely-known industry peers to a
 brief-named incumbent. If the brief names one dominant player (e.g., the user says
 "we're outspent 100x by [market leader]"), do **not** add the obvious #2 or #3 from
@@ -258,6 +260,7 @@ Stage 3–5.
 ### Stage 3 — Asymmetry Audit
 
 **Contract**
+
 - Inputs: budget (user's + competitor's), or heuristic answers from `references/asymmetry-audit-table.md`; the concept(s) the user selected from Stage 2.
 - Outputs: Section 3 (Spend Asymmetry Verdict) — one-sentence classification + preconditions score (0–6).
 - Preconditions: Stage 2 complete; user has named one or more concepts to push forward.
@@ -314,6 +317,7 @@ Score 0–6. Tell the user the count plainly and what it implies:
 ### Stage 3a — Message-Market-Fit Gate
 
 **Contract**
+
 - Inputs: three yes/no signals (revenue/commitment, audience-language, close) from the user.
 - Outputs: Section 3a (3 signals + 0–3 score + explicit verdict).
 - Preconditions: Stage 3 complete.
@@ -348,18 +352,18 @@ Scoring:
 - **3/3 — MMF confirmed.** The campaign is a distribution problem. Proceed to
   Stage 4.
 - **2/3 — Borderline.** Name the weak link and insert a **1–2 week validation
-  cycle** into the plan as a pre-campaign task *before* running the full Stage
+  cycle** into the plan as a pre-campaign task _before_ running the full Stage
   4–5 playbook. Examples: if question 2 fails, do 5 customer discovery
   conversations and extract the language; if question 1 fails, run a paid
   waitlist or pre-order test. Revisit the MMF gate after the validation cycle.
 - **0–1/3 — Refuse the full campaign plan.** MMF is the bottleneck, not
   distribution. Route the user to a discovery cycle: 5 structured customer
   conversations, a pre-order or paid-waitlist test, a small-room live demo.
-  Explain plainly: *"The insurgent playbook scales trust. It cannot
+  Explain plainly: _"The insurgent playbook scales trust. It cannot
   manufacture demand for a product, event, or cause people do not already
   want. Running a full campaign now will burn the volunteer/community energy
   that Stage 5 depends on. Come back when at least 2/3 of these signals are
-  present."* Do not soften this. Do not produce the full Stage 4–5 deliverable.
+  present."_ Do not soften this. Do not produce the full Stage 4–5 deliverable.
 
 Report the MMF verdict at the top of the Stage 3 section of the final output so
 the user sees it before the channel stack.
@@ -367,6 +371,7 @@ the user sees it before the channel stack.
 ### Stage 4 — Channel Tier Stack + 70/30 Allocation
 
 **Contract**
+
 - Inputs: bottleneck (Stage 1 Q6), sector (Stage 1 Q1), asymmetry verdict (Stage 3), MMF verdict (Stage 3a).
 - Outputs: Section 4 (Channel Tier Stack) + Section 5 (70/30 or 80/20 Allocation).
 - Preconditions: Stage 3a verdict is `3/3 proceed` OR `2/3 with validation cycle attached`. **If verdict is `0–1/3 refuse`, this stage MUST NOT execute.**
@@ -385,7 +390,7 @@ against the user's bottleneck (from Stage 1 Q6). Use the function table at the t
   Leads with non-brand Google Search, SEO, directory presence. Never brand-keyword
   bidding without a lift test (see Stage 5).
 - **Paid amplification** — bottleneck is "our organic content works but reaches too few
-  people." Primary function only *after* organic winners exist (24–48h traction gate).
+  people." Primary function only _after_ organic winners exist (24–48h traction gate).
   Leads with retargeting, warm lookalikes, Spark Ads on proven TikTok content.
 - **Trust compounding** — bottleneck is "people find us, sometimes click, but don't
   convert, refer, or come back." Primary function for the majority of underdog
@@ -396,7 +401,7 @@ A mild-asymmetry user with a trust bottleneck should not be routed to paid ampli
 just because they can afford it. Route by function first; allocate within that function
 by cost/asymmetry second.
 
-**Apply the sector rider.** After the function choice but *before* allocation, open
+**Apply the sector rider.** After the function choice but _before_ allocation, open
 `references/sector-riders.md` and apply the rider matching the user's sector
 (captured in Stage 1). The rider adjusts:
 
@@ -411,7 +416,7 @@ by cost/asymmetry second.
   underperforms when misapplied, which becomes a standing warning in Stage 5's
   anti-vanity dashboard.
 
-Do not overwrite the function-first choice. The rider *layers on top*. If the
+Do not overwrite the function-first choice. The rider _layers on top_. If the
 rider and the function choice conflict (e.g., B2B SaaS rider biases toward
 founder-LinkedIn but the function choice is demand capture), surface the conflict
 and name both paths rather than collapsing to one.
@@ -453,6 +458,7 @@ banned-token discipline does not relax downstream of Stage 2.
 ### Stage 5 — Shape Menu + Competitor Saturation Map
 
 **Contract**
+
 - Inputs: selected concept (Stage 2), channel stack + allocation (Stage 4).
 - Outputs: Section 6 (Competitor Saturation Map) + Section 7 (Three Alternative Campaign Shapes). **No other sections.**
 - Preconditions: Stage 4 complete; allocation stated.
@@ -467,7 +473,7 @@ Stage 5 ends with the user picking one of the three shapes; do not generate any
 of the Stage 5b output (`## 8`–`## 11`) until the selection has been made.
 
 1. **Competitor saturation map.** Before shapes, before ad copy, before anything: for
-   each of the top 2 named competitors (or top 2 competitor *categories* if the user did
+   each of the top 2 named competitors (or top 2 competitor _categories_ if the user did
    not name specific ones — see Principles), produce:
 
    (a) **What they saturate** — the channels, visual style, message tropes, production
@@ -476,7 +482,7 @@ of the Stage 5b output (`## 8`–`## 11`) until the selection has been made.
    media ads."
 
    (b) **The absence that becomes your signal.** What is the competitor doing that your
-   *refusal* to do becomes the positioning? Worked examples:
+   _refusal_ to do becomes the positioning? Worked examples:
    - "Fidesz saturated billboards → Tisza's absence from billboards was the message."
    - "Cohort bootcamps saturate paid LinkedIn funnels + affiliate links → our refusal
      to advertise and our free open curriculum is the message."
@@ -487,9 +493,9 @@ of the Stage 5b output (`## 8`–`## 11`) until the selection has been made.
    campaign. This is the single sentence every piece of content must reinforce.
 
 2. **Three alternative campaign shapes** for executing the concept, with tradeoffs. Examples
-   of shapes: *community-first* (start with 100 real people, grow through word of mouth),
-   *earned-media-first* (one newsworthy action drives press + organic amplification),
-   *search-capture-first* (dominate long-tail high-intent queries where demand already
+   of shapes: _community-first_ (start with 100 real people, grow through word of mouth),
+   _earned-media-first_ (one newsworthy action drives press + organic amplification),
+   _search-capture-first_ (dominate long-tail high-intent queries where demand already
    exists). Use the `alternative-generator` pattern — do not collapse to one recommendation
    prematurely; let the user choose. Each shape must include at least one flagship piece
    of content structured as **Self / Us / Now** (Marshall Ganz's organizing framework —
@@ -500,8 +506,8 @@ of the Stage 5b output (`## 8`–`## 11`) until the selection has been made.
 
 **Stop point.** Output only sections `## 6` (Competitor Saturation Map) and `## 7`
 (Three Alternative Campaign Shapes), then end the turn with an explicit request:
-*"Pick one of the three shapes (or ask me to revise them) and I will produce the
-First-30-Days plan, ad copy, lift-test, and anti-vanity dashboard."* Do not
+_"Pick one of the three shapes (or ask me to revise them) and I will produce the
+First-30-Days plan, ad copy, lift-test, and anti-vanity dashboard."_ Do not
 generate `## 8`–`## 11` until the user names a shape. If the user's initial brief
 already pre-selected a shape (rare), confirm that selection in one sentence and
 proceed to Stage 5b.
@@ -509,7 +515,8 @@ proceed to Stage 5b.
 ### Stage 5b — Selected-Shape Plan
 
 **Contract**
-- Inputs: the *one* shape the user selected from Stage 5; capacity (Stage 1 Q8); paid-channel role from Stage 4 allocation.
+
+- Inputs: the _one_ shape the user selected from Stage 5; capacity (Stage 1 Q8); paid-channel role from Stage 4 allocation.
 - Outputs: Section 8 (First-30-Days Action List) + Section 9 (Ad Copy + Boost Rules, only if paid applies) + Section 10 (Lift-Test / Measurement Plan) + Section 11 (Anti-Vanity Metric Dashboard).
 - Preconditions: Stage 5 complete AND a specific shape has been named by the user (by index or name).
 - Postconditions: 30-day plan fits within stated capacity ceiling (cuts named if not); a single named lift-test template selected; track/ignore metrics enumerated.
@@ -522,7 +529,7 @@ proceed to Stage 5b.
 
 Begin only after the user has picked one of the three shapes from Stage 5. If no
 selection has been received, ask for it and stop. The four items below are
-produced against the *one* selected shape — not all three.
+produced against the _one_ selected shape — not all three.
 
 1. **First-30-days action list** — concrete weekly actions for weeks 1–4, mapped to the chosen
    shape. Each action has an owner (if multiple people), an effort estimate, and a clear
@@ -538,7 +545,7 @@ produced against the *one* selected shape — not all three.
    **Earned-media actions must be specific or flagged.** Every earned-media action in
    the list must include:
    - (a) A **named target** (e.g., "Latent Space podcast, The Pragmatic Engineer
-     newsletter"), *or* an explicit "target TBD — research is the week-1 action" flag.
+     newsletter"), _or_ an explicit "target TBD — research is the week-1 action" flag.
      Never pitch "5 podcasts in the niche" without naming them; that is not an action,
      that is a wish.
    - (b) A **one-sentence pitch hook** matched to the target's recent content — not a
@@ -568,7 +575,7 @@ produced against the *one* selected shape — not all three.
    - **Month 2+:** budget 3–4h/week sustained — moderation, weekly post, member welcomes,
      pruning dead accounts. Underinvest and the community dies.
 
-2. **Ad copy + boost rules** — *only* if paid has a role in the chosen stack:
+2. **Ad copy + boost rules** — _only_ if paid has a role in the chosen stack:
    - Creative direction in the user's authentic voice (see `references/authenticity-playbook.md`).
    - The explicit **24–48h organic traction gate**: do not boost a post until it has
      demonstrated genuine organic signal (saves, shares, sustained watch time, thread-depth
@@ -580,7 +587,7 @@ produced against the *one* selected shape — not all three.
    - **Do not bid on your own brand-name keywords without a lift test.** Blake, Nosko &
      Tadelis's eBay field experiment (2015) found weak or no incremental lift from brand-
      keyword bidding — the traffic arrives organically anyway. Platform-reported ROAS on
-     brand keywords is always excellent *because* the traffic would have converted
+     brand keywords is always excellent _because_ the traffic would have converted
      regardless. This is one of the most reliable ways established brands waste paid
      budget. If the user is already bidding on their own brand, require a
      brand-keyword holdout test (Template 5 in `references/lift-test-templates.md`)
@@ -596,10 +603,10 @@ produced against the *one* selected shape — not all three.
    - **Zero budget:** Template 6 (organic-source attribution) — directional, UTM-tagged,
      30-day window, per-channel conversion-rate ranking, cut-the-bottom-20%-reinvest-
      in-the-top decision rule.
-   Specify:
+     Specify:
    - The hypothesis (paid channel X drives incremental action Y on top of organic
-     baseline — or, for Template 6, *"channel X outperforms channel Y on conversion rate
-     per unique visitor"*).
+     baseline — or, for Template 6, _"channel X outperforms channel Y on conversion rate
+     per unique visitor"_).
    - Control vs. test group definition (or channel-comparison definition for Template 6).
    - Holdout percentage, duration, and minimum sample size.
    - The incremental metric (not attributed; not platform-reported ROAS). For Template 6,
@@ -664,14 +671,14 @@ Produce the final deliverable in this exact order so the user can scan it and ac
 **Completeness — do not compress the final deliverable.** This is the payload, not a
 summary of it; the user should never have to run follow-up rounds to pull out the full
 plan. Fill every applicable section in full prose, not headline fragments. For each
-recommendation include the *why* — the mechanism, the tradeoff, the diminishing-returns
+recommendation include the _why_ — the mechanism, the tradeoff, the diminishing-returns
 or authenticity logic behind it — not just the conclusion; the reasoning is what lets the
 user hold the discipline after the run ends. Concretely: each campaign concept carries its
 full thesis + archetype + primary tier + authenticity hook + MVP; the channel stack names
 weekly effort per channel; the action list spells out week-by-week actions with the cuts
 named; the lift test states hypothesis, control/test groups, duration, incremental metric,
-and decision threshold. Brevity in *structure* (scannable headings, tables) is the goal;
-brevity in *content* is a failure. If a section does not apply (e.g. no paid in the stack),
+and decision threshold. Brevity in _structure_ (scannable headings, tables) is the goal;
+brevity in _content_ is a failure. If a section does not apply (e.g. no paid in the stack),
 state why in one line rather than dropping it silently.
 
 ## Principles to Hold Throughout
@@ -711,8 +718,8 @@ state why in one line rather than dropping it silently.
   refuse the full campaign plan and route the user to a discovery / validation cycle.
   Running a full insurgent campaign against a broken offer burns the volunteer,
   community, and founder-attention capital the playbook depends on.
-- **Do not over-generalize the Hungarian case.** Organic beats paid saturation *when
-  preconditions are present*: credible insider, accumulated grievance, consolidated
+- **Do not over-generalize the Hungarian case.** Organic beats paid saturation _when
+  preconditions are present_: credible insider, accumulated grievance, consolidated
   challenger, felt pain, threshold-rewarding system, overplayed incumbent. Absent most of
   these, the playbook alone will not win — name the missing preconditions and recommend
   building them first.
@@ -731,27 +738,27 @@ state why in one line rather than dropping it silently.
 One-page summary of the per-stage Contracts above. Use this when reviewing an
 output to check whether a declared failure-mode action was actually taken.
 
-| Stage | Trigger | Required action |
-|---|---|---|
-| 1 | Always-capture field missing under Mode C | Ask in the question batch; do not default silently |
-| 1 | Missing field changes Stage 3 / Stage 4 outcome | Escalate into the batch even if normally defaulted |
-| 2 | Competitor unnamed in brief | Use `[incumbent]` / category descriptor; never invent |
-| 2 | Cannot generate 5 distinct archetypes | Say so; present what you have; do not pad |
-| 3 | Preconditions score 0–2 | Refuse full playbook; route to building preconditions |
-| 3 | Asymmetry numbers absent | Ask heuristic questions; do not assume a level |
-| 3a | **MMF score 0–1/3** | **Produce only Section 3a + refusal; STOP — do not generate Sections 4–11** |
-| 3a | MMF score 2/3 | Insert validation cycle before Section 4 |
-| 3a | User does not know a signal | Treat as a "no" |
-| 4 | Categorical asymmetry + broad cold-paid request | Refuse; route to Tier 1/2 + counter-positioning |
-| 4 | Sector = `other` | Flag rider mismatch; proceed with closest rider |
-| 4 | Function ↔ sector-rider conflict | Surface both paths; do not collapse silently |
-| 5 | **End of stage without shape selection** | **Repeat the ask; STOP — do not produce Sections 8–11** |
-| 5 | User cannot tell Self-story | Drop founder-led shape; route to community / earned-media / search |
-| 5b | Entered without named shape | Ask for selection; do not produce any Section 8–11 |
-| 5b | Drafted effort exceeds capacity | Cut lowest-ROI actions; name the cuts |
-| 5b | Earned-media targets unknown | Flag week-1 research with method; do not invent outlets |
-| 5b | Paid does not apply in stack | Omit Section 9; do not produce placeholder copy |
-| 5b | Categorical asymmetry + paid in stack | Produce counter-positioning refusal in Section 9, not cold-paid creative |
+| Stage | Trigger                                         | Required action                                                             |
+| ----- | ----------------------------------------------- | --------------------------------------------------------------------------- |
+| 1     | Always-capture field missing under Mode C       | Ask in the question batch; do not default silently                          |
+| 1     | Missing field changes Stage 3 / Stage 4 outcome | Escalate into the batch even if normally defaulted                          |
+| 2     | Competitor unnamed in brief                     | Use `[incumbent]` / category descriptor; never invent                       |
+| 2     | Cannot generate 5 distinct archetypes           | Say so; present what you have; do not pad                                   |
+| 3     | Preconditions score 0–2                         | Refuse full playbook; route to building preconditions                       |
+| 3     | Asymmetry numbers absent                        | Ask heuristic questions; do not assume a level                              |
+| 3a    | **MMF score 0–1/3**                             | **Produce only Section 3a + refusal; STOP — do not generate Sections 4–11** |
+| 3a    | MMF score 2/3                                   | Insert validation cycle before Section 4                                    |
+| 3a    | User does not know a signal                     | Treat as a "no"                                                             |
+| 4     | Categorical asymmetry + broad cold-paid request | Refuse; route to Tier 1/2 + counter-positioning                             |
+| 4     | Sector = `other`                                | Flag rider mismatch; proceed with closest rider                             |
+| 4     | Function ↔ sector-rider conflict                | Surface both paths; do not collapse silently                                |
+| 5     | **End of stage without shape selection**        | **Repeat the ask; STOP — do not produce Sections 8–11**                     |
+| 5     | User cannot tell Self-story                     | Drop founder-led shape; route to community / earned-media / search          |
+| 5b    | Entered without named shape                     | Ask for selection; do not produce any Section 8–11                          |
+| 5b    | Drafted effort exceeds capacity                 | Cut lowest-ROI actions; name the cuts                                       |
+| 5b    | Earned-media targets unknown                    | Flag week-1 research with method; do not invent outlets                     |
+| 5b    | Paid does not apply in stack                    | Omit Section 9; do not produce placeholder copy                             |
+| 5b    | Categorical asymmetry + paid in stack           | Produce counter-positioning refusal in Section 9, not cold-paid creative    |
 
 ## References (read when relevant)
 

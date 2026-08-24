@@ -46,11 +46,11 @@ ANALYSIS REQUIRED:
 1. Does this fact duplicate existing content?
    - Check all relevant arrays (dosing_protocols, mechanism_claims, interpretation_patterns, etc.)
    - Consider: same claim with same or lower confidence = duplicate
-   
+
 2. Does this fact conflict with existing content?
    - Check for contradictory claims about same target/topic
    - Consider: different dosing for same indication, opposite effects on same target
-   
+
 3. Is this genuinely new information to append?
    - New protocol for different indication
    - New mechanism claim for different target
@@ -81,6 +81,7 @@ OUTPUT as JSON:
 ## Example: New Protocol (Append)
 
 **Input:**
+
 ```
 EXISTING NODE (rapamycin):
 {
@@ -107,6 +108,7 @@ NEW FACT:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "append",
@@ -122,6 +124,7 @@ NEW FACT:
 ## Example: Duplicate (Skip)
 
 **Input:**
+
 ```
 EXISTING NODE (rapamycin):
 {
@@ -150,6 +153,7 @@ NEW FACT:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "skip_duplicate",
@@ -165,6 +169,7 @@ NEW FACT:
 ## Example: Conflict Detected
 
 **Input:**
+
 ```
 EXISTING NODE (rapamycin):
 {
@@ -190,6 +195,7 @@ NEW FACT:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "flag_conflict",
@@ -209,6 +215,7 @@ NEW FACT:
 ## Example: Update Confidence
 
 **Input:**
+
 ```
 EXISTING NODE (metformin):
 {
@@ -237,6 +244,7 @@ NEW FACT:
 ```
 
 **Output:**
+
 ```json
 {
   "decision": "update_confidence",
@@ -254,21 +262,25 @@ NEW FACT:
 The LLM should consider these patterns as potential conflicts:
 
 ### Directional Conflicts
+
 - "inhibits X" vs "activates X"
 - "increases Y" vs "decreases Y"
 - "beneficial for Z" vs "harmful for Z"
 
 ### Numeric Conflicts
+
 - Different doses for same indication (5mg vs 10mg weekly for longevity)
 - Different optimal ranges for same context (IGF-1: 150-250 vs 100-180)
 - Different frequencies (daily vs weekly for same dose)
 
 ### Contextual Conflicts
+
 - Same claim but different patient populations
 - Different timeframes (acute vs chronic effects)
 - Different routes of administration
 
 ### Temporal Conflicts
+
 - "Early initiation recommended" vs "Start only after X"
 - "Short-term use only" vs "Indefinite use appropriate"
 

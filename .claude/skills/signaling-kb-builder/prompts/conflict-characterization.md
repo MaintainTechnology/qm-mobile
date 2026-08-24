@@ -91,6 +91,7 @@ OUTPUT as JSON:
 ## Example: Temporal Complementarity
 
 **Input:**
+
 ```
 CLAIM A:
 {
@@ -114,6 +115,7 @@ TOPIC: rapamycin effect on PGC-1alpha
 ```
 
 **Output:**
+
 ```json
 {
   "conflict_id": "conflict_rapa_pgc1a_temporal_001",
@@ -150,6 +152,7 @@ TOPIC: rapamycin effect on PGC-1alpha
 ## Example: True Numeric Conflict
 
 **Input:**
+
 ```
 CLAIM A:
 {
@@ -171,6 +174,7 @@ TOPIC: Optimal IGF-1 range for longevity
 ```
 
 **Output:**
+
 ```json
 {
   "conflict_id": "conflict_igf1_range_longevity_001",
@@ -208,6 +212,7 @@ TOPIC: Optimal IGF-1 range for longevity
 ## Example: Contextual Compatibility
 
 **Input:**
+
 ```
 CLAIM A:
 {
@@ -227,6 +232,7 @@ TOPIC: Rapamycin dosing for longevity
 ```
 
 **Output:**
+
 ```json
 {
   "conflict_id": "conflict_rapa_dose_context_001",
@@ -263,34 +269,46 @@ TOPIC: Rapamycin dosing for longevity
 ## Conflict Types Reference
 
 ### Directional
+
 One claims X increases Y, other claims X decreases Y.
+
 - Often indicates different experimental conditions
 - May be dose-dependent, time-dependent, or cell-type specific
 
 ### Numeric
+
 Same metric, different values.
+
 - Different optimal ranges
 - Different recommended doses
 - Different thresholds for intervention
 
 ### Contextual
+
 Same recommendation, different contexts claimed.
+
 - Usually not true conflicts
 - May be stored as separate context-specific entries
 
 ### Temporal
+
 Different effects at different timeframes.
+
 - Acute vs chronic effects
 - Early vs late treatment
 - Often complementary rather than contradictory
 
 ### Evidence Grade
+
 Same claim, different confidence.
+
 - Usually resolved by updating to higher confidence
 - Only flag if confidence difference is dramatic with different implications
 
 ### Definitional
+
 Different definitions of the same term.
+
 - May indicate domain-specific usage
 - Flag for terminology standardization
 

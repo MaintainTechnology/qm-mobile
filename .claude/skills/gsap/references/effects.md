@@ -28,11 +28,11 @@ Reveal text character by character using GSAP's TextPlugin.
 ### Basic Typewriter
 
 ```js
-const text = "Hello, world!";
+const text = 'Hello, world!';
 const cps = 10; // chars per second: 3-5 dramatic, 8-12 conversational, 15-20 energetic
 tl.to(
-  "#typed-text",
-  { text: { value: text }, duration: text.length / cps, ease: "none" },
+  '#typed-text',
+  { text: { value: text }, duration: text.length / cps, ease: 'none' },
   startTime,
 );
 ```
@@ -75,9 +75,9 @@ Three rules:
 Pattern: blink → solid (typing starts) → type → solid → blink (typing done).
 
 ```js
-tl.call(() => cursor.classList.replace("cursor-blink", "cursor-solid"), [], startTime);
-tl.to("#typed-text", { text: { value: text }, duration: dur, ease: "none" }, startTime);
-tl.call(() => cursor.classList.replace("cursor-solid", "cursor-blink"), [], startTime + dur);
+tl.call(() => cursor.classList.replace('cursor-blink', 'cursor-solid'), [], startTime);
+tl.to('#typed-text', { text: { value: text }, duration: dur, ease: 'none' }, startTime);
+tl.call(() => cursor.classList.replace('cursor-solid', 'cursor-blink'), [], startTime + dur);
 ```
 
 ### Backspacing
@@ -120,16 +120,16 @@ Type → hold → backspace → next word. Cursor blinks during every idle momen
 words.forEach((word, i) => {
   const typeDur = word.length / 10;
   // Solid while typing
-  tl.call(() => cursor.classList.replace("cursor-blink", "cursor-solid"), [], offset);
-  tl.to("#typed-text", { text: { value: word }, duration: typeDur, ease: "none" }, offset);
+  tl.call(() => cursor.classList.replace('cursor-blink', 'cursor-solid'), [], offset);
+  tl.to('#typed-text', { text: { value: word }, duration: typeDur, ease: 'none' }, offset);
   // Blink during hold
-  tl.call(() => cursor.classList.replace("cursor-solid", "cursor-blink"), [], offset + typeDur);
+  tl.call(() => cursor.classList.replace('cursor-solid', 'cursor-blink'), [], offset + typeDur);
   offset += typeDur + 1.5; // hold
 
   if (i < words.length - 1) {
-    tl.call(() => cursor.classList.replace("cursor-blink", "cursor-solid"), [], offset);
+    tl.call(() => cursor.classList.replace('cursor-blink', 'cursor-solid'), [], offset);
     const clearDur = backspace(tl, el, word, offset, 20);
-    tl.call(() => cursor.classList.replace("cursor-solid", "cursor-blink"), [], offset + clearDur);
+    tl.call(() => cursor.classList.replace('cursor-solid', 'cursor-blink'), [], offset + clearDur);
     offset += clearDur + 0.3;
   }
 });
@@ -140,11 +140,11 @@ words.forEach((word, i) => {
 Build a sentence word-by-word into the same element:
 
 ```js
-let accumulated = "";
-words.forEach((word) => {
-  const target = accumulated + (accumulated ? " " : "") + word;
+let accumulated = '';
+words.forEach(word => {
+  const target = accumulated + (accumulated ? ' ' : '') + word;
   const newChars = target.length - accumulated.length;
-  tl.to("#typed-text", { text: { value: target }, duration: newChars / 10, ease: "none" }, offset);
+  tl.to('#typed-text', { text: { value: target }, duration: newChars / 10, ease: 'none' }, offset);
   accumulated = target;
   offset += newChars / 10 + 0.3;
 });
@@ -157,17 +157,17 @@ When handing off between typewriter lines: hide previous → blink new → pause
 ```js
 tl.call(
   () => {
-    prevCursor.classList.replace("cursor-blink", "cursor-hide");
-    nextCursor.classList.replace("cursor-hide", "cursor-blink");
+    prevCursor.classList.replace('cursor-blink', 'cursor-hide');
+    nextCursor.classList.replace('cursor-hide', 'cursor-blink');
   },
   [],
   handoffTime,
 );
 
 const typeStart = handoffTime + 0.5; // brief blink pause
-tl.call(() => nextCursor.classList.replace("cursor-blink", "cursor-solid"), [], typeStart);
-tl.to("#next-text", { text: { value: text }, duration: dur, ease: "none" }, typeStart);
-tl.call(() => nextCursor.classList.replace("cursor-solid", "cursor-blink"), [], typeStart + dur);
+tl.call(() => nextCursor.classList.replace('cursor-blink', 'cursor-solid'), [], typeStart);
+tl.to('#next-text', { text: { value: text }, duration: dur, ease: 'none' }, typeStart);
+tl.call(() => nextCursor.classList.replace('cursor-solid', 'cursor-blink'), [], typeStart + dur);
 ```
 
 ### Timing Guide
@@ -210,13 +210,11 @@ Requires ffmpeg and numpy.
 
 ```js
 // Option A: inline (small files, under ~500KB)
-var AUDIO_DATA = {
-  /* paste audio-data.json contents */
-};
+var AUDIO_DATA = {/* paste audio-data.json contents */};
 
 // Option B: sync XHR (large files — must be synchronous for deterministic timeline construction)
 var xhr = new XMLHttpRequest();
-xhr.open("GET", "audio-data.json", false);
+xhr.open('GET', 'audio-data.json', false);
 xhr.send();
 var AUDIO_DATA = JSON.parse(xhr.responseText);
 ```

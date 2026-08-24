@@ -15,7 +15,11 @@ export const Route = createRootRouteWithContext()({
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1' },
       { title: 'Acme Studio — Creative Agency for Bold Brands' },
-      { name: 'description', content: 'Acme Studio builds brand identities, websites, and campaigns that stand out. Based in NYC, working worldwide.' },
+      {
+        name: 'description',
+        content:
+          'Acme Studio builds brand identities, websites, and campaigns that stand out. Based in NYC, working worldwide.',
+      },
       { name: 'author', content: 'Acme Studio' },
       { name: 'theme-color', content: '#0A0A0A' },
       { name: 'robots', content: 'index, follow, max-image-preview:large' },
@@ -40,17 +44,22 @@ export const Route = createFileRoute('/services')({
   head: () => ({
     meta: [
       { title: 'Services — Acme Studio' },
-      { name: 'description', content: 'Brand identity, web design, and digital campaigns. See what Acme Studio can build for you.' },
+      {
+        name: 'description',
+        content:
+          'Brand identity, web design, and digital campaigns. See what Acme Studio can build for you.',
+      },
       { property: 'og:title', content: 'Services — Acme Studio' },
       { property: 'og:description', content: 'Brand identity, web design, and digital campaigns.' },
       { property: 'og:url', content: 'https://acme-studio.higgsfield.app/services' },
       { property: 'og:image', content: 'https://acme-studio.higgsfield.app/og-services.png' },
       { name: 'twitter:title', content: 'Services — Acme Studio' },
-      { name: 'twitter:description', content: 'Brand identity, web design, and digital campaigns.' },
+      {
+        name: 'twitter:description',
+        content: 'Brand identity, web design, and digital campaigns.',
+      },
     ],
-    links: [
-      { rel: 'canonical', href: 'https://acme-studio.higgsfield.app/services' },
-    ],
+    links: [{ rel: 'canonical', href: 'https://acme-studio.higgsfield.app/services' }],
   }),
   component: ServicesPage,
 });
@@ -80,11 +89,11 @@ All Higgsfield apps follow: `https://<slug>.higgsfield.app/<path>`
 
 ### Robots Directive
 
-| Page type | `robots` value |
-|---|---|
+| Page type                                      | `robots` value                           |
+| ---------------------------------------------- | ---------------------------------------- |
 | Public pages (homepage, services, about, blog) | `index, follow, max-image-preview:large` |
-| Auth pages, admin, dashboard | `noindex, nofollow` |
-| Legal (privacy, terms) | `index, nofollow` |
+| Auth pages, admin, dashboard                   | `noindex, nofollow`                      |
+| Legal (privacy, terms)                         | `index, nofollow`                        |
 
 Set the default in `__root.tsx`. Override per-route for protected pages.
 
@@ -92,13 +101,13 @@ Set the default in `__root.tsx`. Override per-route for protected pages.
 
 Map user input directly:
 
-| Intake field | Meta target |
-|---|---|
-| Brand / business name | `title` (brand part), `og:site_name`, `author` |
-| Purpose / tagline | `title` (tagline part), homepage `description` |
-| Primary service / product | Subpage `description` seed |
-| Brand color | `theme-color` |
-| Logo / hero image | `og:image` |
+| Intake field              | Meta target                                    |
+| ------------------------- | ---------------------------------------------- |
+| Brand / business name     | `title` (brand part), `og:site_name`, `author` |
+| Purpose / tagline         | `title` (tagline part), homepage `description` |
+| Primary service / product | Subpage `description` seed                     |
+| Brand color               | `theme-color`                                  |
+| Logo / hero image         | `og:image`                                     |
 
 ### Page metadata file (`app/src/app-meta.json`) + Cover video
 
@@ -108,12 +117,12 @@ website's feed/listing card on every deploy. Its keys:
 
 ```jsonc
 {
-  "og_title":       "…",   // browser <title> + og:title
-  "og_description": "…",   // meta description + og:description
-  "og_image_url":   "…",   // og:image + twitter:image (the feed card cover)
+  "og_title": "…", // browser <title> + og:title
+  "og_description": "…", // meta description + og:description
+  "og_image_url": "…", // og:image + twitter:image (the feed card cover)
   "marketplace_cover_url": "…", // plain (unmasked) cover art — marketplace/preview slot
-  "favicon_url":    "…",   // <link rel="icon">
-  "og_video_url":   "…"    // og:video — the COVER VIDEO (feed cards play it on hover)
+  "favicon_url": "…", // <link rel="icon">
+  "og_video_url": "…", // og:video — the COVER VIDEO (feed cards play it on hover)
 }
 ```
 
@@ -161,12 +170,7 @@ export const Route = createFileRoute('/robots')({
     handlers: {
       GET: async ({ request }) => {
         const origin = new URL(request.url).origin;
-        const body = [
-          'User-agent: *',
-          'Allow: /',
-          '',
-          `Sitemap: ${origin}/sitemap.xml`,
-        ].join('\n');
+        const body = ['User-agent: *', 'Allow: /', '', `Sitemap: ${origin}/sitemap.xml`].join('\n');
 
         return new Response(body, {
           status: 200,
@@ -237,12 +241,12 @@ export const Route = createFileRoute('/sitemap')({
         const today = new Date().toISOString().split('T')[0];
 
         const urls = ROUTES.map(
-          (r) => `  <url>
+          r => `  <url>
     <loc>${origin}${r.path === '/' ? '' : r.path}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>${r.changefreq}</changefreq>
     <priority>${r.priority}</priority>
-  </url>`
+  </url>`,
         ).join('\n');
 
         const xml = `<?xml version="1.0" encoding="UTF-8"?>
@@ -307,9 +311,7 @@ Every page route's `head()` must include a canonical link. This is the single so
 ```ts
 export const Route = createFileRoute('/about')({
   head: () => ({
-    links: [
-      { rel: 'canonical', href: 'https://acme-studio.higgsfield.app/about' },
-    ],
+    links: [{ rel: 'canonical', href: 'https://acme-studio.higgsfield.app/about' }],
     meta: [
       { title: 'About — Acme Studio' },
       // ... other meta
@@ -361,19 +363,19 @@ This is a structural SEO advantage over client-rendered SPAs. Don't undermine it
 
 ## Schema markup
 
-Load this skill for any website build with a public face. Structured data (JSON-LD) is how search engines understand what a page *is* — without it, rich results are off the table.
+Load this skill for any website build with a public face. Structured data (JSON-LD) is how search engines understand what a page _is_ — without it, rich results are off the table.
 
 ### Schema Type Decision Matrix
 
-| Site type | Schema types to apply |
-|---|---|
+| Site type                 | Schema types to apply                              |
+| ------------------------- | -------------------------------------------------- |
 | Agency / studio / company | `Organization` + `ProfessionalService` + `WebSite` |
-| Product / e-commerce | `Product` + `Organization` + `WebSite` |
-| SaaS / app | `SoftwareApplication` + `Organization` + `WebSite` |
-| Local business | `LocalBusiness` + `WebSite` |
-| Blog / content site | `Article` or `BlogPosting` + `WebSite` |
-| Any site | `WebSite` (always include) |
-| Page has FAQ section | Add `FAQPage` to the above |
+| Product / e-commerce      | `Product` + `Organization` + `WebSite`             |
+| SaaS / app                | `SoftwareApplication` + `Organization` + `WebSite` |
+| Local business            | `LocalBusiness` + `WebSite`                        |
+| Blog / content site       | `Article` or `BlogPosting` + `WebSite`             |
+| Any site                  | `WebSite` (always include)                         |
+| Page has FAQ section      | Add `FAQPage` to the above                         |
 
 ### Reusable Component
 
@@ -381,12 +383,7 @@ Create `app/src/components/StructuredData.tsx`:
 
 ```tsx
 export function StructuredData({ json }: { json: string }) {
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: json }}
-    />
-  );
+  return <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: json }} />;
 }
 ```
 
@@ -422,61 +419,61 @@ export function HomePage() {
 
 #### Organization
 
-| Field | Value |
-|---|---|
-| `@type` | `"Organization"` |
-| `name` | Brand name |
-| `url` | Canonical site URL |
-| `logo` | Absolute URL to logo image |
+| Field    | Value                                                   |
+| -------- | ------------------------------------------------------- |
+| `@type`  | `"Organization"`                                        |
+| `name`   | Brand name                                              |
+| `url`    | Canonical site URL                                      |
+| `logo`   | Absolute URL to logo image                              |
 | `sameAs` | Array of social profile URLs (optional but recommended) |
 
 #### WebSite
 
-| Field | Value |
-|---|---|
-| `@type` | `"WebSite"` |
-| `name` | Site name |
-| `url` | Canonical homepage URL |
+| Field             | Value                                                  |
+| ----------------- | ------------------------------------------------------ |
+| `@type`           | `"WebSite"`                                            |
+| `name`            | Site name                                              |
+| `url`             | Canonical homepage URL                                 |
 | `potentialAction` | `SearchAction` with `query-input` (if site has search) |
 
 #### ProfessionalService
 
-| Field | Value |
-|---|---|
-| `@type` | `"ProfessionalService"` |
-| `name` | Business name |
-| `url` | Canonical URL |
+| Field         | Value                            |
+| ------------- | -------------------------------- |
+| `@type`       | `"ProfessionalService"`          |
+| `name`        | Business name                    |
+| `url`         | Canonical URL                    |
 | `description` | One-sentence service description |
-| `areaServed` | Geographic area or `"Worldwide"` |
-| `serviceType` | Primary service category |
-| `priceRange` | e.g. `"$$"` or `"$$$"` |
+| `areaServed`  | Geographic area or `"Worldwide"` |
+| `serviceType` | Primary service category         |
+| `priceRange`  | e.g. `"$$"` or `"$$$"`           |
 
 #### SoftwareApplication
 
-| Field | Value |
-|---|---|
-| `@type` | `"SoftwareApplication"` |
-| `name` | App name |
-| `url` | Canonical URL |
-| `applicationCategory` | e.g. `"BusinessApplication"` |
-| `operatingSystem` | `"Web"` for web apps |
-| `offers` | `{ "@type": "Offer", "price": "0", "priceCurrency": "USD" }` |
+| Field                 | Value                                                        |
+| --------------------- | ------------------------------------------------------------ |
+| `@type`               | `"SoftwareApplication"`                                      |
+| `name`                | App name                                                     |
+| `url`                 | Canonical URL                                                |
+| `applicationCategory` | e.g. `"BusinessApplication"`                                 |
+| `operatingSystem`     | `"Web"` for web apps                                         |
+| `offers`              | `{ "@type": "Offer", "price": "0", "priceCurrency": "USD" }` |
 
 #### Product
 
-| Field | Value |
-|---|---|
-| `@type` | `"Product"` |
-| `name` | Product name |
-| `description` | Short product description |
-| `image` | Product image URL |
-| `offers` | `Offer` with `price`, `priceCurrency`, `availability` |
+| Field         | Value                                                 |
+| ------------- | ----------------------------------------------------- |
+| `@type`       | `"Product"`                                           |
+| `name`        | Product name                                          |
+| `description` | Short product description                             |
+| `image`       | Product image URL                                     |
+| `offers`      | `Offer` with `price`, `priceCurrency`, `availability` |
 
 #### FAQPage
 
-| Field | Value |
-|---|---|
-| `@type` | `"FAQPage"` |
+| Field        | Value                                                                                                     |
+| ------------ | --------------------------------------------------------------------------------------------------------- |
+| `@type`      | `"FAQPage"`                                                                                               |
 | `mainEntity` | Array of `{ "@type": "Question", "name": "...", "acceptedAnswer": { "@type": "Answer", "text": "..." } }` |
 
 ### Complete Example: Agency Site
@@ -493,10 +490,7 @@ const SCHEMA = JSON.stringify({
       name: 'Acme Studio',
       url: 'https://acme-studio.higgsfield.app',
       logo: 'https://acme-studio.higgsfield.app/logo.png',
-      sameAs: [
-        'https://twitter.com/acmestudio',
-        'https://linkedin.com/company/acmestudio',
-      ],
+      sameAs: ['https://twitter.com/acmestudio', 'https://linkedin.com/company/acmestudio'],
     },
     {
       '@type': 'WebSite',
@@ -538,16 +532,16 @@ Entity optimization establishes the site's primary entity (business, person, pro
 
 Collect these fields during the business intake (the "Schema markup" section above handles the base schema; this section enriches it):
 
-| Field          | Example                                      | Required |
-|----------------|----------------------------------------------|----------|
-| name           | Acme Corp                                    | Yes      |
-| description    | Automated invoicing for logistics companies  | Yes      |
-| url            | https://acmecorp.com                         | Yes      |
-| logo           | https://acmecorp.com/logo.png                | Yes      |
-| sameAs[]       | [LinkedIn URL, Instagram URL, ...]           | Yes      |
-| foundingDate   | 2019-03-15                                   | If known |
-| industry       | Financial Technology                         | If known |
-| areaServed     | North America, Europe                        | If known |
+| Field        | Example                                     | Required |
+| ------------ | ------------------------------------------- | -------- |
+| name         | Acme Corp                                   | Yes      |
+| description  | Automated invoicing for logistics companies | Yes      |
+| url          | https://acmecorp.com                        | Yes      |
+| logo         | https://acmecorp.com/logo.png               | Yes      |
+| sameAs[]     | [LinkedIn URL, Instagram URL, ...]          | Yes      |
+| foundingDate | 2019-03-15                                  | If known |
+| industry     | Financial Technology                        | If known |
+| areaServed   | North America, Europe                       | If known |
 
 ### sameAs Strategy
 
@@ -587,10 +581,7 @@ When a page represents multiple entities (the company, its founder, and its prod
       "url": "https://acmecorp.com",
       "logo": "https://acmecorp.com/logo.png",
       "founder": { "@id": "https://acmecorp.com/#founder" },
-      "sameAs": [
-        "https://linkedin.com/company/acmecorp",
-        "https://instagram.com/acmecorp"
-      ]
+      "sameAs": ["https://linkedin.com/company/acmecorp", "https://instagram.com/acmecorp"]
     },
     {
       "@type": "Person",
@@ -626,8 +617,8 @@ Use the `StructuredData` component from the "Schema markup" section above. Build
 import { StructuredData } from '~/components/StructuredData';
 
 const entityJson = JSON.stringify({
-  "@context": "https://schema.org",
-  "@graph": [ /* entities as above */ ]
+  '@context': 'https://schema.org',
+  '@graph': [/* entities as above */],
 });
 
 export default function Page() {
@@ -727,6 +718,7 @@ Demonstrate depth through internal linking, consistent entity naming, and expert
 ### Before / After Example
 
 **Before (vague, buried answer):**
+
 ```
 Welcome to Acme Corp. We've been in business for years and pride
 ourselves on excellent service. Our innovative platform helps
@@ -735,6 +727,7 @@ Contact us to learn more about what we can do for you.
 ```
 
 **After (GEO-optimized):**
+
 ```
 Acme Corp is an automated invoicing platform for mid-market
 logistics companies, processing over 2M invoices annually across

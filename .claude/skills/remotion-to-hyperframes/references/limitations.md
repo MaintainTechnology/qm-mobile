@@ -76,7 +76,7 @@ bow out.
 ### Code-split components (`React.lazy`)
 
 ```tsx
-const HeavyChart = React.lazy(() => import("./HeavyChart"));
+const HeavyChart = React.lazy(() => import('./HeavyChart'));
 ```
 
 `React.lazy` is async and doesn't fit the deterministic-render model.

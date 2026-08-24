@@ -5,6 +5,7 @@ A Claude Code skill for converting markdown email content into HubSpot-compatibl
 ## What It Does
 
 Transforms markdown email files into production-ready HTML that:
+
 - Uses inline styles for maximum email client compatibility
 - Follows NGM's editorial design aesthetic
 - Works directly in HubSpot's HTML email editor
@@ -33,6 +34,7 @@ Convert all emails from content/email-sequences/elite-mentorship-nurture.md
 ## Output
 
 For each email, you'll receive:
+
 1. **Subject line** - Ready for HubSpot subject field
 2. **Preview text** - Ready for HubSpot preview text field
 3. **Full HTML** - Ready to paste into HubSpot HTML editor
@@ -40,6 +42,7 @@ For each email, you'll receive:
 ## Design System
 
 The generated HTML uses:
+
 - **Cormorant Garamond** serif for headlines
 - **DM Sans** sans-serif for body text
 - **Gold accents** (#C49A6C) for bullets and highlights

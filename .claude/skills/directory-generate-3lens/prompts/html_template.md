@@ -5,6 +5,7 @@ Render the synthesized content as an **elevated scientific listicle**—a compre
 ## Output Format Philosophy
 
 This is NOT a generic template. It's a specific format designed for:
+
 1. **LLM citability** — Quick reference table at top, structured headings, inline Q&A
 2. **Clinical depth** — 5,000-7,000 words of substantive content
 3. **Vendor positivity** — "Notable for" framing, numbered but not ranked
@@ -14,14 +15,14 @@ This is NOT a generic template. It's a specific format designed for:
 
 These elements are **required** for optimal AI citation:
 
-| Element | Purpose | Placement |
-|---------|---------|-----------|
-| Quick Reference Table | Immediate data extraction | After header, before summary |
-| Sequential H1>H2>H3>H4 | 3x higher citation rate | Throughout |
-| Inline Q&A blocks | 40% more likely to be extracted | Technology, Evidence, Decision Support sections |
-| Numbered entity sections | Listicle format for LLMs | Entity evaluation section |
-| ItemList schema | Structured data for crawlers | JSON-LD in head |
-| Front-loaded answers | Direct answer in first sentence | All Q&A blocks and FAQ |
+| Element                  | Purpose                         | Placement                                       |
+| ------------------------ | ------------------------------- | ----------------------------------------------- |
+| Quick Reference Table    | Immediate data extraction       | After header, before summary                    |
+| Sequential H1>H2>H3>H4   | 3x higher citation rate         | Throughout                                      |
+| Inline Q&A blocks        | 40% more likely to be extracted | Technology, Evidence, Decision Support sections |
+| Numbered entity sections | Listicle format for LLMs        | Entity evaluation section                       |
+| ItemList schema          | Structured data for crawlers    | JSON-LD in head                                 |
+| Front-loaded answers     | Direct answer in first sentence | All Q&A blocks and FAQ                          |
 
 ## Page Structure
 
@@ -83,6 +84,7 @@ These elements are **required** for optimal AI citation:
 ## CSS Component Reference
 
 ### Quick Reference Table
+
 ```css
 .quick-reference {
   width: 100%;
@@ -98,6 +100,7 @@ These elements are **required** for optimal AI citation:
 ```
 
 ### Entity Section Cards
+
 ```css
 .entity-section {
   margin: var(--space-5) 0;
@@ -108,7 +111,8 @@ These elements are **required** for optimal AI citation:
 }
 .entity-number {
   display: inline-flex;
-  width: 32px; height: 32px;
+  width: 32px;
+  height: 32px;
   background: var(--gold);
   color: white;
   border-radius: 50%;
@@ -117,6 +121,7 @@ These elements are **required** for optimal AI citation:
 ```
 
 ### Inline Q&A Block
+
 ```css
 .inline-qa {
   background: linear-gradient(135deg, rgba(92, 122, 138, 0.06) 0%, rgba(92, 122, 138, 0.02) 100%);
@@ -135,6 +140,7 @@ These elements are **required** for optimal AI citation:
 ```
 
 ### Quick Facts Grid
+
 ```css
 .quick-facts {
   display: grid;
@@ -152,6 +158,7 @@ These elements are **required** for optimal AI citation:
 ```
 
 ### Action Pathways Table
+
 ```css
 .action-table {
   width: 100%;
@@ -189,7 +196,7 @@ Include both Article and ItemList schema:
         "position": 1,
         "name": "[Entity 1]",
         "description": "[One-line description]"
-      },
+      }
       // ... entities 2-5
     ]
   }
@@ -233,16 +240,22 @@ Each entity follows this exact structure:
   </ul>
 
   <h4>The Approach in Depth</h4>
-  <p>[2-3 substantive paragraphs explaining methodology, technology choices,
-     what distinguishes this approach. Include specific technical details.]</p>
+  <p>
+    [2-3 substantive paragraphs explaining methodology, technology choices, what distinguishes this
+    approach. Include specific technical details.]
+  </p>
 
   <h4>Clinical Fit</h4>
-  <p>[1-2 paragraphs on which practitioners/workflows this supports,
-     patient populations, specific use cases.]</p>
+  <p>
+    [1-2 paragraphs on which practitioners/workflows this supports, patient populations, specific
+    use cases.]
+  </p>
 
   <h4>Evidence & Validation</h4>
-  <p>[1-2 paragraphs on validation studies, regulatory status,
-     what literature shows about this specific product/methodology.]</p>
+  <p>
+    [1-2 paragraphs on validation studies, regulatory status, what literature shows about this
+    specific product/methodology.]
+  </p>
 </div>
 ```
 
@@ -254,14 +267,19 @@ Each entity follows this exact structure:
 4. **Length:** 80-150 words per answer
 
 Example:
+
 ```html
 <div class="inline-qa">
   <p class="qa-question">Q: How does metatranscriptomics differ from shotgun metagenomics?</p>
-  <p class="qa-answer"><strong>Shotgun metagenomics sequences DNA to show what organisms
-  are present and what they could potentially do. Metatranscriptomics sequences RNA to
-  reveal what genes are actively being expressed.</strong> Think of it as the difference
-  between reading someone's resume (DNA: what they're capable of) versus watching them
-  work (RNA: what they're actually doing).</p>
+  <p class="qa-answer">
+    <strong
+      >Shotgun metagenomics sequences DNA to show what organisms are present and what they could
+      potentially do. Metatranscriptomics sequences RNA to reveal what genes are actively being
+      expressed.</strong
+    >
+    Think of it as the difference between reading someone's resume (DNA: what they're capable of)
+    versus watching them work (RNA: what they're actually doing).
+  </p>
 </div>
 ```
 
@@ -291,5 +309,6 @@ Before saving, verify:
 ## Output Files
 
 Save to `{{output_dir}}/{{slug}}/`:
+
 - `directory_content.json` - Structured data with all lens outputs
 - `directory_page.html` - Rendered elevated scientific listicle

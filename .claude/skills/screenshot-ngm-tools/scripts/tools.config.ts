@@ -197,7 +197,7 @@ export async function settleText(
   const stablePolls = opts.stablePolls ?? 3;
   const pollMs = opts.pollMs ?? 2_000;
   const now = opts.now ?? Date.now;
-  const sleep = opts.sleep ?? ((ms: number) => new Promise<void>((r) => setTimeout(r, ms)));
+  const sleep = opts.sleep ?? ((ms: number) => new Promise<void>(r => setTimeout(r, ms)));
 
   const deadline = now() + opts.timeoutMs;
   let last = -1;
@@ -262,7 +262,7 @@ async function frameAnswerStart(page: Page): Promise<void> {
   await page.evaluate(() => {
     const search = document.querySelector('input[aria-label="Search conversations"]');
     const areas = Array.from(document.querySelectorAll<HTMLElement>('.overflow-y-auto')).filter(
-      (el) => !(search && el.contains(search)), // never the conversation rail
+      el => !(search && el.contains(search)), // never the conversation rail
     );
     const scroller = areas.sort((a, b) => b.scrollHeight - a.scrollHeight)[0];
     if (scroller) scroller.scrollTop = 0;
@@ -280,7 +280,7 @@ export const REPORT_FRAME = '#biomarker-visual-report-iframe';
  * figure into layout at once.
  */
 async function expandReportFrame(page: Page): Promise<void> {
-  await page.evaluate((sel) => {
+  await page.evaluate(sel => {
     const f = document.querySelector(sel) as HTMLIFrameElement | null;
     const h = f?.contentDocument?.documentElement?.scrollHeight;
     if (f && h) f.style.height = `${h}px`;
@@ -322,7 +322,7 @@ function figureByHeading(heading: string | RegExp) {
 async function hideSlideNav(page: Page): Promise<void> {
   await page.evaluate(() => {
     const next = Array.from(document.querySelectorAll('button')).find(
-      (b) => (b.textContent || '').trim() === 'Next',
+      b => (b.textContent || '').trim() === 'Next',
     );
     // Walk up to the row that also contains "Previous" — that's the nav bar, not just the button.
     let el = next ? (next.parentElement as HTMLElement | null) : null;
@@ -348,7 +348,11 @@ export const TOOLS: Record<string, ToolConfig> = {
     trigger: async (page, input) => {
       await startFreshThread(page, page.locator('.prose'));
       // Lean mode → a concise answer that generates faster and frames as a compact card.
-      await page.getByRole('button', { name: 'Lean', exact: true }).first().click().catch(() => {});
+      await page
+        .getByRole('button', { name: 'Lean', exact: true })
+        .first()
+        .click()
+        .catch(() => {});
       const box = page.getByPlaceholder('Ask a question');
       await box.waitFor({ state: 'visible' });
       await box.fill(input);
@@ -405,7 +409,10 @@ export const TOOLS: Record<string, ToolConfig> = {
      * spinning underneath it. So require the action row AND no in-flight generation.
      */
     waitForReady: async (page, timeoutMs) => {
-      await page.getByTitle('Download as PDF').first().waitFor({ state: 'visible', timeout: timeoutMs });
+      await page
+        .getByTitle('Download as PDF')
+        .first()
+        .waitFor({ state: 'visible', timeout: timeoutMs });
 
       // The processing block carries its own copy; wait for every one of them to clear.
       const processing = page.getByText(/Processing\s*-\s*may take up to/i);
@@ -414,7 +421,9 @@ export const TOOLS: Record<string, ToolConfig> = {
         if ((await processing.count()) === 0) return;
         await page.waitForTimeout(3_000);
       }
-      throw new Error('a generation was still in flight at the deadline — refusing to capture a half-finished thread.');
+      throw new Error(
+        'a generation was still in flight at the deadline — refusing to capture a half-finished thread.',
+      );
     },
     captureLocator: outputColumn,
     beforeCapture: frameAnswerStart,
@@ -431,7 +440,9 @@ export const TOOLS: Record<string, ToolConfig> = {
     timeoutMs: 30 * MIN,
     trigger: async (page, _input, filePath) => {
       if (!filePath) {
-        throw new Error('biomarker requires --file <lab.(pdf|jpg|png|txt|csv)> or BIOMARKER_SAMPLE_PATH');
+        throw new Error(
+          'biomarker requires --file <lab.(pdf|jpg|png|txt|csv)> or BIOMARKER_SAMPLE_PATH',
+        );
       }
       await page.locator('input#files').setInputFiles(filePath);
       await page.getByRole('button', { name: /Generate analysis report/i }).click();
@@ -459,14 +470,20 @@ export const TOOLS: Record<string, ToolConfig> = {
       { name: 'risk-stratification-matrix', locator: figureByHeading(/Risk Stratification/i) },
       { name: 'intervention-priority', locator: figureByHeading(/Intervention Priority/i) },
       { name: 'glycemic-pathway', locator: figureByHeading(/Glycemic|Glucose|Insulin/i) },
-      { name: 'metabolic-biomarker-overview', locator: figureByHeading(/Metabolic (Function|Biomarker|Overview)/i) },
-      { name: 'intervention-strategy', locator: figureByHeading(/Recommended Interventions|Intervention Strategy/i) },
+      {
+        name: 'metabolic-biomarker-overview',
+        locator: figureByHeading(/Metabolic (Function|Biomarker|Overview)/i),
+      },
+      {
+        name: 'intervention-strategy',
+        locator: figureByHeading(/Recommended Interventions|Intervention Strategy/i),
+      },
       { name: 'cardiovascular-findings', locator: figureByHeading(/Cardiovascular/i) },
       { name: 'hpg-axis-diagram', locator: figureByHeading(/HPG|Hypothalamic|Gonadal/i) },
     ],
 
     // Fallback when --shots is off: the whole report section, not the upload dashboard.
-    captureLocator: (page) => page.locator('[data-report-section]').first(),
+    captureLocator: page => page.locator('[data-report-section]').first(),
   },
 
   /**
@@ -497,16 +514,19 @@ export const TOOLS: Record<string, ToolConfig> = {
 
     // Drop the site nav and the sticky slide-nav bar: the first is page chrome, the second
     // overlays the content in an element crop (same sticky-overlap problem as the deck walk).
-    beforeCapture: async (page) => {
+    beforeCapture: async page => {
       await page.evaluate(() => {
         const nav = document.querySelector('nav, header[class*="sticky"]') as HTMLElement | null;
         if (nav) nav.style.display = 'none';
         const next = Array.from(document.querySelectorAll('button')).find(
-          (b) => (b.textContent || '').trim() === 'Next',
+          b => (b.textContent || '').trim() === 'Next',
         );
         let el = next ? (next.parentElement as HTMLElement | null) : null;
         for (let i = 0; i < 5 && el; i++) {
-          if ((el.textContent || '').includes('Previous')) { el.style.opacity = '0'; return; }
+          if ((el.textContent || '').includes('Previous')) {
+            el.style.opacity = '0';
+            return;
+          }
           el = el.parentElement as HTMLElement | null;
         }
       });
@@ -514,7 +534,7 @@ export const TOOLS: Record<string, ToolConfig> = {
     },
 
     // The lecture <header> (module kicker, title, meta row) is the top of the real chrome.
-    captureLocator: (page) => page.locator('header.bg-gradient-to-b').first(),
+    captureLocator: page => page.locator('header.bg-gradient-to-b').first(),
     clipHeight: 1180,
   },
 
@@ -539,7 +559,7 @@ export const TOOLS: Record<string, ToolConfig> = {
 
     // Hide the harness's replica tab bar, then scroll the first module row to the top so the
     // clip below starts on a row boundary rather than mid-stat.
-    beforeCapture: async (page) => {
+    beforeCapture: async page => {
       await page.evaluate(() => {
         const bar = document.querySelector('div.sticky') as HTMLElement | null;
         if (bar) bar.style.display = 'none';
@@ -559,7 +579,7 @@ export const TOOLS: Record<string, ToolConfig> = {
      * from the locator's top edge, so anchoring on the container reproduced the header + stats
      * instead of a close-up. Clipping from the row extends down through its sibling rows.
      */
-    captureLocator: (page) =>
+    captureLocator: page =>
       page.getByRole('heading', { name: 'The Biology of Aging' }).locator('xpath=ancestor::div[3]'),
 
     // ~3 of the 12 rows (192px each) — enough to read the pattern, short enough to sit beside copy.
@@ -590,7 +610,7 @@ export const TOOLS: Record<string, ToolConfig> = {
       await page.waitForTimeout(600); // Zen Old Mincho / Herr Von Muellerhoff need a beat to paint
     },
 
-    captureLocator: (page) => page.locator('#certificate-capture'),
+    captureLocator: page => page.locator('#certificate-capture'),
   },
 
   /**
@@ -619,7 +639,7 @@ export const TOOLS: Record<string, ToolConfig> = {
      * Drop the harness's REPLICA tab bar. It must not ship in marketing — it would present
      * harness scaffolding as product UI. What remains is the real ClinicalAcademyTab.
      */
-    beforeCapture: async (page) => {
+    beforeCapture: async page => {
       await page.evaluate(() => {
         const bar = document.querySelector('div.sticky') as HTMLElement | null;
         if (bar) bar.style.display = 'none';
@@ -628,7 +648,7 @@ export const TOOLS: Record<string, ToolConfig> = {
     },
 
     // The harness wraps the real tab in this container (dev-academy-preview/page.tsx).
-    captureLocator: (page) => page.locator('div.max-w-6xl.mx-auto.px-6').last(),
+    captureLocator: page => page.locator('div.max-w-6xl.mx-auto.px-6').last(),
 
     // The full tab is 2865px tall — a wall of twelve modules, useless as a card. Clip to the
     // header + stats + first four modules. A clip is deterministic; trying to hide the later
@@ -673,7 +693,7 @@ export const TOOLS: Record<string, ToolConfig> = {
     // classes are Tailwind, so `.prose` is the only meaningful slide container.
     paginate: {
       next: 'Next',
-      slide: (page) => page.locator('div.prose').first(),
+      slide: page => page.locator('div.prose').first(),
       max: 60, // advanced-diagnostics is 32; headroom for longer decks
     },
   },

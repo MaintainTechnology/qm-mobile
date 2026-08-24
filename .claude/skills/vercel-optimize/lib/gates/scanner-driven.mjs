@@ -3,16 +3,41 @@
 // Annotation happens in scan-codebase.mjs; gates here just read scanner.o11ySignal.
 
 export const SCANNER_GATES = [
-  { id: 'image_optimization', patterns: ['unoptimized-image'], threshold: 2,
-    billingDimension: 'image-optimization', priority: 30 },
-  { id: 'cache_header_gap', patterns: ['max-age-without-s-maxage', 'missing-cache-headers'], threshold: 1,
-    billingDimension: 'edge-requests', priority: 40 },
-  { id: 'rendering_candidate', patterns: ['force-dynamic', 'headers-in-page'], threshold: 3,
-    billingDimension: 'function-duration', priority: 35 },
-  { id: 'use_cache_date_stamp', patterns: ['use-cache-date-stamp'], threshold: 1,
-    billingDimension: 'isr', priority: 45 },
-  { id: 'cache_components_suspense_dedupe', patterns: ['cache-components-suspense-dedupe'], threshold: 1,
-    billingDimension: 'function-duration', priority: 38 },
+  {
+    id: 'image_optimization',
+    patterns: ['unoptimized-image'],
+    threshold: 2,
+    billingDimension: 'image-optimization',
+    priority: 30,
+  },
+  {
+    id: 'cache_header_gap',
+    patterns: ['max-age-without-s-maxage', 'missing-cache-headers'],
+    threshold: 1,
+    billingDimension: 'edge-requests',
+    priority: 40,
+  },
+  {
+    id: 'rendering_candidate',
+    patterns: ['force-dynamic', 'headers-in-page'],
+    threshold: 3,
+    billingDimension: 'function-duration',
+    priority: 35,
+  },
+  {
+    id: 'use_cache_date_stamp',
+    patterns: ['use-cache-date-stamp'],
+    threshold: 1,
+    billingDimension: 'isr',
+    priority: 45,
+  },
+  {
+    id: 'cache_components_suspense_dedupe',
+    patterns: ['cache-components-suspense-dedupe'],
+    threshold: 1,
+    billingDimension: 'function-duration',
+    priority: 38,
+  },
 ];
 
 export const metadata = {
@@ -32,7 +57,7 @@ export function gate(signals) {
   const candidates = [];
 
   for (const cfg of SCANNER_GATES) {
-    const matched = findings.filter((f) => {
+    const matched = findings.filter(f => {
       if (!cfg.patterns.includes(f.pattern)) return false;
       if (!f.trafficIndependent) {
         if (!f.o11ySignal || f.o11ySignal === 'scanner-only') return false;
@@ -72,13 +97,13 @@ function candidateForGroup(cfg, group) {
     kind: cfg.id,
     scope: group.scope,
     route,
-    files: uniqueStrings(matched.map((m) => m.file)).slice(0, 6),
+    files: uniqueStrings(matched.map(m => m.file)).slice(0, 6),
     priority: cfg.priority + Math.min(matched.length, 10),
     confidence: 0.88,
-    o11ySignal: matched
-      .map((m) => m.o11ySignal)
-      .find((s) => s && s !== 'COLD-PATH' && s !== 'NO-ROUTE-MAPPING')
-      ?? 'scanner-only',
+    o11ySignal:
+      matched
+        .map(m => m.o11ySignal)
+        .find(s => s && s !== 'COLD-PATH' && s !== 'NO-ROUTE-MAPPING') ?? 'scanner-only',
     reason: `${matched.length} ${cfg.patterns.join('+')} finding(s)`,
     question: questionFor(cfg.id, matched),
     evidence: {
@@ -86,13 +111,16 @@ function candidateForGroup(cfg, group) {
       patterns: cfg.patterns,
       scope: group.scope,
       route,
-      sampleFiles: matched.slice(0, 3).map((m) => ({ file: m.file, line: m.line })),
+      sampleFiles: matched.slice(0, 3).map(m => ({ file: m.file, line: m.line })),
     },
   };
 }
 
 function questionFor(kindId, matched) {
-  const sample = matched.slice(0, 3).map((m) => m.file).join(', ');
+  const sample = matched
+    .slice(0, 3)
+    .map(m => m.file)
+    .join(', ');
   switch (kindId) {
     case 'image_optimization':
       return `Which raw <img> tags in ${sample} should move to next/image (or the framework's image component)?`;
@@ -110,7 +138,7 @@ function questionFor(kindId, matched) {
 }
 
 function uniqueStrings(values) {
-  return [...new Set(values.filter((v) => typeof v === 'string' && v.length > 0))];
+  return [...new Set(values.filter(v => typeof v === 'string' && v.length > 0))];
 }
 
 function observedCacheHitRate(signal) {

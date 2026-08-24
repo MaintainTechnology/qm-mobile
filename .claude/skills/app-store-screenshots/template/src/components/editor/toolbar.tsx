@@ -1,29 +1,26 @@
-"use client";
-import * as React from "react";
-import { AlertTriangle, Check, Cloud, Download, UnfoldHorizontal, RotateCcw } from "lucide-react";
-import { Button } from "@/components/ui/button";
+'use client';
+import * as React from 'react';
+import { AlertTriangle, Check, Cloud, Download, UnfoldHorizontal, RotateCcw } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 import {
   Dialog,
   DialogContent,
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
+} from '@/components/ui/dialog';
+import { Input } from '@/components/ui/input';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import {
-  DEVICE_LABEL,
-  supportsLandscape,
-} from "@/lib/constants";
-import { detectPlatform } from "@/lib/defaults";
-import type { Device, Orientation } from "@/lib/types";
+} from '@/components/ui/select';
+import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { DEVICE_LABEL, supportsLandscape } from '@/lib/constants';
+import { detectPlatform } from '@/lib/defaults';
+import type { Device, Orientation } from '@/lib/types';
 
 type Props = {
   appName: string;
@@ -53,8 +50,8 @@ export function Toolbar(props: Props) {
 
   // Track last device per platform so iOS/Android tabs preserve user's choice.
   const lastByPlatform = React.useRef<{ ios: Device; android: Device }>({
-    ios: platform === "ios" ? props.device : "iphone",
-    android: platform === "android" ? props.device : "android",
+    ios: platform === 'ios' ? props.device : 'iphone',
+    android: platform === 'android' ? props.device : 'android',
   });
   React.useEffect(() => {
     lastByPlatform.current[platform] = props.device;
@@ -68,7 +65,7 @@ export function Toolbar(props: Props) {
     <div className="flex flex-wrap items-center gap-x-2 gap-y-1.5 border-b bg-card/40 px-4 py-2">
       <Input
         value={props.appName}
-        onChange={(e) => props.setAppName(e.target.value)}
+        onChange={e => props.setAppName(e.target.value)}
         className="h-8 w-40 border-dashed text-sm font-semibold focus-visible:border-input focus-visible:border-solid focus-visible:bg-background"
         placeholder="App name"
         aria-label="App name"
@@ -80,29 +77,29 @@ export function Toolbar(props: Props) {
 
       <Button
         type="button"
-        variant={props.connectedCanvas ? "secondary" : "outline"}
+        variant={props.connectedCanvas ? 'secondary' : 'outline'}
         size="sm"
         className="h-8 gap-1.5 px-2 text-xs"
         onClick={() => props.setConnectedCanvas(!props.connectedCanvas)}
         aria-pressed={props.connectedCanvas}
         title={
           props.connectedCanvas
-            ? "Connected canvas enabled"
-            : "Isolated screens; turn on to let elements cross screen edges"
+            ? 'Connected canvas enabled'
+            : 'Isolated screens; turn on to let elements cross screen edges'
         }
         disabled={props.busy}
       >
         <UnfoldHorizontal className="h-3.5 w-3.5" />
-        {props.connectedCanvas ? "Connected" : "Isolated"}
+        {props.connectedCanvas ? 'Connected' : 'Isolated'}
       </Button>
 
       <span aria-hidden className="mx-1 h-5 w-px bg-border" />
 
       <Tabs
         value={platform}
-        onValueChange={(p) => {
+        onValueChange={p => {
           if (props.busy) return;
-          const next = p === "ios" ? lastByPlatform.current.ios : lastByPlatform.current.android;
+          const next = p === 'ios' ? lastByPlatform.current.ios : lastByPlatform.current.android;
           props.setDevice(next);
         }}
       >
@@ -118,14 +115,14 @@ export function Toolbar(props: Props) {
 
       <Select
         value={props.device}
-        onValueChange={(v) => props.setDevice(v as Device)}
+        onValueChange={v => props.setDevice(v as Device)}
         disabled={props.busy}
       >
         <SelectTrigger className="h-8 w-44 text-xs">
           <SelectValue placeholder="Device">{deviceLabel}</SelectValue>
         </SelectTrigger>
         <SelectContent>
-          {platform === "ios" ? (
+          {platform === 'ios' ? (
             <>
               <SelectItem value="iphone">{DEVICE_LABEL.iphone}</SelectItem>
               <SelectItem value="ipad">{DEVICE_LABEL.ipad}</SelectItem>
@@ -133,9 +130,9 @@ export function Toolbar(props: Props) {
           ) : (
             <>
               <SelectItem value="android">{DEVICE_LABEL.android}</SelectItem>
-              <SelectItem value="android-7">{DEVICE_LABEL["android-7"]}</SelectItem>
-              <SelectItem value="android-10">{DEVICE_LABEL["android-10"]}</SelectItem>
-              <SelectItem value="feature-graphic">{DEVICE_LABEL["feature-graphic"]}</SelectItem>
+              <SelectItem value="android-7">{DEVICE_LABEL['android-7']}</SelectItem>
+              <SelectItem value="android-10">{DEVICE_LABEL['android-10']}</SelectItem>
+              <SelectItem value="feature-graphic">{DEVICE_LABEL['feature-graphic']}</SelectItem>
             </>
           )}
         </SelectContent>
@@ -144,7 +141,7 @@ export function Toolbar(props: Props) {
       {hasLandscape && (
         <Select
           value={props.orientation}
-          onValueChange={(v) => props.setOrientation(v as Orientation)}
+          onValueChange={v => props.setOrientation(v as Orientation)}
           disabled={props.busy}
         >
           <SelectTrigger className="h-8 w-32 text-xs">
@@ -163,7 +160,7 @@ export function Toolbar(props: Props) {
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            {props.locales.map((l) => (
+            {props.locales.map(l => (
               <SelectItem key={l} value={l}>
                 {l.toUpperCase()}
               </SelectItem>
@@ -194,7 +191,7 @@ export function Toolbar(props: Props) {
           title="Export every size × locale for this device as a zip"
         >
           <Download className="h-4 w-4" />
-          {props.exporting ? `Exporting ${props.exporting}` : "Export bundle"}
+          {props.exporting ? `Exporting ${props.exporting}` : 'Export bundle'}
         </Button>
       </div>
 
@@ -203,7 +200,8 @@ export function Toolbar(props: Props) {
           <DialogHeader>
             <DialogTitle>Reset to defaults?</DialogTitle>
             <DialogDescription>
-              Choose whether to reset just <span className="font-medium">{deviceLabel}</span> or every device deck. Your canvas edits, uploaded screenshots, and copy will be lost.
+              Choose whether to reset just <span className="font-medium">{deviceLabel}</span> or
+              every device deck. Your canvas edits, uploaded screenshots, and copy will be lost.
             </DialogDescription>
           </DialogHeader>
           <div className="flex flex-wrap justify-end gap-2">
@@ -240,16 +238,13 @@ export function Toolbar(props: Props) {
 function SaveStatus({ savedAt, saveError }: { savedAt: number | null; saveError: string | null }) {
   const [, setTick] = React.useState(0);
   React.useEffect(() => {
-    const t = setInterval(() => setTick((x) => x + 1), 60_000);
+    const t = setInterval(() => setTick(x => x + 1), 60_000);
     return () => clearInterval(t);
   }, []);
 
   if (saveError) {
     return (
-      <span
-        className="flex items-center gap-1 text-xs text-destructive"
-        title={saveError}
-      >
+      <span className="flex items-center gap-1 text-xs text-destructive" title={saveError}>
         <AlertTriangle className="h-3.5 w-3.5" /> save failed
       </span>
     );
@@ -265,7 +260,7 @@ function SaveStatus({ savedAt, saveError }: { savedAt: number | null; saveError:
   const seconds = Math.max(0, Math.round((Date.now() - savedAt) / 1000));
   const label =
     seconds < 5
-      ? "saved"
+      ? 'saved'
       : seconds < 60
         ? `saved ${seconds}s ago`
         : seconds < 3600

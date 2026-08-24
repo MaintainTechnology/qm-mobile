@@ -10,7 +10,7 @@ description: |
   and online multiplayer games. NOT for: ordinary image/video generation,
   game trailers, native mobile/desktop builds, or editing a game without its
   source files.
-argument-hint: "[game brief or asset request] [reference files]"
+argument-hint: '[game brief or asset request] [reference files]'
 allowed-tools: Bash
 ---
 
@@ -77,13 +77,13 @@ Media flags accept local paths or prior upload/job IDs. Keep job JSON in project
 
 Read the reference matching each manifest row:
 
-| Asset | Required reference |
-|---|---|
-| Static sprites, backgrounds, UI | `references/stylization.md` |
-| Spritesheets / 2D animation | `references/2d-animation.md` |
-| Repeating ground, walls, tiles, PBR maps | `references/textures.md` |
-| Any 3D model or animation | `references/3d-animation.md` |
-| Music, SFX, voice | `references/audio.md` |
+| Asset                                    | Required reference           |
+| ---------------------------------------- | ---------------------------- |
+| Static sprites, backgrounds, UI          | `references/stylization.md`  |
+| Spritesheets / 2D animation              | `references/2d-animation.md` |
+| Repeating ground, walls, tiles, PBR maps | `references/textures.md`     |
+| Any 3D model or animation                | `references/3d-animation.md` |
+| Music, SFX, voice                        | `references/audio.md`        |
 
 For 3D animation selection:
 

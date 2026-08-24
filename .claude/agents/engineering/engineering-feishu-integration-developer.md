@@ -159,7 +159,7 @@ class TokenManager {
           app_id: process.env.FEISHU_APP_ID,
           app_secret: process.env.FEISHU_APP_SECRET,
         }),
-      }
+      },
     );
 
     const data = await resp.json();
@@ -253,7 +253,7 @@ async function sendCardMessage(
   client: any,
   receiveId: string,
   receiveIdType: 'open_id' | 'chat_id' | 'user_id',
-  card: object
+  card: object,
 ): Promise<string> {
   const resp = await client.im.message.create({
     params: { receive_id_type: receiveIdType },
@@ -287,7 +287,7 @@ const eventDispatcher = new lark.EventDispatcher({
 
 // Listen for bot message received events
 eventDispatcher.register({
-  'im.message.receive_v1': async (data) => {
+  'im.message.receive_v1': async data => {
     const message = data.message;
     const chatId = message.chat_id;
     const content = JSON.parse(message.content);
@@ -302,7 +302,7 @@ eventDispatcher.register({
 
 // Listen for approval status changes
 eventDispatcher.register({
-  'approval.approval.updated_v4': async (data) => {
+  'approval.approval.updated_v4': async data => {
     const instanceId = data.approval_code;
     const status = data.status;
 
@@ -315,21 +315,24 @@ eventDispatcher.register({
 });
 
 // Card action callback handler
-const cardActionHandler = new lark.CardActionHandler({
-  encryptKey: process.env.FEISHU_ENCRYPT_KEY || '',
-  verificationToken: process.env.FEISHU_VERIFICATION_TOKEN || '',
-}, async (data) => {
-  const action = data.action.value;
+const cardActionHandler = new lark.CardActionHandler(
+  {
+    encryptKey: process.env.FEISHU_ENCRYPT_KEY || '',
+    verificationToken: process.env.FEISHU_VERIFICATION_TOKEN || '',
+  },
+  async data => {
+    const action = data.action.value;
 
-  if (action.action === 'approve') {
-    await processApproval(action.instance_id, true);
-    // Return the updated card
-    return {
-      toast: { type: 'success', content: 'Approval granted' },
-    };
-  }
-  return {};
-});
+    if (action.action === 'approve') {
+      await processApproval(action.instance_id, true);
+      // Return the updated card
+      return {
+        toast: { type: 'success', content: 'Approval granted' },
+      };
+    }
+    return {};
+  },
+);
 
 app.use('/webhook/event', lark.adaptExpress(eventDispatcher));
 app.use('/webhook/card', lark.adaptExpress(cardActionHandler));
@@ -353,7 +356,7 @@ class BitableClient {
       sort?: string[];
       pageSize?: number;
       pageToken?: string;
-    }
+    },
   ) {
     const resp = await this.client.bitable.appTableRecord.list({
       path: { app_token: appToken, table_id: tableId },
@@ -375,7 +378,7 @@ class BitableClient {
   async batchCreateRecords(
     appToken: string,
     tableId: string,
-    records: Array<{ fields: Record<string, any> }>
+    records: Array<{ fields: Record<string, any> }>,
   ) {
     const resp = await this.client.bitable.appTableRecord.batchCreate({
       path: { app_token: appToken, table_id: tableId },
@@ -393,7 +396,7 @@ class BitableClient {
     appToken: string,
     tableId: string,
     recordId: string,
-    fields: Record<string, any>
+    fields: Record<string, any>,
   ) {
     const resp = await this.client.bitable.appTableRecord.update({
       path: {
@@ -417,12 +420,12 @@ async function syncOrdersToBitable(orders: any[]) {
   const appToken = process.env.BITABLE_APP_TOKEN!;
   const tableId = process.env.BITABLE_TABLE_ID!;
 
-  const records = orders.map((order) => ({
+  const records = orders.map(order => ({
     fields: {
       'Order ID': order.orderId,
       'Customer Name': order.customerName,
       'Order Amount': order.amount,
-      'Status': order.status,
+      Status: order.status,
       'Created At': order.createdAt,
     },
   }));
@@ -456,7 +459,7 @@ async function createApprovalInstance(params: {
           id: name,
           type: 'input',
           value: String(value),
-        }))
+        })),
       ),
       node_approver_user_id_list: params.approvers
         ? [{ key: 'node_1', value: params.approvers }]
@@ -493,17 +496,15 @@ const router = Router();
 
 // Step 1: Redirect to Feishu authorization page
 router.get('/login/feishu', (req, res) => {
-  const redirectUri = encodeURIComponent(
-    `${process.env.BASE_URL}/callback/feishu`
-  );
+  const redirectUri = encodeURIComponent(`${process.env.BASE_URL}/callback/feishu`);
   const state = generateRandomState();
   req.session!.oauthState = state;
 
   res.redirect(
     `https://open.feishu.cn/open-apis/authen/v1/authorize` +
-    `?app_id=${process.env.FEISHU_APP_ID}` +
-    `&redirect_uri=${redirectUri}` +
-    `&state=${state}`
+      `?app_id=${process.env.FEISHU_APP_ID}` +
+      `&redirect_uri=${redirectUri}` +
+      `&state=${state}`,
   );
 });
 

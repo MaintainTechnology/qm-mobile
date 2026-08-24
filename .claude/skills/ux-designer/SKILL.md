@@ -10,6 +10,7 @@ You are a UX design expert with comprehensive knowledge of modern user experienc
 ## When to Apply This Skill
 
 Use this skill when:
+
 - Designing new user interfaces or components
 - Reviewing existing UI/UX for improvements
 - Implementing accessibility features
@@ -34,6 +35,7 @@ Use this skill when:
 ## Core Design Philosophy
 
 ### User-Centered Design
+
 1. **Understand users first** - Research before designing
 2. **Reduce cognitive load** - Keep interfaces simple and intuitive
 3. **Provide feedback** - Every action should have a visible response
@@ -41,6 +43,7 @@ Use this skill when:
 5. **Design for accessibility** - Include all users from the start
 
 ### Calm & Clarity Over Complexity (2026)
+
 - **Cognitive clarity over sensory richness** - Calm, legible interfaces beat busy,
   flashy ones. Motion, color, and density should earn their place by aiding
   understanding, not by impressing.
@@ -50,9 +53,10 @@ Use this skill when:
 - **Responsible adaptation over hyper-personalization** - Adapt to genuine user
   needs and context; avoid manipulative or opaque personalization.
 - **Depth and judgment over polish** - As UI becomes a commodity, the value is in
-  research, correctness, and knowing when *not* to add something.
+  research, correctness, and knowing when _not_ to add something.
 
 ### The UX Hierarchy of Needs
+
 1. **Functional** - Does it work?
 2. **Reliable** - Is it dependable?
 3. **Usable** - Is it easy to use?
@@ -62,18 +66,21 @@ Use this skill when:
 ## Quick Reference Checklist
 
 ### Before Designing
+
 - [ ] Understand user goals and pain points
 - [ ] Review existing patterns in the codebase
 - [ ] Consider accessibility requirements (WCAG 2.2 AA)
 - [ ] Define success metrics
 
 ### Visual Design
+
 - [ ] Clear visual hierarchy (size, color, spacing)
 - [ ] Consistent typography (16px+ body, 1.3-1.6x heading scale)
 - [ ] Sufficient color contrast (4.5:1 for text)
 - [ ] Adequate whitespace and breathing room
 
 ### Interaction Design
+
 - [ ] Touch targets minimum 44×44px (iOS) / 48×48dp (Android)
 - [ ] Important actions in thumb-friendly zones (bottom/center on mobile)
 - [ ] Clear feedback for all interactions (< 100ms response)
@@ -81,18 +88,21 @@ Use this skill when:
 - [ ] Support `prefers-reduced-motion`
 
 ### Forms
+
 - [ ] Inline validation (on blur, not during typing)
 - [ ] Clear error messages near the field
 - [ ] Required fields marked with asterisk (*)
 - [ ] Logical field order and grouping
 
 ### Navigation
+
 - [ ] Limited top-level items (7±2 rule)
 - [ ] Current location always visible
 - [ ] Mobile: bottom navigation preferred
 - [ ] Consistent navigation across pages
 
 ### Accessibility
+
 - [ ] Keyboard navigable
 - [ ] Screen reader compatible
 - [ ] Color not sole conveyor of information
@@ -100,6 +110,7 @@ Use this skill when:
 - [ ] Alt text for images
 
 ### Collaborative Features
+
 - [ ] Presence indicators (cursors, avatars, typing)
 - [ ] Clear conflict prevention/resolution
 - [ ] Offline state communication
@@ -107,6 +118,7 @@ Use this skill when:
 - [ ] Permission levels clearly communicated
 
 ### Canvas/Spatial Apps
+
 - [ ] Cursor-centered zoom (not screen center)
 - [ ] Smart guides and snapping with toggle
 - [ ] Minimap for large canvases
@@ -114,6 +126,7 @@ Use this skill when:
 - [ ] Viewport culling for performance
 
 ### AI Interfaces
+
 - [ ] AI-generated content clearly labeled
 - [ ] Source attribution for AI claims
 - [ ] User feedback mechanism (thumbs up/down)
@@ -121,24 +134,28 @@ Use this skill when:
 - [ ] Human override always available
 
 ### Onboarding
+
 - [ ] First-run experience guides users to "aha moment"
 - [ ] Empty states provide clear next actions
 - [ ] Onboarding is skippable and won't re-show
 - [ ] Sign-up collects only essential fields
 
 ### Notifications
+
 - [ ] Notification severity matches visual treatment
 - [ ] Push permission requested in context (not on first visit)
 - [ ] Users can control notification preferences per channel
 - [ ] Toasts auto-dismiss (4-8s) with action button option
 
 ### Ethical Design
+
 - [ ] Accept/reject buttons have equal visual prominence
 - [ ] No pre-checked optional consent boxes
 - [ ] Cancellation is as easy as subscription
 - [ ] No confirmshaming in decline copy
 
 ### Internationalization
+
 - [ ] RTL-ready (logical CSS properties, layout verified in `dir="rtl"`)
 - [ ] Tolerant of ~30-40% text expansion (no fixed-width labels/buttons)
 - [ ] No text baked into images; all strings externalized
@@ -223,53 +240,53 @@ What needs the user's attention?
 
 ### Layout & Typography
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Touch target | 44-48px | Minimum tappable area |
-| Body text | 16px+ | Minimum readable size |
-| Line height | 1.2-1.45 | Optimal readability |
-| Line length | 50-75 chars | Ideal for reading |
-| Contrast ratio | 4.5:1 | WCAG AA for normal text |
-| Contrast ratio | 3:1 | WCAG AA for large text |
-| Working memory | 7±2 items | Miller's Law |
-| Text expansion | ~30-40% | Translation growth (DE/FI/RU) |
+| Metric         | Value       | Context                       |
+| -------------- | ----------- | ----------------------------- |
+| Touch target   | 44-48px     | Minimum tappable area         |
+| Body text      | 16px+       | Minimum readable size         |
+| Line height    | 1.2-1.45    | Optimal readability           |
+| Line length    | 50-75 chars | Ideal for reading             |
+| Contrast ratio | 4.5:1       | WCAG AA for normal text       |
+| Contrast ratio | 3:1         | WCAG AA for large text        |
+| Working memory | 7±2 items   | Miller's Law                  |
+| Text expansion | ~30-40%     | Translation growth (DE/FI/RU) |
 
 ### Interaction & Animation
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Animation | 300-500ms | Natural feeling duration |
-| Touch feedback | < 100ms | Perceived instant response |
-| Form abandonment | 81% | Users who start but don't finish |
-| Canvas zoom range | 10%-4000% | Typical design tool range |
-| Smart guide snap | 2-8px | Distance before snapping |
-| Canvas render | 60fps | Target during pan/zoom |
+| Metric            | Value     | Context                          |
+| ----------------- | --------- | -------------------------------- |
+| Animation         | 300-500ms | Natural feeling duration         |
+| Touch feedback    | < 100ms   | Perceived instant response       |
+| Form abandonment  | 81%       | Users who start but don't finish |
+| Canvas zoom range | 10%-4000% | Typical design tool range        |
+| Smart guide snap  | 2-8px     | Distance before snapping         |
+| Canvas render     | 60fps     | Target during pan/zoom           |
 
 ### Collaboration
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Cursor update rate | 50-100ms | Smooth live cursor movement |
-| Cursor label max | 12 chars | Truncate longer usernames |
-| Avatar stack | 3-5 visible | Use "+N" for overflow |
+| Metric             | Value       | Context                     |
+| ------------------ | ----------- | --------------------------- |
+| Cursor update rate | 50-100ms    | Smooth live cursor movement |
+| Cursor label max   | 12 chars    | Truncate longer usernames   |
+| Avatar stack       | 3-5 visible | Use "+N" for overflow       |
 
 ### AI Interfaces
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| AI first token | < 1s | Perceived responsiveness |
-| AI streaming | 30-80 tok/s | Natural reading pace |
-| Copilot accept rate | 25-35% | Suggestion usefulness |
+| Metric              | Value       | Context                  |
+| ------------------- | ----------- | ------------------------ |
+| AI first token      | < 1s        | Perceived responsiveness |
+| AI streaming        | 30-80 tok/s | Natural reading pace     |
+| Copilot accept rate | 25-35%      | Suggestion usefulness    |
 
 ### Engagement Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Onboarding completion | > 65% | Checklist finish rate |
-| Time to first value | < 5 min | Sign-up to activation |
-| Toast duration | 4-8s | Auto-dismiss timing |
-| Search success | > 70% | Users finding results |
-| NPS | > 50 | User sentiment |
+| Metric                | Value   | Context               |
+| --------------------- | ------- | --------------------- |
+| Onboarding completion | > 65%   | Checklist finish rate |
+| Time to first value   | < 5 min | Sign-up to activation |
+| Toast duration        | 4-8s    | Auto-dismiss timing   |
+| Search success        | > 70%   | Users finding results |
+| NPS                   | > 50    | User sentiment        |
 
 ## Anti-Patterns to Avoid
 
@@ -302,6 +319,7 @@ What needs the user's attention?
 ## Sources
 
 This skill synthesizes best practices from:
+
 - [Laws of UX](https://lawsofux.com/) - Jon Yablonski
 - [Nielsen Norman Group](https://www.nngroup.com/) - Usability research
 - [WCAG 2.2](https://www.w3.org/TR/WCAG22/) - Accessibility guidelines

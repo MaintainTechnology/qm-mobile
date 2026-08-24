@@ -35,7 +35,7 @@ Check each item; fix every hit before deploying.
    the icon slots use the generated icon set (or the documented library
    fallback), and no kit item from `asset-system.md`'s "always" list is
    silently missing.
-5b. **Head kit complete** — the full favicon/meta set from `asset-system.md`
+   5b. **Head kit complete** — the full favicon/meta set from `asset-system.md`
    §7 is present and wired: favicon (ico/svg + png sizes), apple-touch-icon,
    192/512 + maskable icons with a `site.webmanifest`, `theme-color`, and the
    full OG + twitter card block with absolute image URLs. An empty `<head>`
@@ -51,7 +51,7 @@ Check each item; fix every hit before deploying.
    AND no shared site-wide button style: grep for a repeated CTA class string /
    `Button` utility component reused across sections — every CTA per the brief's
    inventory has its own component with its own interaction identity.
-9b. **Screenshot-safe reveals** — flag any `opacity: 0` / `opacity-0` **whose
+   9b. **Screenshot-safe reveals** — flag any `opacity: 0` / `opacity-0` **whose
    removal depends on a viewport/scroll trigger** (`whileInView`,
    IntersectionObserver entry, ScrollTrigger-gated fade-ins). Hover-state
    decorations at opacity-0 are fine. Nothing may sit invisible waiting for a
@@ -59,7 +59,7 @@ Check each item; fix every hit before deploying.
    mount. Video elements need a `poster` (or a rendered first frame) so
    headless shots never show a black box. A full-page headless screenshot
    must show every section.
-9c. **No Higgsfield branding on `type: "website"` builds** —
+   9c. **No Higgsfield branding on `type: "website"` builds** —
    `grep -rin "higgsfield\|quanta" app/src/` returns no user-visible strings,
    no Quanta imports, no q-prefixed tokens, no "Powered by / Built on" badge,
    no Higgsfield marks in page chrome. fnf/auth strings in server/service
@@ -68,14 +68,14 @@ Check each item; fix every hit before deploying.
    imports and q- tokens are REQUIRED there and "Sign in with Higgsfield" is
    part of the product — only gratuitous "Powered by / Built on Higgsfield"
    marketing badges remain forbidden.
-9d. **Anti-convergence ledger honored** — the brief lists the previous
+   9d. **Anti-convergence ledger honored** — the brief lists the previous
    build's six identity axes (palette family, type pairing, hero
    architecture, Tier-1 technique, CTA garments, corner language) and this
    build differs on ≥4; the rationed garments (drawing underline, hover
    flood-fill, framed block) appear at most once page-wide combined; the
    Tier-1 technique carries a `wow-catalog.md` ID and is interactive (not a
    passive loop) on cinema/spectacle.
-9e. **A4 seam-locked scroll scrub (conditional)** — when the brief selects
+   9e. **A4 seam-locked scroll scrub (conditional)** — when the brief selects
    A4, verify every media segment has a first-frame poster extracted from the
    exact deployed clip; chapter copy is server-rendered in semantic document
    flow (not hidden until a viewport callback); `prefers-reduced-motion`

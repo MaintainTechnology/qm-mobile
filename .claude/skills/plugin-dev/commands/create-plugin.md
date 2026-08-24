@@ -1,7 +1,8 @@
 ---
 description: Guided end-to-end plugin creation workflow with component design, implementation, and validation
 argument-hint: Optional plugin description
-allowed-tools: ["Read", "Write", "Grep", "Glob", "Bash", "TodoWrite", "AskUserQuestion", "Skill", "Task"]
+allowed-tools:
+  ['Read', 'Write', 'Grep', 'Glob', 'Bash', 'TodoWrite', 'AskUserQuestion', 'Skill', 'Task']
 ---
 
 # Plugin Creation Workflow
@@ -26,6 +27,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Understand what plugin needs to be built and what problem it solves
 
 **Actions**:
+
 1. Create todo list with all 7 phases
 2. If plugin purpose is clear from arguments:
    - Summarize understanding
@@ -48,6 +50,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **MUST load plugin-structure skill** using Skill tool before this phase.
 
 **Actions**:
+
 1. Load plugin-structure skill to understand component types
 2. Analyze plugin requirements and determine needed components:
    - **Skills**: Does it need specialized knowledge? (hooks API, MCP patterns, etc.)
@@ -83,6 +86,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **CRITICAL**: This is one of the most important phases. DO NOT SKIP.
 
 **Actions**:
+
 1. For each component in the plan, identify underspecified aspects:
    - **Skills**: What triggers them? What knowledge do they provide? How detailed?
    - **Commands**: What arguments? What tools? Interactive or automated?
@@ -98,12 +102,14 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 4. If user says "whatever you think is best", provide specific recommendations and get explicit confirmation
 
 **Example questions for a skill**:
+
 - What specific user queries should trigger this skill?
 - Should it include utility scripts? What functionality?
 - How detailed should the core SKILL.md be vs references/?
 - Any real-world examples to include?
 
 **Example questions for an agent**:
+
 - Should this agent trigger proactively after certain actions, or only when explicitly requested?
 - What tools does it need (Read, Write, Bash, etc.)?
 - What should the output format be?
@@ -118,6 +124,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Create plugin directory structure and manifest
 
 **Actions**:
+
 1. Determine plugin name (kebab-case, descriptive)
 2. Choose plugin location:
    - Ask user: "Where should I create the plugin?"
@@ -155,6 +162,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Create each component following best practices
 
 **LOAD RELEVANT SKILLS** before implementing each component type:
+
 - Skills: Load skill-development skill
 - Commands: Load command-development skill
 - Agents: Load agent-development skill
@@ -165,6 +173,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Actions for each component**:
 
 ### For Skills:
+
 1. Load skill-development skill using Skill tool
 2. For each skill:
    - Ask user for concrete usage examples (or use from Phase 3)
@@ -180,6 +189,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 3. Use skill-reviewer agent to validate each skill
 
 ### For Commands:
+
 1. Load command-development skill using Skill tool
 2. For each command:
    - Write command markdown with frontmatter
@@ -190,6 +200,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
    - Reference relevant skills if applicable
 
 ### For Agents:
+
 1. Load agent-development skill using Skill tool
 2. For each agent, use agent-creator agent:
    - Provide description of what agent should do
@@ -199,6 +210,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
    - Validate with validate-agent.sh script
 
 ### For Hooks:
+
 1. Load hook-development skill using Skill tool
 2. For each hook:
    - Create hooks/hooks.json with hook configuration
@@ -208,6 +220,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
    - Test with validate-hook-schema.sh and test-hook.sh utilities
 
 ### For MCP:
+
 1. Load mcp-integration skill using Skill tool
 2. Create .mcp.json configuration with:
    - Server type (stdio for local, SSE for hosted)
@@ -218,6 +231,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 4. Provide setup instructions
 
 ### For Settings:
+
 1. Load plugin-settings skill using Skill tool
 2. Create settings template in README
 3. Create example .claude/plugin-name.local.md file (as documentation)
@@ -235,6 +249,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Ensure plugin meets quality standards and works correctly
 
 **Actions**:
+
 1. **Run plugin-validator agent**:
    - Use plugin-validator agent to comprehensively validate plugin
    - Check: manifest, structure, naming, components, security
@@ -275,6 +290,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Test that plugin works correctly in Claude Code
 
 **Actions**:
+
 1. **Installation instructions**:
    - Show user how to test locally:
      ```bash
@@ -310,6 +326,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 **Goal**: Ensure plugin is well-documented and ready for distribution
 
 **Actions**:
+
 1. **Verify README completeness**:
    - Check README has: overview, features, installation, prerequisites, usage
    - For MCP plugins: Document required environment variables
@@ -377,6 +394,7 @@ Guide the user through creating a complete, high-quality Claude Code plugin from
 ### Quality Standards
 
 Every component must meet these standards:
+
 - ✅ Follows plugin-dev's proven patterns
 - ✅ Uses correct naming conventions
 - ✅ Has strong trigger conditions (skills/agents)
@@ -390,19 +408,23 @@ Every component must meet these standards:
 ## Example Workflow
 
 ### User Request
+
 "Create a plugin for managing database migrations"
 
 ### Phase 1: Discovery
+
 - Understand: Migration management, database schema versioning
 - Confirm: User wants to create, run, rollback migrations
 
 ### Phase 2: Component Planning
+
 - Skills: 1 (migration best practices)
 - Commands: 3 (create-migration, run-migrations, rollback)
 - Agents: 1 (migration-validator)
 - MCP: 1 (database connection)
 
 ### Phase 3: Clarifying Questions
+
 - Which databases? (PostgreSQL, MySQL, etc.)
 - Migration file format? (SQL, code-based?)
 - Should agent validate before applying?

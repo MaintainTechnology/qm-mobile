@@ -113,14 +113,14 @@ Position every element where it should be at its **most visible moment** — the
 
 ```js
 // Step 3: Animate INTO those positions
-tl.from(".title", { y: 60, opacity: 0, duration: 0.6, ease: "power3.out" }, 0);
-tl.from(".subtitle", { y: 40, opacity: 0, duration: 0.5, ease: "power3.out" }, 0.2);
-tl.from(".logo", { scale: 0.8, opacity: 0, duration: 0.4, ease: "power2.out" }, 0.3);
+tl.from('.title', { y: 60, opacity: 0, duration: 0.6, ease: 'power3.out' }, 0);
+tl.from('.subtitle', { y: 40, opacity: 0, duration: 0.5, ease: 'power3.out' }, 0.2);
+tl.from('.logo', { scale: 0.8, opacity: 0, duration: 0.4, ease: 'power2.out' }, 0.3);
 
 // Step 4: Animate OUT from those positions
-tl.to(".title", { y: -40, opacity: 0, duration: 0.4, ease: "power2.in" }, 3);
-tl.to(".subtitle", { y: -30, opacity: 0, duration: 0.3, ease: "power2.in" }, 3.1);
-tl.to(".logo", { scale: 0.9, opacity: 0, duration: 0.3, ease: "power2.in" }, 3.2);
+tl.to('.title', { y: -40, opacity: 0, duration: 0.4, ease: 'power2.in' }, 3);
+tl.to('.subtitle', { y: -30, opacity: 0, duration: 0.3, ease: 'power2.in' }, 3.1);
+tl.to('.logo', { scale: 0.9, opacity: 0, duration: 0.3, ease: 'power2.in' }, 3.2);
 ```
 
 ### When elements share space across time
@@ -167,7 +167,7 @@ Sub-composition structure:
   <div data-composition-id="my-comp" data-width="1920" data-height="1080">
     <!-- content -->
     <style>
-      [data-composition-id="my-comp"] {
+      [data-composition-id='my-comp'] {
         /* scoped styles */
       }
     </style>
@@ -176,7 +176,7 @@ Sub-composition structure:
       window.__timelines = window.__timelines || {};
       const tl = gsap.timeline({ paused: true });
       // tweens...
-      window.__timelines["my-comp"] = tl;
+      window.__timelines['my-comp'] = tl;
     </script>
   </div>
 </template>
@@ -255,8 +255,8 @@ Every multi-scene composition MUST follow ALL of these rules. Violating any one 
 
 ```js
 // BANNED — this empties the scene before the transition can use it
-tl.to("#s1-title", { opacity: 0, y: -40, duration: 0.4 }, 6.5);
-tl.to("#s1-subtitle", { opacity: 0, duration: 0.3 }, 6.7);
+tl.to('#s1-title', { opacity: 0, y: -40, duration: 0.4 }, 6.5);
+tl.to('#s1-subtitle', { opacity: 0, duration: 0.3 }, 6.7);
 // transition fires on empty frame
 ```
 
@@ -264,11 +264,11 @@ tl.to("#s1-subtitle", { opacity: 0, duration: 0.3 }, 6.7);
 
 ```js
 // Scene 1 entrance animations
-tl.from("#s1-title", { y: 50, opacity: 0, duration: 0.7, ease: "power3.out" }, 0.3);
-tl.from("#s1-subtitle", { y: 30, opacity: 0, duration: 0.5, ease: "power2.out" }, 0.6);
+tl.from('#s1-title', { y: 50, opacity: 0, duration: 0.7, ease: 'power3.out' }, 0.3);
+tl.from('#s1-subtitle', { y: 30, opacity: 0, duration: 0.5, ease: 'power2.out' }, 0.6);
 // NO exit tweens — transition at 7.2s handles the scene change
 // Scene 2 entrance animations
-tl.from("#s2-heading", { x: -40, opacity: 0, duration: 0.6, ease: "expo.out" }, 8.0);
+tl.from('#s2-heading', { x: -40, opacity: 0, duration: 0.6, ease: 'expo.out' }, 8.0);
 ```
 
 ## Animation Guardrails

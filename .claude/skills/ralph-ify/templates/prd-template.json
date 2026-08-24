@@ -26,10 +26,7 @@
         "attempts": 0,
         "failureCount": 0,
         "dependsOn": [],
-        "acceptanceCriteria": [
-          "{{CRITERION_1}}",
-          "{{CRITERION_2}}"
-        ],
+        "acceptanceCriteria": ["{{CRITERION_1}}", "{{CRITERION_2}}"],
         "result": null,
         "error": null,
         "feedback": null,
@@ -53,22 +50,9 @@
     }
   },
 
-  "statusValues": [
-    "pending",
-    "in_progress",
-    "passed",
-    "failed",
-    "blocked",
-    "skipped"
-  ],
+  "statusValues": ["pending", "in_progress", "passed", "failed", "blocked", "skipped"],
 
-  "requiredFields": [
-    "id",
-    "title",
-    "description",
-    "priority",
-    "status"
-  ],
+  "requiredFields": ["id", "title", "description", "priority", "status"],
 
   "optionalFields": [
     "dependsOn",

@@ -40,8 +40,8 @@ let discarded;
 let entries;
 const buffer = readBuffer(cwd);
 if (pageUrlFilter) {
-  entries = buffer.entries.filter((entry) => entry.pageUrl === pageUrlFilter);
-  discarded = removeEntries(cwd, (entry) => entry.pageUrl === pageUrlFilter);
+  entries = buffer.entries.filter(entry => entry.pageUrl === pageUrlFilter);
+  discarded = removeEntries(cwd, entry => entry.pageUrl === pageUrlFilter);
 } else {
   entries = buffer.entries;
   discarded = truncateBuffer(cwd);

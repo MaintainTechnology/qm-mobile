@@ -1,7 +1,7 @@
 import '@/polyfills';
 
-import { ClerkProvider } from '@clerk/clerk-expo';
-import { tokenCache } from '@clerk/clerk-expo/token-cache';
+import { ClerkProvider } from '@clerk/expo';
+import { tokenCache } from '@clerk/expo/token-cache';
 import {
   JetBrainsMono_400Regular,
   JetBrainsMono_500Medium,
@@ -25,6 +25,7 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { clerkPublishableKey } from '@/lib/env';
 import { usePurchases } from '@/lib/purchases';
 import { queryClient } from '@/lib/query';
 import { themes } from '@/lib/theme';
@@ -95,9 +96,10 @@ export default function RootLayout() {
     // GestureHandlerRootView must wrap everything, or swipes and scroll gestures silently no-op.
     <GestureHandlerRootView style={{ flex: 1 }}>
       <SafeAreaProvider>
-        {/* Publishable key comes from EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY; Clerk
-            throws its own descriptive error when it is missing. */}
-        <ClerkProvider tokenCache={tokenCache}>
+        {/* Clerk Core 3 requires the key to be passed in: EXPO_PUBLIC_* is not
+            inlined inside node_modules in a production build, so Clerk cannot
+            read it for itself any more. */}
+        <ClerkProvider publishableKey={clerkPublishableKey()} tokenCache={tokenCache}>
           <QueryClientProvider client={queryClient}>
             <ThemeControlProvider>
               <ThemedApp />

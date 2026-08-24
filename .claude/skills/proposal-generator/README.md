@@ -14,6 +14,7 @@ This skill transforms your meeting notes or call transcripts into polished, bran
 ## Quick Start
 
 **Basic usage:**
+
 ```
 Create a proposal for [Client Name]. Here's the transcript:
 
@@ -21,6 +22,7 @@ Create a proposal for [Client Name]. Here's the transcript:
 ```
 
 **From a file:**
+
 ```
 Generate a proposal for Acme Health from the transcript at content/transcripts/acme-call.txt
 ```
@@ -28,20 +30,25 @@ Generate a proposal for Acme Health from the transcript at content/transcripts/a
 ## Proposal Types
 
 ### Consulting
+
 For individuals, clinics, or small organizations seeking:
+
 - Strategic advisory and guidance
 - Fractional CMO/medical leadership
 - Protocol development
 - Practice optimization
 
 ### Enterprise
+
 For larger organizations seeking:
+
 - Platform licensing
 - Team training programs
 - White-label solutions
 - API integrations
 
 The skill will infer the type from context, or you can specify:
+
 ```
 Create an enterprise proposal for...
 ```
@@ -68,6 +75,7 @@ The skill learns from existing proposals in this folder to maintain consistent t
 ## Input Formats
 
 The skill accepts transcripts in any format:
+
 - Raw conversation text
 - Timestamped transcripts
 - Speaker-labeled dialogue
@@ -79,6 +87,7 @@ No special formatting required.
 ## Pricing Framework
 
 The skill generates pricing recommendations based on:
+
 - Complexity of needs
 - Time/resource requirements
 - Urgency signals

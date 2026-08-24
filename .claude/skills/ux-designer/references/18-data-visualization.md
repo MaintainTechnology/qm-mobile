@@ -8,18 +8,18 @@ Data visualization and dashboard design are specialized UX disciplines critical 
 
 ### When to Use Each Chart Type
 
-| Data Relationship | Recommended Chart | Avoid |
-|-------------------|------------------|-------|
-| **Part of whole** | Pie (≤6 slices), donut, stacked bar, treemap | Pie with >6 slices |
-| **Comparison** | Bar (vertical/horizontal), grouped bar | 3D bars, radar (hard to read) |
-| **Trend over time** | Line, area, sparkline | Pie (no time axis) |
-| **Distribution** | Histogram, box plot, violin plot | Pie or bar |
-| **Correlation** | Scatter plot, bubble chart | Line (implies time) |
-| **Ranking** | Horizontal bar (sorted), lollipop chart | Vertical bar (hard to label) |
-| **Geographic** | Choropleth map, dot map | Bar chart for location data |
-| **Hierarchy** | Treemap, sunburst | Nested pie charts |
-| **Flow/process** | Sankey diagram, funnel | Bar chart |
-| **Single value** | KPI card, gauge, big number | Chart with one data point |
+| Data Relationship   | Recommended Chart                            | Avoid                         |
+| ------------------- | -------------------------------------------- | ----------------------------- |
+| **Part of whole**   | Pie (≤6 slices), donut, stacked bar, treemap | Pie with >6 slices            |
+| **Comparison**      | Bar (vertical/horizontal), grouped bar       | 3D bars, radar (hard to read) |
+| **Trend over time** | Line, area, sparkline                        | Pie (no time axis)            |
+| **Distribution**    | Histogram, box plot, violin plot             | Pie or bar                    |
+| **Correlation**     | Scatter plot, bubble chart                   | Line (implies time)           |
+| **Ranking**         | Horizontal bar (sorted), lollipop chart      | Vertical bar (hard to label)  |
+| **Geographic**      | Choropleth map, dot map                      | Bar chart for location data   |
+| **Hierarchy**       | Treemap, sunburst                            | Nested pie charts             |
+| **Flow/process**    | Sankey diagram, funnel                       | Bar chart                     |
+| **Single value**    | KPI card, gauge, big number                  | Chart with one data point     |
 
 ### Chart Decision Tree
 
@@ -153,6 +153,7 @@ Recommended categorical palette (colorblind-safe):
 ```
 
 **Rules:**
+
 - Never use color as the only differentiator
 - Add patterns, shapes, or labels as secondary encoding
 - Test with colorblind simulation tools
@@ -293,28 +294,28 @@ Breakpoints:
 
 ### Table Interaction Patterns
 
-| Feature | Implementation |
-|---------|---------------|
-| **Sorting** | Click column header, toggle asc/desc, show arrow indicator |
-| **Filtering** | Per-column filter dropdowns or global search |
-| **Pagination** | 10/25/50/100 rows per page, page numbers, prev/next |
-| **Infinite scroll** | For exploration (prefer pagination for data analysis) |
-| **Row selection** | Checkbox column, shift-click for range, bulk actions bar |
-| **Column resizing** | Drag column borders, double-click to auto-fit |
-| **Column reordering** | Drag column headers |
-| **Pinned columns** | Pin first 1-2 columns on horizontal scroll |
-| **Inline editing** | Click to edit cell, Enter to save, Esc to cancel |
-| **Row expansion** | Expand row for nested detail without leaving the table |
-| **Export** | CSV, Excel, PDF — selected rows or all |
+| Feature               | Implementation                                             |
+| --------------------- | ---------------------------------------------------------- |
+| **Sorting**           | Click column header, toggle asc/desc, show arrow indicator |
+| **Filtering**         | Per-column filter dropdowns or global search               |
+| **Pagination**        | 10/25/50/100 rows per page, page numbers, prev/next        |
+| **Infinite scroll**   | For exploration (prefer pagination for data analysis)      |
+| **Row selection**     | Checkbox column, shift-click for range, bulk actions bar   |
+| **Column resizing**   | Drag column borders, double-click to auto-fit              |
+| **Column reordering** | Drag column headers                                        |
+| **Pinned columns**    | Pin first 1-2 columns on horizontal scroll                 |
+| **Inline editing**    | Click to edit cell, Enter to save, Esc to cancel           |
+| **Row expansion**     | Expand row for nested detail without leaving the table     |
+| **Export**            | CSV, Excel, PDF — selected rows or all                     |
 
 ### Pagination vs. Infinite Scroll
 
-| Use Pagination | Use Infinite Scroll |
-|----------------|-------------------|
-| Data analysis tasks | Content browsing |
-| Need to return to specific position | Feed/timeline content |
-| Large datasets (1000+ rows) | Progressive loading |
-| Printable/exportable views | Mobile-first interfaces |
+| Use Pagination                      | Use Infinite Scroll     |
+| ----------------------------------- | ----------------------- |
+| Data analysis tasks                 | Content browsing        |
+| Need to return to specific position | Feed/timeline content   |
+| Large datasets (1000+ rows)         | Progressive loading     |
+| Printable/exportable views          | Mobile-first interfaces |
 
 ---
 
@@ -377,7 +378,10 @@ Partial data:
 - **Pattern fills**: Use patterns in addition to colors for categories
 
 ```html
-<figure role="img" aria-label="Revenue trend showing 12% growth from January to December 2025, with a peak of $52K in November">
+<figure
+  role="img"
+  aria-label="Revenue trend showing 12% growth from January to December 2025, with a peak of $52K in November"
+>
   <canvas id="revenue-chart"></canvas>
   <figcaption>
     Monthly revenue, Jan-Dec 2025.
@@ -399,15 +403,15 @@ Partial data:
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Dashboard load time | < 3s | Including data fetch |
-| Chart render time | < 500ms | After data available |
-| Tooltip response | < 100ms | On hover/tap |
-| Data refresh interval | 15-60s | Live dashboards |
-| Color contrast (data) | ≥ 3:1 | Adjacent data colors |
-| Max chart categories | 6-8 | Before readability drops |
-| Max KPI cards | 3-6 | Above fold visibility |
+| Metric                | Target  | Context                  |
+| --------------------- | ------- | ------------------------ |
+| Dashboard load time   | < 3s    | Including data fetch     |
+| Chart render time     | < 500ms | After data available     |
+| Tooltip response      | < 100ms | On hover/tap             |
+| Data refresh interval | 15-60s  | Live dashboards          |
+| Color contrast (data) | ≥ 3:1   | Adjacent data colors     |
+| Max chart categories  | 6-8     | Before readability drops |
+| Max KPI cards         | 3-6     | Above fold visibility    |
 
 ---
 

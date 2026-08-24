@@ -22,7 +22,7 @@ function calculateAlignmentGuides(draggedObject, allObjects) {
         type: 'horizontal',
         y: other.centerY,
         from: Math.min(draggedObject.left, other.left),
-        to: Math.max(draggedObject.right, other.right)
+        to: Math.max(draggedObject.right, other.right),
       });
     }
 
@@ -32,7 +32,7 @@ function calculateAlignmentGuides(draggedObject, allObjects) {
         type: 'vertical',
         x: other.centerX,
         from: Math.min(draggedObject.top, other.top),
-        to: Math.max(draggedObject.bottom, other.bottom)
+        to: Math.max(draggedObject.bottom, other.bottom),
       });
     }
 
@@ -89,7 +89,7 @@ function snapToGrid(value) {
 function snapPosition(x, y) {
   return {
     x: snapToGrid(x),
-    y: snapToGrid(y)
+    y: snapToGrid(y),
   };
 }
 ```
@@ -151,19 +151,25 @@ function snapPosition(x, y) {
 }
 
 /* Indent for hierarchy */
-.layer-item[data-depth="1"] { padding-left: 20px; }
-.layer-item[data-depth="2"] { padding-left: 36px; }
-.layer-item[data-depth="3"] { padding-left: 52px; }
+.layer-item[data-depth='1'] {
+  padding-left: 20px;
+}
+.layer-item[data-depth='2'] {
+  padding-left: 36px;
+}
+.layer-item[data-depth='3'] {
+  padding-left: 52px;
+}
 ```
 
 ### Z-Index Operations
 
-| Shortcut | Action |
-|----------|--------|
-| Cmd/Ctrl + ] | Bring forward |
-| Cmd/Ctrl + [ | Send backward |
+| Shortcut             | Action         |
+| -------------------- | -------------- |
+| Cmd/Ctrl + ]         | Bring forward  |
+| Cmd/Ctrl + [         | Send backward  |
 | Cmd/Ctrl + Shift + ] | Bring to front |
-| Cmd/Ctrl + Shift + [ | Send to back |
+| Cmd/Ctrl + Shift + [ | Send to back   |
 
 ### Grouping
 
@@ -173,7 +179,7 @@ function groupSelection() {
     type: 'group',
     id: generateId(),
     children: [...selectedObjects],
-    bounds: calculateBounds(selectedObjects)
+    bounds: calculateBounds(selectedObjects),
   };
 
   // Remove from root, add to group
@@ -200,12 +206,12 @@ function ungroupSelection() {
 }
 ```
 
-| Shortcut | Action |
-|----------|--------|
-| Cmd/Ctrl + G | Group selection |
-| Cmd/Ctrl + Shift + G | Ungroup selection |
-| Double-click | Enter group (edit children) |
-| Escape | Exit group |
+| Shortcut             | Action                      |
+| -------------------- | --------------------------- |
+| Cmd/Ctrl + G         | Group selection             |
+| Cmd/Ctrl + Shift + G | Ungroup selection           |
+| Double-click         | Enter group (edit children) |
+| Escape               | Exit group                  |
 
 ---
 
@@ -217,9 +223,7 @@ Common in whiteboard apps.
 
 ```html
 <div class="sticky-note" style="--sticky-color: #fef08a;">
-  <div class="sticky-note__content" contenteditable>
-    Type your idea here...
-  </div>
+  <div class="sticky-note__content" contenteditable>Type your idea here...</div>
   <div class="sticky-note__author">Alice</div>
 </div>
 ```
@@ -251,6 +255,7 @@ Common in whiteboard apps.
 ```
 
 **Sticky Note Colors:**
+
 - Yellow (#fef08a) - General ideas
 - Pink (#fbcfe8) - Questions
 - Blue (#bfdbfe) - Insights
@@ -307,9 +312,7 @@ Only render objects visible in the current viewport.
 function getVisibleObjects(camera, objects) {
   const viewport = getViewportBounds(camera);
 
-  return objects.filter(obj =>
-    intersects(obj.bounds, viewport)
-  );
+  return objects.filter(obj => intersects(obj.bounds, viewport));
 }
 
 function render() {
@@ -350,13 +353,13 @@ function renderObject(obj, ctx, zoom) {
 
 ### Performance Guidelines
 
-| Technique | When to Apply |
-|-----------|--------------|
-| Viewport culling | Always for >100 objects |
-| LOD rendering | Zoom levels <50% |
-| Debounced render | Rapid camera movement |
-| Canvas layering | Static vs. dynamic content |
-| Web Workers | Heavy calculations |
+| Technique         | When to Apply                |
+| ----------------- | ---------------------------- |
+| Viewport culling  | Always for >100 objects      |
+| LOD rendering     | Zoom levels <50%             |
+| Debounced render  | Rapid camera movement        |
+| Canvas layering   | Static vs. dynamic content   |
+| Web Workers       | Heavy calculations           |
 | Virtual scrolling | Layer panel with 1000+ items |
 
 ### Canvas Size Limits
@@ -390,20 +393,20 @@ Practical limits:
 
 ```javascript
 const votingSession = {
-  id: "vote-123",
-  topic: "Which design do we prefer?",
+  id: 'vote-123',
+  topic: 'Which design do we prefer?',
   options: [
-    { id: "a", label: "Option A", votes: [] },
-    { id: "b", label: "Option B", votes: [] }
+    { id: 'a', label: 'Option A', votes: [] },
+    { id: 'b', label: 'Option B', votes: [] },
   ],
   anonymous: true,
   allowMultiple: false,
-  endTime: new Date("2024-12-20T14:00:00")
+  endTime: new Date('2024-12-20T14:00:00'),
 };
 
 function castVote(sessionId, optionId, userId) {
   const session = getSession(sessionId);
-  const vote = session.anonymous ? "anonymous" : userId;
+  const vote = session.anonymous ? 'anonymous' : userId;
 
   session.options.find(o => o.id === optionId).votes.push(vote);
   broadcastVoteUpdate(session);
@@ -456,18 +459,18 @@ function clusterStickies(stickies) {
 ```javascript
 // Full keyboard support for canvas
 const keyboardControls = {
-  'Tab': () => selectNextObject(),
+  Tab: () => selectNextObject(),
   'Shift+Tab': () => selectPreviousObject(),
-  'Enter': () => enterEditMode(),
-  'Escape': () => exitEditMode(),
-  'Delete': () => deleteSelection(),
-  'ArrowUp': () => moveSelection(0, -1),
-  'ArrowDown': () => moveSelection(0, 1),
-  'ArrowLeft': () => moveSelection(-1, 0),
-  'ArrowRight': () => moveSelection(1, 0),
+  Enter: () => enterEditMode(),
+  Escape: () => exitEditMode(),
+  Delete: () => deleteSelection(),
+  ArrowUp: () => moveSelection(0, -1),
+  ArrowDown: () => moveSelection(0, 1),
+  ArrowLeft: () => moveSelection(-1, 0),
+  ArrowRight: () => moveSelection(1, 0),
   'Cmd+A': () => selectAll(),
   'Cmd+Z': () => undo(),
-  'Cmd+Shift+Z': () => redo()
+  'Cmd+Shift+Z': () => redo(),
 };
 ```
 
@@ -480,20 +483,16 @@ const keyboardControls = {
     <!-- Dynamic announcements -->
   </div>
 
-  <div
-    role="img"
-    tabindex="0"
-    aria-describedby="canvas-description"
-  >
+  <div role="img" tabindex="0" aria-describedby="canvas-description">
     <canvas></canvas>
   </div>
 </div>
 
 <script>
-function announceSelection(objects) {
-  const announcer = document.getElementById('canvas-announcer');
-  announcer.textContent = `Selected ${objects.length} objects`;
-}
+  function announceSelection(objects) {
+    const announcer = document.getElementById('canvas-announcer');
+    announcer.textContent = `Selected ${objects.length} objects`;
+  }
 </script>
 ```
 
@@ -517,12 +516,12 @@ Per WCAG 2.5.7, provide non-dragging alternatives:
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Grid size | 4, 8, or 16px | Common options |
-| Snap threshold | 2-8px | Distance before snapping |
-| Undo stack | 100+ actions | Memory permitting |
-| Object limit | 10,000+ | With culling |
+| Metric         | Value         | Context                  |
+| -------------- | ------------- | ------------------------ |
+| Grid size      | 4, 8, or 16px | Common options           |
+| Snap threshold | 2-8px         | Distance before snapping |
+| Undo stack     | 100+ actions  | Memory permitting        |
+| Object limit   | 10,000+       | With culling             |
 
 ---
 

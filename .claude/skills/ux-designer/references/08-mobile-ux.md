@@ -27,11 +27,11 @@ Coined by mobile UX expert Steven Hoober, the Thumb Zone defines how users inter
 
 ### Zone Definitions
 
-| Zone | Location | Usage |
-|------|----------|-------|
-| **Easy** | Bottom center/left | Primary actions, frequent navigation |
-| **Stretch** | Middle, far left/right | Secondary actions |
-| **Hard** | Top corners | Rarely used actions |
+| Zone        | Location               | Usage                                |
+| ----------- | ---------------------- | ------------------------------------ |
+| **Easy**    | Bottom center/left     | Primary actions, frequent navigation |
+| **Stretch** | Middle, far left/right | Secondary actions                    |
+| **Hard**    | Top corners            | Rarely used actions                  |
 
 ### Modern Device Considerations
 
@@ -46,11 +46,11 @@ Coined by mobile UX expert Steven Hoober, the Thumb Zone defines how users inter
 
 ### Platform Guidelines
 
-| Platform | Minimum Size | Recommended |
-|----------|--------------|-------------|
-| Apple iOS | 44×44pt | 44-48pt |
-| Material Design | 48×48dp | 48dp |
-| WCAG 2.2 | 24×24px | 44×44px |
+| Platform        | Minimum Size | Recommended |
+| --------------- | ------------ | ----------- |
+| Apple iOS       | 44×44pt      | 44-48pt     |
+| Material Design | 48×48dp      | 48dp        |
+| WCAG 2.2        | 24×24px      | 44×44px     |
 
 ### Implementation
 
@@ -128,30 +128,31 @@ html {
 </nav>
 
 <style>
-.bottom-nav {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  display: flex;
-  justify-content: space-around;
-  background: white;
-  padding: 8px 0;
-  padding-bottom: env(safe-area-inset-bottom); /* iPhone notch */
-  box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
-}
+  .bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    display: flex;
+    justify-content: space-around;
+    background: white;
+    padding: 8px 0;
+    padding-bottom: env(safe-area-inset-bottom); /* iPhone notch */
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.1);
+  }
 
-.nav-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  min-width: 64px;
-  padding: 8px;
-}
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 64px;
+    padding: 8px;
+  }
 </style>
 ```
 
 **Best Practices:**
+
 - 3-5 items maximum
 - Icons with labels (not icons alone)
 - Clear active state
@@ -172,11 +173,13 @@ html {
 ```
 
 **When to Use:**
+
 - Many navigation items (6+)
 - Secondary/utility navigation
 - Space-constrained headers
 
 **When to Avoid:**
+
 - Primary navigation (use bottom bar)
 - When discoverability is crucial
 - E-commerce main categories
@@ -193,7 +196,7 @@ html {
   border-radius: 50%;
   background: var(--accent);
   color: white;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -201,6 +204,7 @@ html {
 ```
 
 **Use For:**
+
 - Single primary action (create, compose, add)
 - Actions available on every screen
 - Thumb-friendly access
@@ -329,12 +333,12 @@ Edge swipe  → Back navigation
 
 ### Key Metrics
 
-| Metric | Target | Impact |
-|--------|--------|--------|
-| First Contentful Paint | < 1.8s | User perceives loading |
-| Largest Contentful Paint | < 2.5s | Main content visible |
-| Time to Interactive | < 3.8s | Users can interact |
-| Cumulative Layout Shift | < 0.1 | Visual stability |
+| Metric                   | Target | Impact                 |
+| ------------------------ | ------ | ---------------------- |
+| First Contentful Paint   | < 1.8s | User perceives loading |
+| Largest Contentful Paint | < 2.5s | Main content visible   |
+| Time to Interactive      | < 3.8s | Users can interact     |
+| Cumulative Layout Shift  | < 0.1  | Visual stability       |
 
 ### Mobile Performance Tips
 
@@ -393,7 +397,7 @@ Edge swipe  → Back navigation
 .ripple::after {
   content: '';
   position: absolute;
-  background: rgba(255,255,255,0.3);
+  background: rgba(255, 255, 255, 0.3);
   border-radius: 50%;
   transform: scale(0);
   animation: ripple 0.6s linear;

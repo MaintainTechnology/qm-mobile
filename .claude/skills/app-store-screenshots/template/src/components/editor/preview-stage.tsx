@@ -1,8 +1,8 @@
-"use client";
-import * as React from "react";
-import { Maximize2, ZoomIn, ZoomOut } from "lucide-react";
-import { Button } from "@/components/ui/button";
-import { DEVICE_LABEL, LAYOUT_LABEL } from "@/lib/constants";
+'use client';
+import * as React from 'react';
+import { Maximize2, ZoomIn, ZoomOut } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { DEVICE_LABEL, LAYOUT_LABEL } from '@/lib/constants';
 import type {
   Device,
   ElementId,
@@ -11,8 +11,8 @@ import type {
   SelectedElement,
   Slide,
   Theme,
-} from "@/lib/types";
-import { DeckCanvas, getCanvas } from "./slide-canvas";
+} from '@/lib/types';
+import { DeckCanvas, getCanvas } from './slide-canvas';
 
 type Props = {
   slides: Slide[];
@@ -61,7 +61,10 @@ export function PreviewStage({
   const { cW, cH } = getCanvas(device, orientation);
   const totalW = Math.max(1, slides.length) * cW;
   const scale = fitScale * zoom;
-  const activeIndex = Math.max(0, slides.findIndex((slide) => slide.id === activeSlideId));
+  const activeIndex = Math.max(
+    0,
+    slides.findIndex(slide => slide.id === activeSlideId),
+  );
   const activeSlide = slides[activeIndex] || slides[0] || null;
 
   React.useEffect(() => {
@@ -94,7 +97,7 @@ export function PreviewStage({
     const screenLeft = activeIndex * cW * scale;
     const screenWidth = cW * scale;
     const targetLeft = Math.max(0, screenLeft - (scroller.clientWidth - screenWidth) / 2);
-    scroller.scrollTo({ left: targetLeft, behavior: "smooth" });
+    scroller.scrollTo({ left: targetLeft, behavior: 'smooth' });
   }, [activeIndex, activeSlide, cW, scale]);
 
   const handleCanvasActiveSlideChange = React.useCallback(
@@ -117,9 +120,9 @@ export function PreviewStage({
           style={{
             width: totalW * scale,
             height: cH * scale,
-            position: "relative",
+            position: 'relative',
             flexShrink: 0,
-            filter: "drop-shadow(0 32px 42px rgba(15, 23, 42, 0.18))",
+            filter: 'drop-shadow(0 32px 42px rgba(15, 23, 42, 0.18))',
           }}
         >
           <div
@@ -127,7 +130,7 @@ export function PreviewStage({
               width: totalW,
               height: cH,
               transform: `scale(${scale})`,
-              transformOrigin: "top left",
+              transformOrigin: 'top left',
             }}
           >
             <DeckCanvas
@@ -146,11 +149,11 @@ export function PreviewStage({
               showGuides
               edit={{
                 onLabelChange: (slideId, value) => {
-                  const slide = slides.find((s) => s.id === slideId);
+                  const slide = slides.find(s => s.id === slideId);
                   if (slide) onLabelChange(slide, value);
                 },
                 onHeadlineChange: (slideId, value) => {
-                  const slide = slides.find((s) => s.id === slideId);
+                  const slide = slides.find(s => s.id === slideId);
                   if (slide) onHeadlineChange(slide, value);
                 },
                 onTextElementTextChange,
@@ -173,7 +176,7 @@ export function PreviewStage({
             <span>{LAYOUT_LABEL[activeSlide.layout]}</span>
           </>
         )}
-        {orientation === "landscape" && (
+        {orientation === 'landscape' && (
           <>
             <span aria-hidden>·</span>
             <span>landscape</span>
@@ -188,14 +191,18 @@ export function PreviewStage({
       </div>
 
       <div className="absolute bottom-4 right-4 flex items-center gap-1.5 rounded-md bg-background/85 px-1.5 py-1 text-[10px] tabular-nums text-muted-foreground shadow-sm backdrop-blur">
-        <span className="px-1">{slides.length}× {cW}×{cH}</span>
-        <span aria-hidden className="text-border">|</span>
+        <span className="px-1">
+          {slides.length}× {cW}×{cH}
+        </span>
+        <span aria-hidden className="text-border">
+          |
+        </span>
         <Button
           type="button"
           variant="ghost"
           size="icon"
           className="h-6 w-6"
-          onClick={() => setZoom((value) => Math.max(0.25, Number((value - 0.1).toFixed(2))))}
+          onClick={() => setZoom(value => Math.max(0.25, Number((value - 0.1).toFixed(2))))}
           disabled={zoom <= 0.25}
           title="Zoom out"
           aria-label="Zoom out"
@@ -208,7 +215,7 @@ export function PreviewStage({
           variant="ghost"
           size="icon"
           className="h-6 w-6"
-          onClick={() => setZoom((value) => Math.min(2, Number((value + 0.1).toFixed(2))))}
+          onClick={() => setZoom(value => Math.min(2, Number((value + 0.1).toFixed(2))))}
           disabled={zoom >= 2}
           title="Zoom in"
           aria-label="Zoom in"

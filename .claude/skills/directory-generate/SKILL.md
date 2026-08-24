@@ -17,6 +17,7 @@ Generate comprehensive, clinically useful directory listings for the NGM Commons
 ```
 
 **Arguments:**
+
 - `<category_name>` - Category to generate (e.g., "Microbiome Testing")
 - `--entities "E1,E2,..."` - **Required**: Comma-separated list of entities
 - `--resume` - Resume from last checkpoint if interrupted
@@ -28,11 +29,11 @@ Generate comprehensive, clinically useful directory listings for the NGM Commons
 ### Phase 1: Research (Perplexity Sonar)
 
 For each entity:
+
 1. **First Principles** (Sonar Reasoning Pro) - HOW it works mechanistically
 2. **Evidence Audit** (Sonar Deep Research) - Studies, pricing, regulatory status
 
-Then:
-3. **Market Context** - Category trends and landscape
+Then: 3. **Market Context** - Category trends and landscape
 
 ### Phase 2: Content Generation (Claude Opus)
 
@@ -50,13 +51,13 @@ Combine into `directory_content.json` + `directory_page.html`
 
 ## Quality Criteria
 
-| Criterion | Threshold |
-|-----------|-----------|
-| Clinical Utility | >= 0.8 |
-| Educational Rigor | >= 0.8 |
-| Vendor Neutrality | >= 0.8 |
-| Factual Precision | >= 1.0 |
-| Information Density | >= 0.8 |
+| Criterion           | Threshold |
+| ------------------- | --------- |
+| Clinical Utility    | >= 0.8    |
+| Educational Rigor   | >= 0.8    |
+| Vendor Neutrality   | >= 0.8    |
+| Factual Precision   | >= 1.0    |
+| Information Density | >= 0.8    |
 
 ## Key Principles
 

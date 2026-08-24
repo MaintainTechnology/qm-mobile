@@ -48,7 +48,10 @@ describe('overviewStats (web OverviewTab parity)', () => {
 
   it('converts API dollars to integer cents, half away from zero', () => {
     expect(centsFromApiDollars(1234.565)).toBe(123457);
-    expect(overviewStats([quote({ total_inc_gst: 0.1 }), quote({ id: 'q2', total_inc_gst: 0.2 })]).quotedCents).toBe(30);
+    expect(
+      overviewStats([quote({ total_inc_gst: 0.1 }), quote({ id: 'q2', total_inc_gst: 0.2 })])
+        .quotedCents,
+    ).toBe(30);
   });
 });
 
@@ -64,12 +67,12 @@ describe('isAccepted', () => {
 
 describe('tenantTrades', () => {
   it('prefers trades[] and falls back to the legacy single trade', () => {
-    expect(tenantTrades({ tenant: { id: 't', trades: ['roofing'] }, quotes: [] } as never)).toEqual([
-      'roofing',
-    ]);
-    expect(tenantTrades({ tenant: { id: 't', trade: 'electrical' }, quotes: [] } as never)).toEqual([
-      'electrical',
-    ]);
+    expect(tenantTrades({ tenant: { id: 't', trades: ['roofing'] }, quotes: [] } as never)).toEqual(
+      ['roofing'],
+    );
+    expect(tenantTrades({ tenant: { id: 't', trade: 'electrical' }, quotes: [] } as never)).toEqual(
+      ['electrical'],
+    );
     expect(tenantTrades({ tenant: { id: 't' }, quotes: [] } as never)).toEqual([]);
   });
 });

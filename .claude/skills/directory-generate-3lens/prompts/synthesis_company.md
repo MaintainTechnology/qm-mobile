@@ -29,14 +29,14 @@ The KBV2 dossier provides the clinical context that turns a product review into 
 
 ### How KBV2 Enriches Each Profile Section
 
-| Profile Section | KBV2 Source | What It Provides |
-|----------------|-------------|-------------------|
-| **Executive Summary** | `narrative_threads` | Frames the company within the broader story of its category |
-| **The Approach** | `tier_1_files` (pathways) | Precise mechanistic context — the biology that makes this technology possible or limited |
-| **Evidence & Validation** | `conflict_synthesis` + `citation_harvest` | Known controversies, field debates, and curated citations beyond what the company publishes |
-| **Clinical Implementation** | `tier_1_files` (interventions + biomarkers) | How practitioners typically act on results from this type of technology |
-| **KB Integration** | `tier_1_files` (all types) + `cross_references` | Intervention connections, biomarker interpretation, signaling pathway context |
-| **Category Context** | `lens_priming` + `conflict_synthesis` | How this company's approach compares methodologically to alternatives |
+| Profile Section             | KBV2 Source                                     | What It Provides                                                                            |
+| --------------------------- | ----------------------------------------------- | ------------------------------------------------------------------------------------------- |
+| **Executive Summary**       | `narrative_threads`                             | Frames the company within the broader story of its category                                 |
+| **The Approach**            | `tier_1_files` (pathways)                       | Precise mechanistic context — the biology that makes this technology possible or limited    |
+| **Evidence & Validation**   | `conflict_synthesis` + `citation_harvest`       | Known controversies, field debates, and curated citations beyond what the company publishes |
+| **Clinical Implementation** | `tier_1_files` (interventions + biomarkers)     | How practitioners typically act on results from this type of technology                     |
+| **KB Integration**          | `tier_1_files` (all types) + `cross_references` | Intervention connections, biomarker interpretation, signaling pathway context               |
+| **Category Context**        | `lens_priming` + `conflict_synthesis`           | How this company's approach compares methodologically to alternatives                       |
 
 ## CRITICAL: KB Citation Integration
 
@@ -57,12 +57,14 @@ All editorial voice rules from the default synthesis apply. Additionally:
 ### Tier-Aware Content Depth
 
 **Tier 2 (Company Page):**
+
 - Full three-lens evaluation as described below
 - 4,000-6,000 total words
 - Standard inline Q&A distribution (minimum 3)
 - Evidence table with graded studies
 
 **Tier 3 (Strategic Partner):**
+
 - Everything in Tier 2, plus:
 - 6,000-8,000 total words
 - Extended KB integration section with more intervention mappings
@@ -82,6 +84,7 @@ Subtitle: One-sentence description of what the company does and its primary meth
 ```
 
 Quick Facts grid (4-6 items):
+
 - Methodology / Technology
 - Founded / Headquarters
 - Price range (if publicly available)
@@ -92,6 +95,7 @@ Quick Facts grid (4-6 items):
 ### 2. Executive Summary (200-300 words)
 
 In the summary box with gold left border. 2-3 paragraphs covering:
+
 - What the company does in plain clinical language
 - What makes their approach notable within the category
 - Clinical relevance — who should care and why
@@ -105,11 +109,13 @@ Primary source: **Lens 1 (Mechanistic)**
 **H2: The Approach**
 
 Structured as:
+
 - **H3: Foundational Methodology** — What technology/methodology does the company use? How does it work at a first-principles level?
 - **H3: Technical Differentiation** — What specifically does this company do differently from others using similar methodology? (Describe without ranking.)
 - **H3: Data Processing & Analysis** — If applicable, how do they process raw data into clinically relevant outputs?
 
 Include:
+
 - SVG diagram of the company's specific analytical process (inline, same style as guide SVGs)
 - At least 1 inline Q&A block
 
@@ -122,6 +128,7 @@ Primary source: **Lens 2 (Literature)**
 **H2: Evidence & Validation**
 
 Structured as:
+
 - **H3: Published Studies** — What has the company published or been validated by? Grade each study.
 - Evidence grading table (`.evidence-table`):
   - Study | Design | N | Key Finding | Evidence Level
@@ -130,10 +137,12 @@ Structured as:
 - **H3: Clinical Performance Data** — Sensitivity, specificity, reproducibility where available.
 
 Include:
+
 - At least 1 inline Q&A block
 - KB insight callouts for relevant field debates from `conflict_synthesis`
 
 Evidence level labels (NOT letter grades):
+
 - Strong | Moderate | Emerging | Preliminary | Expert Consensus
 
 ### 5. Clinical Implementation (600+ words)
@@ -143,11 +152,13 @@ Primary source: **Lens 3 (KB Cross-Reference)**
 **H2: Clinical Implementation**
 
 Structured as:
+
 - **H3: Patient / Population Fit** — Which patients benefit most? Who is not a good candidate?
 - **H3: Workflow Integration** — How does this fit into clinical practice? Ordering, turnaround, interpretation.
 - **H3: Interpretation Framework** — How should clinicians read the results? What are the common pitfalls?
 
 Include:
+
 - At least 1 inline Q&A on practical usage
 - KB insights from `tier_1_files` (interventions) for what practitioners typically do with results
 
@@ -158,6 +169,7 @@ Include:
 This section draws from Lens 3 KB cross-reference output to connect the company's measurements or treatments to actionable clinical interventions.
 
 Structured as:
+
 - **H3: What practitioners typically do with results** — Common clinical responses to findings from this type of technology
 - **H3: Biomarkers this company measures** — If diagnostic: list key biomarkers and what they indicate
 - **H3: Signaling pathways targeted** — If therapeutic: relevant pathways and mechanisms
@@ -174,6 +186,7 @@ Template placeholder for vendor-submitted video (product walkthrough, up to 10 m
 **H2: Category Context**
 
 Structured as:
+
 - **H3: Methodological Comparison** — Comparison table positioning this company's approach alongside alternatives. Highlight the current company's row with `.current-company` class. Describe approaches, don't rank them.
 - **H3: Where the Field Is Evolving** — What's changing in this category? What should clinicians watch for?
 
@@ -186,6 +199,7 @@ Custom call-to-action provided by the vendor. Heading, description, and link to 
 Company-specific Q&A. Questions should anticipate what a clinician would ask before adopting this product.
 
 Rules:
+
 - Answers start affirmative, never with "No."
 - Each answer is 2-4 sentences
 - Draw from all three lenses
@@ -194,7 +208,8 @@ Rules:
 ### 11. Sources
 
 Merged and deduplicated from L2 (Perplexity) + L3 (KB-extracted) citations.
-- Format: Author et al. (Year). "Title." *Journal*. PMID/DOI link.
+
+- Format: Author et al. (Year). "Title." _Journal_. PMID/DOI link.
 - Minimum 15 unique citations
 - All PMIDs/DOIs must be real and verifiable
 
@@ -256,13 +271,13 @@ Render the JSON content into the `templates/company_page.html` template, substit
 
 All 5 must pass:
 
-| ID | Criterion | Pass if... |
-|----|-----------|-----------|
-| CP.1 | `clinical_voice_throughout` | Every section answers "so what?" from a clinician's perspective |
-| CP.2 | `vendor_positive_framing` | Company positioned via "notable for" — zero ranking language |
-| CP.3 | `evidence_honestly_graded` | All studies have explicit evidence levels; unknowns acknowledged |
-| CP.4 | `kb_wisdom_integrated` | KBV2 content enriches at least 3 of 5 major sections |
-| CP.5 | `actionability_clear` | Clinician can answer "should I use this?" after reading |
+| ID   | Criterion                   | Pass if...                                                       |
+| ---- | --------------------------- | ---------------------------------------------------------------- |
+| CP.1 | `clinical_voice_throughout` | Every section answers "so what?" from a clinician's perspective  |
+| CP.2 | `vendor_positive_framing`   | Company positioned via "notable for" — zero ranking language     |
+| CP.3 | `evidence_honestly_graded`  | All studies have explicit evidence levels; unknowns acknowledged |
+| CP.4 | `kb_wisdom_integrated`      | KBV2 content enriches at least 3 of 5 major sections             |
+| CP.5 | `actionability_clear`       | Clinician can answer "should I use this?" after reading          |
 
 ## Litmus Tests
 

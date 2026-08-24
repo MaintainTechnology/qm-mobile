@@ -1,6 +1,6 @@
 ---
 name: NGM Turborepo Migration
-overview: "Migrate NGM Website from React+Vite+Express to a Turborepo monorepo with two Next.js apps: marketing site (Vercel) and LIP platform (Railway), with shared packages for UI, database, and auth."
+overview: 'Migrate NGM Website from React+Vite+Express to a Turborepo monorepo with two Next.js apps: marketing site (Vercel) and LIP platform (Railway), with shared packages for UI, database, and auth.'
 todos:
   - id: phase-0-cleanup
     content: Delete garbage files, peptide content, library pages, duplicates, backups
@@ -9,7 +9,7 @@ todos:
     content: Initialize Turborepo monorepo with directory structure
     status: pending
   - id: phase-2-packages
-    content: "Create shared packages: @ngm/database, @ngm/auth, @ngm/ui, @ngm/config"
+    content: 'Create shared packages: @ngm/database, @ngm/auth, @ngm/ui, @ngm/config'
     status: pending
   - id: phase-3-web
     content: Create apps/web (marketing site) with migrated pages
@@ -74,17 +74,17 @@ fresh_pipeline_test.py, exact_script.py, copy_screenshots.py
 **Temporary/junk files:**
 
 ```javascript
-90000, cookie.txt, SSHTest, temp.txt, temp_recovery.txt
-peptide_part1.txt, peptide_part2.txt, peptide_part2_fixed.txt
-bpc157-scroll.gif, bpc157-scroll-compressed.gif, bpc157-scroll.mp4, bpc157-start.png
-slideshow_component.txt, testing.txt, pipeline_full_data.json, vectorshift_pipelines.json
-capture-bpc157-scroll.js, cv-anant-vinjamoori.html
+(90000, cookie.txt, SSHTest, temp.txt, temp_recovery.txt);
+(peptide_part1.txt, peptide_part2.txt, peptide_part2_fixed.txt);
+(bpc157 - scroll.gif, bpc157 - scroll - compressed.gif, bpc157 - scroll.mp4, bpc157 - start.png);
+(slideshow_component.txt, testing.txt, pipeline_full_data.json, vectorshift_pipelines.json);
+(capture - bpc157 - scroll.js, cv - anant - vinjamoori.html);
 ```
 
 **Replit files:**
 
 ```javascript
-replit.md, replit.nix, windsurf_deployment.yaml
+(replit.md, replit.nix, windsurf_deployment.yaml);
 ```
 
 **Temporary directories:**
@@ -95,8 +95,6 @@ frames/             (17 files)
 deploy-temp/
 temp/
 ```
-
-
 
 ### 0.2 Delete Peptide Content
 
@@ -137,25 +135,21 @@ images/             (entire directory - 2 BPC157 files)
 **Data to delete:**
 
 ```javascript
-client/src/data/peptidesData.tsx
+client / src / data / peptidesData.tsx;
 ```
-
-
 
 ### 0.3 Delete Library/Free Content Pages
 
 **Pages to delete from `client/src/pages/`:**
 
 ```javascript
-LibraryPage.tsx
-BryanJohnsonReview.tsx
-LongevityLessons.tsx
-LongevityMistakes.tsx
-Longevity2025.tsx
-LongevityGuild.tsx
+LibraryPage.tsx;
+BryanJohnsonReview.tsx;
+LongevityLessons.tsx;
+LongevityMistakes.tsx;
+Longevity2025.tsx;
+LongevityGuild.tsx;
 ```
-
-
 
 ### 0.4 Clean Up Assets
 
@@ -179,8 +173,6 @@ NGM Report Example.html → content/docs/
 NGM Sample Report.pdf   → public/downloads/
 ```
 
-
-
 ### 0.5 Clean Up Auth References
 
 **In `esbuild.config.js`, remove 'passport' from externals array.**
@@ -188,9 +180,9 @@ NGM Sample Report.pdf   → public/downloads/
 ### 0.6 Delete Backup Files
 
 ```javascript
-client/src/pages/Consulting.tsx.bak
-client/src/pages/mentorship/lectures/Inflammation.tsx.backup
-temp/Inflammation.tsx.bak
+client / src / pages / Consulting.tsx.bak;
+client / src / pages / mentorship / lectures / Inflammation.tsx.backup;
+temp / Inflammation.tsx.bak;
 ```
 
 ---
@@ -237,8 +229,6 @@ mkdir -p content/email-sequences
 mkdir -p content/docs
 ```
 
-
-
 ### 1.3 Configure Root package.json
 
 Create `ngm-monorepo/package.json`:
@@ -247,11 +237,7 @@ Create `ngm-monorepo/package.json`:
 {
   "name": "ngm-monorepo",
   "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*",
-    "tools/*"
-  ],
+  "workspaces": ["apps/*", "packages/*", "tools/*"],
   "scripts": {
     "build": "turbo build",
     "dev": "turbo dev",
@@ -273,8 +259,6 @@ Create `ngm-monorepo/package.json`:
   "packageManager": "npm@10.0.0"
 }
 ```
-
-
 
 ### 1.4 Configure turbo.json
 
@@ -364,8 +348,6 @@ export default defineConfig({
 });
 ```
 
-
-
 ### 2.2 Auth Package (@ngm/auth)
 
 Create `packages/auth/package.json`:
@@ -413,8 +395,6 @@ Create `packages/auth/src/middleware.ts`:
 ```typescript
 export { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
 ```
-
-
 
 ### 2.3 UI Package (@ngm/ui)
 
@@ -480,8 +460,6 @@ export * from './use-toast';
 // ... export all UI components
 ```
 
-
-
 ### 2.4 Config Package (@ngm/config)
 
 Create `packages/config/package.json`:
@@ -515,8 +493,6 @@ cd apps/web
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
 ```
 
-
-
 ### 3.2 Configure package.json
 
 Update `apps/web/package.json`:
@@ -545,8 +521,6 @@ Update `apps/web/package.json`:
   }
 }
 ```
-
-
 
 ### 3.3 Migrate Marketing Pages
 
@@ -606,8 +580,6 @@ import Link from "next/link";
 export default function Page() { ... }
 ```
 
-
-
 ### 3.4 Create Layout
 
 Create `apps/web/src/app/layout.tsx`:
@@ -645,8 +617,6 @@ export default function RootLayout({
 }
 ```
 
-
-
 ### 3.5 Migrate Layout Components
 
 Copy and adapt:
@@ -660,8 +630,6 @@ Update imports to use shared packages:
 import { Button, Input } from '@ngm/ui';
 import { useAuth, UserButton } from '@ngm/auth';
 ```
-
-
 
 ### 3.6 Create API Routes for Web
 
@@ -680,8 +648,6 @@ These are simple routes that don't need long-running processes.---
 cd apps/platform
 npx create-next-app@latest . --typescript --tailwind --eslint --app --src-dir --import-alias "@/*"
 ```
-
-
 
 ### 4.2 Configure package.json
 
@@ -716,8 +682,6 @@ Update `apps/platform/package.json`:
   }
 }
 ```
-
-
 
 ### 4.3 Migrate LIP Pages
 
@@ -790,7 +754,7 @@ export function generateStaticParams() {
 export default function LecturePage({ params }: { params: { slug: string } }) {
   const lecture = lectures.find((l) => l.slug === params.slug);
   if (!lecture) return notFound();
-  
+
   const LectureComponent = lecture.component;
   return <LectureComponent />;
 }
@@ -880,16 +844,12 @@ cp -r content/email-sequences/ ngm-monorepo/content/email-sequences/
 cp -r content/docs/ ngm-monorepo/content/docs/
 ```
 
-
-
 ### 5.3 Copy Cursor Rules and Claude Skills
 
 ```bash
 cp -r .cursor/ ngm-monorepo/.cursor/
 cp -r .claude/ ngm-monorepo/.claude/
 ```
-
-
 
 ### 5.4 Copy Documentation
 
@@ -956,8 +916,6 @@ Create `apps/web/vercel.json`:
   "buildCommand": "cd ../.. && npx turbo build --filter=web"
 }
 ```
-
-
 
 ### 7.2 Railway Configuration (apps/platform)
 

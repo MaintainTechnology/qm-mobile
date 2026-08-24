@@ -39,7 +39,7 @@ separate. `FnfProvider` and every SDK-backed route still require `/api/user` and
 server-side `https://fnf.internal/user` guards.
 
 ```tsx
-import { FnfProvider } from '@higgsfield/fnf-react'
+import { FnfProvider } from '@higgsfield/fnf-react';
 
 <FnfProvider
   adapter={adapter}
@@ -49,7 +49,7 @@ import { FnfProvider } from '@higgsfield/fnf-react'
   scopeKey={workspaceId}
 >
   {children}
-</FnfProvider>
+</FnfProvider>;
 ```
 
 Provider hooks:
@@ -94,17 +94,17 @@ references stable. Do not create a new adapter or new job array on every render.
 Common query helpers:
 
 ```ts
-characterQueryOptions(characterClient, characterId, { scopeKey })
-referenceQueryOptions(referenceClient, elementId, { scopeKey })
-referencesQueryOptions(referenceClient, { category: 'character' }, { scopeKey })
-generationQueryOptions(jobClient, id, { scopeKey })
-jobSetQueryOptions(jobClient, jobSetId, { scopeKey })
-jobsFeedQueryOptions(jobClient, { type: 'image', size: 20 }, { scopeKey })
-profileSnapshotQueryOptions(profileClient, { scopeKey })
-profileCreditsQueryOptions(profileClient, { scopeKey, includeOnDemand: true })
-costQueryOptions(jobClient, input, { scopeKey, enabled })
-realtimeChainCostQueryOptions(realtimeClient, input, { scopeKey, enabled })
-realtimeCustomStylesQueryOptions(realtimeClient, query, { scopeKey, enabled })
+characterQueryOptions(characterClient, characterId, { scopeKey });
+referenceQueryOptions(referenceClient, elementId, { scopeKey });
+referencesQueryOptions(referenceClient, { category: 'character' }, { scopeKey });
+generationQueryOptions(jobClient, id, { scopeKey });
+jobSetQueryOptions(jobClient, jobSetId, { scopeKey });
+jobsFeedQueryOptions(jobClient, { type: 'image', size: 20 }, { scopeKey });
+profileSnapshotQueryOptions(profileClient, { scopeKey });
+profileCreditsQueryOptions(profileClient, { scopeKey, includeOnDemand: true });
+costQueryOptions(jobClient, input, { scopeKey, enabled });
+realtimeChainCostQueryOptions(realtimeClient, input, { scopeKey, enabled });
+realtimeCustomStylesQueryOptions(realtimeClient, query, { scopeKey, enabled });
 ```
 
 The realtime query helpers cache read-only cost estimates and saved-style
@@ -156,8 +156,8 @@ For SDK-backed generators, React UI must handle both the submit lifecycle and
 the historical feed:
 
 ```tsx
-import { HiggsfieldGenerationCard } from "@/components/higgsfield-generation-card"
-import { jobsFeedQueryOptions, flattenFeedPages, useGenerationRun } from "@higgsfield/fnf-react"
+import { HiggsfieldGenerationCard } from '@/components/higgsfield-generation-card';
+import { jobsFeedQueryOptions, flattenFeedPages, useGenerationRun } from '@higgsfield/fnf-react';
 ```
 
 Required behavior:

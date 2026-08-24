@@ -23,15 +23,15 @@ Do this conversion once when translating, not at runtime.
 ## interpolate — linear
 
 ```tsx
-const opacity = interpolate(frame, [0, 30], [0, 1], { extrapolateRight: "clamp" });
+const opacity = interpolate(frame, [0, 30], [0, 1], { extrapolateRight: 'clamp' });
 ```
 
 Translates to:
 
 ```js
-gsap.to(target, { opacity: 1, duration: 1.0, ease: "none" }, 0);
+gsap.to(target, { opacity: 1, duration: 1.0, ease: 'none' }, 0);
 // fromTo if the property starts at 0 and CSS doesn't already set it
-gsap.fromTo(target, { opacity: 0 }, { opacity: 1, duration: 1.0, ease: "none" }, 0);
+gsap.fromTo(target, { opacity: 0 }, { opacity: 1, duration: 1.0, ease: 'none' }, 0);
 ```
 
 `ease: "none"` matches Remotion's default linear interpolation. CSS sets the
@@ -52,9 +52,9 @@ Three keyframed tweens at offsets `[0]/fps`, `[1]/fps`, `[2]/fps`:
 
 ```js
 const tl = gsap.timeline({ paused: true });
-tl.to(target, { opacity: 1, duration: 0.5, ease: "none" }, 0);
-tl.to(target, { opacity: 1, duration: 2.0, ease: "none" }, 0.5);
-tl.to(target, { opacity: 0, duration: 0.5, ease: "none" }, 2.5);
+tl.to(target, { opacity: 1, duration: 0.5, ease: 'none' }, 0);
+tl.to(target, { opacity: 1, duration: 2.0, ease: 'none' }, 0.5);
+tl.to(target, { opacity: 0, duration: 0.5, ease: 'none' }, 2.5);
 ```
 
 Validated in T1 — mean SSIM 0.974 against Remotion baseline.
@@ -82,7 +82,7 @@ proportionally.
 ## interpolate with custom easing
 
 ```tsx
-import { Easing } from "remotion";
+import { Easing } from 'remotion';
 interpolate(frame, [0, 30], [0, 1], { easing: Easing.out(Easing.cubic) });
 ```
 
@@ -100,13 +100,13 @@ interpolate(frame, [0, 30], [0, 1], { easing: Easing.out(Easing.cubic) });
 ## interpolate driving non-numeric properties
 
 ```tsx
-const color = interpolateColors(frame, [0, 30], ["#ff0000", "#0000ff"]);
+const color = interpolateColors(frame, [0, 30], ['#ff0000', '#0000ff']);
 ```
 
 GSAP does color tweens natively:
 
 ```js
-gsap.to(target, { color: "#0000ff", duration: 1.0, ease: "none" }, 0);
+gsap.to(target, { color: '#0000ff', duration: 1.0, ease: 'none' }, 0);
 ```
 
 Same for `backgroundColor`, `borderColor`. The `from` value is read from CSS
@@ -132,7 +132,7 @@ tl.to(
   {
     v: target,
     duration: 1.5,
-    ease: "power3.out",
+    ease: 'power3.out',
     onUpdate: () => {
       el.textContent = Math.round(counter.v).toLocaleString();
     },

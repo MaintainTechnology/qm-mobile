@@ -38,9 +38,9 @@ export const WELL_TIERS = ['graphic', 'interaction', 'atmosphere'];
 // onboarding request had nothing to draw.
 export const COMPOSITION_GRAINS = [
   'product', // a whole site or app: its information architecture
-  'flow',    // a sequence of views with one outcome: onboarding, checkout, setup
-  'view',    // one page or screen
-  'region',  // a section inside a view: a hero, a feature grid, a table
+  'flow', // a sequence of views with one outcome: onboarding, checkout, setup
+  'view', // one page or screen
+  'region', // a section inside a view: a hero, a feature grid, a table
 ];
 
 // Delivery targets a composition can survive. Mirrors the skill's platform axis
@@ -60,7 +60,6 @@ export function isGrain(value) {
 export function isPlatform(value) {
   return COMPOSITION_PLATFORMS.includes(value);
 }
-
 
 /**
  * Drives a selection generator with a synchronous hash.
@@ -108,7 +107,10 @@ function challengerTickets(pool) {
     const rating = concept.review?.rating;
     if (rating === 1 || concept.review?.breadth === 'niche') return [];
     return rating === 3
-      ? [{ concept, ticket: 0 }, { concept, ticket: 1 }]
+      ? [
+          { concept, ticket: 0 },
+          { concept, ticket: 1 },
+        ]
       : [{ concept, ticket: 0 }];
   });
 }
@@ -118,7 +120,10 @@ function compositionTickets(pool) {
     const rating = composition.review?.rating;
     if (rating === 1) return [];
     return rating === 3
-      ? [{ composition, ticket: 0 }, { composition, ticket: 1 }]
+      ? [
+          { composition, ticket: 0 },
+          { composition, ticket: 1 },
+        ]
       : [{ composition, ticket: 0 }];
   });
 }
@@ -143,15 +148,21 @@ function modeAllows(concept, mode) {
   return allowed.includes(mode);
 }
 
-export function* selectApprovedChallengers({ scope, key, reroll = 0, minRating = null, mode = null, concepts }) {
+export function* selectApprovedChallengers({
+  scope,
+  key,
+  reroll = 0,
+  minRating = null,
+  mode = null,
+  concepts,
+}) {
   const approved = concepts.filter(concept => concept.status === 'approved');
   // Direction chooses a durable identity, so it draws worlds; surface designs
   // one page inside a committed identity, so it draws compositions. Duals serve
   // both. A tier with no matching-strength approvals falls back to its full
   // approved pool rather than starving the roll.
-  const wanted = scope === 'direction'
-    ? new Set(['world', 'dual'])
-    : new Set(['composition', 'dual']);
+  const wanted =
+    scope === 'direction' ? new Set(['world', 'dual']) : new Set(['composition', 'dual']);
 
   const approvedByTier = new Map();
   for (const concept of approved) {
@@ -196,7 +207,7 @@ export function* selectApprovedChallengers({ scope, key, reroll = 0, minRating =
     const salt = round === 0 ? '' : `:reroll-${round}`;
     const tierOrder = (yield* rank(
       WELL_TIERS.map(id => ({ id })),
-      `${scope}:${key}:tiers${salt}`
+      `${scope}:${key}:tiers${salt}`,
     )).map(item => item.id);
     const picks = [];
     for (const [index, tier] of tierOrder.entries()) {
@@ -208,7 +219,7 @@ export function* selectApprovedChallengers({ scope, key, reroll = 0, minRating =
       const ranked = yield* rank(
         tickets,
         `${scope}:${key}:challenger-${index}${salt}`,
-        entry => `${entry.concept.id}#${entry.ticket}`
+        entry => `${entry.concept.id}#${entry.ticket}`,
       );
       const order = [];
       const seen = new Set();
@@ -218,8 +229,9 @@ export function* selectApprovedChallengers({ scope, key, reroll = 0, minRating =
         order.push(entry.concept);
       }
       const first = order[0];
-      const second = order.find(concept => concept.familyId !== first.familyId)
-        || order.find(concept => concept.id !== first.id);
+      const second =
+        order.find(concept => concept.familyId !== first.familyId) ||
+        order.find(concept => concept.id !== first.id);
       picks.push(...(second ? [first, second] : [first]));
     }
     return picks;
@@ -237,7 +249,13 @@ export function* selectApprovedChallengers({ scope, key, reroll = 0, minRating =
 }
 
 function emptyMatch(grain, platform, platformExcluded = 0) {
-  return { grain: grain ?? null, atGrain: grain ? 0 : null, grainAvailable: grain ? 0 : null, platform: platform ?? null, platformExcluded };
+  return {
+    grain: grain ?? null,
+    atGrain: grain ? 0 : null,
+    grainAvailable: grain ? 0 : null,
+    platform: platform ?? null,
+    platformExcluded,
+  };
 }
 
 /**
@@ -263,7 +281,16 @@ function emptyMatch(grain, platform, platformExcluded = 0) {
  * @param {number} [options.count]
  * @returns {Generator<string[], {picks: Array, match: object}, string[]>}
  */
-export function* selectApprovedCompositions({ scope, key, reroll = 0, mode = null, grain = null, platform = null, compositions, count = 3 }) {
+export function* selectApprovedCompositions({
+  scope,
+  key,
+  reroll = 0,
+  mode = null,
+  grain = null,
+  platform = null,
+  compositions,
+  count = 3,
+}) {
   // Compositions honour the same breadth gate as worlds: one too specific to serve
   // an arbitrary build stays approved for direct briefs and leaves the
   // challenger pool. Falls back to the full approved set rather than returning
@@ -291,7 +318,8 @@ export function* selectApprovedCompositions({ scope, key, reroll = 0, mode = nul
     // No fallback here either: dealing a hover-only composition to a phone build
     // is worse than dealing nothing, and an empty deal is a visible gap.
     approved = survives;
-    if (approved.length === 0) return { picks: [], match: emptyMatch(grain, platform, platformExcluded) };
+    if (approved.length === 0)
+      return { picks: [], match: emptyMatch(grain, platform, platformExcluded) };
   }
 
   const prior = new Set();
@@ -313,7 +341,7 @@ export function* selectApprovedCompositions({ scope, key, reroll = 0, mode = nul
       // The salt keeps the word "staging" deliberately. It is hash input, so
       // renaming it would re-deal every roll anyone has ever reproduced by key.
       round === 0 ? `${scope}:${key}:staging` : `${scope}:${key}:staging:reroll-${round}`,
-      entry => `${entry.composition.id}#${entry.ticket}`
+      entry => `${entry.composition.id}#${entry.ticket}`,
     )).map(entry => entry.composition);
 
     // Grain is a preference, not a filter: requesting an onboarding flow deals
@@ -326,8 +354,10 @@ export function* selectApprovedCompositions({ scope, key, reroll = 0, mode = nul
     // the same silent-plausibility failure this whole axis exists to fix: the
     // model would improvise the flow structure while believing it was handed one.
     const ordered = grain
-      ? [...ranked.filter(composition => composition.grain === grain),
-         ...ranked.filter(composition => composition.grain !== grain)]
+      ? [
+          ...ranked.filter(composition => composition.grain === grain),
+          ...ranked.filter(composition => composition.grain !== grain),
+        ]
       : ranked;
 
     const families = new Set();
@@ -354,7 +384,9 @@ export function* selectApprovedCompositions({ scope, key, reroll = 0, mode = nul
       // How many of the dealt compositions actually sit at the requested grain.
       // 0 with a grain requested means every pick is a borrowed structure.
       atGrain,
-      grainAvailable: grain ? approved.filter(composition => composition.grain === grain).length : null,
+      grainAvailable: grain
+        ? approved.filter(composition => composition.grain === grain).length
+        : null,
       platform: platform ?? null,
       platformExcluded,
     },

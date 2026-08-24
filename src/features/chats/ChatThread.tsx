@@ -22,7 +22,13 @@ import { SendIcon } from '@/features/home/icons';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-import { canReply, replyErrorMessage, useSendChatReply, type ChatMessage, type ChatRow } from './chats-api';
+import {
+  canReply,
+  replyErrorMessage,
+  useSendChatReply,
+  type ChatMessage,
+  type ChatRow,
+} from './chats-api';
 import { chatDisplayName, channelLabel, relativeTime } from './format';
 
 export function ChatThread({
@@ -114,7 +120,11 @@ export function ChatThread({
                 editable={!mutation.isPending}
                 style={[
                   styles.input,
-                  { backgroundColor: colors.ink, borderColor: colors.inkLine, color: colors.textPri },
+                  {
+                    backgroundColor: colors.ink,
+                    borderColor: colors.inkLine,
+                    color: colors.textPri,
+                  },
                 ]}
               />
               <Pressable
@@ -142,7 +152,9 @@ export function ChatThread({
             ) : null}
           </>
         ) : (
-          <Text style={[styles.noReply, { color: colors.textDim }]}>Voice call · no SMS thread</Text>
+          <Text style={[styles.noReply, { color: colors.textDim }]}>
+            Voice call · no SMS thread
+          </Text>
         )}
       </View>
     </KeyboardAvoidingView>

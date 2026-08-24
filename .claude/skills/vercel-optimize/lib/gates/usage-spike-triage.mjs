@@ -26,7 +26,7 @@ export function gate(signals) {
 
   const totalSpikeDays = dayTotals
     .map((value, idx) => ({ idx, value }))
-    .filter((d) => d.value > mean * TOTAL_MULTIPLIER && d.value > MIN_BILLED_FLOOR);
+    .filter(d => d.value > mean * TOTAL_MULTIPLIER && d.value > MIN_BILLED_FLOOR);
 
   const skuStats = aggregateSkuStats(days);
   const skuSpikes = [];
@@ -58,7 +58,8 @@ export function gate(signals) {
       confidence: 0.78,
       o11ySignal: `total_spike day_idx=${peak.idx} day_billed=${peak.value.toFixed(2)} window_mean=${mean.toFixed(2)} mult=${(peak.value / mean).toFixed(1)}x`,
       reason: 'total billed cost on one day exceeds 2× the window mean',
-      question: 'Which workload generated the day-over-day spike — bot or AI-crawler traffic on a cacheable route, a viral event, a pricing-model migration, or a code regression?',
+      question:
+        'Which workload generated the day-over-day spike — bot or AI-crawler traffic on a cacheable route, a viral event, a pricing-model migration, or a code regression?',
       evidence: {
         metric: 'usage.breakdown.data.total',
         spikeDay: peak.idx,

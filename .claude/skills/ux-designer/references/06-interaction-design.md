@@ -11,9 +11,11 @@ Small, contained moments that accomplish a single task while enhancing the user 
 ### Dan Saffer's Four Components
 
 #### 1. Trigger
+
 What initiates the micro-interaction.
 
 **User Triggers:**
+
 - Click/tap
 - Swipe
 - Hover
@@ -22,12 +24,14 @@ What initiates the micro-interaction.
 - Keyboard input
 
 **System Triggers:**
+
 - Time-based (notification)
 - Location-based
 - Data changes
 - Error conditions
 
 #### 2. Rules
+
 What happens once triggered.
 
 ```
@@ -42,6 +46,7 @@ Example: Like button
 ```
 
 #### 3. Feedback
+
 How the system communicates what's happening.
 
 **Visual:** Color, shape, position changes
@@ -50,6 +55,7 @@ How the system communicates what's happening.
 **Motion:** Animation
 
 #### 4. Loops and Modes
+
 How the interaction changes over time or in different states.
 
 ```
@@ -112,31 +118,43 @@ Modes:
 
 ```css
 /* Default */
-.input { border: 1px solid #ccc; }
+.input {
+  border: 1px solid #ccc;
+}
 
 /* Focus */
-.input:focus { border-color: #0066cc; box-shadow: 0 0 0 3px rgba(0,102,204,0.2); }
+.input:focus {
+  border-color: #0066cc;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.2);
+}
 
 /* Valid */
-.input:valid { border-color: #28a745; }
+.input:valid {
+  border-color: #28a745;
+}
 
 /* Invalid */
-.input:invalid { border-color: #dc3545; }
+.input:invalid {
+  border-color: #dc3545;
+}
 
 /* Disabled */
-.input:disabled { background: #f5f5f5; cursor: not-allowed; }
+.input:disabled {
+  background: #f5f5f5;
+  cursor: not-allowed;
+}
 ```
 
 ### System States
 
-| State | Visual Indicator | User Action |
-|-------|-----------------|-------------|
-| Loading | Spinner, skeleton, progress bar | Wait |
-| Success | Green check, confirmation message | Continue |
-| Error | Red alert, error message | Correct and retry |
-| Warning | Yellow/orange alert | Proceed with caution |
-| Empty | Illustration, helpful message | Add content |
-| Offline | Banner, cached indicator | Limited functionality |
+| State   | Visual Indicator                  | User Action           |
+| ------- | --------------------------------- | --------------------- |
+| Loading | Spinner, skeleton, progress bar   | Wait                  |
+| Success | Green check, confirmation message | Continue              |
+| Error   | Red alert, error message          | Correct and retry     |
+| Warning | Yellow/orange alert               | Proceed with caution  |
+| Empty   | Illustration, helpful message     | Add content           |
+| Offline | Banner, cached indicator          | Limited functionality |
 
 ---
 
@@ -146,30 +164,48 @@ Modes:
 
 ```css
 /* Natural feeling durations */
-.quick { transition-duration: 100ms; }   /* Hovers, immediate feedback */
-.normal { transition-duration: 200ms; }  /* Standard transitions */
-.smooth { transition-duration: 300ms; }  /* Panel transitions */
-.slow { transition-duration: 500ms; }    /* Large/complex animations */
+.quick {
+  transition-duration: 100ms;
+} /* Hovers, immediate feedback */
+.normal {
+  transition-duration: 200ms;
+} /* Standard transitions */
+.smooth {
+  transition-duration: 300ms;
+} /* Panel transitions */
+.slow {
+  transition-duration: 500ms;
+} /* Large/complex animations */
 
 /* Maximum for focused attention */
-.complex { animation-duration: 500ms; }  /* Don't exceed 500ms typically */
+.complex {
+  animation-duration: 500ms;
+} /* Don't exceed 500ms typically */
 ```
 
 ### Easing Functions
 
 ```css
 /* Standard easing curves */
-.ease-out { transition-timing-function: ease-out; }
+.ease-out {
+  transition-timing-function: ease-out;
+}
 /* Fast start, slow end - entering elements */
 
-.ease-in { transition-timing-function: ease-in; }
+.ease-in {
+  transition-timing-function: ease-in;
+}
 /* Slow start, fast end - exiting elements */
 
-.ease-in-out { transition-timing-function: ease-in-out; }
+.ease-in-out {
+  transition-timing-function: ease-in-out;
+}
 /* Smooth start and end - moving elements */
 
 /* Custom bezier curves */
-.bounce { transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55); }
+.bounce {
+  transition-timing-function: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
 ```
 
 ### The 12 Principles of Animation (Disney)
@@ -204,21 +240,20 @@ Applied to UI:
 </div>
 
 <style>
-.skeleton * {
-  background: linear-gradient(
-    90deg,
-    #f0f0f0 25%,
-    #e0e0e0 50%,
-    #f0f0f0 75%
-  );
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-}
+  .skeleton * {
+    background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.5s infinite;
+  }
 
-@keyframes shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
-}
+  @keyframes shimmer {
+    0% {
+      background-position: 200% 0;
+    }
+    100% {
+      background-position: -200% 0;
+    }
+  }
 </style>
 ```
 
@@ -249,15 +284,15 @@ Indeterminate (unknown duration):
 
 ### Standard Touch Gestures
 
-| Gesture | Action | Example |
-|---------|--------|---------|
-| Tap | Select, activate | Button press |
-| Double tap | Zoom, like | Photo zoom |
-| Long press | Context menu | Delete options |
-| Swipe | Navigate, dismiss | Page turn, delete |
-| Pinch | Zoom | Map, photo |
-| Rotate | Rotate object | Image editing |
-| Drag | Move, reorder | List sorting |
+| Gesture    | Action            | Example           |
+| ---------- | ----------------- | ----------------- |
+| Tap        | Select, activate  | Button press      |
+| Double tap | Zoom, like        | Photo zoom        |
+| Long press | Context menu      | Delete options    |
+| Swipe      | Navigate, dismiss | Page turn, delete |
+| Pinch      | Zoom              | Map, photo        |
+| Rotate     | Rotate object     | Image editing     |
+| Drag       | Move, reorder     | List sorting      |
 
 ### Gesture Best Practices
 
@@ -331,7 +366,9 @@ Indeterminate (unknown duration):
 .modal {
   transform: scale(0.95);
   opacity: 0;
-  transition: transform 200ms ease, opacity 200ms ease;
+  transition:
+    transform 200ms ease,
+    opacity 200ms ease;
 }
 .modal.open {
   transform: scale(1);
@@ -406,18 +443,19 @@ if ('vibrate' in navigator) {
 
 ### Haptic Patterns
 
-| Action | Pattern | Feel |
-|--------|---------|------|
-| Success | Short, light | Confirmation |
-| Error | Two quick pulses | Alert |
-| Selection | Very short | Tactile |
-| Warning | Medium, strong | Attention |
+| Action    | Pattern          | Feel         |
+| --------- | ---------------- | ------------ |
+| Success   | Short, light     | Confirmation |
+| Error     | Two quick pulses | Alert        |
+| Selection | Very short       | Tactile      |
+| Warning   | Medium, strong   | Attention    |
 
 ---
 
 ## 2026 Trends
 
 ### Functional Motion (motion earns its keep)
+
 The dominant 2026 framing: motion should **guide, not flash**. Every animation must
 do a job—orient the user, show cause and effect, or maintain spatial continuity—
 otherwise it's decoration that adds cognitive load. Reserve flourish for moments
@@ -429,6 +467,7 @@ that matter (success, first-run delight); keep everyday transitions calm and qui
 - Cut motion that exists only to look impressive—calm interfaces win in 2026
 
 ### Giving Users Control Over Motion
+
 `prefers-reduced-motion` (see [Reduced Motion](#reduced-motion) above) is the
 baseline, but it's an OS-level all-or-nothing switch many users never set. Mature
 products add an **explicit in-product "Reduce motion" toggle** in settings so users
@@ -443,14 +482,16 @@ Settings → Accessibility → Motion
 
 - Default to the OS preference, then let the in-app setting override it
 - Persist the choice per user/device; apply it everywhere, not just key screens
-- Treat "reduced" as *reduced* (instant fades) not *broken* (no feedback at all)
+- Treat "reduced" as _reduced_ (instant fades) not _broken_ (no feedback at all)
 
 ### AI-Driven Interactions
+
 - Predictive UI that anticipates needs (offered, never forced)
 - Personalized micro-interactions
 - Adaptive animation complexity tuned to device performance
 
 ### Voice + Multimodal
+
 - Multimodal feedback (voice confirms visual action)
 - Combining voice, touch, pointer, and keyboard input
 - See [24-voice-and-multimodal.md](24-voice-and-multimodal.md) for depth

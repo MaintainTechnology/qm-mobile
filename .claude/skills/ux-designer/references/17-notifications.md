@@ -8,13 +8,13 @@ Notifications are a cross-cutting concern that affects every product. This refer
 
 ### By Purpose
 
-| Type | Description | Priority | Example |
-|------|-------------|----------|---------|
-| **Transactional** | Result of a user action | High | "Order confirmed", "Payment received" |
-| **Informational** | System updates or status | Medium | "Maintenance scheduled", "Export ready" |
-| **Social** | Activity from other users | Medium | "Alex commented on your post" |
-| **Promotional** | Marketing or upsell | Low | "Try our new feature", "Upgrade plan" |
-| **Alert** | Urgent system or security | Critical | "Unusual sign-in detected", "Server down" |
+| Type              | Description               | Priority | Example                                   |
+| ----------------- | ------------------------- | -------- | ----------------------------------------- |
+| **Transactional** | Result of a user action   | High     | "Order confirmed", "Payment received"     |
+| **Informational** | System updates or status  | Medium   | "Maintenance scheduled", "Export ready"   |
+| **Social**        | Activity from other users | Medium   | "Alex commented on your post"             |
+| **Promotional**   | Marketing or upsell       | Low      | "Try our new feature", "Upgrade plan"     |
+| **Alert**         | Urgent system or security | Critical | "Unusual sign-in detected", "Server down" |
 
 ### By Urgency
 
@@ -64,13 +64,13 @@ Info       █░░░░░░░░░░░  Background context (changelog, 
 
 ### Visual Priority
 
-| Element | Critical | Warning | Info | Success |
-|---------|----------|---------|------|---------|
-| Icon | ⛔ / 🔴 | ⚠️ / 🟡 | ℹ️ / 🔵 | ✅ / 🟢 |
-| Color | Red | Yellow/Amber | Blue | Green |
-| Position | Modal/top banner | Top banner | Inline/toast | Toast |
-| Sound | Optional alert | None | None | None |
-| Persistence | Until resolved | Until dismissed | Auto-dismiss | Auto-dismiss |
+| Element     | Critical         | Warning         | Info         | Success      |
+| ----------- | ---------------- | --------------- | ------------ | ------------ |
+| Icon        | ⛔ / 🔴          | ⚠️ / 🟡         | ℹ️ / 🔵      | ✅ / 🟢      |
+| Color       | Red              | Yellow/Amber    | Blue         | Green        |
+| Position    | Modal/top banner | Top banner      | Inline/toast | Toast        |
+| Sound       | Optional alert   | None            | None         | None         |
+| Persistence | Until resolved   | Until dismissed | Auto-dismiss | Auto-dismiss |
 
 ---
 
@@ -118,18 +118,21 @@ Info       █░░░░░░░░░░░  Background context (changelog, 
 ```
 
 **Duration guidelines:**
+
 - Short messages (no action): 4 seconds
 - Messages with action button: 6-8 seconds
 - Error messages: 8-10 seconds or until dismissed
 - Never auto-dismiss critical errors
 
 **Placement:**
+
 - Bottom-center or bottom-right (most common)
 - Top-center for important alerts
 - Consistent position throughout the app
 - Away from primary interaction areas
 
 **Stacking:**
+
 ```
 ┌──────────────────────────────┐
 │ ✅ File uploaded              │  ← newest
@@ -156,6 +159,7 @@ Older toasts slide out or collapse
 ```
 
 **Design rules:**
+
 - Numeric badge: 1-99, then "99+" for overflow
 - Dot badge: for "something new" without specific count
 - Position: top-right of the icon
@@ -260,6 +264,7 @@ Reserve for critical interruptions that require immediate user decision.
 ```
 
 **Features:**
+
 - Read/unread visual distinction (dot, bold, background color)
 - Grouping by time (Today, Yesterday, This week, Older)
 - Filter tabs (All, Unread, Mentions, specific categories)
@@ -410,15 +415,15 @@ When user denied permission:
 
 ## Key Metrics
 
-| Metric | Target | Context |
-|--------|--------|---------|
-| Push opt-in rate | > 50% | Permission acceptance |
-| Notification open rate | > 15% | Push engagement |
-| Email unsubscribe rate | < 0.5%/email | List health |
-| Toast dismissal rate | Track | Too many = too noisy |
-| Notification → action | > 25% | Relevance indicator |
-| Permission ask timing | After activation | Not on first visit |
-| DND usage | Monitor | High = too noisy overall |
+| Metric                 | Target           | Context                  |
+| ---------------------- | ---------------- | ------------------------ |
+| Push opt-in rate       | > 50%            | Permission acceptance    |
+| Notification open rate | > 15%            | Push engagement          |
+| Email unsubscribe rate | < 0.5%/email     | List health              |
+| Toast dismissal rate   | Track            | Too many = too noisy     |
+| Notification → action  | > 25%            | Relevance indicator      |
+| Permission ask timing  | After activation | Not on first visit       |
+| DND usage              | Monitor          | High = too noisy overall |
 
 ---
 

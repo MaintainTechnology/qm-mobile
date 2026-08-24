@@ -9,8 +9,8 @@ and seeks them per-frame via `goToAndStop`.
 ## Pattern
 
 ```tsx
-import { Lottie } from "@remotion/lottie";
-import animationData from "./hello.json";
+import { Lottie } from '@remotion/lottie';
+import animationData from './hello.json';
 
 export const MyComp = () => (
   <AbsoluteFill>
@@ -27,11 +27,11 @@ Translates to:
   <script src="https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"></script>
   <script>
     const anim = lottie.loadAnimation({
-      container: document.getElementById("lottie-anim"),
-      renderer: "svg",
+      container: document.getElementById('lottie-anim'),
+      renderer: 'svg',
       loop: false,
       autoplay: false,
-      path: "assets/hello.json",
+      path: 'assets/hello.json',
     });
     window.__hfLottie = window.__hfLottie || [];
     window.__hfLottie.push(anim);
@@ -61,8 +61,8 @@ For dotlottie (binary) format, swap in `@lottiefiles/dotlottie-web`:
 <canvas id="anim" style="width:100%;height:100%"></canvas>
 <script>
   const player = new DotLottie({
-    canvas: document.getElementById("anim"),
-    src: "assets/hello.lottie",
+    canvas: document.getElementById('anim'),
+    src: 'assets/hello.lottie',
     autoplay: false,
   });
   window.__hfLottie = window.__hfLottie || [];

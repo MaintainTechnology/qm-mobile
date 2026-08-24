@@ -159,19 +159,19 @@ have read the guides + the chosen code layout, you have enough — start writing
 
 ## Functional routing
 
-| Task | Read |
-|---|---|
-| **START HERE** — the working critical path: auth, generation submit/poll, result rendering, the common Quanta components | **`references/app-quickstart.md`** |
-| fnf SDK: generation jobs, media upload, profile/workspace/credits, adapters | `references/fnf-sdk.md` + `references/auth.md` + `references/runtime-and-infra.md` |
-| React query/cache/controllers for fnf | `references/fnf-react.md` + `references/auth.md` |
-| Higgsfield-SDK app UI (generation console, fnf-backed tool) | `references/app-layouts.md` + `references/quanta-design.md` + `references/fnf-sdk.md` + `references/fnf-react.md` + `references/auth.md` (component gaps: build from Quanta primitives) |
-| Cover / OG image ("cover", "обложка", "OG image", publish prep) | `references/app-cover.md` — branded 3:2 cover + capsule OG mask |
-| Cover video / "animate the cover" (`og_video_url`, permission-gated) | `references/cover-animator.md` — ~5s end-frame reveal via `seedance_2_0` |
-| App contest ("enter the contest", "$100k contest", `higgsfield website contest`) | `references/contest.md` — entry auto-publishes; submit with social links |
-| Auth, current user, login/logout, `/api/user`, `__auth` routes | `references/auth.md` + `references/runtime-and-infra.md` |
-| Protected/authenticated `/api/...` file downloads inside the Higgsfield iframe | `references/auth.md` — credentialed fetch → Blob download; signed URLs for large files |
-| TanStack Start routes, SSR, server functions, Cloudflare Worker runtime | `references/runtime-and-infra.md` |
-| Heavy / long-running work (ffmpeg, headless browser, background jobs), containers | `references/containers.md` |
+| Task                                                                                                                     | Read                                                                                                                                                                                    |
+| ------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **START HERE** — the working critical path: auth, generation submit/poll, result rendering, the common Quanta components | **`references/app-quickstart.md`**                                                                                                                                                      |
+| fnf SDK: generation jobs, media upload, profile/workspace/credits, adapters                                              | `references/fnf-sdk.md` + `references/auth.md` + `references/runtime-and-infra.md`                                                                                                      |
+| React query/cache/controllers for fnf                                                                                    | `references/fnf-react.md` + `references/auth.md`                                                                                                                                        |
+| Higgsfield-SDK app UI (generation console, fnf-backed tool)                                                              | `references/app-layouts.md` + `references/quanta-design.md` + `references/fnf-sdk.md` + `references/fnf-react.md` + `references/auth.md` (component gaps: build from Quanta primitives) |
+| Cover / OG image ("cover", "обложка", "OG image", publish prep)                                                          | `references/app-cover.md` — branded 3:2 cover + capsule OG mask                                                                                                                         |
+| Cover video / "animate the cover" (`og_video_url`, permission-gated)                                                     | `references/cover-animator.md` — ~5s end-frame reveal via `seedance_2_0`                                                                                                                |
+| App contest ("enter the contest", "$100k contest", `higgsfield website contest`)                                         | `references/contest.md` — entry auto-publishes; submit with social links                                                                                                                |
+| Auth, current user, login/logout, `/api/user`, `__auth` routes                                                           | `references/auth.md` + `references/runtime-and-infra.md`                                                                                                                                |
+| Protected/authenticated `/api/...` file downloads inside the Higgsfield iframe                                           | `references/auth.md` — credentialed fetch → Blob download; signed URLs for large files                                                                                                  |
+| TanStack Start routes, SSR, server functions, Cloudflare Worker runtime                                                  | `references/runtime-and-infra.md`                                                                                                                                                       |
+| Heavy / long-running work (ffmpeg, headless browser, background jobs), containers                                        | `references/containers.md`                                                                                                                                                              |
 
 Do NOT search the skill library for other design guidance — everything is here.
 
@@ -207,6 +207,7 @@ public site immediately; never hard-code `HF_DESIGN_INSPECTOR=1` into the
 `build` script or hand-edit the build scripts to toggle the inspector.
 
 ### 1. SSR-safe rendering
+
 Every route renders on the server per request. NEVER touch browser-only
 globals (`window`, `document`, `localStorage`, `navigator`) at module top
 level or during render — only inside `useEffect`/event handlers, or guarded
@@ -214,6 +215,7 @@ with `typeof window !== "undefined"`. A top-level `window` reference crashes
 SSR.
 
 ### 2. Server-only code stays server-only
+
 Put server logic in `createServerFn(...).handler(...)` or a `*.server.ts`
 module (the `.server.ts` suffix keeps it out of the client bundle). Secrets
 and bindings are read **server-side, per request** — never shipped to the
@@ -298,6 +300,7 @@ The ONLY exception is when the user **explicitly** asks for an offline/mock
 demo — then say plainly that it is a mock and why.
 
 ### 4. Cloudflare bindings via `cloudflare:workers`
+
 Any infra you opt into (D1 `DB`, R2 `STORAGE`, KV `KV`) is read server-side
 through `app/src/lib/bindings.server.ts`
 (`import { env } from "cloudflare:workers"`). Each binding is present ONLY if
@@ -306,6 +309,7 @@ guard before use. Do not thread `env` through React props or read it at
 module top level.
 
 ### 5. Opted-in storage is LIVE — one deploy, one database
+
 If you opt into D1, R2, or KV, each is a SINGLE instance backing the ONE live
 deploy. There is no staging copy: every migration and data change hits **live
 production data** directly. `env.HF_ENV` is always `"production"` on deployed
@@ -315,6 +319,7 @@ migrations (`CREATE TABLE IF NOT EXISTS`, `ADD COLUMN`), and get explicit user
 approval before any destructive change.
 
 ### 6. `app/app.manifest.json` declares infra — NOTHING is provisioned by default
+
 A new app gets **no D1, no R2, no KV, no Durable Object**. Opt in only when
 the app actually needs it: `"db": true` → D1 (`env.DB`); `"r2": true` → R2
 (`env.STORAGE`); `"kv": true` → KV (`env.KV`); `"durableObject": "ClassName"`
@@ -327,6 +332,7 @@ build/dev input only. **KV is eventually consistent** (NOT Redis) — use a
 Durable Object for strong consistency.
 
 ## Editing map
+
 - Pages / routing → `app/src/routes/**` (file-based; `__root.tsx` is the shell).
 - Server logic → `createServerFn` (see `app/src/lib/api/example.functions.ts`)
   or `*.server.ts`.
@@ -413,6 +419,7 @@ rules, prizes, and how the contest shapes the build are in
 `references/contest.md`.
 
 **Run the local checks only when you actually need them** — from `app/`:
+
 ```bash
 cd app
 bun install          # only when you changed dependencies / package.json

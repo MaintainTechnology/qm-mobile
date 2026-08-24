@@ -1,9 +1,9 @@
 ---
-name: {{SKILL_NAME}}
-description: {{SKILL_DESCRIPTION}}
+name: { { SKILL_NAME } }
+description: { { SKILL_DESCRIPTION } }
 allowed-tools: Read, Write, Edit, Bash, Glob, Grep, TodoWrite, Task, AskUserQuestion
 user_invocable: true
-argument-hint: {{ARGUMENT_HINT}}
+argument-hint: { { ARGUMENT_HINT } }
 ---
 
 # {{SKILL_TITLE}}
@@ -20,11 +20,11 @@ argument-hint: {{ARGUMENT_HINT}}
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-{{#ARGUMENTS}}
+| Argument       | Required         | Description         |
+| -------------- | ---------------- | ------------------- |
+| {{#ARGUMENTS}} |
 | `{{ARG_NAME}}` | {{ARG_REQUIRED}} | {{ARG_DESCRIPTION}} |
-{{/ARGUMENTS}}
+| {{/ARGUMENTS}} |
 
 ## Execution Flow
 
@@ -75,8 +75,9 @@ argument-hint: {{ARGUMENT_HINT}}
 Generate a PRD with the following item types:
 
 {{#ITEM_TYPES}}
+
 - **{{ITEM_TYPE}}**: {{ITEM_TYPE_DESCRIPTION}}
-{{/ITEM_TYPES}}
+  {{/ITEM_TYPES}}
 
 ### Step 1.3: State Initialization
 
@@ -131,6 +132,7 @@ WHILE pending items exist AND iterations < {{MAX_ITERATIONS}}:
 ### Item Execution Details
 
 {{#ITEM_TYPES}}
+
 #### {{ITEM_TYPE}}
 
 **Execution Steps:**
@@ -159,6 +161,7 @@ Gather all passed item outputs from the state.
 ### Step 3.4: Output
 
 Write final deliverable to:
+
 ```
 {{OUTPUT_PATH}}
 ```

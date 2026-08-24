@@ -1,5 +1,6 @@
-import { useAuth } from '@clerk/clerk-expo';
+import { useAuth } from '@clerk/expo';
 import { Redirect, Tabs } from 'expo-router';
+import { useEffect, useState } from 'react';
 import { ActivityIndicator, View } from 'react-native';
 
 import { TabBar } from '@/features/shell/TabBar';
@@ -13,12 +14,20 @@ export default function TabsLayout() {
   // confirms a session — useTenantMe forces retry:false, so a 404 (no tenant)
   // or an offline error both resolve fast rather than spinning.
   const { isPending, error } = useTenantMe({ enabled: !!isSignedIn });
+  // The boot spinner may only gate the FIRST resolution. Screens inside the shell
+  // share this query, and their mount refetches an errored query back to pending —
+  // if that re-triggered the spinner it would unmount those screens, cancel the
+  // refetch and loop forever: offline tradies got an infinite spinner, never a shell.
+  const [settledOnce, setSettledOnce] = useState(false);
+  useEffect(() => {
+    if (!isPending) setSettledOnce(true);
+  }, [isPending]);
 
   // Signed-out tradies land on the welcome screen; Clerk restores the session
   // from the keychain first, so wait for isLoaded rather than flashing welcome.
   if (!isLoaded) return null;
   if (!isSignedIn) return <Redirect href="/welcome" />;
-  if (isPending) {
+  if (isPending && !settledOnce) {
     // A visible wait, not a blank shell — the probe can be slow on two bars.
     return (
       <View

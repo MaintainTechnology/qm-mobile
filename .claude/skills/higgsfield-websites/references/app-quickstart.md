@@ -32,41 +32,43 @@ pieces you always write:
 
 ```ts
 // app/src/routes/api/user.ts — browser-safe proxy; preserve status + body 1:1
-import { createFileRoute } from '@tanstack/react-router'
+import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/api/user')({
   server: {
     handlers: {
       GET: async () => {
-        const upstream = await fetch('https://fnf.internal/user')
-        const body = await upstream.text()
+        const upstream = await fetch('https://fnf.internal/user');
+        const body = await upstream.text();
         return new Response(body, {
           status: upstream.status, // a 401 must stay a 401
           headers: {
             'content-type': upstream.headers.get('content-type') ?? 'application/json',
             'cache-control': 'no-store',
           },
-        })
+        });
       },
     },
   },
-})
+});
 ```
 
 ```ts
 // Browser: read the current user; null = signed out (don't crash the page)
 export async function fetchCurrentUser() {
-  const res = await fetch('/api/user', { credentials: 'include' })
-  if (res.status === 401) return null
-  if (!res.ok) throw new Error('Failed to load user')
-  return res.json()
+  const res = await fetch('/api/user', { credentials: 'include' });
+  if (res.status === 401) return null;
+  if (!res.ok) throw new Error('Failed to load user');
+  return res.json();
 }
 
 // Login / logout are browser NAVIGATION, not SDK calls:
-const login = (ret = location.pathname + location.search) =>
-  { location.href = `/__auth/login?return=${encodeURIComponent(ret)}` }
-const logout = (ret = '/') =>
-  { location.href = `/__auth/logout?return=${encodeURIComponent(ret)}` }
+const login = (ret = location.pathname + location.search) => {
+  location.href = `/__auth/login?return=${encodeURIComponent(ret)}`;
+};
+const logout = (ret = '/') => {
+  location.href = `/__auth/logout?return=${encodeURIComponent(ret)}`;
+};
 ```
 
 A signed-out surface renders a sign-in action that calls `login()`; a server-side
@@ -78,16 +80,16 @@ One adapter satisfies jobs + media + profile. Import the adapter from
 `@higgsfield/fnf/workflow-platform` (NOT `/adapters` — that subpath is gone):
 
 ```ts
-import { createJobClient } from '@higgsfield/fnf/client'
-import { createMediaClient } from '@higgsfield/fnf/media'
-import { createProfileClient } from '@higgsfield/fnf/profile'
-import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform'
-import { gptImage2 } from '@higgsfield/fnf/jobs' // register ONLY the jobs you use
+import { createJobClient } from '@higgsfield/fnf/client';
+import { createMediaClient } from '@higgsfield/fnf/media';
+import { createProfileClient } from '@higgsfield/fnf/profile';
+import { createWorkflowPlatformAdapter } from '@higgsfield/fnf/workflow-platform';
+import { gptImage2 } from '@higgsfield/fnf/jobs'; // register ONLY the jobs you use
 
-const adapter = createWorkflowPlatformAdapter({ baseUrl: 'https://fnf.internal' })
-const jobs = createJobClient({ adapter, jobs: [gptImage2] })
-const media = createMediaClient({ mediaAdapter: adapter })
-const profile = createProfileClient({ profileAdapter: adapter })
+const adapter = createWorkflowPlatformAdapter({ baseUrl: 'https://fnf.internal' });
+const jobs = createJobClient({ adapter, jobs: [gptImage2] });
+const media = createMediaClient({ mediaAdapter: adapter });
+const profile = createProfileClient({ profileAdapter: adapter });
 ```
 
 The `jobs: [...]` registry is what gives `model`/`settings` their TypeScript
@@ -106,31 +108,31 @@ const adapter = createWorkflowPlatformAdapter({
   baseUrl: 'https://fnf.internal',
   confirm: async ({ jobSetType }) => {
     // UI host opens its cost-preview modal here and resolves; reject to cancel.
-    if (!(await openConfirmModal(jobSetType))) throw new Error('declined')
+    if (!(await openConfirmModal(jobSetType))) throw new Error('declined');
   },
-})
+});
 
 const { generations } = await jobs.submit({
   model: 'gpt_image_2',
   prompt: { instruction: userPrompt },
   settings: { aspectRatio: '1:1', quality: 'high', resolution: '2k', batchSize: 1 },
-})
+});
 
 const [done] = await jobs.wait(generations, {
   signal,
   onProgress: g => console.log(g.status),
-})
+});
 ```
 
 Prefer `safeSubmit` across a client/server or iframe boundary and branch on
 `error.code` (survives JSON; `instanceof` does not):
 
 ```ts
-const r = await jobs.safeSubmit(input)
+const r = await jobs.safeSubmit(input);
 if (!r.ok) {
-  if (r.error.code === 'out_of_credits') return showBillingUI()
-  if (r.error.code === 'confirmation_rejected') return // declined — not an error
-  throw r.error
+  if (r.error.code === 'out_of_credits') return showBillingUI();
+  if (r.error.code === 'confirmation_rejected') return; // declined — not an error
+  throw r.error;
 }
 ```
 
@@ -144,11 +146,11 @@ Common codes: `out_of_credits`, `rate_limit`, `prompt_nsfw`, `ip_detected`,
 present only once completed. Do NOT hand-roll URL selection — use the selectors:
 
 ```ts
-import { getPreviewUrl, getRawUrl, getJobPhase } from '@higgsfield/fnf/client'
+import { getPreviewUrl, getRawUrl, getJobPhase } from '@higgsfield/fnf/client';
 
-getPreviewUrl(done)  // grids/cards — precedence minUrl → thumbnailUrl → rawUrl
-getRawUrl(done)      // full quality
-getJobPhase(done)    // 'progress' | 'completed' | 'failed' — drives state UI
+getPreviewUrl(done); // grids/cards — precedence minUrl → thumbnailUrl → rawUrl
+getRawUrl(done); // full quality
+getJobPhase(done); // 'progress' | 'completed' | 'failed' — drives state UI
 ```
 
 In-app, compose result cards from `app/src/lib/higgsfield-generation-results.ts`
@@ -194,14 +196,14 @@ returns only the `MediaRef`. Detail in `references/fnf-sdk.md` ("Media recipes")
 App data operations run through TanStack server functions or `/api/*` routes:
 
 ```ts
-import { createServerFn } from '@tanstack/react-start'
-import { z } from 'zod'
+import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
 
 export const generateMeme = createServerFn({ method: 'POST' })
   .inputValidator(z.object({ prompt: z.string().min(1) }))
   .handler(async ({ data }) => {
     // re-check auth, build the server-side adapter, submit, persist to D1…
-  })
+  });
 ```
 
 Cloudflare bindings (D1 `DB`, R2 `STORAGE`, KV `KV`) are read server-side via

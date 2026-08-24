@@ -6,11 +6,43 @@ const REQUIRE_RE = /\brequire\s*\(\s*["']([^"']+)["']\s*\)/g;
 // Captures package root from `pkg/sub` and `@scope/pkg/sub`.
 const PKG_ROOT_RE = /^(@[^/]+\/[^/]+|[^/]+)/;
 const NODE_BUILTINS = new Set([
-  'fs', 'fs/promises', 'path', 'os', 'crypto', 'http', 'https', 'http2', 'net',
-  'dns', 'tls', 'util', 'url', 'stream', 'buffer', 'events', 'process', 'child_process',
-  'cluster', 'worker_threads', 'inspector', 'perf_hooks', 'assert', 'console',
-  'querystring', 'string_decoder', 'tty', 'vm', 'zlib', 'readline', 'punycode',
-  'module', 'timers', 'async_hooks', 'v8', 'test', 'diagnostics_channel',
+  'fs',
+  'fs/promises',
+  'path',
+  'os',
+  'crypto',
+  'http',
+  'https',
+  'http2',
+  'net',
+  'dns',
+  'tls',
+  'util',
+  'url',
+  'stream',
+  'buffer',
+  'events',
+  'process',
+  'child_process',
+  'cluster',
+  'worker_threads',
+  'inspector',
+  'perf_hooks',
+  'assert',
+  'console',
+  'querystring',
+  'string_decoder',
+  'tty',
+  'vm',
+  'zlib',
+  'readline',
+  'punycode',
+  'module',
+  'timers',
+  'async_hooks',
+  'v8',
+  'test',
+  'diagnostics_channel',
 ]);
 
 export const metadata = {
@@ -30,7 +62,7 @@ export function apply(rec, ctx = {}) {
   ]);
 
   const text = [rec.fix, rec.currentBehavior, rec.desiredBehavior]
-    .filter((s) => typeof s === 'string')
+    .filter(s => typeof s === 'string')
     .join('\n');
   const codeBlocks = extractCodeBlocks(text);
   const importedRoots = new Set();
@@ -46,18 +78,18 @@ export function apply(rec, ctx = {}) {
   }
 
   const undeclared = [...importedRoots]
-    .filter((r) => !r.startsWith('.'))
-    .filter((r) => !NODE_BUILTINS.has(r))
-    .filter((r) => !r.startsWith('node:'))
-    .filter((r) => !known.has(r));
+    .filter(r => !r.startsWith('.'))
+    .filter(r => !NODE_BUILTINS.has(r))
+    .filter(r => !r.startsWith('node:'))
+    .filter(r => !known.has(r));
 
   if (undeclared.length === 0) return {};
 
-  const installLines = undeclared.map((p) => `\`npm i ${p}\``).join(', ');
+  const installLines = undeclared.map(p => `\`npm i ${p}\``).join(', ');
   const prepend = `**Add dependency first**: ${installLines}\n\n`;
   if (typeof rec.fix === 'string') rec.fix = prepend + rec.fix;
   else rec.fix = prepend.trim();
-  return { tags: undeclared.map((p) => `undeclared-dep:${p}`), needsReview: true };
+  return { tags: undeclared.map(p => `undeclared-dep:${p}`), needsReview: true };
 }
 
 function pkgRoot(specifier) {

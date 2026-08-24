@@ -12,19 +12,20 @@ const MODE_PATTERNS = {
 
 export const metadata = {
   id: 'rendering-mode-mislabel',
-  description: 'Catch recs that blame the wrong rendering mode (e.g. "convert from ISR" on a static page).',
+  description:
+    'Catch recs that blame the wrong rendering mode (e.g. "convert from ISR" on a static page).',
 };
 
 export function apply(rec, ctx = {}) {
   const route = extractRoute(rec);
   if (!route) return {};
   const routes = ctx?.signals?.codebase?.routes ?? [];
-  const match = routes.find((r) => r.routePath === route);
+  const match = routes.find(r => r.routePath === route);
   const actualMode = match?.renderingMode;
   if (!actualMode) return {};
 
   const text = [rec.what, rec.why, rec.fix, rec.currentBehavior, rec.desiredBehavior]
-    .filter((s) => typeof s === 'string')
+    .filter(s => typeof s === 'string')
     .join('\n');
   const claimedModes = Object.entries(MODE_PATTERNS)
     .filter(([, re]) => re.test(text))
@@ -34,5 +35,8 @@ export function apply(rec, ctx = {}) {
 
   const warning = `\n\n_⚠ Rendering-mode mismatch: this rec describes the route as \`${claimedModes.join(', ')}\` but the scanner classified it as \`${actualMode}\`. Verify the rendering mode before applying._`;
   if (typeof rec.fix === 'string') rec.fix += warning;
-  return { tag: `rendering-mode-mislabel:${claimedModes.join(',')}!=${actualMode}`, needsReview: true };
+  return {
+    tag: `rendering-mode-mislabel:${claimedModes.join(',')}!=${actualMode}`,
+    needsReview: true,
+  };
 }

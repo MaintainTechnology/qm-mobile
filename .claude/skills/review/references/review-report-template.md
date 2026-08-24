@@ -19,35 +19,42 @@ Verdict values per item: **Pass** (verified), **Fail** (gap/bug/missing). There 
 ## Requirement-by-requirement audit
 
 ### Functional requirements
-| ID | Requirement (short) | Verdict | Evidence / reason |
-|----|---------------------|---------|-------------------|
-| R1 | <short restatement> | Pass | <what was checked: file:line, test run, observed behavior> |
-| R2 | ... | Fail | <the exact gap/bug observed> |
-| ... | | | |
+
+| ID  | Requirement (short) | Verdict | Evidence / reason                                          |
+| --- | ------------------- | ------- | ---------------------------------------------------------- |
+| R1  | <short restatement> | Pass    | <what was checked: file:line, test run, observed behavior> |
+| R2  | ...                 | Fail    | <the exact gap/bug observed>                               |
+| ... |                     |         |                                                            |
 
 ### Non-functional requirements
-| ID | Requirement (short) | Verdict | Evidence / reason |
-|----|---------------------|---------|-------------------|
-| N1 | <e.g. "p95 < 2s"> | Fail | <measured value / why unmet> |
-| ... | | | |
+
+| ID  | Requirement (short) | Verdict | Evidence / reason            |
+| --- | ------------------- | ------- | ---------------------------- |
+| N1  | <e.g. "p95 < 2s">   | Fail    | <measured value / why unmet> |
+| ... |                     |         |                              |
 
 ### Edge cases & failure handling (spec §6)
-| Edge case | Verdict | Evidence / reason |
-|-----------|---------|-------------------|
-| <invalid input> | Pass | <observed behavior> |
-| <external timeout> | Fail | <not handled — what happens instead> |
-| ... | | |
+
+| Edge case          | Verdict | Evidence / reason                    |
+| ------------------ | ------- | ------------------------------------ |
+| <invalid input>    | Pass    | <observed behavior>                  |
+| <external timeout> | Fail    | <not handled — what happens instead> |
+| ...                |         |                                      |
 
 ### Definition of Done (spec §7)
+
 - [x] <DoD item> — <evidence>
 - [ ] <DoD item> — <why unmet>
 - ...
 
 ## Out-of-scope / fidelity findings
+
 (Anything built that the spec did not call for: added features, unrelated refactoring, invented behavior. If none, write "None.")
+
 - <finding> — <where> — <why it's out of scope>
 
-## Required Fixes  (hand-off to /build)
+## Required Fixes (hand-off to /build)
+
 (One entry per failure. Each names the spec ID it closes, the problem, and the specific fix. Ordered by priority. `/build` works this list.)
 
 - [ ] **Fix for R2** — <problem in one line>. **Fix:** <what to change and where, e.g. "add empty-input guard in src/foo.ts handleSubmit(); return early with error message">. **Done when:** <observable condition that makes R2 pass>.
@@ -56,5 +63,6 @@ Verdict values per item: **Pass** (verified), **Fail** (gap/bug/missing). There 
 - ...
 
 ## Re-review checklist
+
 After /build addresses the fixes, re-run /review. The build passes only when every row above is Pass and every Required Fix is resolved.
 ```

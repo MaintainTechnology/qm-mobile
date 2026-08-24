@@ -68,33 +68,32 @@ while players think) and runs the kernel as a pure message handler:
 //   (state, playerId, action) · applyAction(state, playerId, action) ·
 //   isGameOver(state) · viewFor(state, playerId)
 
-import { DurableObject } from "cloudflare:workers";
-import * as logic from "./logic.js";
+import { DurableObject } from 'cloudflare:workers';
+import * as logic from './logic.js';
 
 export class App extends DurableObject {
   async _load() {
     return {
-      game:
-        (await this.ctx.storage.get("game")) ?? {
-          status: "waiting", // waiting | playing | over
-          seats: [], // playerIds in join order
-          state: null,
-          result: null,
-        },
-      conns: (await this.ctx.storage.get("conns")) ?? {}, // connId -> playerId
+      game: (await this.ctx.storage.get('game')) ?? {
+        status: 'waiting', // waiting | playing | over
+        seats: [], // playerIds in join order
+        state: null,
+        result: null,
+      },
+      conns: (await this.ctx.storage.get('conns')) ?? {}, // connId -> playerId
     };
   }
 
   async _save(game, conns) {
-    await this.ctx.storage.put("game", game);
-    await this.ctx.storage.put("conns", conns);
+    await this.ctx.storage.put('game', game);
+    await this.ctx.storage.put('conns', conns);
   }
 
   _broadcast(game, conns) {
     return Object.entries(conns).map(([connId, playerId]) => ({
       to: connId,
       data: {
-        type: "state",
+        type: 'state',
         status: game.status,
         seats: game.seats,
         you: playerId,
@@ -107,7 +106,7 @@ export class App extends DurableObject {
   }
 
   _error(connId, error) {
-    return [{ to: connId, data: { type: "error", error } }];
+    return [{ to: connId, data: { type: 'error', error } }];
   }
 
   async onConnect(_connId, _meta) {
@@ -115,53 +114,53 @@ export class App extends DurableObject {
   }
 
   async onMessage(connId, raw) {
-    if (typeof raw !== "string") return [];
+    if (typeof raw !== 'string') return [];
     let msg;
     try {
       msg = JSON.parse(raw);
     } catch {
-      return this._error(connId, "invalid json");
+      return this._error(connId, 'invalid json');
     }
 
     const { game, conns } = await this._load();
 
-    if (msg.type === "join") {
-      const playerId = String(msg.playerId || "").slice(0, 64);
-      if (!playerId) return this._error(connId, "playerId required");
+    if (msg.type === 'join') {
+      const playerId = String(msg.playerId || '').slice(0, 64);
+      if (!playerId) return this._error(connId, 'playerId required');
       conns[connId] = playerId;
       if (!game.seats.includes(playerId) && game.seats.length < logic.meta.maxPlayers) {
         game.seats.push(playerId);
       }
-      if (game.status === "waiting" && game.seats.length >= logic.meta.minPlayers) {
+      if (game.status === 'waiting' && game.seats.length >= logic.meta.minPlayers) {
         game.state = logic.setup(game.seats);
-        game.status = "playing";
+        game.status = 'playing';
       }
       await this._save(game, conns);
       return this._broadcast(game, conns);
     }
 
     const playerId = conns[connId];
-    if (!playerId) return this._error(connId, "join first");
+    if (!playerId) return this._error(connId, 'join first');
 
-    if (msg.type === "action") {
-      if (game.status !== "playing") return this._error(connId, "game is not in progress");
-      if (!game.seats.includes(playerId)) return this._error(connId, "spectators cannot act");
+    if (msg.type === 'action') {
+      if (game.status !== 'playing') return this._error(connId, 'game is not in progress');
+      if (!game.seats.includes(playerId)) return this._error(connId, 'spectators cannot act');
       const verdict = logic.validateAction(game.state, playerId, msg.action);
       if (!verdict.ok) return this._error(connId, verdict.error);
       game.state = logic.applyAction(game.state, playerId, msg.action);
       const end = logic.isGameOver(game.state);
       if (end.over) {
-        game.status = "over";
+        game.status = 'over';
         game.result = end;
       }
       await this._save(game, conns);
       return this._broadcast(game, conns);
     }
 
-    if (msg.type === "reset") {
-      if (!game.seats.includes(playerId)) return this._error(connId, "spectators cannot reset");
+    if (msg.type === 'reset') {
+      if (!game.seats.includes(playerId)) return this._error(connId, 'spectators cannot reset');
       game.state = game.seats.length >= logic.meta.minPlayers ? logic.setup(game.seats) : null;
-      game.status = game.state ? "playing" : "waiting";
+      game.status = game.state ? 'playing' : 'waiting';
       game.result = null;
       await this._save(game, conns);
       return this._broadcast(game, conns);
@@ -186,7 +185,7 @@ export class App extends DurableObject {
 
 export default {
   fetch() {
-    return new Response("game kernel module", { status: 200 });
+    return new Response('game kernel module', { status: 200 });
   },
 };
 ```

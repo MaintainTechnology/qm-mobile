@@ -7,6 +7,7 @@ Build and maintain an entity-centric cell signaling knowledge base from lecture 
 This skill transforms lecture transcript analyses into a queryable knowledge graph organized by biological entity (interventions, pathways, biomarkers) rather than by source document.
 
 **Key Features:**
+
 - LLM-driven extraction, entity resolution, and conflict detection
 - Peer-reviewed literature enrichment via Perplexity
 - Conflict preservation (surfaces both positions, doesn't rank)
@@ -75,9 +76,7 @@ Transcript → Extract → Entity Match → Merge → Conflict Check → Enrich 
       "indication": "longevity/healthspan",
       "evidence_grade": "moderate",
       "source_type": "expert_lecture",
-      "peer_reviewed_citations": [
-        "Mannick JB et al. (2014) Sci Transl Med"
-      ]
+      "peer_reviewed_citations": ["Mannick JB et al. (2014) Sci Transl Med"]
     }
   ],
   "has_conflicts": true,

@@ -159,7 +159,9 @@ function readProjectRootPatterns(repoRoot) {
           if (typeof entry === 'string' && entry.trim()) patterns.push(entry.trim());
         }
       }
-    } catch { /* missing or malformed: nothing to check */ }
+    } catch {
+      /* missing or malformed: nothing to check */
+    }
   }
   return patterns;
 }
@@ -179,15 +181,20 @@ function applyFixes(report) {
     }
     if (entry.id === 'design-sidecar-legacy-path') {
       const canonical = report.sidecarCandidates[0];
-      const present = report.sidecarCandidates.find((candidate) => fs.existsSync(candidate));
+      const present = report.sidecarCandidates.find(candidate => fs.existsSync(candidate));
       if (!canonical || !present || path.resolve(canonical) === path.resolve(present)) continue;
       if (fs.existsSync(canonical)) {
-        skipped.push({ id: entry.id, reason: `${rel(canonical, report.projectRoot)} already exists; not overwriting` });
+        skipped.push({
+          id: entry.id,
+          reason: `${rel(canonical, report.projectRoot)} already exists; not overwriting`,
+        });
         continue;
       }
       fs.mkdirSync(path.dirname(canonical), { recursive: true });
       fs.renameSync(present, canonical);
-      applied.push(`Moved ${rel(present, report.projectRoot)} to ${rel(canonical, report.projectRoot)}.`);
+      applied.push(
+        `Moved ${rel(present, report.projectRoot)} to ${rel(canonical, report.projectRoot)}.`,
+      );
       continue;
     }
     if (entry.id === 'legacy-live-state') {
@@ -203,10 +210,16 @@ function applyFixes(report) {
   // Stamping the product record is additive and safe, and it is what stops a
   // later version proposing an interview the user has already sat through.
   const productPath = report.absProductPath;
-  if (productPath && report.ctx.product && readProductSchemaVersion(report.ctx.product) === null
-    && !report.findings.some((entry) => entry.id === 'product-schema-legacy')) {
+  if (
+    productPath &&
+    report.ctx.product &&
+    readProductSchemaVersion(report.ctx.product) === null &&
+    !report.findings.some(entry => entry.id === 'product-schema-legacy')
+  ) {
     fs.writeFileSync(productPath, stampProductSchema(report.ctx.product), 'utf-8');
-    applied.push(`Stamped ${rel(productPath, report.projectRoot)} as product-schema ${PRODUCT_SCHEMA_VERSION}.`);
+    applied.push(
+      `Stamped ${rel(productPath, report.projectRoot)} as product-schema ${PRODUCT_SCHEMA_VERSION}.`,
+    );
   }
 
   return { applied, skipped };
@@ -238,7 +251,7 @@ function renderText(report, fixes) {
   } else {
     const order = ['route', 'mention', 'auto'];
     for (const severity of order) {
-      const group = findings.filter((entry) => entry.severity === severity);
+      const group = findings.filter(entry => entry.severity === severity);
       if (!group.length) continue;
       lines.push(`${SEVERITY_LABEL[severity]} (${group.length}):`);
       for (const entry of group) {
@@ -253,29 +266,35 @@ function renderText(report, fixes) {
   if (report.workspaces.length) {
     lines.push('Workspaces:');
     for (const workspace of report.workspaces) {
-      lines.push(`  ${workspace.path}  product: ${workspace.productStatus}`
-        + `  design: ${workspace.designStatus}`
-        + `${workspace.platform ? `  platform: ${workspace.platform}` : ''}`);
+      lines.push(
+        `  ${workspace.path}  product: ${workspace.productStatus}` +
+          `  design: ${workspace.designStatus}` +
+          `${workspace.platform ? `  platform: ${workspace.platform}` : ''}`,
+      );
     }
     lines.push('');
   }
 
   if (!report.ruleRegistryAvailable) {
-    lines.push('Note: the bundled detector could not be resolved, so ignored rule ids were not validated.');
+    lines.push(
+      'Note: the bundled detector could not be resolved, so ignored rule ids were not validated.',
+    );
     lines.push('');
   }
 
   if (fixes) {
     lines.push(fixes.applied.length ? 'Applied:' : 'Applied nothing.');
     for (const entry of fixes.applied) lines.push(`  ${entry}`);
-    const held = fixes.skipped.filter((entry) => entry.reason !== 'needs a decision from the user');
+    const held = fixes.skipped.filter(entry => entry.reason !== 'needs a decision from the user');
     if (held.length) {
       lines.push('Left alone:');
       for (const entry of held) lines.push(`  ${entry.id}: ${entry.reason}`);
     }
-  } else if (findings.some((entry) => entry.severity === 'auto')) {
-    lines.push(`Run \`node doctor.mjs --fix\` to apply the automatic migrations, `
-      + `or \`${IMPECCABLE_COMMAND} doctor\` to work through all of them.`);
+  } else if (findings.some(entry => entry.severity === 'auto')) {
+    lines.push(
+      `Run \`node doctor.mjs --fix\` to apply the automatic migrations, ` +
+        `or \`${IMPECCABLE_COMMAND} doctor\` to work through all of them.`,
+    );
   }
 
   return lines.join('\n');
@@ -298,18 +317,24 @@ async function cli() {
   const fixes = parsed.flags.fix ? applyFixes(report) : null;
 
   if (parsed.flags.json) {
-    process.stdout.write(`${JSON.stringify({
-      projectRoot: report.projectRoot,
-      repoRoot: report.ctx.repoRoot,
-      isMonorepo: report.ctx.isMonorepo,
-      productPath: report.ctx.productPath,
-      designPath: report.ctx.designPath,
-      platform: report.ctx.platform,
-      ruleRegistryAvailable: report.ruleRegistryAvailable,
-      findings: report.findings,
-      workspaces: report.workspaces,
-      ...(fixes ? { fixes } : {}),
-    }, null, 2)}\n`);
+    process.stdout.write(
+      `${JSON.stringify(
+        {
+          projectRoot: report.projectRoot,
+          repoRoot: report.ctx.repoRoot,
+          isMonorepo: report.ctx.isMonorepo,
+          productPath: report.ctx.productPath,
+          designPath: report.ctx.designPath,
+          platform: report.ctx.platform,
+          ruleRegistryAvailable: report.ruleRegistryAvailable,
+          findings: report.findings,
+          workspaces: report.workspaces,
+          ...(fixes ? { fixes } : {}),
+        },
+        null,
+        2,
+      )}\n`,
+    );
     return;
   }
 
@@ -327,7 +352,7 @@ function invokedAsScript() {
 }
 
 if (invokedAsScript()) {
-  cli().catch((err) => {
+  cli().catch(err => {
     process.stderr.write(`impeccable doctor failed: ${err?.message || err}\n`);
     process.exit(1);
   });

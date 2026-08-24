@@ -7,6 +7,7 @@ allowed-tools: Read, Write, Edit, Glob, Grep, Shell
 # Auth Builder for NGM Platform
 
 ## Overview
+
 This skill manages the authentication and enrollment flow for the NGM platform, specifically the integration between Stripe payments and Clerk user management. It handles the complete flow from CTA button click to auto-login.
 
 ## Complete Flow
@@ -35,21 +36,22 @@ This skill manages the authentication and enrollment flow for the NGM platform, 
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `src/views/LongevityIntelligenceCore.tsx` | Pricing cards and `handleSubscribe` function |
-| `server/routes.ts` | Express route for `/api/lip/create-checkout` |
-| `src/app/api/lip/create-checkout/route.ts` | Next.js App Router checkout (backup) |
-| `src/app/api/verify-and-enroll/route.ts` | Creates Clerk user, sets metadata, generates sign-in token |
-| `src/views/SubscriptionSuccess.tsx` | Post-payment page, calls verify-and-enroll |
-| `src/app/auth/callback/page.tsx` | Handles sign-in token authentication |
-| `src/views/AuthCallback.tsx` | Clerk sign-in with ticket |
+| File                                       | Purpose                                                    |
+| ------------------------------------------ | ---------------------------------------------------------- |
+| `src/views/LongevityIntelligenceCore.tsx`  | Pricing cards and `handleSubscribe` function               |
+| `server/routes.ts`                         | Express route for `/api/lip/create-checkout`               |
+| `src/app/api/lip/create-checkout/route.ts` | Next.js App Router checkout (backup)                       |
+| `src/app/api/verify-and-enroll/route.ts`   | Creates Clerk user, sets metadata, generates sign-in token |
+| `src/views/SubscriptionSuccess.tsx`        | Post-payment page, calls verify-and-enroll                 |
+| `src/app/auth/callback/page.tsx`           | Handles sign-in token authentication                       |
+| `src/views/AuthCallback.tsx`               | Clerk sign-in with ticket                                  |
 
 ## Tier Metadata Configuration
 
 All LIP tiers use this metadata structure:
 
 ### Core ($99/month or $79/month annual)
+
 ```json
 {
   "lipTier": "core",
@@ -58,6 +60,7 @@ All LIP tiers use this metadata structure:
 ```
 
 ### Professional ($249/month or $199/month annual)
+
 ```json
 {
   "lipTier": "professional",
@@ -67,6 +70,7 @@ All LIP tiers use this metadata structure:
 ```
 
 ### Elite ($625/month or $499/month annual)
+
 ```json
 {
   "lipTier": "elite",
@@ -78,6 +82,7 @@ All LIP tiers use this metadata structure:
 ## Environment Variables
 
 ### Required Stripe Price IDs
+
 ```bash
 # Annual pricing (effective monthly rate)
 STRIPE_PRICE_ID_CORE=price_xxx           # $79/mo billed annually
@@ -93,17 +98,18 @@ STRIPE_PRICE_ID_ELITE_MONTHLY=price_xxx         # $625/mo
 ## Frontend Implementation
 
 ### handleSubscribe Function
+
 Located in `src/views/LongevityIntelligenceCore.tsx`:
 
 ```typescript
 const handleSubscribe = async (
-  tier: "core" | "professional" | "elite",
-  period: "annual" | "monthly" = billingPeriod
+  tier: 'core' | 'professional' | 'elite',
+  period: 'annual' | 'monthly' = billingPeriod,
 ) => {
   try {
-    const response = await fetch("/api/lip/create-checkout", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
+    const response = await fetch('/api/lip/create-checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
         tier,
         billingPeriod: period,
@@ -117,12 +123,13 @@ const handleSubscribe = async (
       window.location.href = data.checkoutUrl;
     }
   } catch (error) {
-    console.error("Error creating checkout session:", error);
+    console.error('Error creating checkout session:', error);
   }
 };
 ```
 
 ### Billing Period Toggle
+
 ```typescript
 const [billingPeriod, setBillingPeriod] = useState<'annual' | 'monthly'>('annual');
 ```
@@ -130,6 +137,7 @@ const [billingPeriod, setBillingPeriod] = useState<'annual' | 'monthly'>('annual
 ## Backend Implementation
 
 ### Create Checkout Session
+
 The checkout session must include `session_id` in the success URL:
 
 ```typescript
@@ -137,6 +145,7 @@ success_url: `${origin}/subscription-success?session_id={CHECKOUT_SESSION_ID}`,
 ```
 
 ### Verify and Enroll (Key Logic)
+
 Located in `src/app/api/verify-and-enroll/route.ts`:
 
 1. **Verify Stripe Session**: Check `session.status === 'complete'`
@@ -151,7 +160,9 @@ Located in `src/app/api/verify-and-enroll/route.ts`:
 6. **Return Token**: Frontend uses it for auto-login
 
 ### Required Clerk User Fields
+
 Your Clerk instance requires these fields:
+
 ```typescript
 await clerk.users.createUser({
   emailAddress: [customerEmail],
@@ -159,7 +170,7 @@ await clerk.users.createUser({
   lastName: lastName,
   publicMetadata: { lipTier, mentorshipTier, mentorshipAccess },
   privateMetadata: { stripeCustomerId, lipSubscriptionStatus: 'active' },
-  skipPasswordRequirement: true
+  skipPasswordRequirement: true,
 });
 ```
 
@@ -167,14 +178,15 @@ await clerk.users.createUser({
 
 ### Common Errors and Fixes
 
-| Error | Cause | Fix |
-|-------|-------|-----|
-| 422 "form_data_missing" | Clerk requires first_name/last_name | Extract name from Stripe session |
-| 422 "Unprocessable Entity" | User already exists | Retry lookup and update instead |
-| 400 "Bad Request" on invitation | Email has pending invitation | Skip invitation, return success with manual sign-in instructions |
-| No session_id | success_url missing template var | Add `?session_id={CHECKOUT_SESSION_ID}` |
+| Error                           | Cause                               | Fix                                                              |
+| ------------------------------- | ----------------------------------- | ---------------------------------------------------------------- |
+| 422 "form_data_missing"         | Clerk requires first_name/last_name | Extract name from Stripe session                                 |
+| 422 "Unprocessable Entity"      | User already exists                 | Retry lookup and update instead                                  |
+| 400 "Bad Request" on invitation | Email has pending invitation        | Skip invitation, return success with manual sign-in instructions |
+| No session_id                   | success_url missing template var    | Add `?session_id={CHECKOUT_SESSION_ID}`                          |
 
 ### Fallback Chain
+
 1. Try to find existing user → update metadata
 2. Try to create new user → with name and metadata
 3. If 422, retry user lookup → update if found
@@ -194,6 +206,7 @@ await clerk.users.createUser({
 ## Debugging
 
 Check terminal logs for these patterns:
+
 ```
 [Verify-Enroll] Looking up user by email: xxx
 [Verify-Enroll] Found X existing user(s)
@@ -202,6 +215,7 @@ Check terminal logs for these patterns:
 ```
 
 Errors will show:
+
 ```
 [Verify-Enroll] Error creating user: xxx
 [Verify-Enroll] Error details: [...]

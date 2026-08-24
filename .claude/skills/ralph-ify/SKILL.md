@@ -25,10 +25,10 @@ RALPH-ify is a meta-skill that transforms any workflow, existing skill, or busin
 
 ### Arguments
 
-| Argument | Required | Description |
-|----------|----------|-------------|
-| `<input>` | Yes | Workflow description, file path, or existing skill path |
-| `--name` | No | Name for the generated skill (auto-generated if not provided) |
+| Argument  | Required | Description                                                   |
+| --------- | -------- | ------------------------------------------------------------- |
+| `<input>` | Yes      | Workflow description, file path, or existing skill path       |
+| `--name`  | No       | Name for the generated skill (auto-generated if not provided) |
 
 ### Input Formats
 
@@ -98,6 +98,7 @@ ELSE:
 Read the referenced prompt template: `.claude/skills/ralph-ify/prompts/analysis.md`
 
 Run the analysis prompt against the input to extract:
+
 - **Workflow name**: What is this process called?
 - **Workflow steps**: What are the sequential/parallel steps?
 - **Work units**: What are the discrete, atomic tasks?
@@ -114,16 +115,18 @@ Present findings to the user in this format:
 
 ### Identified Work Units ({count})
 
-| ID | Unit Name | Dependencies | Est. Complexity |
-|----|-----------|--------------|-----------------|
-| 1  | ...       | None         | Low             |
-| 2  | ...       | [1]          | Medium          |
+| ID  | Unit Name | Dependencies | Est. Complexity |
+| --- | --------- | ------------ | --------------- |
+| 1   | ...       | None         | Low             |
+| 2   | ...       | [1]          | Medium          |
 
 ### Success Criteria
+
 - Unit 1: [criteria]
 - Unit 2: [criteria]
 
 ### Potential Failure Modes
+
 - [failure mode 1]
 - [failure mode 2]
 ```
@@ -131,6 +134,7 @@ Present findings to the user in this format:
 ### Step 1.4: User Approval Checkpoint
 
 Use `AskUserQuestion` to confirm:
+
 - Are the work units correctly identified?
 - Are there any missing steps?
 - Should any units be split or merged?
@@ -142,6 +146,7 @@ Use `AskUserQuestion` to confirm:
 ### Step 2.1: Generate Atomic Work Units
 
 For each identified work unit, ensure it:
+
 - Can be completed in one context window
 - Has clear input/output boundaries
 - Has measurable success criteria
@@ -182,10 +187,10 @@ For each item type, generate 4-8 quality checks:
 ```markdown
 ## Quality Gate: {item_type}
 
-| Check | Criteria | Pass Threshold | Failure Suggestion |
-|-------|----------|----------------|-------------------|
-| check_1 | ... | ... | "To fix: ..." |
-| check_2 | ... | ... | "To fix: ..." |
+| Check   | Criteria | Pass Threshold | Failure Suggestion |
+| ------- | -------- | -------------- | ------------------ |
+| check_1 | ...      | ...            | "To fix: ..."      |
+| check_2 | ...      | ...            | "To fix: ..."      |
 
 **Pass Threshold**: 70% of checks must pass
 **Critical Failures**: [checks that auto-fail the gate]
@@ -206,6 +211,7 @@ Design the state directory:
 ### Step 2.5: User Approval Checkpoint
 
 Present the complete design and use `AskUserQuestion` to confirm:
+
 - Is the PRD structure correct?
 - Are the quality gates appropriate?
 - Should any gates be added/removed?
@@ -219,6 +225,7 @@ Present the complete design and use `AskUserQuestion` to confirm:
 Read the template: `.claude/skills/ralph-ify/templates/skill-template.md`
 
 Generate a complete SKILL.md with:
+
 - Frontmatter (name, description, tools, invocation)
 - Overview section
 - Three-phase execution flow
@@ -260,12 +267,14 @@ Present a summary:
 **Location**: .claude/skills/{skill-name}/
 
 ### Files Created
+
 - SKILL.md (main skill definition)
 - prd-schema.json (PRD structure)
 - quality-gates.md (validation criteria)
 - state-template/ (state directory)
 
 ### Next Steps
+
 1. Review the generated SKILL.md
 2. Test with: `/{skill-name} <test-input>`
 3. Iterate on quality gates as needed
@@ -277,39 +286,39 @@ Present a summary:
 
 ### Gate 1: Decomposition Quality
 
-| Check | Criteria |
-|-------|----------|
-| atomic_units | Each unit can be completed in one context window |
-| clear_boundaries | Units have defined inputs and outputs |
-| no_overlap | Units don't duplicate work |
-| complete_coverage | All workflow steps are covered |
+| Check             | Criteria                                         |
+| ----------------- | ------------------------------------------------ |
+| atomic_units      | Each unit can be completed in one context window |
+| clear_boundaries  | Units have defined inputs and outputs            |
+| no_overlap        | Units don't duplicate work                       |
+| complete_coverage | All workflow steps are covered                   |
 
 ### Gate 2: Quality Gate Coverage
 
-| Check | Criteria |
-|-------|----------|
-| gate_count | Each item type has 4-8 validation checks |
-| specific_suggestions | Each failure has actionable suggestions |
-| measurable_criteria | Criteria are objective, not subjective |
-| threshold_defined | Pass threshold is explicitly set |
+| Check                | Criteria                                 |
+| -------------------- | ---------------------------------------- |
+| gate_count           | Each item type has 4-8 validation checks |
+| specific_suggestions | Each failure has actionable suggestions  |
+| measurable_criteria  | Criteria are objective, not subjective   |
+| threshold_defined    | Pass threshold is explicitly set         |
 
 ### Gate 3: State Schema Validity
 
-| Check | Criteria |
-|-------|----------|
-| valid_json | PRD schema is valid JSON |
-| required_fields | Has id, status, priority, title |
-| status_enum | Status uses standard values (pending/in_progress/passed/failed/blocked) |
-| dependency_refs | Dependencies reference valid IDs |
+| Check           | Criteria                                                                |
+| --------------- | ----------------------------------------------------------------------- |
+| valid_json      | PRD schema is valid JSON                                                |
+| required_fields | Has id, status, priority, title                                         |
+| status_enum     | Status uses standard values (pending/in_progress/passed/failed/blocked) |
+| dependency_refs | Dependencies reference valid IDs                                        |
 
 ### Gate 4: Skill Definition Completeness
 
-| Check | Criteria |
-|-------|----------|
-| has_frontmatter | Skill has valid YAML frontmatter |
-| has_overview | Overview section explains purpose |
-| has_phases | All three phases documented |
-| has_state_docs | State files are documented |
+| Check           | Criteria                          |
+| --------------- | --------------------------------- |
+| has_frontmatter | Skill has valid YAML frontmatter  |
+| has_overview    | Overview section explains purpose |
+| has_phases      | All three phases documented       |
+| has_state_docs  | State files are documented        |
 
 ---
 
@@ -322,14 +331,17 @@ This skill does not maintain persistent state. Each invocation is independent.
 ## Troubleshooting
 
 ### "Input not recognized"
+
 - Ensure the input is either a valid file path or text description
 - For existing skills, provide the full path to the skill directory
 
 ### "Workflow too complex"
+
 - Break the workflow into smaller sub-workflows
 - Run RALPH-ify on each sub-workflow separately
 
 ### "Quality gates seem wrong"
+
 - Quality gates are generated heuristically; edit them manually after generation
 - Focus on measurable, objective criteria
 

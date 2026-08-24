@@ -104,6 +104,7 @@ const KEYS_FILE = path.join(DATA_DIR, 'api-keys.json');
 ```
 
 In production:
+
 1. Railway UI → Service → **Volumes** → New Volume, mount at `/data`
 2. `railway variables set DATA_DIR=/data`
 3. Redeploy
@@ -119,30 +120,38 @@ Now keys survive redeploys.
 import 'dotenv/config';
 
 const REQUIRED = [
-  { key: 'VECTORSHIFT_API_KEY',                          why: 'KB retrieval.' },
-  { key: 'ANTHROPIC_API_KEY_<PIPELINE>',                 why: 'Classifier LlmNode.' },
-  { key: 'GOOGLE_AI_KEY_<PIPELINE>',                     why: 'Synthesis LlmNode.' },
-  { key: 'KB_INTERVENTION_ID', defaultOk: '<id>',        why: 'knowledge_base_0.' },
-  { key: 'KB_PATHWAY_ID',      defaultOk: '<id>',        why: 'knowledge_base_1.' },
-  { key: 'KB_BIOMARKER_ID',    defaultOk: '<id>',        why: 'knowledge_base_2.' },
-  { key: 'ADMIN_API_KEY',                                why: 'Issue/revoke consumer keys.' },
+  { key: 'VECTORSHIFT_API_KEY', why: 'KB retrieval.' },
+  { key: 'ANTHROPIC_API_KEY_<PIPELINE>', why: 'Classifier LlmNode.' },
+  { key: 'GOOGLE_AI_KEY_<PIPELINE>', why: 'Synthesis LlmNode.' },
+  { key: 'KB_INTERVENTION_ID', defaultOk: '<id>', why: 'knowledge_base_0.' },
+  { key: 'KB_PATHWAY_ID', defaultOk: '<id>', why: 'knowledge_base_1.' },
+  { key: 'KB_BIOMARKER_ID', defaultOk: '<id>', why: 'knowledge_base_2.' },
+  { key: 'ADMIN_API_KEY', why: 'Issue/revoke consumer keys.' },
 ];
 
-let missing = 0, warnings = 0;
+let missing = 0,
+  warnings = 0;
 for (const { key, why, defaultOk } of REQUIRED) {
   const value = process.env[key];
-  if (!value) { console.log(`  ✗ ${key}  (${why})`); missing++; }
-  else if (key === 'ADMIN_API_KEY' && /change.?me/i.test(value)) {
+  if (!value) {
+    console.log(`  ✗ ${key}  (${why})`);
+    missing++;
+  } else if (key === 'ADMIN_API_KEY' && /change.?me/i.test(value)) {
     console.log(`  ⚠ ${key}  still default "change me" value — rotate for production`);
     warnings++;
   } else {
-    const masked = key.includes('KEY') || key.includes('SECRET')
-      ? `${value.slice(0, 8)}...${value.slice(-4)}` : value;
+    const masked =
+      key.includes('KEY') || key.includes('SECRET')
+        ? `${value.slice(0, 8)}...${value.slice(-4)}`
+        : value;
     console.log(`  ✓ ${key}  = ${masked}`);
   }
 }
 
-if (missing > 0) { console.log(`\n  ✗ ${missing} missing`); process.exit(1); }
+if (missing > 0) {
+  console.log(`\n  ✗ ${missing} missing`);
+  process.exit(1);
+}
 if (warnings > 0) console.log(`\n  ⚠ ${warnings} warning(s) — review before production`);
 else console.log('\n  ✓ All required env vars present. Ready to deploy.');
 ```
@@ -180,12 +189,14 @@ if (missingEnv.length > 0) {
 ### HTTP timeouts — long Gemini calls
 
 ```js
-const server = app.listen(PORT, HOST, () => { /* ... */ });
+const server = app.listen(PORT, HOST, () => {
+  /* ... */
+});
 
 // Gemini 3.1 Pro with 24K thinking budget can take 60-90s
-server.keepAliveTimeout = 125_000;  // 125s — longer than any plausible single request
-server.headersTimeout = 130_000;    // must be > keepAliveTimeout
-server.requestTimeout = 0;          // no cap (we use SSE + long polls)
+server.keepAliveTimeout = 125_000; // 125s — longer than any plausible single request
+server.headersTimeout = 130_000; // must be > keepAliveTimeout
+server.requestTimeout = 0; // no cap (we use SSE + long polls)
 ```
 
 ### Graceful SIGTERM handler
@@ -197,7 +208,10 @@ async function gracefulShutdown(signal) {
   shuttingDown = true;
   console.log(`\n  ${signal} received — draining connections...`);
   server.close(err => {
-    if (err) { console.error('  Shutdown error:', err.message); process.exit(1); }
+    if (err) {
+      console.error('  Shutdown error:', err.message);
+      process.exit(1);
+    }
     console.log('  Server closed cleanly.');
     process.exit(0);
   });
@@ -210,7 +224,7 @@ process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 process.on('unhandledRejection', r => console.error('  ✗ Unhandled rejection:', r));
 process.on('uncaughtException', err => {
   console.error('  ✗ Uncaught exception:', err.message);
-  process.exit(1);  // Let Railway's restart policy recover
+  process.exit(1); // Let Railway's restart policy recover
 });
 ```
 
@@ -270,15 +284,15 @@ curl -X POST https://<your>.up.railway.app/api/pipeline/run \
 
 Add this to the README so operators have a runbook:
 
-| Symptom | Fix |
-|---|---|
-| Build fails at `npm ci` | Check `package-lock.json` is committed. Nixpacks config falls back to `npm install` if missing. |
-| Healthcheck fails after deploy | Hit `/api/health` directly — if env vars are missing, the server refuses to start. Run `npm run preflight` locally to see which are unset. |
-| 429 errors in production | Raise `MAX_CONCURRENT_PIPELINES` or scale up `numReplicas` in `railway.json`. |
-| API keys disappear on redeploy | Attach a Railway Volume and set `DATA_DIR=/data`. |
-| Pipeline times out after ~60s | Check Railway region vs LLM region. Synthesizer retries 10× at 1s intervals — verify in logs. |
-| SSE stream disconnects | Client-side timeout likely. Server keep-alive is 125s; short client timeouts drop early. |
-| "Server is at capacity" immediately | Concurrency counter not decremented on error — check that the `.catch` block calls `activePipelines--` before returning. |
+| Symptom                             | Fix                                                                                                                                        |
+| ----------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| Build fails at `npm ci`             | Check `package-lock.json` is committed. Nixpacks config falls back to `npm install` if missing.                                            |
+| Healthcheck fails after deploy      | Hit `/api/health` directly — if env vars are missing, the server refuses to start. Run `npm run preflight` locally to see which are unset. |
+| 429 errors in production            | Raise `MAX_CONCURRENT_PIPELINES` or scale up `numReplicas` in `railway.json`.                                                              |
+| API keys disappear on redeploy      | Attach a Railway Volume and set `DATA_DIR=/data`.                                                                                          |
+| Pipeline times out after ~60s       | Check Railway region vs LLM region. Synthesizer retries 10× at 1s intervals — verify in logs.                                              |
+| SSE stream disconnects              | Client-side timeout likely. Server keep-alive is 125s; short client timeouts drop early.                                                   |
+| "Server is at capacity" immediately | Concurrency counter not decremented on error — check that the `.catch` block calls `activePipelines--` before returning.                   |
 
 ## Rotating the admin key
 

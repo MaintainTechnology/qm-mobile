@@ -16,14 +16,14 @@
 // works — the producer's file server auto-injects the runtime at serve time.
 // Exits 1 if any text element fails WCAG AA.
 
-import { mkdir, writeFile } from "node:fs/promises";
-import { resolve } from "node:path";
-import { hyperframesPackageSpec, importPackagesOrBootstrap } from "./package-loader.mjs";
+import { mkdir, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
+import { hyperframesPackageSpec, importPackagesOrBootstrap } from './package-loader.mjs';
 
 // Use the producer's file server — it auto-injects the HyperFrames runtime
 // and render-seek bridge, so raw authoring HTML works without a build step.
-const packages = await importPackagesOrBootstrap(["@hyperframes/producer", "sharp"], {
-  npmPackages: [hyperframesPackageSpec("@hyperframes/producer"), "sharp@0.34.5"],
+const packages = await importPackagesOrBootstrap(['@hyperframes/producer', 'sharp'], {
+  npmPackages: [hyperframesPackageSpec('@hyperframes/producer'), 'sharp@0.34.5'],
 });
 const sharp = packages.sharp.default;
 const {
@@ -33,15 +33,15 @@ const {
   closeCaptureSession,
   captureFrameToBuffer,
   getCompositionDuration,
-} = packages["@hyperframes/producer"];
+} = packages['@hyperframes/producer'];
 
 // ─── CLI ─────────────────────────────────────────────────────────────────────
 
 const args = parseArgs(process.argv.slice(2));
-if (!args.composition) die("missing <composition-dir>");
+if (!args.composition) die('missing <composition-dir>');
 
 const SAMPLES = Number(args.samples ?? 10);
-const OUT_DIR = resolve(args.out ?? ".hyperframes/contrast");
+const OUT_DIR = resolve(args.out ?? '.hyperframes/contrast');
 const WIDTH = Number(args.width ?? 1920);
 const HEIGHT = Number(args.height ?? 1080);
 const FPS = Number(args.fps ?? 30);
@@ -55,7 +55,7 @@ const server = await createFileServer({ projectDir: COMP_DIR, port: 0 });
 const session = await createCaptureSession(
   server.url,
   OUT_DIR,
-  { width: WIDTH, height: HEIGHT, fps: FPS, format: "png" },
+  { width: WIDTH, height: HEIGHT, fps: FPS, format: 'png' },
   null,
 );
 await initializeSession(session);
@@ -89,8 +89,8 @@ try {
     summary: summarize(allEntries),
   };
 
-  await writeFile(resolve(OUT_DIR, "contrast-report.json"), JSON.stringify(report, null, 2));
-  await writeOverlaySprite(overlayFrames, resolve(OUT_DIR, "contrast-overlay.png"));
+  await writeFile(resolve(OUT_DIR, 'contrast-report.json'), JSON.stringify(report, null, 2));
+  await writeOverlaySprite(overlayFrames, resolve(OUT_DIR, 'contrast-overlay.png'));
 
   printSummary(report);
   process.exitCode = report.summary.failAA > 0 ? 1 : 0;
@@ -109,26 +109,24 @@ async function probeTextElements(session, _t) {
     /** @type {Array<{selector: string, text: string, fg: [number,number,number,number], fontSize: number, fontWeight: number, bbox: {x:number,y:number,w:number,h:number}}>} */
     const out = [];
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_ELEMENT);
-    const parseColor = (c) => {
+    const parseColor = c => {
       const m = c.match(/rgba?\(([^)]+)\)/);
       if (!m) return [0, 0, 0, 1];
-      const parts = m[1].split(",").map((s) => parseFloat(s.trim()));
+      const parts = m[1].split(',').map(s => parseFloat(s.trim()));
       return [parts[0], parts[1], parts[2], parts[3] ?? 1];
     };
-    const selectorOf = (el) => {
+    const selectorOf = el => {
       if (el.id) return `#${el.id}`;
-      const cls = [...el.classList].slice(0, 2).join(".");
+      const cls = [...el.classList].slice(0, 2).join('.');
       return cls ? `${el.tagName.toLowerCase()}.${cls}` : el.tagName.toLowerCase();
     };
     let el;
     while ((el = walker.nextNode())) {
       // must have direct text
-      const direct = [...el.childNodes].some(
-        (n) => n.nodeType === 3 && n.textContent.trim().length,
-      );
+      const direct = [...el.childNodes].some(n => n.nodeType === 3 && n.textContent.trim().length);
       if (!direct) continue;
       const cs = getComputedStyle(el);
-      if (cs.visibility === "hidden" || cs.display === "none") continue;
+      if (cs.visibility === 'hidden' || cs.display === 'none') continue;
       if (parseFloat(cs.opacity) <= 0.01) continue;
       const rect = el.getBoundingClientRect();
       if (rect.width < 8 || rect.height < 8) continue;
@@ -217,7 +215,7 @@ function compositeOver([fr, fg, fb, fa], [br, bg, bb]) {
 }
 
 function relLum([r, g, b]) {
-  const ch = (v) => {
+  const ch = v => {
     const s = v / 255;
     return s <= 0.03928 ? s / 12.92 : ((s + 0.055) / 1.055) ** 2.4;
   };
@@ -239,8 +237,8 @@ function isLargeText(fontSize, fontWeight) {
 
 function buildOverlaySVG(elements, w, h) {
   const rects = elements
-    .map((el) => {
-      const color = !el.wcagAA ? "#ff00aa" : !el.wcagAAA ? "#ffcc00" : "#00e08a";
+    .map(el => {
+      const color = !el.wcagAA ? '#ff00aa' : !el.wcagAAA ? '#ffcc00' : '#00e08a';
       const { x, y, w: bw, h: bh } = el.bbox;
       return `
         <rect x="${x}" y="${y}" width="${bw}" height="${bh}"
@@ -250,7 +248,7 @@ function buildOverlaySVG(elements, w, h) {
           ${el.ratio.toFixed(1)}:1
         </text>`;
     })
-    .join("");
+    .join('');
   return `<svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}">${rects}</svg>`;
 }
 
@@ -264,7 +262,7 @@ async function writeOverlaySprite(frames, outPath) {
   const cellH = Math.round(height * scale);
 
   const cells = await Promise.all(
-    frames.map(async (f) => ({
+    frames.map(async f => ({
       input: await sharp(f.png).resize(cellW, cellH).png().toBuffer(),
       time: f.t,
     })),
@@ -293,9 +291,9 @@ async function writeOverlaySprite(frames, outPath) {
 
 function summarize(entries) {
   const total = entries.length;
-  const failAA = entries.filter((e) => !e.wcagAA).length;
-  const passAAonly = entries.filter((e) => e.wcagAA && !e.wcagAAA).length;
-  const passAAA = entries.filter((e) => e.wcagAAA).length;
+  const failAA = entries.filter(e => !e.wcagAA).length;
+  const passAAonly = entries.filter(e => e.wcagAA && !e.wcagAAA).length;
+  const passAAA = entries.filter(e => e.wcagAAA).length;
   return { total, failAA, passAAonly, passAAA };
 }
 
@@ -306,8 +304,8 @@ function printSummary({ summary, entries }) {
   console.log(`  pass AA, not AAA: ${passAAonly}`);
   console.log(`  pass AAA:         ${passAAA}`);
   if (failAA) {
-    console.log("\nFailures:");
-    for (const e of entries.filter((x) => !x.wcagAA)) {
+    console.log('\nFailures:');
+    for (const e of entries.filter(x => !x.wcagAA)) {
       console.log(`  t=${e.time}s  ${e.selector.padEnd(24)}  ${e.ratio.toFixed(2)}:1  "${e.text}"`);
     }
   }
@@ -320,9 +318,9 @@ function parseArgs(argv) {
   let positional = 0;
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
-    if (a.startsWith("--")) {
+    if (a.startsWith('--')) {
       const k = a.slice(2);
-      const v = argv[i + 1]?.startsWith("--") ? true : argv[++i];
+      const v = argv[i + 1]?.startsWith('--') ? true : argv[++i];
       out[k] = v;
     } else if (positional === 0) {
       out.composition = a;

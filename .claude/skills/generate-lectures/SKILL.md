@@ -2,7 +2,7 @@
 name: generate-lectures
 description: Generate all lectures from a course outline using the VectorShift pipeline
 user_invocable: true
-arguments: "<outline_path> [--dry-run] [--start N] [--end N] [--materials PATH] [--no-llm-parser] [--claude-api-key KEY]"
+arguments: '<outline_path> [--dry-run] [--start N] [--end N] [--materials PATH] [--no-llm-parser] [--claude-api-key KEY]'
 allowed-tools: Read, Bash, Glob, Grep
 ---
 
@@ -17,6 +17,7 @@ Generate complete lecture packages from a course outline by running the VectorSh
 ```
 
 **Examples:**
+
 - `/generate-lectures outline.md` - Generate all lectures
 - `/generate-lectures outline.md --dry-run` - Preview without API calls
 - `/generate-lectures outline.md --start 2 --end 4` - Generate lectures 2-4 only
@@ -43,6 +44,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/iterative_lecture_runn
 ## When to Use This Skill
 
 Use this skill when the user:
+
 - Has a course outline (markdown) and wants to generate all lectures
 - Says "generate lectures", "create the course", "run the lecture pipeline"
 - Asks to "batch process" or "iterate through" lectures
@@ -51,11 +53,11 @@ Use this skill when the user:
 
 ## Pipeline Information
 
-| Property | Value |
-|----------|-------|
-| Pipeline ID | `69601d086fdec16163dc80fe` |
+| Property      | Value                                     |
+| ------------- | ----------------------------------------- |
+| Pipeline ID   | `69601d086fdec16163dc80fe`                |
 | Pipeline Name | Individual Lecture HTML v1 (SVG Diagrams) |
-| Module | `vs_pipelines/individual_lecture_html.py` |
+| Module        | `vs_pipelines/individual_lecture_html.py` |
 
 ## Required Inputs
 
@@ -67,6 +69,7 @@ Use this skill when the user:
 ### Step 1: Gather Information
 
 Ask the user for:
+
 - Path to course outline markdown file
 - Materials folder path (or confirm default: `Abid Husain/`)
 - Lecture range to process (start/end numbers, optional)
@@ -85,6 +88,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/iterative_lecture_runn
 ```
 
 Options:
+
 - `--dry-run` - Preview without making API calls
 - `--start N` - Start from lecture N
 - `--end N` - Stop after lecture N
@@ -96,6 +100,7 @@ Options:
 ### Step 3: Monitor Progress
 
 The script will:
+
 1. Parse the course outline to find lectures (regex or LLM parser)
 2. Extract suggested materials for each lecture
 3. Fuzzy-match material names to PDF files
@@ -108,6 +113,7 @@ The script will:
 ### Step 4: Report Results
 
 After completion, show the user:
+
 - Number of successful/failed lectures
 - Location of output files
 - Any error messages
@@ -116,13 +122,13 @@ After completion, show the user:
 
 For each lecture, the following files are saved to `outputs/{course_name}/`:
 
-| File | Content |
-|------|---------|
-| `lecture_N_slides.json` | Structured JSON slides |
-| `lecture_N_transcript.md` | TTS-ready speaker script |
-| `lecture_N_blueprint.md` | Slide-by-slide plan |
-| `lecture_N_research_dossier.md` | Deep research content |
-| `lecture_N_kb_context.md` | Knowledge base results |
+| File                            | Content                  |
+| ------------------------------- | ------------------------ |
+| `lecture_N_slides.json`         | Structured JSON slides   |
+| `lecture_N_transcript.md`       | TTS-ready speaker script |
+| `lecture_N_blueprint.md`        | Slide-by-slide plan      |
+| `lecture_N_research_dossier.md` | Deep research content    |
+| `lecture_N_kb_context.md`       | Knowledge base results   |
 
 ## Course Outline Format
 
@@ -134,15 +140,18 @@ The skill expects course outlines with this structure:
 ## Lecture 1 - Introduction to Topic
 
 ### Where to integrate user-provided materials
+
 - Use "BPC-157 and the Cardiovascular System" dossier
 - Reference "SS-31 in Cardiovascular Medicine" protocols
 
 ### Suggested preparatory materials
+
 - Reading: "Apolipoprotein B: Bridging the Gap"
 
 ---
 
 ## Lecture 2 - Deep Dive
+
 ...
 ```
 
@@ -150,15 +159,16 @@ The skill expects course outlines with this structure:
 
 The skill fuzzy-matches material references to PDF files:
 
-| Reference in Outline | Matched PDF |
-|---------------------|-------------|
-| "BPC-157 and the Cardiovascular System" | BPC-157-and-the-Cardiovascular-System-*.pdf |
-| "SS-31 in Cardiovascular Medicine" | SS-31-Elamipretide-in-Cardiovascular-Medicine-*.pdf |
-| "Cardio-Zoomer" | CARDIO-ZOOMER-A-FUNCTIONAL-CARDIOVASCULAR-PHENOTYPE-MAP.pdf |
+| Reference in Outline                    | Matched PDF                                                 |
+| --------------------------------------- | ----------------------------------------------------------- |
+| "BPC-157 and the Cardiovascular System" | BPC-157-and-the-Cardiovascular-System-*.pdf                 |
+| "SS-31 in Cardiovascular Medicine"      | SS-31-Elamipretide-in-Cardiovascular-Medicine-*.pdf         |
+| "Cardio-Zoomer"                         | CARDIO-ZOOMER-A-FUNCTIONAL-CARDIOVASCULAR-PHENOTYPE-MAP.pdf |
 
 ## Available Materials (Abid Husain folder)
 
 49 PDF files including:
+
 - BPC-157 research papers
 - SS-31/Elamipretide studies
 - GLP-1 and cardiovascular effects
@@ -169,14 +179,14 @@ The skill fuzzy-matches material references to PDF files:
 
 ## Error Handling
 
-| Error | Action |
-|-------|--------|
-| Course outline not found | Ask user for correct path |
-| No lectures parsed | Check format, show example |
+| Error                    | Action                                    |
+| ------------------------ | ----------------------------------------- |
+| Course outline not found | Ask user for correct path                 |
+| No lectures parsed       | Check format, show example                |
 | Materials folder missing | Proceed without materials or ask for path |
-| API timeout | Retry 3x with 30s delay |
-| API rate limit (429) | Wait and retry with backoff |
-| Pipeline error | Log error, continue with next lecture |
+| API timeout              | Retry 3x with 30s delay                   |
+| API rate limit (429)     | Wait and retry with backoff               |
+| Pipeline error           | Log error, continue with next lecture     |
 
 ## Output Retrieval Fallback
 
@@ -193,6 +203,7 @@ task_id from job submission == span_id for status queries
 ### Automatic Recovery
 
 The runner scripts now automatically:
+
 1. Store the `task_id` from each job submission
 2. Use the `task_id` to retry fetching results on timeout
 3. Log all task IDs for manual recovery if needed
@@ -210,6 +221,7 @@ python3 "/Users/anantvinjamoori/Vectorshift Pipelines/cli/fetch_by_span_id.py" \
 ```
 
 Or use Python:
+
 ```python
 from vs_pipelines.config import fetch_pipeline_result_by_span_id
 
@@ -228,6 +240,7 @@ See [vectorshift-pipeline-deployment.md](../vectorshift-pipeline-deployment.md#o
 ## Example Usage
 
 **Via slash command:**
+
 ```
 /generate-lectures outline.md
 /generate-lectures outline.md --dry-run

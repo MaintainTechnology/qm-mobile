@@ -21,26 +21,31 @@ Optimize locally       Sacrifice for coherence
 ### Architectural Loyalty Anti-Patterns
 
 **The Endless Pivot**
+
 - Symptoms: "We're migrating to X" every 6 months
 - Root cause: Lack of commitment, not lack of tools
 - Fix: Commit to current stack for defined period
 
 **The Greenfield Fallacy**
+
 - Symptoms: "If we just started over..."
 - Root cause: Underestimating rewrite cost, overestimating new system
 - Fix: Invest in existing system instead
 
 **The Trend Chase**
+
 - Symptoms: Architecture decisions based on Hacker News front page
 - Root cause: External validation over internal coherence
 - Fix: Decision criteria based on YOUR context, not industry hype
 
 **The Premature Abstraction**
+
 - Symptoms: Building for hypothetical scale/requirements
 - Root cause: Optimizing for imaginary future, betraying present needs
 - Fix: Solve today's problem. Evolve when needed.
 
 **The Shiny Object Syndrome**
+
 - Symptoms: Every new project uses a different stack
 - Root cause: Boredom masked as technical justification
 - Fix: Recognize that mastery requires commitment
@@ -48,34 +53,38 @@ Optimize locally       Sacrifice for coherence
 ### Loyalty-Preserving Practices
 
 **Decision Records**
+
 - Document WHY you chose this architecture
 - Reference when tempted to switch
 - Update only with genuine new information
 
 **Commitment Windows**
+
 - "We will use X for at least 2 years before reconsidering"
 - Creates space for learning curve and optimization
 - Prevents impulse pivots
 
 **Deprecation Rituals**
+
 - Formal process for breaking commitments
 - Requires justification, stakeholder notification
 - Makes betrayal conscious, not casual
 
 **The Strangler Fig**
+
 - When change IS needed, evolve gradually
 - New system grows around old, doesn't replace suddenly
 - Honors existing commitments while enabling transition
 
 ### The Loyalty Decision Matrix
 
-| Situation | Optimization Response | Loyal Response |
-|-----------|----------------------|----------------|
-| New framework is 20% faster | Migrate | Profile YOUR code first |
-| Dependency has security issue | Replace entirely | Patch or fork |
-| Team wants to try new tech | Greenfield project | Master current stack |
-| Performance is "slow" | Rewrite | Measure, optimize, iterate |
-| Code feels "messy" | Full refactor | Incremental improvement |
+| Situation                     | Optimization Response | Loyal Response             |
+| ----------------------------- | --------------------- | -------------------------- |
+| New framework is 20% faster   | Migrate               | Profile YOUR code first    |
+| Dependency has security issue | Replace entirely      | Patch or fork              |
+| Team wants to try new tech    | Greenfield project    | Master current stack       |
+| Performance is "slow"         | Rewrite               | Measure, optimize, iterate |
+| Code feels "messy"            | Full refactor         | Incremental improvement    |
 
 ### When Betrayal Is Justified (The Short List)
 
@@ -150,16 +159,16 @@ Use this template to define unbreakable rules for a project.
 
 ### Superhuman Quality Standards Table
 
-| Quality Dimension | Human Standard | Superhuman Standard | Verification Method |
-|-------------------|----------------|---------------------|---------------------|
-| **Naming** | Mostly consistent | Zero collisions, 100% convention compliance | Automated linting + namespace analysis |
-| **Test Coverage** | 70-80% lines | 100% branches, all edge cases | Coverage tools with branch analysis |
-| **Structure** | Generally follows patterns | Mathematically consistent (every file same shape) | AST analysis + pattern matching |
-| **Traceability** | Comments mention tickets | `// Implements: REQ-AUTH-001` on every function | Traceability matrix automation |
-| **Documentation** | Key APIs | Every public interface fully documented | Documentation coverage tools |
-| **Error Handling** | Happy path + common errors | Every error state explicitly handled | Error path analysis |
-| **Type Safety** | No `any`, mostly typed | Zero implicit types, no casts | TypeScript strict mode |
-| **Dependencies** | Up to date | Pinned versions, security-scanned | Dependency analysis tools |
+| Quality Dimension  | Human Standard             | Superhuman Standard                               | Verification Method                    |
+| ------------------ | -------------------------- | ------------------------------------------------- | -------------------------------------- |
+| **Naming**         | Mostly consistent          | Zero collisions, 100% convention compliance       | Automated linting + namespace analysis |
+| **Test Coverage**  | 70-80% lines               | 100% branches, all edge cases                     | Coverage tools with branch analysis    |
+| **Structure**      | Generally follows patterns | Mathematically consistent (every file same shape) | AST analysis + pattern matching        |
+| **Traceability**   | Comments mention tickets   | `// Implements: REQ-AUTH-001` on every function   | Traceability matrix automation         |
+| **Documentation**  | Key APIs                   | Every public interface fully documented           | Documentation coverage tools           |
+| **Error Handling** | Happy path + common errors | Every error state explicitly handled              | Error path analysis                    |
+| **Type Safety**    | No `any`, mostly typed     | Zero implicit types, no casts                     | TypeScript strict mode                 |
+| **Dependencies**   | Up to date                 | Pinned versions, security-scanned                 | Dependency analysis tools              |
 
 ### Traceability Matrix Template
 
@@ -168,18 +177,18 @@ Use this template to define unbreakable rules for a project.
 
 ## Requirements to Tasks
 
-| Requirement ID | Description | Tasks | Status |
-|----------------|-------------|-------|--------|
-| REQ-AUTH-001 | User can register with email | TASK-AUTH-001, TASK-AUTH-002 | ✓ |
-| REQ-AUTH-002 | Email must be unique | TASK-AUTH-003 | ✓ |
-| REQ-AUTH-003 | Password meets strength requirements | TASK-AUTH-004, TASK-AUTH-005 | In Progress |
+| Requirement ID | Description                          | Tasks                        | Status      |
+| -------------- | ------------------------------------ | ---------------------------- | ----------- |
+| REQ-AUTH-001   | User can register with email         | TASK-AUTH-001, TASK-AUTH-002 | ✓           |
+| REQ-AUTH-002   | Email must be unique                 | TASK-AUTH-003                | ✓           |
+| REQ-AUTH-003   | Password meets strength requirements | TASK-AUTH-004, TASK-AUTH-005 | In Progress |
 
 ## Tasks to Code
 
-| Task ID | Description | Files Modified | Tests |
-|---------|-------------|----------------|-------|
-| TASK-AUTH-001 | Create User entity | src/entities/user.ts | tests/entities/user.test.ts |
-| TASK-AUTH-002 | Create registration endpoint | src/routes/auth.ts | tests/routes/auth.test.ts |
+| Task ID       | Description                     | Files Modified       | Tests                       |
+| ------------- | ------------------------------- | -------------------- | --------------------------- |
+| TASK-AUTH-001 | Create User entity              | src/entities/user.ts | tests/entities/user.test.ts |
+| TASK-AUTH-002 | Create registration endpoint    | src/routes/auth.ts   | tests/routes/auth.test.ts   |
 | TASK-AUTH-003 | Add email uniqueness validation | src/services/auth.ts | tests/services/auth.test.ts |
 
 ## Coverage Summary
@@ -299,6 +308,7 @@ Most technical failures are domain failures. The code works perfectly; it just s
 ### Domain Discovery Techniques
 
 **Event Storming:**
+
 1. Write domain events on sticky notes (past tense: "Order Placed")
 2. Arrange chronologically
 3. Identify commands that trigger events
@@ -306,6 +316,7 @@ Most technical failures are domain failures. The code works perfectly; it just s
 5. Identify aggregates (clusters of related events)
 
 **Domain Expert Interviews:**
+
 ```
 "Walk me through a typical [process]."
 "What happens when [unusual case]?"
@@ -315,6 +326,7 @@ Most technical failures are domain failures. The code works perfectly; it just s
 ```
 
 **Document Analysis:**
+
 - Existing forms and workflows
 - Regulatory documents
 - Training materials
@@ -342,21 +354,25 @@ Systems thinking sees **relationships, not just components**.
 ### Dependency Categories
 
 **1. Direct Dependencies**
+
 - What this system calls/uses
 - Visible in code (imports, API calls)
 - Usually documented
 
 **2. Indirect Dependencies**
+
 - What those dependencies depend on
 - Not visible in your code
 - Often forgotten
 
 **3. Reverse Dependencies**
+
 - What depends on this system
 - Not in your code at all
 - Breaking changes affect them
 
 **4. Shared Dependencies**
+
 - Resources multiple systems use
 - Database, message queue, file system
 - Contention and coordination issues
@@ -364,26 +380,31 @@ Systems thinking sees **relationships, not just components**.
 ### Failure Mode Categories
 
 **1. Crash Failures**
+
 - System stops completely
 - Usually detected quickly
 - Clear failure signal
 
 **2. Omission Failures**
+
 - System doesn't respond to some requests
 - May not be detected immediately
 - Partial functionality
 
 **3. Timing Failures**
+
 - System responds too slowly
 - Can cascade to timeouts elsewhere
 - Often misdiagnosed as crash
 
 **4. Byzantine Failures**
+
 - System produces incorrect results
 - Hardest to detect
 - Can corrupt other systems
 
 **5. Silent Failures**
+
 - System appears to work
 - Actually doing nothing (or wrong thing)
 - Detected only by missing outcomes
@@ -429,6 +450,7 @@ RECOVERY:
 4. **Saturation:** How full the system is
 
 **For each system, define:**
+
 - What's normal for each signal?
 - What threshold triggers alert?
 - What's the escalation path?
@@ -441,18 +463,21 @@ RECOVERY:
 ### Technical Constraints
 
 **Existing Systems:**
+
 - APIs that can't change
 - Data formats locked by contracts
 - Legacy systems without documentation
 - Performance ceilings
 
 **Infrastructure:**
+
 - Deployment environment limitations
 - Network topology
 - Security requirements
 - Disaster recovery requirements
 
 **Technical Debt:**
+
 - Systems that work but shouldn't be extended
 - Undocumented behaviors
 - Workarounds that became permanent
@@ -460,18 +485,21 @@ RECOVERY:
 ### Organizational Constraints
 
 **Team Structure:**
+
 - Who owns what
 - Team boundaries
 - Communication overhead
 - Conway's Law implications
 
 **Process:**
+
 - Approval chains
 - Change management
 - Release cycles
 - Documentation requirements
 
 **Knowledge:**
+
 - Who understands what
 - Bus factor
 - Tribal knowledge
@@ -480,18 +508,21 @@ RECOVERY:
 ### Business Constraints
 
 **Resources:**
+
 - Budget limits
 - Timeline pressure
 - Headcount constraints
 - Vendor contracts
 
 **Compliance:**
+
 - Industry regulations
 - Legal requirements
 - Audit requirements
 - Data residency
 
 **Strategic:**
+
 - Product roadmap alignment
 - Partnership constraints
 - Competitive considerations
@@ -502,18 +533,21 @@ RECOVERY:
 **These are real. Ignoring them fails projects.**
 
 **Power Dynamics:**
+
 - Who has authority
 - Who has influence
 - Who has veto power
 - Historical conflicts
 
 **Relationships:**
+
 - Past project history
 - Team reputations
 - Personal relationships
 - Trust levels
 
 **Incentives:**
+
 - What teams are measured on
 - What individuals are rewarded for
 - Risk tolerance
@@ -522,21 +556,25 @@ RECOVERY:
 ### Constraint Navigation Strategies
 
 **Work Within:**
+
 - Accept constraint as given
 - Design around it
 - Document why
 
 **Negotiate:**
+
 - Understand why constraint exists
 - Propose alternatives that address underlying need
 - Get explicit agreement
 
 **Escalate:**
+
 - When constraint blocks critical path
 - When cost of constraint exceeds benefit
 - With clear proposal, not just complaint
 
 **Ignore:**
+
 - Almost never appropriate
 - Only with explicit risk acceptance
 - Document thoroughly
@@ -580,6 +618,7 @@ RECOVERY:
 ### Task Boundary Anti-Patterns
 
 **The Vague Task:**
+
 ```
 BAD: "Improve the code quality"
 WHY: No measurable output, no verification
@@ -589,6 +628,7 @@ BETTER: "Add input validation to function X
 ```
 
 **The Unbounded Task:**
+
 ```
 BAD: "Fix all the bugs"
 WHY: No clear scope, no end condition
@@ -598,6 +638,7 @@ BETTER: "Fix the null pointer exception in
 ```
 
 **The Context-Dependent Task:**
+
 ```
 BAD: "Write it the way our team does"
 WHY: Requires knowledge AI doesn't have
@@ -607,6 +648,7 @@ BETTER: "Write a function following this example's
 ```
 
 **The Judgment Task:**
+
 ```
 BAD: "Decide if we should use Redis or Postgres"
 WHY: Requires tradeoff analysis, domain context
@@ -618,23 +660,28 @@ BETTER: "List pros/cons of Redis vs Postgres for
 ### Task Decomposition Strategy
 
 **Step 1: Identify the outcome**
+
 - What's the end state we want?
 - How will we know we're done?
 
 **Step 2: List the sub-tasks**
+
 - What discrete steps achieve this?
 - What's the dependency graph?
 
 **Step 3: For each sub-task, evaluate:**
+
 - Can AI do this with clear input/output?
 - Or does this require human judgment?
 
 **Step 4: Define boundaries**
+
 - What exactly does AI receive?
 - What exactly should AI produce?
 - How do we verify?
 
 **Step 5: Plan integration**
+
 - How do AI outputs combine?
 - Where are the gaps?
 - Who handles integration?
@@ -658,23 +705,29 @@ BETTER: "List pros/cons of Redis vs Postgres for
 ### Composition Patterns
 
 **Sequential:**
+
 ```
 Task A → Verify → Task B → Verify → Task C → Verify → Integrate
 ```
+
 Use when: Tasks have dependencies
 
 **Parallel:**
+
 ```
 Task A ↘
 Task B → Verify All → Integrate
 Task C ↗
 ```
+
 Use when: Tasks are independent
 
 **Iterative:**
+
 ```
 Task A → Verify → Feedback → Task A' → Verify → Done
 ```
+
 Use when: First attempt may need refinement
 
 ---
@@ -771,6 +824,7 @@ ARCHITECTURAL LESSONS:
 **Risk = Impact if fails × Likelihood of failure**
 
 For HIGH risk dependencies:
+
 - [ ] Fallback strategy documented
 - [ ] Monitoring in place
 - [ ] Runbook exists
@@ -830,6 +884,7 @@ AI DECOMPOSITION (if applicable):
 ### The Five Questions
 
 Before ANY architecture work:
+
 1. What problem are we solving? (Domain)
 2. What can break? (Systems)
 3. What can't we change? (Constraints)
@@ -839,6 +894,7 @@ Before ANY architecture work:
 ### The Shippability Test
 
 Can this ship? Check:
+
 - [ ] Fits technical constraints
 - [ ] Fits budget/timeline
 - [ ] Has required approvals
@@ -848,6 +904,7 @@ Can this ship? Check:
 ### The AI Task Checklist
 
 For each AI task:
+
 - [ ] Input is clear
 - [ ] Output is clear
 - [ ] Success is verifiable

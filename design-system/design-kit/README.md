@@ -24,22 +24,22 @@ production code to port line-by-line**.
 Your task is to **recreate these designs in React Native / Expo** using that
 platform's idioms and the project's established patterns:
 
-| HTML in the prototype | React Native equivalent |
-| --- | --- |
-| `div` / `section` | `View` |
-| `span` / `p` / `h1`–`h3` | `Text` |
-| `button` | `Pressable` (or `TouchableOpacity`) |
-| `.qm-scroll` (vertical) | `ScrollView` / `FlatList` |
-| `.qm-x` (horizontal chips, cards) | `ScrollView horizontal` |
-| CSS custom properties (`--bg`, `--acc`…) | theme object + context, or `useColorScheme()` |
-| `sc-for` loops | `.map()` / `FlatList` |
-| `sc-if` conditionals | conditional render |
-| Bottom tab bar | `expo-router` tabs or React Navigation `createBottomTabNavigator` |
-| Bottom sheets (send, fix, deposit) | `@gorhom/bottom-sheet` or a `Modal` with slide-up |
-| `image-slot` (aerial placeholder) | `Image` fed by the Google Static Maps API |
-| Inline `svg` icons | `react-native-svg` (all icon paths are 24×24 viewBox) |
-| `@keyframes` (pulse, dots, drop) | `react-native-reanimated` |
-| `font-variant-numeric: tabular-nums` | `fontVariant: ['tabular-nums']` |
+| HTML in the prototype                    | React Native equivalent                                           |
+| ---------------------------------------- | ----------------------------------------------------------------- |
+| `div` / `section`                        | `View`                                                            |
+| `span` / `p` / `h1`–`h3`                 | `Text`                                                            |
+| `button`                                 | `Pressable` (or `TouchableOpacity`)                               |
+| `.qm-scroll` (vertical)                  | `ScrollView` / `FlatList`                                         |
+| `.qm-x` (horizontal chips, cards)        | `ScrollView horizontal`                                           |
+| CSS custom properties (`--bg`, `--acc`…) | theme object + context, or `useColorScheme()`                     |
+| `sc-for` loops                           | `.map()` / `FlatList`                                             |
+| `sc-if` conditionals                     | conditional render                                                |
+| Bottom tab bar                           | `expo-router` tabs or React Navigation `createBottomTabNavigator` |
+| Bottom sheets (send, fix, deposit)       | `@gorhom/bottom-sheet` or a `Modal` with slide-up                 |
+| `image-slot` (aerial placeholder)        | `Image` fed by the Google Static Maps API                         |
+| Inline `svg` icons                       | `react-native-svg` (all icon paths are 24×24 viewBox)             |
+| `@keyframes` (pulse, dots, drop)         | `react-native-reanimated`                                         |
+| `font-variant-numeric: tabular-nums`     | `fontVariant: ['tabular-nums']`                                   |
 
 Everything is one file (`QuoteMax Mobile App.dc.html`) with a `screen` prop that
 switches between 18 screens — that is a prototyping convenience, **not** the
@@ -66,49 +66,49 @@ static screens:
 
 ### Colour — dark theme (primary)
 
-| Token | Value | Use |
-| --- | --- | --- |
-| `bg` | `#16120F` | Screen background (warm charcoal) |
-| `card` | `#2B2422` | Cards, panels, sheets |
-| `sunk` | `#1E1813` | Inputs, wells, inactive chips |
-| `line` | `#3A322C` | All borders and dividers |
-| `pri` | `#F6F1EA` | Primary text |
-| `sec` | `#C3B8AC` | Secondary text, body copy |
-| `dim` | `#A2968A` | Meta text, labels, placeholders |
-| `acc` | `#FFC400` | Accent **fills** (buttons, toggles, bars) |
-| `accTx` | `#FFC400` | Accent **text and icons** |
-| `accUnder` | `transparent` | Highlighter underline (off in dark) |
-| `accPress` | `#E6AC00` | Accent pressed state |
-| `accInk` | `#1C1812` | Text/icons **on** an accent fill |
-| `ok` | `#34D27B` | Success / paid / accepted |
-| `warn` | `#F59E0B` | Needs attention / awaiting you |
-| `bad` | `#F0816B` | Declined / error / destructive |
-| `logo` | `#FFFFFF` | Brand mark body |
-| `lift` | `inset 0 1px 0 0 rgba(255,255,255,.06)` | Card top-edge highlight |
-| `grain` | `.045` | Film-grain overlay opacity |
+| Token      | Value                                   | Use                                       |
+| ---------- | --------------------------------------- | ----------------------------------------- |
+| `bg`       | `#16120F`                               | Screen background (warm charcoal)         |
+| `card`     | `#2B2422`                               | Cards, panels, sheets                     |
+| `sunk`     | `#1E1813`                               | Inputs, wells, inactive chips             |
+| `line`     | `#3A322C`                               | All borders and dividers                  |
+| `pri`      | `#F6F1EA`                               | Primary text                              |
+| `sec`      | `#C3B8AC`                               | Secondary text, body copy                 |
+| `dim`      | `#A2968A`                               | Meta text, labels, placeholders           |
+| `acc`      | `#FFC400`                               | Accent **fills** (buttons, toggles, bars) |
+| `accTx`    | `#FFC400`                               | Accent **text and icons**                 |
+| `accUnder` | `transparent`                           | Highlighter underline (off in dark)       |
+| `accPress` | `#E6AC00`                               | Accent pressed state                      |
+| `accInk`   | `#1C1812`                               | Text/icons **on** an accent fill          |
+| `ok`       | `#34D27B`                               | Success / paid / accepted                 |
+| `warn`     | `#F59E0B`                               | Needs attention / awaiting you            |
+| `bad`      | `#F0816B`                               | Declined / error / destructive            |
+| `logo`     | `#FFFFFF`                               | Brand mark body                           |
+| `lift`     | `inset 0 1px 0 0 rgba(255,255,255,.06)` | Card top-edge highlight                   |
+| `grain`    | `.045`                                  | Film-grain overlay opacity                |
 
 ### Colour — light theme ("warm paper")
 
-| Token | Value |
-| --- | --- |
-| `bg` | `#FAF8F4` |
-| `card` | `#FFFFFF` |
-| `sunk` | `#F3EEE7` |
-| `line` | `#CFC2B0` |
-| `pri` | `#241E1B` |
-| `sec` | `#5E544E` |
-| `dim` | `#6E645C` |
-| `acc` | `#FFC400` (unchanged — fills only) |
-| `accTx` | `#2B2422` |
-| `accUnder` | `#FFC400` |
-| `accPress` | `#E6AC00` |
-| `accInk` | `#2B2422` |
-| `ok` | `#15803D` |
-| `warn` | `#B45309` |
-| `bad` | `#B91C1C` |
-| `logo` | `#16120F` |
-| `lift` | `0 1px 2px rgba(43,36,34,.06)` |
-| `grain` | `.03` |
+| Token      | Value                              |
+| ---------- | ---------------------------------- |
+| `bg`       | `#FAF8F4`                          |
+| `card`     | `#FFFFFF`                          |
+| `sunk`     | `#F3EEE7`                          |
+| `line`     | `#CFC2B0`                          |
+| `pri`      | `#241E1B`                          |
+| `sec`      | `#5E544E`                          |
+| `dim`      | `#6E645C`                          |
+| `acc`      | `#FFC400` (unchanged — fills only) |
+| `accTx`    | `#2B2422`                          |
+| `accUnder` | `#FFC400`                          |
+| `accPress` | `#E6AC00`                          |
+| `accInk`   | `#2B2422`                          |
+| `ok`       | `#15803D`                          |
+| `warn`     | `#B45309`                          |
+| `bad`      | `#B91C1C`                          |
+| `logo`     | `#16120F`                          |
+| `lift`     | `0 1px 2px rgba(43,36,34,.06)`     |
+| `grain`    | `.03`                              |
 
 ### ⚠ The accent rule — do not collapse `acc` and `accTx`
 
@@ -149,18 +149,18 @@ Named rules from the design system:
 
 Scale as used (fontSize / lineHeight / weight / tracking):
 
-| Role | Value |
-| --- | --- |
-| Hero display (welcome) | 40 / 0.93 / 800 / −0.04em / uppercase |
-| Screen H1 (greeting) | 28 / 0.95 / 800 / −0.04em / uppercase |
-| Sheet + card H2 | 19–27 / 1.0–1.15 / 800 / −0.025em / uppercase |
-| Screen title (header) | 16–17 / 1.0 / 800 / −0.02em / uppercase |
-| Card title | 14–16 / 1.15–1.25 / 700 |
-| Body | 12.5–15.5 / 1.45–1.6 / 400 |
-| Section label (mono) | 10–11.5 / 1.0 / 700 / 0.1–0.14em / uppercase |
-| Eyebrow / kicker (mono) | 9–10 / 1.0 / 600 / 0.14–0.16em / uppercase |
-| Meta (mono) | 8.5–9.5 / 1.0–1.35 / 500 / 0.08–0.12em / uppercase |
-| Big number (mono) | 20–38 / 1.0 / 800 / −0.02 to −0.03em / tabular |
+| Role                    | Value                                              |
+| ----------------------- | -------------------------------------------------- |
+| Hero display (welcome)  | 40 / 0.93 / 800 / −0.04em / uppercase              |
+| Screen H1 (greeting)    | 28 / 0.95 / 800 / −0.04em / uppercase              |
+| Sheet + card H2         | 19–27 / 1.0–1.15 / 800 / −0.025em / uppercase      |
+| Screen title (header)   | 16–17 / 1.0 / 800 / −0.02em / uppercase            |
+| Card title              | 14–16 / 1.15–1.25 / 700                            |
+| Body                    | 12.5–15.5 / 1.45–1.6 / 400                         |
+| Section label (mono)    | 10–11.5 / 1.0 / 700 / 0.1–0.14em / uppercase       |
+| Eyebrow / kicker (mono) | 9–10 / 1.0 / 600 / 0.14–0.16em / uppercase         |
+| Meta (mono)             | 8.5–9.5 / 1.0–1.35 / 500 / 0.08–0.12em / uppercase |
+| Big number (mono)       | 20–38 / 1.0 / 800 / −0.02 to −0.03em / tabular     |
 
 **Minimum tap target is 44 px** throughout — tradies use this one-handed, on
 site, with gloves. Primary CTAs are 52–58 px tall.
@@ -179,15 +179,15 @@ site, with gloves. Primary CTAs are 52–58 px tall.
 
 ### Motion
 
-| Name | Spec | Where |
-| --- | --- | --- |
-| `qmPulse` | opacity 1→0.4→1, 2.2–2.4 s, ease-in-out, infinite | live-status dots, warn dots |
-| `qmDot` | translateY 0→−4, 1.1 s, staggered 0 / 0.16 / 0.32 s | AI typing indicator |
-| `qmDrop` | translateY −120%→0 + fade, 0.42 s `cubic-bezier(.2,.9,.25,1)` | push notification banner |
-| `qmPop` | translateY 10→0, scale .97→1, fade, 0.3 s `cubic-bezier(.22,1,.36,1)` | bottom sheets, new message card |
-| `qmUp` | translateY 8→0 + fade, 0.32 s | screen content entrance |
-| `qmHeart` | scale 1→1.07→1→1.05→1, 2.6 s | boot logo heartbeat (welcome) |
-| `qmBreathe` | opacity .35→1→.35, 2.6 s | wordmark on welcome |
+| Name        | Spec                                                                  | Where                           |
+| ----------- | --------------------------------------------------------------------- | ------------------------------- |
+| `qmPulse`   | opacity 1→0.4→1, 2.2–2.4 s, ease-in-out, infinite                     | live-status dots, warn dots     |
+| `qmDot`     | translateY 0→−4, 1.1 s, staggered 0 / 0.16 / 0.32 s                   | AI typing indicator             |
+| `qmDrop`    | translateY −120%→0 + fade, 0.42 s `cubic-bezier(.2,.9,.25,1)`         | push notification banner        |
+| `qmPop`     | translateY 10→0, scale .97→1, fade, 0.3 s `cubic-bezier(.22,1,.36,1)` | bottom sheets, new message card |
+| `qmUp`      | translateY 8→0 + fade, 0.32 s                                         | screen content entrance         |
+| `qmHeart`   | scale 1→1.07→1→1.05→1, 2.6 s                                          | boot logo heartbeat (welcome)   |
+| `qmBreathe` | opacity .35→1→.35, 2.6 s                                              | wordmark on welcome             |
 
 ---
 
@@ -195,13 +195,13 @@ site, with gloves. Primary CTAs are 52–58 px tall.
 
 **Bottom tab bar** (trade-first, 5 slots), 62 px tall + safe-area inset:
 
-| Tab | Label | Routes it owns |
-| --- | --- | --- |
-| 1 | Home | `home`, `calendar` |
-| 2 | Roof | `hub`, `measure` |
-| 3 | Quotes | `quotes`, `quote` |
-| 4 | Chats | `chats`, `chat` |
-| 5 | Menu | `menu`, `pricing`, `marketing`, `files`, `account`, `billing` |
+| Tab | Label  | Routes it owns                                                |
+| --- | ------ | ------------------------------------------------------------- |
+| 1   | Home   | `home`, `calendar`                                            |
+| 2   | Roof   | `hub`, `measure`                                              |
+| 3   | Quotes | `quotes`, `quote`                                             |
+| 4   | Chats  | `chats`, `chat`                                               |
+| 5   | Menu   | `menu`, `pricing`, `marketing`, `files`, `account`, `billing` |
 
 Active tab: 2 px `acc` bar across the top inset (22%–78%), icon + label in
 `accTx`. Inactive: `dim`.
@@ -219,6 +219,7 @@ tab 2, Price book + Business bands → tab 5 (Menu).
 18 screens. In the prototype, switch via the `screen` prop.
 
 ### 1. `welcome`
+
 Boot/marketing screen. Brand mark + stacked wordmark top-left with the heartbeat
 animation. Bottom-anchored: an "AU tradies" pill (mono, `ok` dot), hero display
 "NEVER QUOTE ON A **SUNDAY NIGHT** AGAIN." (accent word), body paragraph, primary
@@ -227,6 +228,7 @@ CTA "Get my QuoteMax" (58 px, `acc` fill), secondary "I already have an account"
 opacity sits behind the headline.
 
 ### 2. `signin`
+
 Back button + "SIGN IN" kicker header. "WELCOME BACK" H1, body line. Email field
 (filled) and password field in **focus state** (`acc` border + 2 px
 `rgba(255,210,61,.35)` ring) with an eye toggle. Primary "Sign in" CTA, an "or"
@@ -234,6 +236,7 @@ divider, "Unlock with Face ID" outline button, then "Forgot your password?" and 
 sign-up link.
 
 ### 3. `onboard`
+
 4-step wizard mirroring the web funnel. Header: back, brand mark, "STEP 0N / 04".
 Progress = 4 equal bars, filled `acc` up to the current step. Then step label
 pair, ALL-CAPS H2, sub-line, `* Required` legend, fields, and a 58 px CTA
@@ -252,11 +255,13 @@ radius 8. Selected multi-select options: `rgba(255,196,0,0.10)` fill, `acc`
 border, `acc` tick with `accInk` glyph.
 
 ### 4. `home` — Today first
+
 Header: brand mark + "Hartley Electrical", bell (badge "3", tapping fires the
 push banner demo), theme toggle, avatar. Below it a full-width live strip:
 `ok` pulsing dot, "AI LINE LIVE · ANSWERING", and the QuoteMax number.
 
 Then, in order:
+
 1. **Greeting** — "GOOD MORNING, **JEPH**" + "Two visits booked today. One quote
    needs your review."
 2. **`01` Today · 2 site visits** — horizontal cards, 274 px wide: big mono time,
@@ -280,12 +285,14 @@ glass card, brand tile, "Quote drafted · Priya Naidu paid the $99 site visit",
 by the bell; closed by default.
 
 ### 5. `quotes`
+
 Header with "+ NEW". Search field (44 px, mic icon). Horizontal filter chips with
 counts: All 20 · Awaiting you 1 · Sent 6 · Viewed 9 · Accepted 3 · Declined 1
 (filters really filter). Count line + sort cycler (Newest / Value / Oldest).
 Cards: name, job, big mono value, status chip + "suburb · channel · age".
 
 ### 6. `quote` — review & send
+
 Header: "AWAITING YOU · DRAFT" kicker, "Q-1043", share and more buttons.
 
 1. **Customer card** — name, full address, "FULL RE-ROOF · COLORBOND CORRUGATED ·
@@ -304,11 +311,13 @@ Header: "AWAITING YOU · DRAFT" kicker, "Q-1043", share and more buttons.
 sheet) with tick state, then Cancel / Send now.
 
 ### 7. `chats`
+
 Header with an `ok` "AI ON" pill. Filter chips: All / Needs you / AI handled /
 Unread. Rows: 38 px avatar, name, time, truncated preview, a state chip
 (`warn` "NEEDS YOU" / `ok` "AI HANDLED"), channel, and an `acc` unread count.
 
 ### 8. `chat` — SMS thread
+
 Header: back, avatar, name, `ok` "AI HANDLING · 0468 048 422", `acc` call button.
 Day divider, then bubbles: inbound `card` with `line` border, radius
 `14 14 14 4`; AI turns tagged "QUOTEMAX AI" in `ok`; your own tagged "YOU" in
@@ -321,6 +330,7 @@ $73,522 / Q-1043 · tap to review". Composer: camera button, "Take over from the
 AI…" field, `acc` mic button.
 
 ### 9. `calendar`
+
 Header with "+ BOOK". Week strip: 7 day cells with mono day/date and a busy dot;
 selected cell gets `acc` border + tint. Agenda: a time rail (mono time +
 duration) against cards with a 3 px `tone` left border, name, kind, job,
@@ -328,6 +338,7 @@ address, and Call / Drive / Measure actions. Then **Follow-ups**: 3 rows with
 overdue/due tone and a 40 px `acc` "Nudge" button.
 
 ### 10. `hub` — Roof tools
+
 Header: `acc`-tinted icon tile, "TRADE HUB" kicker, "ROOF TOOLS", "MEASURES"
 button. Hero card (`acc` border, radial tint): "ROOF **MEASURE**", the real web
 copy ("Type an address and we measure every structure on the property…"), then
@@ -336,6 +347,7 @@ Measurements, Street view, Photo verify, Solar check, Roof tiles viewer,
 Topology evidence — and a **Recent measures** list (address, meta, `accTx` area).
 
 ### 11. `measure` — the on-site screen
+
 Fixed map on top, fixed results panel below, action bar pinned. No bottom sheet
 to drag — deliberate, for gloved one-handed use.
 
@@ -376,6 +388,7 @@ hip/valley basis 7.4 m per edge", then Cancel / Update prices.
 both, or the excluded badge disappears.
 
 ### 12. `menu`
+
 Profile header (avatar, name, "HARTLEY ELECTRICAL · PRO PLAN", theme toggle).
 Four bands mirroring the web sidebar, each a card of 56 px rows with an icon
 tile, label, sub-line, optional badge, chevron:
@@ -388,6 +401,7 @@ tile, label, sub-line, optional badge, chevron:
 Then a `bad` "Sign out" button and a version footer.
 
 ### 13. `pricing` — Price book
+
 Header kicker "PRICE BOOK", title = the active tab, "+ RATE" button. Four tabs:
 **General pricing** (early-booking discount, quote layout, review policy,
 follow-ups, invoice calibration) · **Services** (each job either "Auto-quote" or
@@ -396,17 +410,20 @@ follow-ups, invoice calibration) · **Services** (each job either "Auto-quote" o
 The "AUTO-QUOTED BY YOUR AI · 49 / 65" gauge appears **only** on Services.
 
 ### 14. `marketing`
+
 QR invite card: a rendered QR block on a light plate, "YOUR INVITE CODE",
 `HARTLEY10` at 21 px mono, a line about sticking it on the ute, and a Share
 button. Then a 3-cell stat strip (QR scans 184 / Leads 31 / Won 9) and three
 tool rows: Flyer designer, Videos, Review requests.
 
 ### 15. `files`
+
 Two-tab switch. **Files**: rows with a mono kind badge (PDF `bad`, JPG `accTx`,
 PNG `ok`, CSV `dim`), filename, "date · size", download icon. **History**: a
 timeline — mono time, a tone dot on a connector line, title, detail.
 
 ### 16. `account`
+
 Profile card (52 px avatar, name, email, licence · state, Edit). Then three
 banded setting groups: **AI line** (number, greeting & voice, quiet hours),
 **Notifications** (quote needs review, deposit paid), **Device** (Face ID,
@@ -415,12 +432,14 @@ offline drafts, trades & licence). Toggle rows use a 50 × 30 pill switch with a
 (`$1,485.00` next Tuesday, "15 × $99 site-visit deposits, less fees").
 
 ### 17. `billing`
+
 Plan card (`acc` border + radial tint): "CURRENT PLAN", `ok` "ACTIVE" chip,
 "PRO", `$349` / month + GST, inclusions, renewal date, "Change plan". Then
 **This cycle** usage bars (Quotes drafted, AI minutes, Roof measures) and an
 **Invoices** list.
 
 ### 18. `customer` — what the customer sees
+
 No tabs; a close button and the public URL in the header. Branded header (mark,
 "HARTLEY ELECTRICAL", licence line), "YOUR REROOF QUOTE" H1, a personal line,
 and three trust chips (Valid 30 days / Licensed & insured / `ok` "$99 visit
@@ -468,23 +487,23 @@ indicator · haptics on primary actions · voice input in the chat composer.
 
 Per-screen state the prototype models:
 
-| State | Purpose |
-| --- | --- |
-| `nav` | current screen (replace with the router) |
-| `theme` | `dark` \| `light` override |
-| `obStep`, `trades[]`, `stateCode` | onboarding wizard |
-| `qf`, `sort` | quote filter + sort |
-| `cf` | chat filter |
-| `period` | KPI period |
-| `day` | selected calendar day |
-| `tier`, `cust` | selected tier (tradie view / customer view) |
-| `priceTab` | price-book tab |
-| `filesTab` | Files vs History |
-| `structOff[]` | structures excluded from the job — **drives all pricing** |
-| `fixArea`, `fixPitch`, `fixHips`, `fixValleys`, `fixBox` | measurement overrides |
-| `notif{}` | quiet hours, quote/deposit push, Face ID, offline drafts |
-| `sendOpen`, `fixOpen`, `depositOpen` | sheet visibility |
-| `push` | push banner visibility |
+| State                                                    | Purpose                                                   |
+| -------------------------------------------------------- | --------------------------------------------------------- |
+| `nav`                                                    | current screen (replace with the router)                  |
+| `theme`                                                  | `dark` \| `light` override                                |
+| `obStep`, `trades[]`, `stateCode`                        | onboarding wizard                                         |
+| `qf`, `sort`                                             | quote filter + sort                                       |
+| `cf`                                                     | chat filter                                               |
+| `period`                                                 | KPI period                                                |
+| `day`                                                    | selected calendar day                                     |
+| `tier`, `cust`                                           | selected tier (tradie view / customer view)               |
+| `priceTab`                                               | price-book tab                                            |
+| `filesTab`                                               | Files vs History                                          |
+| `structOff[]`                                            | structures excluded from the job — **drives all pricing** |
+| `fixArea`, `fixPitch`, `fixHips`, `fixValleys`, `fixBox` | measurement overrides                                     |
+| `notif{}`                                                | quiet hours, quote/deposit push, Face ID, offline drafts  |
+| `sendOpen`, `fixOpen`, `depositOpen`                     | sheet visibility                                          |
+| `push`                                                   | push banner visibility                                    |
 
 ### Pricing model (implement server-side; mirrored in the prototype)
 
@@ -539,15 +558,15 @@ payments.
 
 In this bundle:
 
-| File | What it is |
-| --- | --- |
-| `QuoteMax Mobile App.dc.html` | The app itself — all 18 screens, fully interactive, both themes. Open in a browser; switch screens via the `screen` prop / the app's own navigation. |
-| `QuoteMax Mobile Screens.dc.html` | The presentation wall — 21 live instances in device frames and bare, dark and light. Open this first to see everything at once. |
-| `QuoteMax Web Reference.dc.html` | The existing **web** app recreated from source, for fidelity comparison. |
-| `image-slot.js` | Support file for the aerial placeholder. |
-| `support.js` | Runtime for the `.dc.html` files. Do not port. |
-| `github.md` | Repo association and the screen → source-file map. |
-| `ref/roof-outline-preview.png` | The web app's own roof-outline tracing preview, showing the exact outline palette. |
+| File                              | What it is                                                                                                                                           |
+| --------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `QuoteMax Mobile App.dc.html`     | The app itself — all 18 screens, fully interactive, both themes. Open in a browser; switch screens via the `screen` prop / the app's own navigation. |
+| `QuoteMax Mobile Screens.dc.html` | The presentation wall — 21 live instances in device frames and bare, dark and light. Open this first to see everything at once.                      |
+| `QuoteMax Web Reference.dc.html`  | The existing **web** app recreated from source, for fidelity comparison.                                                                             |
+| `image-slot.js`                   | Support file for the aerial placeholder.                                                                                                             |
+| `support.js`                      | Runtime for the `.dc.html` files. Do not port.                                                                                                       |
+| `github.md`                       | Repo association and the screen → source-file map.                                                                                                   |
+| `ref/roof-outline-preview.png`    | The web app's own roof-outline tracing preview, showing the exact outline palette.                                                                   |
 
 The three `.dc.html` files need `support.js` beside them to run. No build
 step, but they must be **served over HTTP** — the runtime `fetch()`es sibling

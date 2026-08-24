@@ -153,12 +153,12 @@ Do the same for `IP_GUARD_CONFIG`, `IP_GUARD_GATE_CONFIG`, `KB_CONFIG`, and `OUT
 
 Read the source `.env` the user specified. Extract only the keys this pipeline actually uses (don't pollute the new service with unrelated vars). Typical set:
 
-| Var | Purpose |
-|---|---|
-| `VECTORSHIFT_API_KEY` | KB retrieval |
-| `ANTHROPIC_API_KEY_<PIPELINE_NAME>` | LlmNodes using provider=anthropic |
-| `GOOGLE_AI_KEY_<PIPELINE_NAME>` | LlmNodes using provider=google |
-| `KB_*_ID` | one env var per KnowledgeBaseNode, with the real ID as default |
+| Var                                 | Purpose                                                        |
+| ----------------------------------- | -------------------------------------------------------------- |
+| `VECTORSHIFT_API_KEY`               | KB retrieval                                                   |
+| `ANTHROPIC_API_KEY_<PIPELINE_NAME>` | LlmNodes using provider=anthropic                              |
+| `GOOGLE_AI_KEY_<PIPELINE_NAME>`     | LlmNodes using provider=google                                 |
+| `KB_*_ID`                           | one env var per KnowledgeBaseNode, with the real ID as default |
 
 Write two files:
 
@@ -260,6 +260,7 @@ Add a script: `"test": "node --test tests/"` in package.json.
 Drop in these files:
 
 **`railway.json`:**
+
 ```json
 {
   "$schema": "https://railway.com/railway.schema.json",
@@ -332,14 +333,14 @@ Keep track of this as you execute:
 
 When you hit a specific area that needs more care, read the corresponding reference:
 
-| Topic | File |
-|---|---|
-| Per-node-type SDK parsing (what fields to capture) | `references/node-parsing.md` |
-| JavaScript KB query wire format (full body schema) | `references/kb-query-javascript.md` |
+| Topic                                                       | File                                     |
+| ----------------------------------------------------------- | ---------------------------------------- |
+| Per-node-type SDK parsing (what fields to capture)          | `references/node-parsing.md`             |
+| JavaScript KB query wire format (full body schema)          | `references/kb-query-javascript.md`      |
 | Biomarker stage tracking pattern (STAGES, JobProgress, SSE) | `references/biomarker-stage-tracking.md` |
-| Swagger theme + landing page design system | `references/swagger-and-homepage.md` |
-| Railway deployment steps + troubleshooting | `references/railway-deployment.md` |
-| Copy-paste file templates | `templates/*.template` |
+| Swagger theme + landing page design system                  | `references/swagger-and-homepage.md`     |
+| Railway deployment steps + troubleshooting                  | `references/railway-deployment.md`       |
+| Copy-paste file templates                                   | `templates/*.template`                   |
 
 ---
 

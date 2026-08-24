@@ -12,6 +12,7 @@ Fetch VectorShift pipeline outputs by span_id and chain them to builder skills.
 ## When to Use
 
 Use this skill when:
+
 - You have span_ids from a previous VectorShift pipeline run
 - Pipeline jobs completed but outputs weren't processed
 - You want to resume a failed/interrupted processing run
@@ -24,11 +25,11 @@ Use this skill when:
 
 ## Files
 
-| File | Description |
-|------|-------------|
-| `SKILL.md` | Full skill documentation |
+| File               | Description                        |
+| ------------------ | ---------------------------------- |
+| `SKILL.md`         | Full skill documentation           |
 | `fetch_outputs.py` | Python script for fetching outputs |
-| `README.md` | This file |
+| `README.md`        | This file                          |
 
 ## API Reference
 

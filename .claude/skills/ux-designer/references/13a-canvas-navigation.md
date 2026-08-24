@@ -17,14 +17,14 @@ const screenPoint = { x: 500, y: 300 };
 // Canvas coordinates: position in the infinite canvas space
 const canvasPoint = {
   x: (screenPoint.x - camera.x) / camera.zoom,
-  y: (screenPoint.y - camera.y) / camera.zoom
+  y: (screenPoint.y - camera.y) / camera.zoom,
 };
 
 // Camera state
 const camera = {
-  x: 0,      // Horizontal offset
-  y: 0,      // Vertical offset
-  zoom: 1    // Scale factor (1 = 100%)
+  x: 0, // Horizontal offset
+  y: 0, // Vertical offset
+  zoom: 1, // Scale factor (1 = 100%)
 };
 ```
 
@@ -62,15 +62,15 @@ function handleZoom(event) {
 └──────────────────────────────┘
 ```
 
-| Control | Action |
-|---------|--------|
-| Scroll wheel | Zoom in/out |
-| Ctrl/Cmd + scroll | Zoom (alternative) |
-| Pinch gesture | Zoom on touch devices |
-| +/- keys | Step zoom |
-| 0 or 1 | Reset to 100% |
-| Shift + 1 | Fit all to view |
-| Shift + 2 | Fit selection to view |
+| Control           | Action                |
+| ----------------- | --------------------- |
+| Scroll wheel      | Zoom in/out           |
+| Ctrl/Cmd + scroll | Zoom (alternative)    |
+| Pinch gesture     | Zoom on touch devices |
+| +/- keys          | Step zoom             |
+| 0 or 1            | Reset to 100%         |
+| Shift + 1         | Fit all to view       |
+| Shift + 2         | Fit selection to view |
 
 #### Zoom Levels
 
@@ -113,13 +113,13 @@ function handleMouseMove(event) {
 
 #### Pan Methods
 
-| Method | Trigger | Notes |
-|--------|---------|-------|
-| Space + drag | Hold space, click and drag | Most common in design tools |
-| Middle mouse | Middle click and drag | Power user shortcut |
-| Two-finger drag | Trackpad gesture | Natural for laptop users |
-| Scroll bars | Click and drag | Visible scroll position |
-| Arrow keys | Keyboard navigation | Step-based movement |
+| Method          | Trigger                    | Notes                       |
+| --------------- | -------------------------- | --------------------------- |
+| Space + drag    | Hold space, click and drag | Most common in design tools |
+| Middle mouse    | Middle click and drag      | Power user shortcut         |
+| Two-finger drag | Trackpad gesture           | Natural for laptop users    |
+| Scroll bars     | Click and drag             | Visible scroll position     |
+| Arrow keys      | Keyboard navigation        | Step-based movement         |
 
 ### Minimap / Overview
 
@@ -154,6 +154,7 @@ Bird's-eye navigation for large canvases.
 ```
 
 **Minimap Guidelines:**
+
 - Show at 5-10% of actual canvas scale
 - Highlight current viewport area
 - Allow click-to-navigate
@@ -187,12 +188,10 @@ function handleMarquee(startPoint, endPoint) {
     x: Math.min(startPoint.x, endPoint.x),
     y: Math.min(startPoint.y, endPoint.y),
     width: Math.abs(endPoint.x - startPoint.x),
-    height: Math.abs(endPoint.y - startPoint.y)
+    height: Math.abs(endPoint.y - startPoint.y),
   };
 
-  const contained = objects.filter(obj =>
-    isContainedIn(obj.bounds, rect)
-  );
+  const contained = objects.filter(obj => isContainedIn(obj.bounds, rect));
 
   if (event.shiftKey) {
     addToSelection(contained);
@@ -228,14 +227,14 @@ function handleMarquee(startPoint, endPoint) {
 
 ### Selection Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
-| Click | Select single object |
-| Shift + Click | Add/remove from selection |
-| Cmd/Ctrl + A | Select all |
-| Escape | Deselect all |
-| Tab | Select next object |
-| Shift + Tab | Select previous object |
+| Shortcut         | Action                        |
+| ---------------- | ----------------------------- |
+| Click            | Select single object          |
+| Shift + Click    | Add/remove from selection     |
+| Cmd/Ctrl + A     | Select all                    |
+| Escape           | Deselect all                  |
+| Tab              | Select next object            |
+| Shift + Tab      | Select previous object        |
 | Cmd/Ctrl + Click | Deep select (nested elements) |
 
 ---
@@ -267,16 +266,48 @@ function handleMarquee(startPoint, endPoint) {
 }
 
 /* Corner handles - resize */
-.resize-handle--nw { cursor: nwse-resize; top: -4px; left: -4px; }
-.resize-handle--ne { cursor: nesw-resize; top: -4px; right: -4px; }
-.resize-handle--sw { cursor: nesw-resize; bottom: -4px; left: -4px; }
-.resize-handle--se { cursor: nwse-resize; bottom: -4px; right: -4px; }
+.resize-handle--nw {
+  cursor: nwse-resize;
+  top: -4px;
+  left: -4px;
+}
+.resize-handle--ne {
+  cursor: nesw-resize;
+  top: -4px;
+  right: -4px;
+}
+.resize-handle--sw {
+  cursor: nesw-resize;
+  bottom: -4px;
+  left: -4px;
+}
+.resize-handle--se {
+  cursor: nwse-resize;
+  bottom: -4px;
+  right: -4px;
+}
 
 /* Edge handles */
-.resize-handle--n { cursor: ns-resize; top: -4px; left: 50%; }
-.resize-handle--s { cursor: ns-resize; bottom: -4px; left: 50%; }
-.resize-handle--e { cursor: ew-resize; right: -4px; top: 50%; }
-.resize-handle--w { cursor: ew-resize; left: -4px; top: 50%; }
+.resize-handle--n {
+  cursor: ns-resize;
+  top: -4px;
+  left: 50%;
+}
+.resize-handle--s {
+  cursor: ns-resize;
+  bottom: -4px;
+  left: 50%;
+}
+.resize-handle--e {
+  cursor: ew-resize;
+  right: -4px;
+  top: 50%;
+}
+.resize-handle--w {
+  cursor: ew-resize;
+  left: -4px;
+  top: 50%;
+}
 
 /* Rotation handle */
 .rotate-handle {
@@ -310,16 +341,21 @@ function handleDrop(object, event) {
   const dropTarget = findDropTarget(event.x, event.y);
 
   // Animate to final position
-  animateTo(object, {
-    x: snapToGrid(event.x),
-    y: snapToGrid(event.y)
-  }, { duration: 100 });
+  animateTo(
+    object,
+    {
+      x: snapToGrid(event.x),
+      y: snapToGrid(event.y),
+    },
+    { duration: 100 },
+  );
 
   hideDragPreview();
 }
 ```
 
 **Drag and Drop Guidelines:**
+
 - Show visual feedback during drag (elevation, shadow)
 - Animate other elements moving out of the way
 - Use 100ms animation for drop
@@ -329,18 +365,26 @@ function handleDrop(object, event) {
 ### Keyboard Movement
 
 ```javascript
-const MOVE_STEP = 1;       // Arrow key
+const MOVE_STEP = 1; // Arrow key
 const MOVE_STEP_LARGE = 10; // Shift + Arrow
 
 function handleArrowKey(key, shiftKey) {
   const step = shiftKey ? MOVE_STEP_LARGE : MOVE_STEP;
 
   selectedObjects.forEach(obj => {
-    switch(key) {
-      case 'ArrowUp':    obj.y -= step; break;
-      case 'ArrowDown':  obj.y += step; break;
-      case 'ArrowLeft':  obj.x -= step; break;
-      case 'ArrowRight': obj.x += step; break;
+    switch (key) {
+      case 'ArrowUp':
+        obj.y -= step;
+        break;
+      case 'ArrowDown':
+        obj.y += step;
+        break;
+      case 'ArrowLeft':
+        obj.x -= step;
+        break;
+      case 'ArrowRight':
+        obj.x += step;
+        break;
     }
   });
 }
@@ -350,12 +394,12 @@ function handleArrowKey(key, shiftKey) {
 
 ## Key Metrics
 
-| Metric | Value | Context |
-|--------|-------|---------|
-| Zoom range | 10% - 4000% | Typical design tools |
-| Pan speed | 1:1 cursor ratio | Natural feeling |
-| Touch target | 44×44px | Minimum for handles |
-| Render target | 60fps | During pan/zoom |
+| Metric        | Value            | Context              |
+| ------------- | ---------------- | -------------------- |
+| Zoom range    | 10% - 4000%      | Typical design tools |
+| Pan speed     | 1:1 cursor ratio | Natural feeling      |
+| Touch target  | 44×44px          | Minimum for handles  |
+| Render target | 60fps            | During pan/zoom      |
 
 ---
 

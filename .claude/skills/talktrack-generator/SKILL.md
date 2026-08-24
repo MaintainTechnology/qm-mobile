@@ -13,12 +13,14 @@ Generate natural, ElevenLabs-ready voiceover scripts for physician course lectur
 ## Overview
 
 This skill processes lecture JSON files and generates spoken narration that:
+
 - Covers all slide content naturally
 - Uses natural verbal bridges between slides (no markers)
 - Matches the educator's voice if a transcript is provided
 - Is ready to paste directly into ElevenLabs
 
 **Key Principles:**
+
 - **Iterative**: Each slide is generated, validated, and refined before moving on
 - **Fresh Context**: Each slide uses a fresh subagent to prevent context bloat
 - **Validated**: Every segment passes timing, coverage, flow, and transition checks
@@ -31,12 +33,14 @@ This skill processes lecture JSON files and generates spoken narration that:
 ```
 
 **Arguments:**
+
 - `<lecture-path>` - Path to lecture JSON or shorthand (e.g., `dr-robin-rose/gut-microbiome/lecture-1`)
 - `--transcript PATH` - Voice sample transcript for style matching (optional)
 - `--words-per-minute N` - Target speaking pace (default: 150)
 - `--max-retries N` - Max retries per slide before blocking (default: 2)
 
 **Examples:**
+
 ```bash
 # Generate from lecture JSON path
 /talktrack-generator content/physician-courses/dr-robin-rose/gut-microbiome/lecture-1.json
@@ -96,6 +100,7 @@ const lecture = JSON.parse(Read({ file_path: lecturePath }));
 ```
 
 **Lecture structure expected:**
+
 ```json
 {
   "id": "lecture-id",
@@ -113,6 +118,7 @@ const lecture = JSON.parse(Read({ file_path: lecturePath }));
 If `--transcript` is provided, analyze it for voice patterns:
 
 **Voice extraction analyzes:**
+
 - Tone (formal vs. conversational)
 - Sentence length patterns (short, medium, long rhythm)
 - Transition phrases used
@@ -121,6 +127,7 @@ If `--transcript` is provided, analyze it for voice patterns:
 - Use of first person vs. third person
 
 **Output:**
+
 ```json
 {
   "voiceProfile": {
@@ -139,6 +146,7 @@ If `--transcript` is provided, analyze it for voice patterns:
 ```
 
 If no transcript provided, Claude Opus 4.5 will determine optimal voice based on:
+
 - Physician persona (from course metadata)
 - Content type (clinical, business, research)
 - Target audience expectations
@@ -215,7 +223,7 @@ Lecture: Long COVID and the Gut Microbiome
 Physician: Dr. Robin Rose
 Slides: 16
 
-Voice Profile: 
+Voice Profile:
   - Tone: Warm, conversational with clinical authority
   - Style: First-person plural, rhetorical questions
   - Source: Extracted from provided transcript
@@ -259,22 +267,22 @@ For each slide, prepare the generation context:
 const slideContext = {
   // Current slide content
   slide: lecture.slides[segmentIndex],
-  
+
   // Voice profile for style matching
   voiceProfile: prd.voiceProfile,
-  
+
   // Previous slide ending (for transition continuity)
   previousSlideEnding: segments[segmentIndex - 1]?.lastParagraph || null,
-  
+
   // Next slide preview (for forward transitions)
   nextSlideTitle: lecture.slides[segmentIndex + 1]?.title || null,
-  
+
   // Learnings from previous iterations
   learnings: progress.patterns || [],
-  
+
   // Target metrics
   targetWordCount: segment.targetWordCount,
-  wordsPerMinute: prd.config.wordsPerMinute
+  wordsPerMinute: prd.config.wordsPerMinute,
 };
 ```
 
@@ -283,6 +291,7 @@ const slideContext = {
 Use the Task tool to spawn a fresh subagent with the slide generation prompt:
 
 **Key generation requirements:**
+
 1. Cover ALL content from the slide (paragraphs, bullets, definitions, callouts)
 2. Verbally describe diagrams if present
 3. Use natural transitions (no "[SLIDE]" markers)
@@ -296,6 +305,7 @@ Use the Task tool to spawn a fresh subagent with the slide generation prompt:
 Run four validation checks:
 
 #### Check 1: Timing Validation
+
 ```javascript
 const wordCount = script.split(/\s+/).length;
 const targetMin = segment.targetWordCount * 0.85;
@@ -304,17 +314,17 @@ const timingPass = wordCount >= targetMin && wordCount <= targetMax;
 ```
 
 #### Check 2: Content Coverage
+
 ```javascript
 // Extract key terms from slide content
 const keyTerms = extractKeyTerms(slide);
-const mentionedTerms = keyTerms.filter(term => 
-  script.toLowerCase().includes(term.toLowerCase())
-);
+const mentionedTerms = keyTerms.filter(term => script.toLowerCase().includes(term.toLowerCase()));
 const coveragePercent = mentionedTerms.length / keyTerms.length;
 const coveragePass = coveragePercent >= 0.85; // 85% coverage required
 ```
 
 #### Check 3: Flow Analysis
+
 ```javascript
 // Check for run-on sentences
 const sentences = script.split(/[.!?]+/);
@@ -327,15 +337,22 @@ const hasVariation = standardDeviation(sentenceLengths) > 5;
 ```
 
 #### Check 4: Transition Quality
+
 ```javascript
 // Check for natural transition at end (if not last slide)
 const transitionPhrases = [
-  "let's", "now", "this brings us", "building on",
-  "moving", "next", "consider", "turn to"
+  "let's",
+  'now',
+  'this brings us',
+  'building on',
+  'moving',
+  'next',
+  'consider',
+  'turn to',
 ];
 const lastParagraph = script.split('\n\n').pop();
 const hasTransition = transitionPhrases.some(phrase =>
-  lastParagraph.toLowerCase().includes(phrase)
+  lastParagraph.toLowerCase().includes(phrase),
 );
 const transitionPass = isLastSlide || hasTransition;
 ```
@@ -343,11 +360,12 @@ const transitionPass = isLastSlide || hasTransition;
 ### Step 2.4: Handle Validation Results
 
 **If ALL checks pass:**
+
 ```javascript
 // Save segment
 Write({
   file_path: `.talktrack-gen/segments/slide-${padNumber(index)}.txt`,
-  content: script
+  content: script,
 });
 
 // Update PRD
@@ -360,6 +378,7 @@ appendToProgress(`SEG-${index}: PASSED (${wordCount} words)`);
 ```
 
 **If ANY check fails:**
+
 ```javascript
 segment.attempts += 1;
 
@@ -373,7 +392,7 @@ if (segment.attempts >= prd.config.maxRetries) {
     ...slideContext,
     previousAttempt: script,
     failedChecks: failedChecks,
-    feedback: generateRetryFeedback(failedChecks)
+    feedback: generateRetryFeedback(failedChecks),
   };
   // Loop back to Step 2.2
 }
@@ -422,6 +441,7 @@ for (let i = 1; i <= slideCount; i++) {
 Run a final coherence check on the assembled script:
 
 **Coherence checks:**
+
 1. Transition flow between segments
 2. Consistent terminology throughout
 3. No repetitive phrasing across segments
@@ -429,6 +449,7 @@ Run a final coherence check on the assembled script:
 5. Proper opening hook and closing summary
 
 **Minor adjustments allowed:**
+
 - Smoothing transitions between segments
 - Removing accidental repetition
 - Ensuring consistent name/term usage
@@ -440,11 +461,12 @@ Write the assembled, polished script:
 ```javascript
 Write({
   file_path: '.talktrack-gen/output/talktrack-final.txt',
-  content: assembledScript
+  content: assembledScript,
 });
 ```
 
 **Output characteristics:**
+
 - Plain text only
 - Natural paragraph breaks for pacing
 - No headers, formatting, or markdown
@@ -491,12 +513,12 @@ Next Steps:
 
 ## Validation Criteria Reference
 
-| Criterion | What It Checks | Pass Condition | Retry Feedback |
-|-----------|----------------|----------------|----------------|
-| **Timing** | Word count vs. target | Within ±15% | "Too long/short by X words" |
-| **Coverage** | Key terms mentioned | ≥85% terms covered | "Missing: [terms]" |
-| **Flow** | Sentence structure | No sentences >40 words | "Break up long sentences" |
-| **Transitions** | Natural bridges | Transition phrase at end | "Add natural bridge to next topic" |
+| Criterion       | What It Checks        | Pass Condition           | Retry Feedback                     |
+| --------------- | --------------------- | ------------------------ | ---------------------------------- |
+| **Timing**      | Word count vs. target | Within ±15%              | "Too long/short by X words"        |
+| **Coverage**    | Key terms mentioned   | ≥85% terms covered       | "Missing: [terms]"                 |
+| **Flow**        | Sentence structure    | No sentences >40 words   | "Break up long sentences"          |
+| **Transitions** | Natural bridges       | Transition phrase at end | "Add natural bridge to next topic" |
 
 ---
 
@@ -621,12 +643,14 @@ Validation:
 ## When to Use This Skill
 
 **Use `/talktrack-generator` when:**
+
 - You have a completed lecture JSON and need voiceover narration
 - You want to generate audio via ElevenLabs or similar TTS
 - You need consistent, high-quality spoken scripts
 - You have a voice sample to match (optional)
 
 **Do NOT use when:**
+
 - Creating lectures from scratch (use `/physician-course-builder`)
 - Iterating on lecture content (use `/lecture-iterator`)
 - Just need a quick summary (manual is faster)
@@ -635,11 +659,11 @@ Validation:
 
 ## Related Skills
 
-| Skill | Purpose |
-|-------|---------|
-| `/lecture-iterator` | Iterate on lecture content based on feedback |
-| `/physician-course-builder` | Create new lectures from scratch |
-| `/generate-lectures` | Generate lectures from outline |
+| Skill                       | Purpose                                      |
+| --------------------------- | -------------------------------------------- |
+| `/lecture-iterator`         | Iterate on lecture content based on feedback |
+| `/physician-course-builder` | Create new lectures from scratch             |
+| `/generate-lectures`        | Generate lectures from outline               |
 
 ---
 
@@ -673,6 +697,7 @@ Validation:
 ```
 
 This will:
+
 1. Load existing state from `.talktrack-gen/`
 2. Continue from the last pending segment
 3. Preserve all completed work
@@ -684,33 +709,34 @@ This will:
 Here's an example of generated output for the first slide of Dr. Robin Rose's gut microbiome lecture:
 
 ```
-The gut is ground zero for understanding Long COVID. In this lecture, 
-we're going to explore something that fundamentally changes how we 
-think about post-acute COVID syndrome—and it starts with a surprising 
+The gut is ground zero for understanding Long COVID. In this lecture,
+we're going to explore something that fundamentally changes how we
+think about post-acute COVID syndrome—and it starts with a surprising
 discovery about SARS-CoV-2.
 
-Here's what makes this different from anything you've learned before: 
-this virus doesn't just infect your cells. It infects the bacteria 
-living inside you. It's acting as a bacteriophage, hijacking your gut 
-microbiome to produce toxin-like peptides that explain many of the 
+Here's what makes this different from anything you've learned before:
+this virus doesn't just infect your cells. It infects the bacteria
+living inside you. It's acting as a bacteriophage, hijacking your gut
+microbiome to produce toxin-like peptides that explain many of the
 mysterious symptoms our patients are experiencing.
 
-By the end of this lecture, you'll understand four critical concepts. 
-First, the gut-lung axis and how SARS-CoV-2 directly affects the 
-gastrointestinal tract through ACE2 receptors. Second, the virus's 
-bacteriophage behavior and the production of these toxin-like peptides. 
-Third, how to identify clinical symptom correlations with specific 
-microbiome signatures. And fourth, a three-phase therapeutic protocol 
+By the end of this lecture, you'll understand four critical concepts.
+First, the gut-lung axis and how SARS-CoV-2 directly affects the
+gastrointestinal tract through ACE2 receptors. Second, the virus's
+bacteriophage behavior and the production of these toxin-like peptides.
+Third, how to identify clinical symptom correlations with specific
+microbiome signatures. And fourth, a three-phase therapeutic protocol
 that I've developed: detox, restoration, and repair.
 
-The key takeaway I want you to hold onto is this: the gut microbiome 
-is both a mechanistic link in Long COVID pathogenesis and a therapeutic 
+The key takeaway I want you to hold onto is this: the gut microbiome
+is both a mechanistic link in Long COVID pathogenesis and a therapeutic
 target. If you treat the gut first, everything else becomes easier.
 
 Let's start with the mechanisms that drive Long COVID...
 ```
 
 Notice:
+
 - No headers or formatting
 - Natural paragraph breaks
 - All learning objectives covered

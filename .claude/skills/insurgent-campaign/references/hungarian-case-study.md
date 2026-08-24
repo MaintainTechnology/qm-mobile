@@ -9,6 +9,7 @@ insurgent playbook works under pressure.
 ## The spending asymmetry
 
 **Fidesz communication apparatus:**
+
 - €4 billion spent on government communication campaigns since 2015 (Carnegie
   Endowment).
 - ~€207 million to state media (MTVA) in H1 2025 alone.
@@ -24,6 +25,7 @@ insurgent playbook works under pressure.
   accounts removed in one TikTok sweep), AI-generated 600-page "Tisza program" document.
 
 **Tisza campaign (Péter Magyar's new party, founded 2024):**
+
 - No billboard budget ("Tisza does not spend billions on billboards" — Magyar, Feb 2026).
 - No state media access beyond the legally mandated five minutes before elections.
 - After Meta banned EU political ads in October 2025, paid digital dropped to effectively
@@ -48,25 +50,25 @@ correlated.** The side with vastly more money produced vastly less mobilization 
 of attention bought. At the extreme end of the diminishing-returns curve, additional
 spend became actively counter-productive through saturation, inauthenticity, and reactance.
 
-## Efficiency per forint — paid amplification was the *least* efficient channel
+## Efficiency per forint — paid amplification was the _least_ efficient channel
 
 Beyond the spend-vs-outcome asymmetry, per-unit efficiency in the 2022–2024 Hungarian
 political ad market tells the same story at a rate level, not a ratio level. Measured in
 impressions per Hungarian forint spent across pro-government and independent actors:
 
-| Advertiser | Impressions per HUF |
-|---|---|
-| Independent media (Partizán) | 1.46 |
-| Government Official Pages | 1.26 |
-| Megafon pro-government influencers | 0.88 |
-| Fidesz Official Party Page | 0.60 |
-| Aktuális (pro-government news) | 0.58 |
+| Advertiser                         | Impressions per HUF |
+| ---------------------------------- | ------------------- |
+| Independent media (Partizán)       | 1.46                |
+| Government Official Pages          | 1.26                |
+| Megafon pro-government influencers | 0.88                |
+| Fidesz Official Party Page         | 0.60                |
+| Aktuális (pro-government news)     | 0.58                |
 
 Independent organic content outperformed state-funded paid amplification at a per-forint
 impression level, before accounting for the further authenticity-premium gap in conversion
 quality (whether an impression actually moved the viewer). The paid-amplified content was
-not merely less total-efficient because there was more of it — it was *less efficient per
-unit of money*. Pro-government actors were essentially buying an audience they could not
+not merely less total-efficient because there was more of it — it was _less efficient per
+unit of money_. Pro-government actors were essentially buying an audience they could not
 attract organically, and each additional forint produced fewer impressions than the last.
 
 This is the single strongest piece of evidence in the case for the function-based channel
@@ -131,8 +133,8 @@ algorithmic organic did the work.
 Four failures compounded:
 
 1. **Saturation past the curve.** After 16 years of billion-euro communication spend, each
-   additional forint produced not just zero marginal persuasion but *active resistance*.
-   The 79.5% turnout was partly mobilization *against* messaging fatigue.
+   additional forint produced not just zero marginal persuasion but _active resistance_.
+   The 79.5% turnout was partly mobilization _against_ messaging fatigue.
 2. **Inauthenticity premium inverted.** The polished, AI-generated, agency-produced
    content read as suspect by default. Magyar's unpolished phone-video content carried an
    automatic credibility signal because it did not look like the saturated material.
@@ -225,4 +227,4 @@ For an underdog in any sector, the strategic implication is two-part:
 - Political Capital — Political ad spend share data (2025)
 - Mérték Media Monitor — state advertising distribution research
 
-For the full long-form essay, see *When Money Loses: Paid vs. Organic Advertising* (bencium.io).
+For the full long-form essay, see _When Money Loses: Paid vs. Organic Advertising_ (bencium.io).

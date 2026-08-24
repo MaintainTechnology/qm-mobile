@@ -17,12 +17,14 @@ PERPLEXITY_API_KEY=<key> python3 scripts/enrich_kb_citations.py
 ```
 
 The script will:
+
 1. **Load all KB nodes** from `.signaling-kb/`
 2. **Query Perplexity** (sonar-reasoning-pro model) for each mechanism claim and dosing protocol
 3. **Extract and parse citations** from Perplexity responses
 4. **Update the node JSON files** with `peer_reviewed_citations` arrays
 
 If no relevant peer-reviewed citations are found:
+
 ```json
 {
   "peer_reviewed_citations": [],
@@ -43,6 +45,7 @@ For each claim to be enriched, construct a query:
 ```
 
 **Examples:**
+
 - "rapamycin weekly dosing longevity clinical evidence peer-reviewed 2015-2025"
 - "metformin AMPK activation mechanism peer-reviewed research"
 - "IGF-1 insulin resistance interpretation clinical significance"
@@ -116,6 +119,7 @@ OUTPUT as JSON:
 ## Example: Dosing Protocol Enrichment
 
 **Input:**
+
 ```
 CLAIM TO ENRICH:
 Intervention: rapamycin
@@ -128,6 +132,7 @@ PERPLEXITY SEARCH RESULTS:
 ```
 
 **Output:**
+
 ```json
 {
   "claim_summary": "Rapamycin 5-6mg weekly for longevity in adults over 40",
@@ -168,6 +173,7 @@ PERPLEXITY SEARCH RESULTS:
 ## Example: Mechanism Claim Enrichment
 
 **Input:**
+
 ```
 CLAIM TO ENRICH:
 Intervention: metformin
@@ -180,6 +186,7 @@ PERPLEXITY SEARCH RESULTS:
 ```
 
 **Output:**
+
 ```json
 {
   "claim_summary": "Metformin activates AMPK through inhibition of mitochondrial complex I",
@@ -234,14 +241,14 @@ PERPLEXITY SEARCH RESULTS:
 
 ### Confidence Adjustment Guide
 
-| Finding | Adjustment |
-|---------|------------|
-| RCT directly supports | Increase to high |
-| Multiple mechanistic studies support | Increase |
-| Review articles support but no primary data | Maintain |
-| Evidence is for related but not identical claim | Maintain |
-| Evidence contradicts | Add conflict, don't decrease |
-| No relevant literature found | Maintain (absence isn't contradiction) |
+| Finding                                         | Adjustment                             |
+| ----------------------------------------------- | -------------------------------------- |
+| RCT directly supports                           | Increase to high                       |
+| Multiple mechanistic studies support            | Increase                               |
+| Review articles support but no primary data     | Maintain                               |
+| Evidence is for related but not identical claim | Maintain                               |
+| Evidence contradicts                            | Add conflict, don't decrease           |
+| No relevant literature found                    | Maintain (absence isn't contradiction) |
 
 ---
 

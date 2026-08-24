@@ -8,30 +8,33 @@ This is the complete reference for the Personal Action Blueprint design system. 
 
 ### Font Families
 
-| Usage | Font Stack |
-|-------|------------|
-| Serif (Headlines/Titles) | "Cormorant Garamond", "Noto Serif JP", serif |
-| Body (Paragraphs/Content) | "Source Serif 4", "Noto Serif JP", serif |
-| Sans-serif (UI/Labels) | "DM Sans", system-ui, -apple-system, sans-serif |
-| Monospace (Time displays) | ui-monospace, monospace |
+| Usage                     | Font Stack                                      |
+| ------------------------- | ----------------------------------------------- |
+| Serif (Headlines/Titles)  | "Cormorant Garamond", "Noto Serif JP", serif    |
+| Body (Paragraphs/Content) | "Source Serif 4", "Noto Serif JP", serif        |
+| Sans-serif (UI/Labels)    | "DM Sans", system-ui, -apple-system, sans-serif |
+| Monospace (Time displays) | ui-monospace, monospace                         |
 
 ### Font Import
 
 ```html
-<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
+<link
+  href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap"
+  rel="stylesheet"
+/>
 ```
 
 ### Type Scale
 
-| Level | Size | Line Height | Usage |
-|-------|------|-------------|-------|
-| Hero (h1) | clamp(40px, 5vw, 56px) | 1.05 | Page titles, hero sections |
-| XXL (h2) | clamp(32px, 4vw, 42px) | 1.2 | Section headers |
-| XL (h3) | clamp(24px, 3vw, 32px) | 1.2 | Subsection headers |
-| Large (h4) | clamp(18px, 2.5vw, 24px) | 1.3 | Card titles, smaller headers |
-| Medium | 17px | 1.5 | Emphasis text |
-| Small | 15px | 1.6 | Default body text |
-| Extra Small | 13px | 1.5 | Captions, meta info |
+| Level       | Size                     | Line Height | Usage                        |
+| ----------- | ------------------------ | ----------- | ---------------------------- |
+| Hero (h1)   | clamp(40px, 5vw, 56px)   | 1.05        | Page titles, hero sections   |
+| XXL (h2)    | clamp(32px, 4vw, 42px)   | 1.2         | Section headers              |
+| XL (h3)     | clamp(24px, 3vw, 32px)   | 1.2         | Subsection headers           |
+| Large (h4)  | clamp(18px, 2.5vw, 24px) | 1.3         | Card titles, smaller headers |
+| Medium      | 17px                     | 1.5         | Emphasis text                |
+| Small       | 15px                     | 1.6         | Default body text            |
+| Extra Small | 13px                     | 1.5         | Captions, meta info          |
 
 ---
 
@@ -40,37 +43,37 @@ This is the complete reference for the Personal Action Blueprint design system. 
 ```css
 :root {
   /* Backgrounds */
-  --paper: #FEFDFB;        /* Primary background */
-  --paper-alt: #F5F2EC;    /* Secondary background */
+  --paper: #fefdfb; /* Primary background */
+  --paper-alt: #f5f2ec; /* Secondary background */
 
   /* Text */
-  --ink-900: #302C27;      /* Primary text */
-  --ink-700: #4A4540;      /* Strong emphasis */
-  --ink-500: #706C66;      /* Secondary text */
-  --ink-400: #9C9890;      /* Tertiary text */
+  --ink-900: #302c27; /* Primary text */
+  --ink-700: #4a4540; /* Strong emphasis */
+  --ink-500: #706c66; /* Secondary text */
+  --ink-400: #9c9890; /* Tertiary text */
 
   /* Structural */
-  --line: #E3DFD7;         /* Borders/dividers */
+  --line: #e3dfd7; /* Borders/dividers */
 
   /* Accents */
-  --gold: #C49A6C;         /* Accent/highlights */
-  --vermillion: #C07050;   /* Hover states/CTA */
+  --gold: #c49a6c; /* Accent/highlights */
+  --vermillion: #c07050; /* Hover states/CTA */
 }
 ```
 
 ### Color Usage Guidelines
 
-| Color | Use For | Avoid |
-|-------|---------|-------|
-| `--paper` | Primary backgrounds | N/A |
-| `--paper-alt` | Section backgrounds, cards | Small elements |
-| `--ink-900` | Headings, primary text, buttons | Large background areas |
-| `--ink-700` | Body text, strong emphasis | N/A |
-| `--ink-500` | Secondary text, descriptions | Primary content |
-| `--ink-400` | Tertiary text, meta info | Important information |
-| `--line` | Borders, dividers | Text |
-| `--gold` | Accents, active states, highlights | Large areas |
-| `--vermillion` | Hover states, CTAs | Default states |
+| Color          | Use For                            | Avoid                  |
+| -------------- | ---------------------------------- | ---------------------- |
+| `--paper`      | Primary backgrounds                | N/A                    |
+| `--paper-alt`  | Section backgrounds, cards         | Small elements         |
+| `--ink-900`    | Headings, primary text, buttons    | Large background areas |
+| `--ink-700`    | Body text, strong emphasis         | N/A                    |
+| `--ink-500`    | Secondary text, descriptions       | Primary content        |
+| `--ink-400`    | Tertiary text, meta info           | Important information  |
+| `--line`       | Borders, dividers                  | Text                   |
+| `--gold`       | Accents, active states, highlights | Large areas            |
+| `--vermillion` | Hover states, CTAs                 | Default states         |
 
 ---
 
@@ -88,15 +91,15 @@ This is the complete reference for the Personal Action Blueprint design system. 
 }
 ```
 
-| Variable | Value | Use For |
-|----------|-------|---------|
-| `--space-1` | 8px | Tight spacing, inline elements |
-| `--space-2` | 12px | Related elements, small gaps |
-| `--space-3` | 20px | Standard paragraph/element spacing |
-| `--space-4` | 32px | Card padding, section breaks |
-| `--space-5` | 48px | Major subsections |
-| `--space-6` | 72px | Between major sections |
-| `--space-7` | 96px | Hero sections, large gaps |
+| Variable    | Value | Use For                            |
+| ----------- | ----- | ---------------------------------- |
+| `--space-1` | 8px   | Tight spacing, inline elements     |
+| `--space-2` | 12px  | Related elements, small gaps       |
+| `--space-3` | 20px  | Standard paragraph/element spacing |
+| `--space-4` | 32px  | Card padding, section breaks       |
+| `--space-5` | 48px  | Major subsections                  |
+| `--space-6` | 72px  | Between major sections             |
+| `--space-7` | 96px  | Hero sections, large gaps          |
 
 ---
 
@@ -114,11 +117,11 @@ This is the complete reference for the Personal Action Blueprint design system. 
 
 ### Section Spacing
 
-| Context | Spacing |
-|---------|---------|
+| Context                | Spacing            |
+| ---------------------- | ------------------ |
 | Between major sections | 72px (`--space-6`) |
-| Between subsections | 48px (`--space-5`) |
-| Element spacing | 20px (`--space-3`) |
+| Between subsections    | 48px (`--space-5`) |
+| Element spacing        | 20px (`--space-3`) |
 
 ---
 
@@ -142,7 +145,10 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4 {
+h1,
+h2,
+h3,
+h4 {
   font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
   color: var(--ink-900);
   font-weight: 500;
@@ -633,15 +639,15 @@ h4 {
 
 ## Design Characteristics Summary
 
-| Characteristic | Implementation |
-|----------------|----------------|
-| Editorial Typography | Cormorant Garamond serif for headlines, Source Serif 4 for body, DM Sans for UI/labels |
-| Warm Linen Backgrounds | Warm paper #FEFDFB primary, #F5F2EC for sections |
-| Minimal Borders | Thin #E3DFD7 lines for separation |
-| Gold Accents | #C49A6C for highlights and active states |
-| Monospace Times | Tabular time displays in monospace |
-| Hover Elevations | Cards lift with shadow on hover |
-| Responsive Typography | Using clamp() for fluid type scales |
+| Characteristic         | Implementation                                                                         |
+| ---------------------- | -------------------------------------------------------------------------------------- |
+| Editorial Typography   | Cormorant Garamond serif for headlines, Source Serif 4 for body, DM Sans for UI/labels |
+| Warm Linen Backgrounds | Warm paper #FEFDFB primary, #F5F2EC for sections                                       |
+| Minimal Borders        | Thin #E3DFD7 lines for separation                                                      |
+| Gold Accents           | #C49A6C for highlights and active states                                               |
+| Monospace Times        | Tabular time displays in monospace                                                     |
+| Hover Elevations       | Cards lift with shadow on hover                                                        |
+| Responsive Typography  | Using clamp() for fluid type scales                                                    |
 
 ---
 
@@ -650,110 +656,116 @@ h4 {
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Personal Action Blueprint</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      /* Backgrounds */
-      --paper: #FEFDFB;
-      --paper-alt: #F5F2EC;
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Personal Action Blueprint</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,500;0,8..60,600;1,8..60,400&family=DM+Sans:wght@400;500;600&family=Noto+Serif+JP:wght@500&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        /* Backgrounds */
+        --paper: #fefdfb;
+        --paper-alt: #f5f2ec;
 
-      /* Text */
-      --ink-900: #302C27;
-      --ink-700: #4A4540;
-      --ink-500: #706C66;
-      --ink-400: #9C9890;
+        /* Text */
+        --ink-900: #302c27;
+        --ink-700: #4a4540;
+        --ink-500: #706c66;
+        --ink-400: #9c9890;
 
-      /* Structural */
-      --line: #E3DFD7;
+        /* Structural */
+        --line: #e3dfd7;
 
-      /* Accents */
-      --gold: #C49A6C;
-      --vermillion: #C07050;
+        /* Accents */
+        --gold: #c49a6c;
+        --vermillion: #c07050;
 
-      /* Spacing */
-      --space-1: 8px;
-      --space-2: 12px;
-      --space-3: 20px;
-      --space-4: 32px;
-      --space-5: 48px;
-      --space-6: 72px;
-      --space-7: 96px;
-    }
+        /* Spacing */
+        --space-1: 8px;
+        --space-2: 12px;
+        --space-3: 20px;
+        --space-4: 32px;
+        --space-5: 48px;
+        --space-6: 72px;
+        --space-7: 96px;
+      }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
 
-    body {
-      font-family: 'Source Serif 4', 'Noto Serif JP', serif;
-      font-size: 15px;
-      line-height: 1.6;
-      color: var(--ink-700);
-      background-color: var(--paper);
-      -webkit-font-smoothing: antialiased;
-    }
+      body {
+        font-family: 'Source Serif 4', 'Noto Serif JP', serif;
+        font-size: 15px;
+        line-height: 1.6;
+        color: var(--ink-700);
+        background-color: var(--paper);
+        -webkit-font-smoothing: antialiased;
+      }
 
-    h1, h2, h3, h4 {
-      font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
-      color: var(--ink-900);
-      font-weight: 500;
-    }
+      h1,
+      h2,
+      h3,
+      h4 {
+        font-family: 'Cormorant Garamond', 'Noto Serif JP', serif;
+        color: var(--ink-900);
+        font-weight: 500;
+      }
 
-    h1 {
-      font-size: clamp(40px, 5vw, 56px);
-      line-height: 1.05;
-    }
+      h1 {
+        font-size: clamp(40px, 5vw, 56px);
+        line-height: 1.05;
+      }
 
-    h2 {
-      font-size: clamp(32px, 4vw, 42px);
-      line-height: 1.2;
-    }
+      h2 {
+        font-size: clamp(32px, 4vw, 42px);
+        line-height: 1.2;
+      }
 
-    h3 {
-      font-size: clamp(24px, 3vw, 32px);
-      line-height: 1.2;
-    }
+      h3 {
+        font-size: clamp(24px, 3vw, 32px);
+        line-height: 1.2;
+      }
 
-    h4 {
-      font-size: clamp(18px, 2.5vw, 24px);
-      line-height: 1.3;
-    }
+      h4 {
+        font-size: clamp(18px, 2.5vw, 24px);
+        line-height: 1.3;
+      }
 
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: clamp(20px, 5vw, 48px);
-    }
+      .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: clamp(20px, 5vw, 48px);
+      }
 
-    /* Add component styles here */
-  </style>
-</head>
-<body>
-  <!-- Header -->
-  <header class="header">
-    <div class="header-inner">
-      <div class="wordmark">Personal Action Blueprint</div>
-      <div class="header-actions">
-        <div class="language-toggle">
-          <button class="lang-btn active">EN</button>
-          <button class="lang-btn">JP</button>
+      /* Add component styles here */
+    </style>
+  </head>
+  <body>
+    <!-- Header -->
+    <header class="header">
+      <div class="header-inner">
+        <div class="wordmark">Personal Action Blueprint</div>
+        <div class="header-actions">
+          <div class="language-toggle">
+            <button class="lang-btn active">EN</button>
+            <button class="lang-btn">JP</button>
+          </div>
+          <a href="#" class="back-link">Back</a>
         </div>
-        <a href="#" class="back-link">Back</a>
       </div>
-    </div>
-  </header>
+    </header>
 
-  <!-- Main Content -->
-  <main class="container">
-    <!-- Add sections and content here -->
-  </main>
-</body>
+    <!-- Main Content -->
+    <main class="container">
+      <!-- Add sections and content here -->
+    </main>
+  </body>
 </html>
 ```
 
