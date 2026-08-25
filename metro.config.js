@@ -10,7 +10,9 @@ const config = getDefaultConfig(__dirname);
 //
 // resolver.blockList becomes the file map's ignorePattern — see
 // metro/src/node-haste/DependencyGraph/createFileMap.js getIgnorePattern().
-// Every entry must share the same regex flags; the Expo defaults carry none.
-config.resolver.blockList = [...config.resolver.blockList, /[\/]\.claude[\/]/];
+// Match both separators: the pattern is tested against absolute paths, which use
+// backslashes on Windows. Every entry must share the same regex flags; the Expo
+// defaults carry none, so this one must not add any either.
+config.resolver.blockList = [...config.resolver.blockList, /[\\/]\.claude[\\/]/];
 
 module.exports = config;

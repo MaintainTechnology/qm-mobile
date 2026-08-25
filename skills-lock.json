@@ -13,6 +13,18 @@
       "skillPath": "skills/frontend-responsive-ui/SKILL.md",
       "computedHash": "e01516e24ba086a603fdf753f9b4e428a3684fbf3010b9295352202fd3461fa8"
     },
+    "archive": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/archive/SKILL.md",
+      "computedHash": "8e51d14524e2a168582cef40fc845c01cabb615208c11f3cb18769591d228eaa"
+    },
+    "banner-creator": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/banner-creator/SKILL.md",
+      "computedHash": "d93d50cfc28fd783879098532f6ec091e51b9e6ce5e6ff87fbaa8fc3a6f9b7b6"
+    },
     "brandkit": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
@@ -36,6 +48,12 @@
       "sourceType": "github",
       "skillPath": "skills/taste-skill-v1/SKILL.md",
       "computedHash": "0a226c13d69639553cf8a7c40aa5527b026820f8ddaf7a6b263988e32ab44a27"
+    },
+    "domain-hunter": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/domain-hunter/SKILL.md",
+      "computedHash": "2e6b7fa9e25e89f9524c19ae090ae7b303fb7a1b0d00305b10151f5ea45e12b7"
     },
     "frontend-design": {
       "source": "am-will/codex-skills",
@@ -109,6 +127,12 @@
       "skillPath": "skills/llm-council/SKILL.md",
       "computedHash": "a66d8d9b31147b3f591fd79937065befd3e35555b160fd03d7597a8219656cc3"
     },
+    "logo-creator": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/logo-creator/SKILL.md",
+      "computedHash": "cfb6815ea42686977fb54fe7f6bbd349056a2fcf61f7675fd1becd721029f82b"
+    },
     "markdown-url": {
       "source": "am-will/codex-skills",
       "sourceType": "github",
@@ -120,6 +144,90 @@
       "sourceType": "github",
       "skillPath": "skills/minimalist-skill/SKILL.md",
       "computedHash": "7e88897e0371184e97a82b8d9ef080323c13f21eb067b58ef71eb05173a08ac2"
+    },
+    "muapi-ad-creative": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-ad-creative/SKILL.md",
+      "computedHash": "9fbc3f1e7205e764c0ebb773d478d38ac884d73aced5a4e4949eb14718764b10"
+    },
+    "muapi-ai-clipping": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-ai-clipping/SKILL.md",
+      "computedHash": "4895c040aa6b56ba2abb129c12b48bd2755831675a3b83aa6ca9120cc38b6026"
+    },
+    "muapi-cinema-director": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-cinema-director/SKILL.md",
+      "computedHash": "780ff757e2c2ccd6a7bfdbc3174dbc35edc3b1d41ce5c0681941c562cd9fef4a"
+    },
+    "muapi-instagram-post": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-instagram-post/SKILL.md",
+      "computedHash": "57fda6ecc4f2f2022944e005c3fa766af91661b8a43b3bd6990dca5522f745a2"
+    },
+    "muapi-logo-creator": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-logo-creator/SKILL.md",
+      "computedHash": "a891233c667e4e094a4db20470b39b86516897c9b6834760e7c644f0bf64ff39"
+    },
+    "muapi-nano-banana": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-nano-banana/SKILL.md",
+      "computedHash": "1c158522cbcc5d4cee89bc9973177e87dea38aa69e793c2eb13004071a6f4d21"
+    },
+    "muapi-product-video-ad-maker": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-product-video-ad-maker/SKILL.md",
+      "computedHash": "73223f66cacea623f9f8e5d2be8399b661435dece151530ffa6d812c0eb02134"
+    },
+    "muapi-seedance-2": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-seedance-2/SKILL.md",
+      "computedHash": "a94db0cf2522714c903d1d340b6deb4219a4035d6c206abddeac3e461a88f8f4"
+    },
+    "muapi-social-media-video": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-social-media-video/SKILL.md",
+      "computedHash": "69a8453d40a6db6866b16d951540a97d909ab71f0d9af83ce256910c0391d6e4"
+    },
+    "muapi-ugc-video-factory": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-ugc-video-factory/SKILL.md",
+      "computedHash": "858ac9c21a16bdd95d9af801da1de691c3c4eb7e5dee4bfe030467f5269d9123"
+    },
+    "muapi-ui-design": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-ui-design/SKILL.md",
+      "computedHash": "5905baebc4dc882b911aa361c836e353522a1f7b5048645840d5fc11f1f496ea"
+    },
+    "muapi-youtube-shorts": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-youtube-shorts/SKILL.md",
+      "computedHash": "c726c7408ca400b1d27b148c1269b874dec32e7ab173cd44e1ee84e7f0f959cb"
+    },
+    "muapi-youtube-thumbnail": {
+      "source": "samuraigpt/generative-media-skills",
+      "sourceType": "github",
+      "skillPath": ".opencode/skills/muapi-youtube-thumbnail/SKILL.md",
+      "computedHash": "f81a3748304ffd05b58c160f24b68606c768dec4d6b836f53e97bd6562a02df3"
+    },
+    "nanobanana": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/nanobanana/SKILL.md",
+      "computedHash": "04b3d7e8b7dc1275c131984c2bbb6229783b186c48e74897fa1cc67a1b8593eb"
     },
     "openai-docs-skill": {
       "source": "am-will/codex-skills",
@@ -163,11 +271,23 @@
       "skillPath": "skills/pluginstaller/SKILL.md",
       "computedHash": "7e79be6bfdf551ebf16fd33f432c7d1abebd17b064c710ce800477a235efd009"
     },
+    "producthunt": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/producthunt/SKILL.md",
+      "computedHash": "a8ae4c7ddfa3eadadf1e73323deac6194acb46f9bce7b5b363aafffe23621344"
+    },
     "read-github": {
       "source": "am-will/codex-skills",
       "sourceType": "github",
       "skillPath": "skills/read-github/SKILL.md",
       "computedHash": "fcc7d19c32836245339663135937ec3a330e5fbc7b264ccd5c954b79f72e66ab"
+    },
+    "reddit": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/reddit/SKILL.md",
+      "computedHash": "4f9e4d58f831dbc74a60058a07b0240fb6d1cdc30f35225a7724e5de0e35822d"
     },
     "redesign-existing-projects": {
       "source": "Leonxlnx/taste-skill",
@@ -175,11 +295,29 @@
       "skillPath": "skills/redesign-skill/SKILL.md",
       "computedHash": "47eced3e960a2c961d3cbee11fa1216264f589344b586a5cbd03967cd6b9c54b"
     },
+    "requesthunt": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/requesthunt/SKILL.md",
+      "computedHash": "0d1780b7e12c54d9e32dc33429398d87e4245bc6dfaab000c847acead2531a05"
+    },
     "role-creator": {
       "source": "am-will/codex-skills",
       "sourceType": "github",
       "skillPath": "skills/role-creator/SKILL.md",
       "computedHash": "454ac462b75ba7c7e951ca0f5dcaeeea2710851da43f0cf4dfd2fb4e973ef2c7"
+    },
+    "seo-geo": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/seo-geo/SKILL.md",
+      "computedHash": "1d38520f453282af8712874c360e3e34a379827f737fb536bd45055e2d60d964"
+    },
+    "skill-name": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "template/SKILL.md",
+      "computedHash": "00db8f0c404b638c19eaf7fdb8f85cab56a1fb4f90525b6178c40c1eacaa7208"
     },
     "stitch-design-taste": {
       "source": "Leonxlnx/taste-skill",
@@ -198,6 +336,12 @@
       "sourceType": "github",
       "skillPath": "skills/swarm-planner/SKILL.md",
       "computedHash": "5e8b0f1f9f4842c6ebbcd385baf90ecc7fa3bd7f3ed7cf87d2223e02065336b9"
+    },
+    "twitter": {
+      "source": "ReScienceLab/opc-skills",
+      "sourceType": "github",
+      "skillPath": "skills/twitter/SKILL.md",
+      "computedHash": "912bf06f66031cd7b057ac888100177e6261ee3736b4bcc3a2dd07ee8977e385"
     },
     "update-codex": {
       "source": "am-will/codex-skills",

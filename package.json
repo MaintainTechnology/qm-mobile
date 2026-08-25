@@ -91,6 +91,7 @@
     ]
   },
   "overrides": {
-    "react": "19.1.0"
+    "react": "$react",
+    "react-dom": "$react-dom"
   }
 }
