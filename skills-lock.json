@@ -1,11 +1,29 @@
 {
   "version": 1,
   "skills": {
+    "Agent Browser": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "ee1680b5806ac1f62e79d1fccfefb5bef1200db650bac8cb17456aa301f04eed"
+    },
+    "Frontend Responsive Design Standards": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-responsive-ui/SKILL.md",
+      "computedHash": "e01516e24ba086a603fdf753f9b4e428a3684fbf3010b9295352202fd3461fa8"
+    },
     "brandkit": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/brandkit/SKILL.md",
       "computedHash": "735007879f5110aeae1e981a53fe74a12afde70347f9773dacd50e4697a091bf"
+    },
+    "create-hook": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-hook/SKILL.md",
+      "computedHash": "fd0796f7084c7ad8eb035b2602051f41731fed6bea5055766fd7f14287e5b087"
     },
     "design-taste-frontend": {
       "source": "Leonxlnx/taste-skill",
@@ -19,11 +37,29 @@
       "skillPath": "skills/taste-skill-v1/SKILL.md",
       "computedHash": "0a226c13d69639553cf8a7c40aa5527b026820f8ddaf7a6b263988e32ab44a27"
     },
+    "frontend-design": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/frontend-design/SKILL.md",
+      "computedHash": "d3334661de9ed476cdd2d4ebef8da6a1f0f0432915b2de035f5f2e989216dd94"
+    },
     "full-output-enforcement": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/output-skill/SKILL.md",
       "computedHash": "524f7c7950c3fde726101613f630140411c7d080e63be718687f4b38f919be81"
+    },
+    "gemini-computer-use": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gemini-computer-use/SKILL.md",
+      "computedHash": "ccf048790f240a55a29bf7513d946d2591f87ae399de5e0291ea58211ed9b30d"
+    },
+    "gpt-5-6-prompt-builder": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/gpt-5-6-prompt-builder/SKILL.md",
+      "computedHash": "8bc76eef94e353c76af566ddde53d81a13976dfb04df494c194acbac4f89f55f"
     },
     "gpt-taste": {
       "source": "Leonxlnx/taste-skill",
@@ -55,11 +91,29 @@
       "skillPath": "skills/imagegen-frontend-web/SKILL.md",
       "computedHash": "27255c7c50181e58add156b2aa2bd5325285b85f04027e4c8b73742d98d7be0a"
     },
+    "img-to-frontend": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/img-to-frontend/SKILL.md",
+      "computedHash": "85dbfa566b0e6ecdd0952e001aea64b324f0edd77a487e8c7c8a1a0f6348faa4"
+    },
     "industrial-brutalist-ui": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/brutalist-skill/SKILL.md",
       "computedHash": "e66e5a2a8b73cef79ab6546459c665e8b983645689c5f3772f7eed8b9f1e8e0e"
+    },
+    "llm-council": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/llm-council/SKILL.md",
+      "computedHash": "a66d8d9b31147b3f591fd79937065befd3e35555b160fd03d7597a8219656cc3"
+    },
+    "markdown-url": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/markdown-url/SKILL.md",
+      "computedHash": "8ff9862bdcd6ec419ef8191cf502548995f998a5d363433ce9acd38ca785b7a2"
     },
     "minimalist-ui": {
       "source": "Leonxlnx/taste-skill",
@@ -67,17 +121,95 @@
       "skillPath": "skills/minimalist-skill/SKILL.md",
       "computedHash": "7e88897e0371184e97a82b8d9ef080323c13f21eb067b58ef71eb05173a08ac2"
     },
+    "openai-docs-skill": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/openai-docs-skill/SKILL.md",
+      "computedHash": "b34e42096e642c8c162baff4f3ea138bff60d9399c1fa127dca00c8937b79321"
+    },
+    "parallel": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/parallel/SKILL.md",
+      "computedHash": "fc1fd558f84c7ee3286dd9ba6a9188e179301e6974579eb72843f343b4cf90e3"
+    },
+    "parallel-task": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/parallel-task/SKILL.md",
+      "computedHash": "62a8a154e0b0c7eb77b147d928bc39fcb6848fe08b6c3ca4a6d002b25717fc4e"
+    },
+    "parallel-task-spark": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/parallel-task-spark/SKILL.md",
+      "computedHash": "7f70123edd5ec0d4b5a95a622a17c71de11e40f0ec07761b4cf3870159213aa2"
+    },
+    "plan-harder": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/plan-harder/SKILL.md",
+      "computedHash": "20d0cc9c47b5d46c76808e34f847d8a78f8e5e84d697248b5019f04ce2498116"
+    },
+    "planner": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/planner/SKILL.md",
+      "computedHash": "57039ddee98a01559317ae43d0638cf2cdc3e638a3eac09341bf0964ad211240"
+    },
+    "pluginstaller": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/pluginstaller/SKILL.md",
+      "computedHash": "7e79be6bfdf551ebf16fd33f432c7d1abebd17b064c710ce800477a235efd009"
+    },
+    "read-github": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/read-github/SKILL.md",
+      "computedHash": "fcc7d19c32836245339663135937ec3a330e5fbc7b264ccd5c954b79f72e66ab"
+    },
     "redesign-existing-projects": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/redesign-skill/SKILL.md",
       "computedHash": "47eced3e960a2c961d3cbee11fa1216264f589344b586a5cbd03967cd6b9c54b"
     },
+    "role-creator": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/role-creator/SKILL.md",
+      "computedHash": "454ac462b75ba7c7e951ca0f5dcaeeea2710851da43f0cf4dfd2fb4e973ef2c7"
+    },
     "stitch-design-taste": {
       "source": "Leonxlnx/taste-skill",
       "sourceType": "github",
       "skillPath": "skills/stitch-skill/SKILL.md",
       "computedHash": "c96b580192b34167efa01f460bbc669ff4315cf97f3cf6ff85ded8029aa720b8"
+    },
+    "super-swarm-spark": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/super-swarm-spark/SKILL.md",
+      "computedHash": "b049a526867ece5e54210e81389ea7a6385f5f75c0a3968afa5072f6119f2c76"
+    },
+    "swarm-planner": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/swarm-planner/SKILL.md",
+      "computedHash": "5e8b0f1f9f4842c6ebbcd385baf90ecc7fa3bd7f3ed7cf87d2223e02065336b9"
+    },
+    "update-codex": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/update-codex/SKILL.md",
+      "computedHash": "166cafce78e162f9e9bbb4738a1649b4d62b9d4bb2911181b78f8ca5d143ad9a"
+    },
+    "vercel-react-best-practices": {
+      "source": "am-will/codex-skills",
+      "sourceType": "github",
+      "skillPath": "skills/vercel-react-best-practices/SKILL.md",
+      "computedHash": "0152317e3e11aaec2fd3675d7f0f88bff9b0388be78cf482a7e0657dc7d70239"
     }
   }
 }
