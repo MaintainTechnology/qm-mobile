@@ -4,6 +4,10 @@
  * Without these you get "Property 'structuredClone' doesn't exist" the moment a stream starts.
  * https://ai-sdk.dev/docs/getting-started/expo#polyfills
  */
+// `@supabase/supabase-js` builds every request through `URL`/`URLSearchParams`, which Hermes
+// only partially implements — without this the first query throws. Must precede any Supabase import.
+import 'react-native-url-polyfill/auto';
+
 import structuredClonePolyfill from '@ungap/structured-clone';
 import { Platform } from 'react-native';
 
