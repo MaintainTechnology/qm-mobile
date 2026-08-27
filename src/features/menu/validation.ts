@@ -18,6 +18,9 @@ import { parseAud } from '@/lib/money';
 export type RateBound = {
   /** Strictly greater than zero, vs. zero being an allowed value. */
   positive?: boolean;
+  /** Inclusive lower bound, in dollars — e.g. solar's STC price floor of A$1
+   *  (lib/solar/rate-card-overlay.ts MIN_STC_PRICE). */
+  minDollars?: number;
   /** Inclusive upper bound, in dollars (not cents — matches how the bounds read in the schemas). */
   maxDollars?: number;
   /** Blank blocks Save when true (default). Set false for a rate-card field where blank means
@@ -51,6 +54,9 @@ export function parseRateCents(raw: string, bound: RateBound = {}): ParsedRate {
       provided: false,
     };
   }
+  if (bound.minDollars !== undefined && cents < bound.minDollars * 100) {
+    return { cents: null, error: `Must be at least A$${bound.minDollars}`, provided: false };
+  }
   if (bound.maxDollars !== undefined && cents > bound.maxDollars * 100) {
     return { cents: null, error: `Must be at most A$${bound.maxDollars}`, provided: false };
   }
@@ -69,6 +75,26 @@ export function parsePercent(raw: string, max = 100): ParsedPercent {
   const value = Number(trimmed);
   if (!Number.isFinite(value) || value < 0 || value > max) {
     return { value: null, error: `Enter 0–${max}` };
+  }
+  return { value, error: null };
+}
+
+/**
+ * Optional percentage field for the solar rate card — blank is the legitimate
+ * "no override, use the default" state (never an error), mirroring the web
+ * SolarRatesEditor. Bounds mirror lib/solar/rate-card-overlay.ts: loadings
+ * 0–100 (sent as a 0–1 fraction by the caller), deposit 1–50 (sent as-is).
+ */
+export function parseOptionalPercent(
+  raw: string,
+  { min = 0, max = 100 }: { min?: number; max?: number } = {},
+): ParsedPercent {
+  const trimmed = raw.trim();
+  if (trimmed === '') return { value: null, error: null };
+  if (!/^\d*\.?\d*$/.test(trimmed)) return { value: null, error: 'Enter a percentage' };
+  const value = Number(trimmed);
+  if (!Number.isFinite(value) || value < min || value > max) {
+    return { value: null, error: `Enter ${min}–${max}` };
   }
   return { value, error: null };
 }

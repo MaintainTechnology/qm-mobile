@@ -44,13 +44,13 @@ import {
 } from './sections';
 import {
   CatalogueSection,
-  EstimatingSection,
   EstimatorBetaCard,
-  PricingSection,
   RecipesSection,
-  ServicesSection,
   ToolsWebOnly,
 } from './SectionsContent';
+import { EstimatingSection } from './sections/EstimatingSection';
+import { PricingSection } from './sections/PricingSection';
+import { ServicesSection } from './sections/ServicesSection';
 
 function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrade }) {
   switch (section) {

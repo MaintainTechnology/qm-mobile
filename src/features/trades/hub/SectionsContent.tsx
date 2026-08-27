@@ -1,21 +1,16 @@
 /**
- * The hub's non-queue sections, mirroring the web TradeHub's section renders
- * (page.tsx:17209-17322) at mobile scope:
- *   pricing   → the trade's pricing-book numbers (PricingTab's read surface)
- *   services  → tenant service offerings + preferred brands (ServicesTab)
+ * The hub's remaining read-only sections + shared link-out chrome, mirroring
+ * the web TradeHub's section renders (page.tsx:17209-17322) at mobile scope:
  *   catalogue → GET /api/tenant/catalogue rows (CatalogueTab's list)
  *   recipes   → GET /api/tenant/tasks assemblies + step counts (RecipesTab)
- *   estimating→ pointer card — the web EstimatingTab is a full BOM editor and
- *               stays web-only this round; the section itself is web parity.
- * Editing stays where it already lives (Menu → Pricing book, web dashboard).
+ * The editable sections live in ./sections/ (PricingSection, ServicesSection,
+ * EstimatingSection); catalogue/recipes editors follow in the same directory.
  */
 import { StyleSheet, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { formatJobType } from '@/features/quotes/status';
-import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { fonts, radius, spacing } from '@/lib/theme';
-import { tenantTrades, useTenantMe } from '@/lib/tenant';
 import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
@@ -53,110 +48,6 @@ export function WebOnlyCard({
     <View style={{ gap: spacing.md }}>
       <Notice tone="accent" label={label} body={body} />
       {path ? <LinkOutButton label={cta} path={path} tone="accent" /> : null}
-    </View>
-  );
-}
-
-// ── Pricing ─────────────────────────────────────────────────────────────────
-
-export function PricingSection({ trade }: { trade: HubTrade }) {
-  const me = useTenantMe();
-  const book = (me.data?.pricing_books ?? []).find(b => (b.trade ?? '').toLowerCase() === trade);
-  if (!book) {
-    return (
-      <WebOnlyCard
-        label={`No ${TRADE_LABELS[trade]} pricing book yet`}
-        body="Run the pricing wizard on the web dashboard to set this trade's rates."
-        path={`/dashboard/pricing-wizard?trade=${trade}`}
-        cta="Open the pricing wizard"
-      />
-    );
-  }
-  const money = (dollars: number | null | undefined) =>
-    dollars == null ? '—' : formatAud(centsFromApiDollars(dollars));
-  return (
-    <View style={{ gap: spacing.lg }}>
-      <Card>
-        <SectionLabel>{`${TRADE_LABELS[trade]} pricing book`}</SectionLabel>
-        <KeyValueRow label="Hourly rate" value={money(book.hourly_rate)} />
-        <KeyValueRow label="Call-out minimum" value={money(book.call_out_minimum)} />
-        <KeyValueRow
-          label="Default markup"
-          value={book.default_markup_pct == null ? '—' : `${book.default_markup_pct}%`}
-        />
-        <FootNote text="Edit rates in Menu → Pricing book, or run the pricing wizard on the web." />
-      </Card>
-      {/* Web parity: the hub's pricing section carries a Pricing-wizard link card
-          (page.tsx:17263-17290 → /dashboard/pricing-wizard?trade={trade}). */}
-      <WebOnlyCard
-        label="Pricing wizard"
-        body="Rebuild this trade's rates from a guided walkthrough — call-outs, hourly rate and markup in a few minutes."
-        path={`/dashboard/pricing-wizard?trade=${trade}`}
-        cta="Open the pricing wizard"
-      />
-    </View>
-  );
-}
-
-// ── Services & brands ───────────────────────────────────────────────────────
-
-export function ServicesSection({ trade }: { trade: HubTrade }) {
-  const { colors } = useTheme();
-  const me = useTenantMe();
-  const services = (me.data?.services ?? []).filter(s => (s.trade ?? '').toLowerCase() === trade);
-  const brandRows = (me.data?.material_categories ?? []).filter(
-    c => (c.trade ?? '').toLowerCase() === trade,
-  );
-  const preferences = me.data?.material_preferences ?? {};
-
-  if (services.length === 0 && brandRows.length === 0) {
-    return (
-      <WebOnlyCard
-        label="No services listed yet"
-        body="Turn services on or off from the web dashboard's Services & brands section."
-        path={`/dashboard?tab=hub-${trade}`}
-        cta="Open services on the web"
-      />
-    );
-  }
-  return (
-    <View style={{ gap: spacing.lg }}>
-      {services.length > 0 ? (
-        <Card>
-          <SectionLabel>{`Services · ${services.length}`}</SectionLabel>
-          {services.map((s, i) => (
-            <View
-              key={s.id ?? s.assembly_id ?? `svc-${i}`}
-              style={[styles.kvRow, { borderBottomColor: colors.inkLine }]}
-            >
-              <Text style={[styles.serviceName, { color: colors.textPri }]} numberOfLines={2}>
-                {s.name ?? '—'}
-              </Text>
-              <Text
-                style={[
-                  styles.serviceState,
-                  { color: s.enabled === false ? colors.textDim : colors.successBright },
-                ]}
-              >
-                {s.enabled === false ? 'OFF' : 'ON'}
-              </Text>
-            </View>
-          ))}
-          <FootNote text="Toggle services on the web dashboard — changes show here." />
-        </Card>
-      ) : null}
-      {brandRows.length > 0 ? (
-        <Card>
-          <SectionLabel>Preferred brands</SectionLabel>
-          {brandRows.map((c, i) => (
-            <KeyValueRow
-              key={c.category ?? `cat-${i}`}
-              label={formatJobType(c.category)}
-              value={(c.category && preferences[c.category]) || 'No preference'}
-            />
-          ))}
-        </Card>
-      ) : null}
     </View>
   );
 }
@@ -309,21 +200,6 @@ export function EstimatorBetaCard() {
   );
 }
 
-/** Estimating stays a pointer: the web tab is a full BOM editor. */
-export function EstimatingSection({ trade }: { trade: HubTrade }) {
-  const me = useTenantMe();
-  const trades = me.data ? tenantTrades(me.data) : [];
-  void trades;
-  return (
-    <WebOnlyCard
-      label="Estimating lives on the web"
-      body={`Assembly estimating for ${TRADE_LABELS[trade].toLowerCase()} — labour hours, unit prices and bills of materials — is a web dashboard tool. Everything it prices flows into the quotes here.`}
-      path="/dashboard?tab=estimating"
-      cta="Open estimating"
-    />
-  );
-}
-
 const styles = StyleSheet.create({
   kvRow: {
     flexDirection: 'row',
@@ -344,7 +220,6 @@ const styles = StyleSheet.create({
     fontVariant: ['tabular-nums'],
   },
   serviceName: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
-  serviceState: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 1 },
   foot: {
     marginTop: spacing.md,
     fontFamily: fonts.sans.regular,

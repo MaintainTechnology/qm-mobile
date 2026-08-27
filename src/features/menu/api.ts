@@ -115,3 +115,27 @@ export function useSavePaintingRates() {
     { method: 'PATCH', invalidates: [PAINTING_RATES_KEY] },
   );
 }
+
+const SOLAR_RATES_KEY = ['tenant', 'solar-rates'] as const;
+
+/** GET — same `{ ok, overrides, has_pricing_book }` envelope as roofing/painting
+ *  (plus a `defaults` block the card doesn't read). Scalar overrides come back
+ *  as `null` (not absent) when unset; `install_rate_per_kw` is a nested map. */
+export function useSolarRates() {
+  return useApiQuery(SOLAR_RATES_KEY, '/api/tenant/solar-rates', OverlayGetSchema);
+}
+
+/**
+ * PATCH — unlike roofing/painting there is NO overlay round-trip merge: the
+ * route rebuilds the whole `solar_rate_card` from the body's fixed field set
+ * (buildSolarOverlayFromInputs, lib/solar/rate-card-overlay.ts), so the body
+ * must carry EVERY editable field each save — a value to override, `null` to
+ * clear back to the default. Omitting a field wipes its override.
+ */
+export function useSaveSolarRates() {
+  return useApiMutation<Record<string, unknown>, OverlayPatchResult>(
+    '/api/tenant/solar-rates',
+    OverlayPatchResultSchema,
+    { method: 'PATCH', invalidates: [SOLAR_RATES_KEY] },
+  );
+}
