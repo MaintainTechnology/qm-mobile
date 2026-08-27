@@ -42,14 +42,11 @@ import {
   type HubSectionId,
   type HubTrade,
 } from './sections';
-import {
-  CatalogueSection,
-  EstimatorBetaCard,
-  RecipesSection,
-  ToolsWebOnly,
-} from './SectionsContent';
+import { EstimatorBetaCard, ToolsWebOnly } from './SectionsContent';
+import { CatalogueSection } from './sections/CatalogueSection';
 import { EstimatingSection } from './sections/EstimatingSection';
 import { PricingSection } from './sections/PricingSection';
+import { RecipesSection } from './sections/RecipesSection';
 import { ServicesSection } from './sections/ServicesSection';
 
 function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrade }) {
