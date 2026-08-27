@@ -57,8 +57,7 @@ export const HUB_SECTION_LABELS: Record<HubSectionId, string> = {
 };
 
 /** Every hub trade has a tools section on the web (HUB_TOOL_TRADES lists all 8). */
-export function hubSections(trade: HubTrade): HubSectionId[] {
-  void trade;
+export function hubSections(): HubSectionId[] {
   return ['quotes', 'tools', 'pricing', 'services', 'catalogue', 'recipes', 'estimating'];
 }
 

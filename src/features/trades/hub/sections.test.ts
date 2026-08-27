@@ -35,7 +35,7 @@ describe('hubTrades', () => {
 
 describe('sections', () => {
   it('matches the web order: quotes, tools, pricing, services, catalogue, recipes, estimating', () => {
-    expect(hubSections('electrical')).toEqual([
+    expect(hubSections()).toEqual([
       'quotes',
       'tools',
       'pricing',
@@ -51,7 +51,7 @@ describe('sections', () => {
   });
 
   it('gives Electrical the SECTIONS 07 counter from the screenshot', () => {
-    expect(padCount(hubSections('electrical').length)).toBe('07');
+    expect(padCount(hubSections().length)).toBe('07');
   });
 
   it('writes the web subtitle sentence verbatim', () => {

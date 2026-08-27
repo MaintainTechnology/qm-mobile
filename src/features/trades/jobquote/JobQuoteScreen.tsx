@@ -17,9 +17,10 @@ import { fonts } from '@/lib/theme';
 import { useTenantMe } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
 
-import { useCatalogue, useJobQuote } from './api';
+import { useJobQuote } from './api';
 import { fieldsForJobType, formatJobType, jobTypesForTrade } from './job-fields';
-import { explainJobQuoteFailure, priceLabel, type CatalogueRow } from './schema';
+import { explainJobQuoteFailure, priceLabel } from './schema';
+import { useCatalogue, type CatalogueRow } from '../catalogue-api';
 import { apiErrorMessage, Card, MultilineField, Notice, PillGroup, SectionLabel } from '../ui';
 
 export function JobQuoteScreen({ trades }: { trades: string[] }) {

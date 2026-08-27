@@ -20,6 +20,7 @@ import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { apiErrorMessage, Card, Notice, SectionLabel } from '../ui';
+import { useCatalogue } from '../catalogue-api';
 import { LinkOutButton } from './LinkOut';
 import { TRADE_LABELS, type HubTrade } from './sections';
 
@@ -161,24 +162,12 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
 }
 
 // ── Catalogue ───────────────────────────────────────────────────────────────
-
-const CatalogueSchema = z.looseObject({
-  catalogue: z
-    .array(
-      z.looseObject({
-        id: z.string().nullish(),
-        name: z.string().nullish(),
-        brand: z.string().nullish(),
-        category: z.string().nullish(),
-        trade: z.string().nullish(),
-      }),
-    )
-    .default([]),
-});
+// Shape + query key live in ../catalogue-api — the job quoter reads the same
+// endpoint, and two schemas under one react-query key poisoned the cache.
 
 export function CatalogueSection({ trade }: { trade: HubTrade }) {
   const { colors } = useTheme();
-  const query = useApiQuery(['tenant', 'catalogue'], '/api/tenant/catalogue', CatalogueSchema);
+  const query = useCatalogue();
   if (query.isPending) return <Notice tone="accent" label="Loading catalogue…" />;
   if (query.isError && !query.data)
     return (

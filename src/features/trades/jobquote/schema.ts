@@ -43,24 +43,6 @@ export type JobQuoteFailureBody = {
   intakeId?: string;
 };
 
-export const CatalogueRowSchema = z.looseObject({
-  id: z.string(),
-  name: z.string(),
-  category: z.string().nullable(),
-  trade: z.string().nullable(),
-  brand: z.string().nullable(),
-  range_series: z.string().nullable(),
-  unit_price_ex_gst: z.union([z.number(), z.string()]).nullable(),
-  image_path: z.string().nullable(),
-  tier_hint: z.string().nullable(),
-  active: z.boolean().nullable(),
-});
-export type CatalogueRow = z.infer<typeof CatalogueRowSchema>;
-
-export const CatalogueResponseSchema = z.looseObject({
-  catalogue: z.array(CatalogueRowSchema).default([]),
-});
-
 /** Ex-GST price label for the catalogue picker. */
 export function priceLabel(v: number | string | null): string | null {
   const n = typeof v === 'string' ? Number.parseFloat(v) : v;

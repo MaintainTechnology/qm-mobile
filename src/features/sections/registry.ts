@@ -15,7 +15,7 @@ export type SectionRow = {
   /** One-line description under the title, mobile-worded. */
   blurb: string;
 } & (
-  | { kind: 'tab'; target: '/' | '/roof' | '/quotes' | '/chats' }
+  | { kind: 'tab'; target: '/' | '/tools' | '/quotes' | '/chats' }
   | { kind: 'screen'; target: string }
   | { kind: 'web'; target: string }
 );

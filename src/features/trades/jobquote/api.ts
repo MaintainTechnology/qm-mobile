@@ -1,12 +1,11 @@
 /**
- * Job quoter data layer (spec web-parity F2). Catalogue is fetched only when the
- * selected job type calls for item selection (KEY POINTS) — callers pass `enabled`.
+ * Job quoter data layer (spec web-parity F2). The catalogue query lives in
+ * ../catalogue-api (shared with the hub's Catalogue section).
  */
 import { TENANT_ME_KEY } from '@/lib/tenant';
-import { useApiMutation, useApiQuery } from '@/lib/useApi';
+import { useApiMutation } from '@/lib/useApi';
 
 import {
-  CatalogueResponseSchema,
   JobQuoteResponseSchema,
   type JobQuoteRequest,
   type JobQuoteResponse,
@@ -23,10 +22,4 @@ export function useJobQuote() {
       timeoutMs: 90000,
     },
   );
-}
-
-export function useCatalogue(enabled: boolean) {
-  return useApiQuery(['tenant', 'catalogue'], '/api/tenant/catalogue', CatalogueResponseSchema, {
-    enabled,
-  });
 }

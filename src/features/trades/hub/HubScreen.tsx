@@ -92,7 +92,7 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
 
   const trades = tenantMe.data ? hubTrades(tenantTrades(tenantMe.data)) : [];
   const trade = tradeChoice && trades.includes(tradeChoice) ? tradeChoice : (trades[0] ?? null);
-  const sections = trade ? hubSections(trade) : [];
+  const sections = trade ? hubSections() : [];
   const quoteCount = trade ? quoteCountForTrade(tenantMe.data?.quotes ?? [], trade) : 0;
 
   return (
