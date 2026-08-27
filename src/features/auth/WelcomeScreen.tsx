@@ -126,8 +126,9 @@ export function WelcomeScreen() {
         />
       </View>
 
-      {/* ponytail: Face ID unlock needs expo-local-authentication plus a resumable
-          session; until that lands this row is display-only, per the kit layout. */}
+      {/* The real Face ID unlock shipped as BiometricGate (features/auth/BiometricGate.tsx),
+          opted into under Account → Security — it overlays signed-in sessions, so it never
+          reaches this signed-out screen. This row stays display-only, per the kit layout. */}
       <View style={styles.faceIdRow}>
         <FaceIdIcon color={colors.accentText} size={17} />
         <Text style={[styles.faceIdText, { color: colors.textDim }]}>

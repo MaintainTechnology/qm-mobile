@@ -1,11 +1,15 @@
 /**
  * Follow-ups — the web FollowupsTab (page.tsx:13898-14606) at mobile scope:
  * the same GET /api/tenant/followups list split "To chase" / "Contacted", the
- * same search fields, and the three actions a tradie on site actually uses —
- * Call (bridge call via POST followups/call), Text (POST followups/text) and
- * mark-contacted/reopen (POST followups). The web's paginated table, log-touch
- * outcome radios and inline thread expander stay web-side this round; Messages
- * history lives one tab away in Chats.
+ * same search fields, and the same actions — Call (bridge call via POST
+ * followups/call), Text (POST followups/text), reopen (POST followups) and
+ * mark-contacted, which is the web's "Log touch": the same outcome radios
+ * POSTed to followups/events (the server sets followed_up_at in the same
+ * write). The web paginates the fetched list client-side in pages of 10
+ * (lib/dashboard/pagination PAGE_SIZE — the GET takes no paging params);
+ * mobile idiom is a Load-more window over the same ordered to-chase-then-
+ * contacted list. Each row expands into the same lazy messages thread
+ * (FollowupThread, GET followups/messages).
  *
  * Money on this wire is DOLLARS inc GST (web parity) → cents only at render.
  */
@@ -19,10 +23,24 @@ import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
-import { Notice } from '../trades/ui';
+import { Notice, PillGroup } from '../trades/ui';
+import { FollowupThread } from './FollowupThread';
 import { SectionScreen } from './SectionScreen';
 
 const FOLLOWUPS_KEY = ['tenant', 'followups'] as const;
+
+/** Web parity: lib/dashboard/pagination PAGE_SIZE — pages of 10, sliced client-side. */
+const PAGE_SIZE = 10;
+
+/** The web's log-touch outcome radios (page.tsx NOTE_OUTCOMES), values verbatim. */
+const NOTE_OUTCOMES = [
+  ['spoke', 'Spoke with customer'],
+  ['left_voicemail', 'Left voicemail'],
+  ['no_answer', 'No answer'],
+  ['wants_callback', 'Wants callback'],
+  ['not_interested', 'Not interested'],
+  ['other', 'Other'],
+] as const;
 
 const FollowupItemSchema = z.looseObject({
   kind: z.enum(['quote', 'lead']),
@@ -75,6 +93,11 @@ function FollowupRow({ item }: { item: FollowupItem }) {
   const [note, setNote] = useState<string | null>(null);
   const [text, setText] = useState('');
   const [composing, setComposing] = useState(false);
+  // Log-touch form (the web's mark-contacted path): outcome radio + optional note.
+  const [logging, setLogging] = useState(false);
+  const [outcome, setOutcome] = useState('spoke');
+  const [logNote, setLogNote] = useState('');
+  const [threadOpen, setThreadOpen] = useState(false);
 
   const idBody = item.quote_id
     ? { quoteId: item.quote_id }
@@ -95,8 +118,19 @@ function FollowupRow({ item }: { item: FollowupItem }) {
     },
     onError: err => setNote(apiErrorMessage(err)),
   });
-  const mark = useApiMutation('/api/tenant/followups', ActionOkSchema, {
+  const reopen = useApiMutation('/api/tenant/followups', ActionOkSchema, {
     invalidates: [FOLLOWUPS_KEY],
+    onError: err => setNote(apiErrorMessage(err)),
+  });
+  // POST followups/events {quoteId, kind:'note', outcome, note?} — the server
+  // also sets followed_up_at, so the row moves to Contacted on the refetch.
+  const logTouch = useApiMutation('/api/tenant/followups/events', ActionOkSchema, {
+    invalidates: [FOLLOWUPS_KEY],
+    onSuccess: () => {
+      setNote('Touch logged ✓');
+      setLogging(false);
+      setLogNote('');
+    },
     onError: err => setNote(apiErrorMessage(err)),
   });
 
@@ -104,7 +138,7 @@ function FollowupRow({ item }: { item: FollowupItem }) {
   const amount =
     item.total_inc_gst == null ? null : formatAud(centsFromApiDollars(item.total_inc_gst));
   const phoneOk = hasPhone(item);
-  const busy = call.isPending || send.isPending || mark.isPending;
+  const busy = call.isPending || send.isPending || reopen.isPending || logTouch.isPending;
 
   return (
     <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
@@ -150,20 +184,70 @@ function FollowupRow({ item }: { item: FollowupItem }) {
             setComposing(v => !v);
           }}
         />
+        <ActionBtn
+          label={threadOpen ? 'Hide messages' : 'Messages'}
+          onPress={() => setThreadOpen(v => !v)}
+        />
         {item.quote_id ? (
-          <ActionBtn
-            label={contacted ? 'Reopen' : 'Mark contacted'}
-            disabled={busy}
-            onPress={() => {
-              setNote(null);
-              mark.mutate({
-                quoteId: item.quote_id,
-                action: contacted ? 'reopen' : 'mark_contacted',
-              });
-            }}
-          />
+          contacted ? (
+            <ActionBtn
+              label={reopen.isPending ? 'Saving…' : 'Reopen'}
+              disabled={busy}
+              onPress={() => {
+                setNote(null);
+                reopen.mutate({ quoteId: item.quote_id, action: 'reopen' });
+              }}
+            />
+          ) : (
+            <ActionBtn
+              label={logging ? 'Cancel' : 'Mark contacted'}
+              disabled={busy}
+              onPress={() => {
+                setNote(null);
+                setLogging(v => !v);
+              }}
+            />
+          )
         ) : null}
       </View>
+
+      {logging && item.quote_id ? (
+        <View style={{ gap: spacing.sm }}>
+          <Text style={[styles.formLabel, { color: colors.textDim }]}>
+            LOG TOUCH — WHAT HAPPENED?
+          </Text>
+          <PillGroup options={NOTE_OUTCOMES} value={outcome} onChange={setOutcome} />
+          <TextInput
+            value={logNote}
+            onChangeText={v => setLogNote(v.slice(0, 500))}
+            placeholder="Note (optional) — e.g. call back after 3pm"
+            placeholderTextColor={colors.textDim}
+            multiline
+            accessibilityLabel="Touch note"
+            style={[
+              styles.logNote,
+              { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
+            ]}
+          />
+          <ActionBtn
+            label={logTouch.isPending ? 'Saving…' : 'Save touch'}
+            disabled={logTouch.isPending}
+            primary
+            onPress={() =>
+              logTouch.mutate({
+                quoteId: item.quote_id,
+                kind: 'note',
+                outcome,
+                note: logNote.trim() || undefined,
+              })
+            }
+          />
+        </View>
+      ) : null}
+
+      {threadOpen ? (
+        <FollowupThread quoteId={item.quote_id} conversationId={item.conversation_id} />
+      ) : null}
 
       {composing ? (
         <View style={{ gap: spacing.sm }}>
@@ -239,6 +323,9 @@ function ActionBtn({
 export function FollowupsScreen() {
   const { colors } = useTheme();
   const [search, setSearch] = useState('');
+  // Load-more window over the ordered list (the GET has no paging params —
+  // web slices the same fetched array into pages of 10).
+  const [visible, setVisible] = useState(PAGE_SIZE);
   const query = useApiQuery(
     FOLLOWUPS_KEY,
     '/api/tenant/followups?includeActioned=1&minAgeHours=0',
@@ -267,13 +354,23 @@ export function FollowupsScreen() {
 
   const toChase = items.filter(i => i.followed_up_at == null);
   const contacted = items.filter(i => i.followed_up_at != null);
+  // Web parity ordering: the whole to-chase queue first, then contacted.
+  // The window slices that combined list, so Contacted only paints once
+  // Load more has walked past the chase queue (same as web page order).
+  const ordered = [...toChase, ...contacted];
+  const shown = ordered.slice(0, visible);
+  const shownChase = shown.filter(i => i.followed_up_at == null);
+  const shownDone = shown.filter(i => i.followed_up_at != null);
 
   return (
     <SectionScreen
       title="Follow-ups"
       subtitle="Quotes and enquiries that went quiet, oldest first — chase them before they go cold."
       refreshing={query.isFetching}
-      onRefresh={() => void query.refetch()}
+      onRefresh={() => {
+        setVisible(PAGE_SIZE);
+        void query.refetch();
+      }}
     >
       {query.isPending ? (
         <Notice tone="accent" label="Loading follow-ups…" />
@@ -288,7 +385,10 @@ export function FollowupsScreen() {
         <>
           <TextInput
             value={search}
-            onChangeText={setSearch}
+            onChangeText={v => {
+              setSearch(v);
+              setVisible(PAGE_SIZE); // narrowing the list restarts the window (web resets to page 1)
+            }}
             placeholder="Search name, suburb, phone, code…"
             placeholderTextColor={colors.textDim}
             autoCapitalize="none"
@@ -311,25 +411,31 @@ export function FollowupsScreen() {
               Nothing to chase — every live quote has been followed up.
             </Text>
           ) : (
-            toChase.map(item => (
+            shownChase.map(item => (
               <FollowupRow
                 key={item.quote_id ?? item.conversation_id ?? itemName(item)}
                 item={item}
               />
             ))
           )}
-          {contacted.length > 0 ? (
+          {shownDone.length > 0 ? (
             <>
               <Text style={[styles.groupLabel, { color: colors.textDim }]}>
                 CONTACTED · {contacted.length} — STILL NO PAYMENT
               </Text>
-              {contacted.map(item => (
+              {shownDone.map(item => (
                 <FollowupRow
                   key={item.quote_id ?? item.conversation_id ?? itemName(item)}
                   item={item}
                 />
               ))}
             </>
+          ) : null}
+          {ordered.length > shown.length ? (
+            <ActionBtn
+              label={`Load more (${shown.length} of ${ordered.length})`}
+              onPress={() => setVisible(v => v + PAGE_SIZE)}
+            />
           ) : null}
         </>
       )}
@@ -383,4 +489,14 @@ const styles = StyleSheet.create({
     textAlignVertical: 'top',
   },
   note: { fontFamily: fonts.sans.medium, fontSize: 12.5 },
+  formLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
+  logNote: {
+    minHeight: 56,
+    borderWidth: 1,
+    borderRadius: radius.control,
+    padding: spacing.md,
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+    textAlignVertical: 'top',
+  },
 });

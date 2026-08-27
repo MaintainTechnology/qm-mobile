@@ -59,12 +59,43 @@ export function useApproveQuote() {
   return useQuoteActionMutation<{ quoteId: string }>(vars => `/api/quote/${vars.quoteId}/approve`);
 }
 
-/** POST /api/quote/[id]/send — `{ channel, to? }`. Mobile always sends SMS to the on-file
- *  contact (channel choice + manual recipient entry stays a web-only affordance this round). */
+/** The send route's two channels, verbatim (route.ts: `channel must be 'sms' or 'email'`). */
+export type SendChannel = 'sms' | 'email';
+
+/** `{ channel, to? }` per the route's body schema; `quoteId` rides along for the path builder and
+ *  is ignored by the server (same shape trick as useSetDisplayMode). */
+export type SendQuoteVars = { quoteId: string; channel: SendChannel; to?: string };
+
+/**
+ * Mirrors the web SendQuotePanel `to` rule exactly (app/dashboard/quote/[token]/
+ * SendQuotePanel.tsx): an override goes up ONLY when the tradie typed one — SMS never overrides
+ * an on-file number (the web hides the input entirely), and email only when the typed address
+ * differs from what's on file. Otherwise `to` is omitted and the server resolves the recipient
+ * through its own 4-source contact chain (lib/quote/send-customer.ts).
+ */
+export function sendQuoteVars(
+  quoteId: string,
+  channel: SendChannel,
+  onFile: string | null,
+  typed: string,
+): SendQuoteVars {
+  const entered = typed.trim();
+  const to =
+    channel === 'sms'
+      ? onFile
+        ? undefined
+        : entered || undefined
+      : entered && entered !== (onFile ?? '')
+        ? entered
+        : undefined;
+  return to ? { quoteId, channel, to } : { quoteId, channel };
+}
+
+/** POST /api/quote/[id]/send — `{ channel, to? }`. The route sends from ANY pre-payment status
+ *  (a resend of a sent quote is a legitimate nudge; paid/accepted 409), so the same mutation
+ *  serves first send and resend — build the body with `sendQuoteVars`. */
 export function useSendQuote() {
-  return useQuoteActionMutation<{ quoteId: string; channel: 'sms' }>(
-    vars => `/api/quote/${vars.quoteId}/send`,
-  );
+  return useQuoteActionMutation<SendQuoteVars>(vars => `/api/quote/${vars.quoteId}/send`);
 }
 
 /** Surfaces the server's own message (e.g. "No phone number on file…") over a generic failure —

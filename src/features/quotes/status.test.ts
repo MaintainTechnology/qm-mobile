@@ -5,6 +5,7 @@ import {
   canSend,
   customerLabel,
   formatJobType,
+  isResend,
   matchesFilter,
   quoteAge,
   quoteBadge,
@@ -66,11 +67,20 @@ describe('canApprove / canSend', () => {
     expect(canApprove(quote({ status: 'sent' }))).toBe(false);
   });
 
-  it('send covers every pre-send review state', () => {
+  it('send covers every pre-payment status, resend included (web confirmSendCta parity)', () => {
     expect(canSend(quote({ status: 'drafted' }))).toBe(true);
     expect(canSend(quote({ status: 'awaiting_tradie_approval' }))).toBe(true);
-    expect(canSend(quote({ status: 'sent' }))).toBe(false);
+    expect(canSend(quote({ status: 'sent' }))).toBe(true);
+    expect(canSend(quote({ status: 'viewed' }))).toBe(true);
     expect(canSend(quote({ status: 'accepted' }))).toBe(false);
+    expect(canSend(quote({ status: 'paid' }))).toBe(false);
+    expect(canSend(quote({ status: 'sent', deposit_paid: true }))).toBe(false);
+  });
+
+  it('isResend relabels only already-delivered quotes', () => {
+    expect(isResend(quote({ status: 'sent' }))).toBe(true);
+    expect(isResend(quote({ status: 'viewed' }))).toBe(true);
+    expect(isResend(quote({ status: 'drafted' }))).toBe(false);
   });
 });
 

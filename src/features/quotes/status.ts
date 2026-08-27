@@ -66,14 +66,23 @@ export function canApprove(quote: QuoteRow): boolean {
 }
 
 /**
- * Send is offered for every pre-send review state, including the held-for-approval state (a
- * manual send there IS the tradie's approval, same intent as Approve — `awaiting_tradie_approval`
- * is already in `REVIEW_STATUSES`). Web parity narrows to `canSendQuote`, which also allows
- * resending a `sent` quote; mobile keeps this round to the review states per spec D3
- * (resend/email choice stays a web-only affordance for now).
+ * Web `confirmSendCta` show-logic parity (lib/quote/send-customer.ts): the send endpoint works
+ * from ANY pre-payment status — a send from a held quote IS the tradie's approval, and a resend
+ * of a sent quote is a legitimate nudge. Hidden once the customer has committed: paid/accepted
+ * statuses (which the endpoint also 409s via `canSendQuote`) plus deposit-paid quotes whose
+ * status hasn't caught up yet.
  */
 export function canSend(quote: QuoteRow): boolean {
-  return REVIEW_STATUSES.has(status(quote));
+  if (quote.deposit_paid) return false;
+  const s = status(quote);
+  return s !== 'paid' && s !== 'accepted';
+}
+
+/** Already-delivered quotes get resend wording (web `confirmSendCta`: sent/viewed relabel the
+ *  same action — the endpoint itself is identical either way). */
+export function isResend(quote: QuoteRow): boolean {
+  const s = status(quote);
+  return s === 'sent' || s === 'viewed';
 }
 
 export function customerLabel(quote: QuoteRow): string {

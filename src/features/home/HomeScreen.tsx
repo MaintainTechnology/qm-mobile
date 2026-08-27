@@ -39,6 +39,7 @@ import {
   lastMessagePreview,
   relativeTime,
 } from '@/features/chats/format';
+import { ActivityAnalytics } from '@/features/home/ActivityAnalytics';
 import { CopyIcon, SunIcon } from '@/features/home/icons';
 import { apiErrorMessage } from '@/lib/api';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
@@ -581,6 +582,9 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
               })
             )}
           </View>
+
+          {/* Your activity — the web Overview's analytics block, ported natively. */}
+          <ActivityAnalytics />
         </ScrollView>
       ) : null}
     </View>

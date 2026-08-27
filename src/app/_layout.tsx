@@ -17,7 +17,8 @@ import {
   useFonts,
 } from '@expo-google-fonts/manrope';
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
-import { QueryClientProvider } from '@tanstack/react-query';
+import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
+import Constants from 'expo-constants';
 import { Stack } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
@@ -25,9 +26,10 @@ import { useEffect } from 'react';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { BiometricGate } from '@/features/auth/BiometricGate';
 import { clerkPublishableKey } from '@/lib/env';
 import { usePurchases } from '@/lib/purchases';
-import { queryClient } from '@/lib/query';
+import { asyncStoragePersister, queryClient } from '@/lib/query';
 import { themes } from '@/lib/theme';
 import { ThemeControlProvider, useTheme } from '@/lib/useTheme';
 
@@ -67,6 +69,8 @@ function ThemedApp() {
   return (
     <ThemeProvider value={isDark ? navDark : navLight}>
       <Stack screenOptions={{ headerShown: false }} />
+      {/* Overlay, not a route: deep links keep resolving underneath the lock. */}
+      <BiometricGate />
       <StatusBar style={isDark ? 'light' : 'dark'} />
     </ThemeProvider>
   );
@@ -100,11 +104,22 @@ export default function RootLayout() {
             inlined inside node_modules in a production build, so Clerk cannot
             read it for itself any more. */}
         <ClerkProvider publishableKey={clerkPublishableKey()} tokenCache={tokenCache}>
-          <QueryClientProvider client={queryClient}>
+          {/* Same queryClient as before, now rehydrated from AsyncStorage on cold
+              start (src/lib/query.ts). maxAge mirrors the client's 24h gcTime, and
+              the app version busts the cache across OTA/store updates so a stale
+              shape never meets new screen code. */}
+          <PersistQueryClientProvider
+            client={queryClient}
+            persistOptions={{
+              persister: asyncStoragePersister,
+              maxAge: 24 * 60 * 60 * 1000,
+              buster: Constants.expoConfig?.version ?? 'dev',
+            }}
+          >
             <ThemeControlProvider>
               <ThemedApp />
             </ThemeControlProvider>
-          </QueryClientProvider>
+          </PersistQueryClientProvider>
         </ClerkProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>

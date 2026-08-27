@@ -1,15 +1,22 @@
 /**
  * Server-state cache. Defaults are tuned for a tradie on a roof with two bars, not a desk.
  */
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { QueryClient } from '@tanstack/react-query';
 
 import { ApiError, ApiSchemaError } from '@/lib/api';
 
+/**
+ * Cold-start persistence: PersistQueryClientProvider (src/app/_layout.tsx) rehydrates
+ * this cache from AsyncStorage, so an offline relaunch on site still shows the last-known
+ * quotes instead of an empty app. Its maxAge matches gcTime below.
+ */
+export const asyncStoragePersister = createAsyncStoragePersister({ storage: AsyncStorage });
+
 export const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
-      // In-memory only: there is no persister, so this keeps data alive for the running
-      // process, NOT across a cold start. Offline relaunch still starts empty.
       staleTime: 30_000,
       gcTime: 24 * 60 * 60 * 1000,
       // `failureCount` is 0-based here, so `< 2` means 3 attempts total.

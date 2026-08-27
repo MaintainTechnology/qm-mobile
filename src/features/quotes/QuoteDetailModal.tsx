@@ -11,6 +11,9 @@
  * One primary action per status (web `confirmSendCta` parity): a held-for-approval quote only
  * ever offers Approve, never a second Send button, since approving IS the send. A tap arms the
  * button; a second tap within a few seconds fires it — guards a fat-thumb tap on a live send.
+ * The send action carries the web SendQuotePanel's channel choice (SMS default, email with the
+ * PDF attached) and manual recipient entry, and doubles as Resend for already-delivered quotes —
+ * the route sends from any pre-payment status, so resend is the same POST.
  *
  * Web detail-pane parity (page.tsx QuoteDetail, ~9384-9737): the Details grid
  * (Work/Service/Drafted/Routing), estimated timeframe, the per-quote layout toggle
@@ -20,12 +23,15 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
   ActivityIndicator,
+  KeyboardAvoidingView,
   Modal,
+  Platform,
   Pressable,
   ScrollView,
   Share,
   StyleSheet,
   Text,
+  TextInput,
   View,
 } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
@@ -44,16 +50,19 @@ import { useTheme } from '@/lib/useTheme';
 import { TRADE_LABELS } from '../trades/hub/sections';
 import {
   actionErrorMessage,
+  sendQuoteVars,
   useApproveQuote,
   useSendQuote,
   useSetDisplayMode,
   type DisplayMode,
+  type SendChannel,
 } from './api';
 import {
   canApprove,
   canSend,
   customerLabel,
   formatJobType,
+  isResend,
   quoteAge,
   quoteBadge,
   type QuoteTone,
@@ -392,13 +401,21 @@ export function QuoteDetailModal({
   const send = useSendQuote();
   /** The primary action needs an explicit second tap to fire (web `confirmSendCta` parity). */
   const [armed, setArmed] = useState(false);
+  /** Web SendQuotePanel parity: SMS default; email attaches the PDF server-side. */
+  const [channel, setChannel] = useState<SendChannel>('sms');
+  /** Manual recipient overrides — only sent up when typed (see `sendQuoteVars`). */
+  const [phone, setPhone] = useState('');
+  const [email, setEmail] = useState('');
 
   // A fresh mutation state per quote — reopening the sheet on a different row must not carry over
-  // yesterday's error/success line or an armed confirm.
+  // yesterday's error/success line, an armed confirm, or another customer's typed recipient.
   useEffect(() => {
     approve.reset();
     send.reset();
     setArmed(false);
+    setChannel('sms');
+    setPhone('');
+    setEmail('');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quote?.id]);
 
@@ -434,33 +451,55 @@ export function QuoteDetailModal({
   const justSent = send.isSuccess && !send.isPending;
   const error = approve.error ?? send.error;
   // Hides the action row the instant a tap fires (the optimistic cache update in ./api already
-  // flips the quote's status) and keeps it hidden through success, until refetched data — or a
-  // fresh `quote` prop — actually clears `primaryAction` on its own.
+  // flips the quote's status) and keeps it hidden through success. A sent quote stays sendable
+  // (resend), so the row only comes back on the next open of the sheet — deliberate: it stops an
+  // absent-minded second nudge seconds after the first.
   const showActionRow = primaryAction !== null && !pending && !justApproved && !justSent;
 
   const quoteId = quote.id;
+  const resend = isResend(quote);
+  const onFilePhone = quote.customer_phone?.trim() ? quote.customer_phone.trim() : null;
+  // Web `smsReady` parity: SMS needs a number — on file or typed. Email may go up blank: the
+  // server resolves the on-file address through its contact chain and 400s with its own
+  // plain-language message when there is none.
+  const sendBlocked =
+    primaryAction === 'send' && channel === 'sms' && !onFilePhone && phone.trim().length === 0;
+
   function firePrimaryAction() {
-    if (!primaryAction || pending) return;
+    if (!primaryAction || pending || sendBlocked) return;
     if (!armed) {
       setArmed(true);
       return;
     }
     setArmed(false);
     if (primaryAction === 'approve') approve.mutate({ quoteId });
-    else send.mutate({ quoteId, channel: 'sms' });
+    else
+      send.mutate(
+        sendQuoteVars(
+          quoteId,
+          channel,
+          channel === 'sms' ? onFilePhone : null,
+          channel === 'sms' ? phone : email,
+        ),
+      );
   }
 
-  const actionLabel =
-    primaryAction === 'approve'
-      ? armed
-        ? 'TAP AGAIN TO CONFIRM'
-        : 'APPROVE & SEND'
-      : armed
-        ? 'TAP AGAIN TO CONFIRM'
+  const actionLabel = armed
+    ? 'TAP AGAIN TO CONFIRM'
+    : primaryAction === 'approve'
+      ? 'APPROVE & SEND'
+      : resend
+        ? 'RESEND TO CUSTOMER'
         : 'SEND TO CUSTOMER';
 
   return (
     <Modal visible animationType="slide" onRequestClose={onClose}>
+      {/* The recipient inputs live in the pinned bottom bar — without this the iOS keyboard
+          covers exactly the field being typed into (Android resizes the window itself). */}
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+      >
       <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
         <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
           <Text style={[styles.headerTitle, { color: colors.textPri }]}>QUOTE DETAIL</Text>
@@ -629,52 +668,143 @@ export function QuoteDetailModal({
                 </Text>
               </View>
             ) : showActionRow ? (
-              <View style={styles.actionRow}>
-                <Pressable
-                  accessibilityRole="button"
-                  accessibilityLabel={
-                    primaryAction === 'approve' ? 'Approve and send' : 'Send to customer'
-                  }
-                  onPress={firePrimaryAction}
-                  style={({ pressed }) =>
-                    primaryAction === 'approve'
-                      ? [
-                          styles.ghostBtn,
-                          {
-                            borderColor: armed
-                              ? colors.warningBright
-                              : pressed
-                                ? colors.accent
-                                : colors.inkLine,
-                          },
-                        ]
-                      : [
-                          styles.primaryBtn,
-                          {
-                            backgroundColor: armed
-                              ? colors.warningBright
-                              : pressed
-                                ? colors.accentPress
-                                : colors.accent,
-                          },
-                        ]
-                  }
-                >
-                  <Text
-                    style={
+              <>
+                {primaryAction === 'send' ? (
+                  <View style={styles.channelBlock}>
+                    {/* Web SendQuotePanel rows as pills: Text message / Email (PDF attached). */}
+                    <View style={styles.channelRow}>
+                      {(
+                        [
+                          { key: 'sms', label: 'TEXT MESSAGE' },
+                          { key: 'email', label: 'EMAIL' },
+                        ] as const
+                      ).map(option => {
+                        const active = channel === option.key;
+                        return (
+                          <Pressable
+                            key={option.key}
+                            accessibilityRole="button"
+                            accessibilityState={{ selected: active }}
+                            onPress={() => {
+                              setChannel(option.key);
+                              // A confirm armed for one channel must never fire the other.
+                              setArmed(false);
+                            }}
+                            style={[
+                              styles.channelBtn,
+                              {
+                                borderColor: active ? colors.accent : colors.inkLine,
+                                backgroundColor: active ? colors.ink : 'transparent',
+                              },
+                            ]}
+                          >
+                            <Text
+                              style={[
+                                styles.channelBtnText,
+                                { color: active ? colors.accentText : colors.textDim },
+                              ]}
+                            >
+                              {option.label}
+                            </Text>
+                          </Pressable>
+                        );
+                      })}
+                    </View>
+                    {channel === 'sms' ? (
+                      onFilePhone ? (
+                        <Text style={[styles.recipientOnFile, { color: colors.textSec }]}>
+                          To {onFilePhone}
+                        </Text>
+                      ) : (
+                        <TextInput
+                          value={phone}
+                          onChangeText={setPhone}
+                          keyboardType="phone-pad"
+                          placeholder="Customer mobile, e.g. 04xx xxx xxx"
+                          placeholderTextColor={colors.textDim}
+                          style={[
+                            styles.recipientInput,
+                            { borderColor: colors.inkLine, color: colors.textPri },
+                          ]}
+                        />
+                      )
+                    ) : (
+                      <>
+                        <TextInput
+                          value={email}
+                          onChangeText={setEmail}
+                          keyboardType="email-address"
+                          autoCapitalize="none"
+                          autoCorrect={false}
+                          placeholder="customer@example.com"
+                          placeholderTextColor={colors.textDim}
+                          style={[
+                            styles.recipientInput,
+                            { borderColor: colors.inkLine, color: colors.textPri },
+                          ]}
+                        />
+                        <Text style={[styles.recipientHint, { color: colors.textDim }]}>
+                          PDF attached. Leave blank to use the address on file.
+                        </Text>
+                      </>
+                    )}
+                  </View>
+                ) : null}
+                <View style={styles.actionRow}>
+                  <Pressable
+                    accessibilityRole="button"
+                    accessibilityState={{ disabled: sendBlocked }}
+                    accessibilityLabel={
                       primaryAction === 'approve'
-                        ? [styles.ghostBtnLabel, { color: colors.textPri }]
-                        : [styles.primaryBtnLabel, { color: colors.accentInk }]
+                        ? 'Approve and send'
+                        : resend
+                          ? 'Resend to customer'
+                          : 'Send to customer'
+                    }
+                    disabled={sendBlocked}
+                    onPress={firePrimaryAction}
+                    style={({ pressed }) =>
+                      primaryAction === 'approve'
+                        ? [
+                            styles.ghostBtn,
+                            {
+                              borderColor: armed
+                                ? colors.warningBright
+                                : pressed
+                                  ? colors.accent
+                                  : colors.inkLine,
+                            },
+                          ]
+                        : [
+                            styles.primaryBtn,
+                            sendBlocked ? styles.btnDisabled : null,
+                            {
+                              backgroundColor: armed
+                                ? colors.warningBright
+                                : pressed
+                                  ? colors.accentPress
+                                  : colors.accent,
+                            },
+                          ]
                     }
                   >
-                    {actionLabel}
-                  </Text>
-                </Pressable>
-              </View>
+                    <Text
+                      style={
+                        primaryAction === 'approve'
+                          ? [styles.ghostBtnLabel, { color: colors.textPri }]
+                          : [styles.primaryBtnLabel, { color: colors.accentInk }]
+                      }
+                    >
+                      {actionLabel}
+                    </Text>
+                  </Pressable>
+                </View>
+              </>
             ) : null}
           </View>
         )}
       </View>
+      </KeyboardAvoidingView>
     </Modal>
   );
 }
@@ -820,6 +950,27 @@ const styles = StyleSheet.create({
     paddingTop: spacing.md,
     gap: spacing.sm,
   },
+  channelBlock: { gap: spacing.sm },
+  channelRow: { flexDirection: 'row', gap: spacing.sm },
+  channelBtn: {
+    minHeight: touch.minimum,
+    justifyContent: 'center',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  channelBtnText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  recipientOnFile: { fontFamily: fonts.sans.regular, fontSize: 13 },
+  recipientInput: {
+    minHeight: touch.minimum,
+    borderWidth: 1,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.md,
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+  },
+  recipientHint: { fontFamily: fonts.sans.regular, fontSize: 12 },
+  btnDisabled: { opacity: 0.4 },
   errorText: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
   okText: { fontFamily: fonts.sans.semiBold, fontSize: 13 },
   hintText: { fontFamily: fonts.sans.semiBold, fontSize: 13 },

@@ -1,18 +1,21 @@
 /**
  * Files — the web FilesTab at mobile scope: "Ask your documents" (POST
- * /api/tenant/files/chat) and the document list (GET /api/tenant/files) with
- * indexing state. Viewing/downloading needs a bearer-authed byte stream the
- * system browser can't attach headers to, so each row links out to the web
- * Files tab, which owns the authed viewer; comments stay web-side with it.
+ * /api/tenant/files/chat), the document list (GET /api/tenant/files) with
+ * indexing state, and per-row download. The byte stream
+ * (/api/tenant/files/[id]/download) is bearer-authed, so rows download through
+ * downloadAndShare (cache + share sheet) rather than the system browser, which
+ * can't attach the header. The inline viewer and comments stay web-side.
  * Documents arrive server-side (archived quotes, uploaded invoices) — the web
  * tab has no upload button either.
  */
+import { useAuth } from '@clerk/expo';
 import { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { ActivityIndicator, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 import { LinkOutButton } from '@/features/trades/hub/LinkOut';
 import { apiErrorMessage } from '@/lib/api';
+import { downloadAndShare } from '@/lib/download';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
@@ -64,10 +67,42 @@ function dateLabel(iso: string | null | undefined): string {
   return `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
 }
 
+/** Mirror of the download route's contentTypeFor: extension → share-sheet MIME. */
+const EXT_MIME: Record<string, string> = {
+  pdf: 'application/pdf',
+  jpg: 'image/jpeg',
+  jpeg: 'image/jpeg',
+  png: 'image/png',
+  webp: 'image/webp',
+  gif: 'image/gif',
+  heic: 'image/heic',
+  tif: 'image/tiff',
+  tiff: 'image/tiff',
+  md: 'text/markdown',
+};
+
+/**
+ * The list payload carries no storage_path or MIME, so both derive from the
+ * display name. Quotes are always Gotenberg-rendered PDFs even when the name
+ * lacks .pdf; anything else unknown falls back to octet-stream, same as the
+ * server.
+ */
+function downloadMeta(doc: FileDoc): { filename: string; mimeType: string } {
+  const name = doc.display_name?.trim() || 'document';
+  const ext = name.slice(name.lastIndexOf('.') + 1).toLowerCase();
+  const mime = name.includes('.') ? EXT_MIME[ext] : undefined;
+  if (mime) return { filename: name, mimeType: mime };
+  if (doc.source_kind === 'quote') return { filename: `${name}.pdf`, mimeType: 'application/pdf' };
+  return { filename: name, mimeType: 'application/octet-stream' };
+}
+
 export function FilesScreen() {
   const { colors } = useTheme();
+  const { getToken } = useAuth();
   const [question, setQuestion] = useState('');
   const [asked, setAsked] = useState<AskResult | null>(null);
+  const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [failed, setFailed] = useState<{ doc: FileDoc; message: string } | null>(null);
   const files = useApiQuery(FILES_KEY, '/api/tenant/files', FilesSchema);
   const ask = useApiMutation<{ query: string }, AskResult>('/api/tenant/files/chat', AskSchema, {
     timeoutMs: 45000,
@@ -75,6 +110,28 @@ export function FilesScreen() {
   });
 
   const documents = files.data?.documents ?? [];
+
+  const download = async (doc: FileDoc) => {
+    setDownloadingId(doc.id);
+    setFailed(null);
+    try {
+      await downloadAndShare({
+        path: `/api/tenant/files/${doc.id}/download`,
+        ...downloadMeta(doc),
+        token: (await getToken()) ?? undefined,
+      });
+    } catch (error) {
+      setFailed({
+        doc,
+        message: apiErrorMessage(
+          error,
+          'Could not download that document. Check your signal and try again.',
+        ),
+      });
+    } finally {
+      setDownloadingId(null);
+    }
+  };
 
   return (
     <SectionScreen
@@ -162,6 +219,14 @@ export function FilesScreen() {
           <Text style={[styles.groupLabel, { color: colors.textDim }]}>
             YOUR DOCUMENTS · {documents.length}
           </Text>
+          {failed ? (
+            <Notice
+              tone="danger"
+              label={`Could not download ${failed.doc.display_name ?? 'that document'}`}
+              body={failed.message}
+              onRetry={() => void download(failed.doc)}
+            />
+          ) : null}
           {documents.map((doc: FileDoc) => (
             <View
               key={doc.id}
@@ -191,9 +256,29 @@ export function FilesScreen() {
               >
                 {stateLabel(doc.state)}
               </Text>
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel={`Download ${doc.display_name ?? 'document'}`}
+                disabled={downloadingId != null}
+                onPress={() => void download(doc)}
+                style={({ pressed }) => [
+                  styles.downloadBtn,
+                  {
+                    borderColor: colors.ctlLine,
+                    backgroundColor: pressed ? colors.ink : 'transparent',
+                    opacity: downloadingId != null && downloadingId !== doc.id ? 0.45 : 1,
+                  },
+                ]}
+              >
+                {downloadingId === doc.id ? (
+                  <ActivityIndicator size="small" color={colors.accent} />
+                ) : (
+                  <Text style={[styles.downloadText, { color: colors.textPri }]}>SAVE</Text>
+                )}
+              </Pressable>
             </View>
           ))}
-          <LinkOutButton label="View & download on the web" path="/dashboard?tab=files" />
+          <LinkOutButton label="Viewer & comments on the web" path="/dashboard?tab=files" />
         </>
       )}
     </SectionScreen>
@@ -236,6 +321,16 @@ const styles = StyleSheet.create({
   },
   docName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
   docMeta: { marginTop: 2, fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.5 },
+  downloadBtn: {
+    minHeight: touch.minimum,
+    minWidth: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.sm,
+  },
+  downloadText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
   stateChip: {
     borderWidth: 1,
     borderRadius: radius.chip,

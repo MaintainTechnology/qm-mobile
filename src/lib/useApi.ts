@@ -12,6 +12,7 @@ import {
   type UseMutationOptions,
   useQuery,
   useQueryClient,
+  type UseQueryOptions,
 } from '@tanstack/react-query';
 import type { z } from 'zod';
 
@@ -43,7 +44,15 @@ export function useApiQuery<T>(
   key: readonly unknown[],
   path: string,
   schema: z.ZodType<T>,
-  { timeoutMs, ...opts }: { enabled?: boolean; timeoutMs?: number } = {},
+  {
+    timeoutMs,
+    ...opts
+  }: {
+    enabled?: boolean;
+    timeoutMs?: number;
+    /** Poll cadence (web parity, e.g. videos while generating). NOT retry policy — that stays in query.ts. */
+    refetchInterval?: UseQueryOptions<T>['refetchInterval'];
+  } = {},
 ) {
   const { getToken } = useAuth();
   return useQuery({
