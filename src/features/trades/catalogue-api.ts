@@ -440,6 +440,26 @@ export function useStockEssentials() {
   );
 }
 
+// ── Product photo upload ────────────────────────────────────────────────────
+
+export const CatalogueUploadResponseSchema = z.looseObject({
+  ok: z.literal(true),
+  url: z.string(),
+  path: z.string(),
+});
+export type CatalogueUploadResponse = z.infer<typeof CatalogueUploadResponseSchema>;
+
+/** POST /api/tenant/catalogue/upload — a product PHOTO (JPG/PNG/WebP, ≤8MB,
+ *  multipart field 'file') answering a public URL for the form's photo field.
+ *  Despite the generic route name this is images only, not a data import. */
+export function useUploadCatalogueImage() {
+  return useApiMutation<FormData, CatalogueUploadResponse>(
+    '/api/tenant/catalogue/upload',
+    CatalogueUploadResponseSchema,
+    { timeoutMs: 60000 },
+  );
+}
+
 // ── Coverage gaps (read-only) ───────────────────────────────────────────────
 
 const GapCategorySchema = z.looseObject({

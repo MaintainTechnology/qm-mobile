@@ -43,11 +43,13 @@ import {
   type HubTrade,
 } from './sections';
 import { AirconToolScreen } from '../aircon/AirconToolScreen';
+import { CommercialPaintingScreen } from '../commercial-painting/CommercialPaintingScreen';
+import { EstimatorScreen } from '../estimator/EstimatorScreen';
 import { PaintingSavedJobs } from '../tools/PaintingSavedJobs';
 import { RoofingSavedJobs } from '../tools/RoofingSavedJobs';
 import { SignageTools } from '../tools/SignageTools';
 import { SolarTools } from '../tools/SolarTools';
-import { EstimatorBetaCard, ToolsWebOnly } from './SectionsContent';
+import { ToolsWebOnly } from './SectionsContent';
 import { CatalogueSection } from './sections/CatalogueSection';
 import { EstimatingSection } from './sections/EstimatingSection';
 import { PricingSection } from './sections/PricingSection';
@@ -67,7 +69,7 @@ function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrad
         return (
           <View style={{ gap: spacing.lg }}>
             <JobQuoteScreen trades={[trade]} />
-            <EstimatorBetaCard />
+            <EstimatorScreen />
           </View>
         );
       if (trade === 'plumbing') return <JobQuoteScreen trades={[trade]} />;
@@ -78,6 +80,7 @@ function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrad
             <RoofingSavedJobs />
           </View>
         );
+      if (trade === 'commercial_painting') return <CommercialPaintingScreen />;
       if (trade === 'signage') return <SignageTools />;
       if (trade === 'painting') return <PaintingSavedJobs />;
       if (trade === 'aircon') return <AirconToolScreen />;

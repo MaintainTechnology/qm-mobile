@@ -58,16 +58,3 @@ export function ToolsWebOnly({ trade }: { trade: HubTrade }) {
     />
   );
 }
-
-/** Web parity: electrical's tools section also carries the plan-upload
- *  estimator (EstimatorBetaTab), which stays a web tool this round. */
-export function EstimatorBetaCard() {
-  return (
-    <WebOnlyCard
-      label="Estimator (beta)"
-      body="Upload plans and let QuoteMax extract and price the bill of materials. A web dashboard tool — priced runs land in this queue."
-      path="/dashboard?tab=estimator"
-      cta="Open the estimator"
-    />
-  );
-}

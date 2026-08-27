@@ -22,6 +22,7 @@
 import { useState } from 'react';
 import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
 
+import { appendFile, pickImage, sizeOk } from '@/lib/media';
 import { apiDollarsFromCents, centsFromApiDollars, formatAud, parseAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -52,6 +53,7 @@ import {
   useTierLadder,
   useToggleCatalogueActive,
   useUpdateCatalogueItem,
+  useUploadCatalogueImage,
   wireNumber,
   type CatalogueItemFields,
   type CatalogueRow,
@@ -480,6 +482,7 @@ function ProductForm({
   const { colors } = useTheme();
   const create = useCreateCatalogueItem();
   const update = useUpdateCatalogueItem();
+  const upload = useUploadCatalogueImage();
   const editingId = initial?.id ?? null;
 
   const str = (v: number | string | null | undefined) => (v == null ? '' : String(v));
@@ -518,6 +521,27 @@ function ProductForm({
       return { ok: false };
     }
     return { ok: true, value: apiDollarsFromCents(cents) };
+  };
+
+  /** Snap or choose a product photo → POST catalogue/upload (multipart 'file',
+   *  JPG/PNG/WebP) → the returned public URL fills the photo field. The 8MB
+   *  guard mirrors the server's cap. */
+  const attachPhoto = async (source: 'camera' | 'library') => {
+    const picked = await pickImage(source);
+    if (!picked) return;
+    if (!sizeOk(picked, 8 * 1024 * 1024)) {
+      setFormError('Photo must be under 8 MB.');
+      return;
+    }
+    const form = new FormData();
+    appendFile(form, 'file', picked);
+    upload.mutate(form, {
+      onSuccess: r => {
+        setImagePath(r.url);
+        setFormError(null);
+      },
+      onError: error => setFormError(apiErrorMessage(error)),
+    });
   };
 
   const submit = () => {
@@ -668,6 +692,47 @@ function ProductForm({
         placeholder="Paste an image URL (https://…)"
         maxLength={300}
       />
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+        <Pressable
+          accessibilityRole="button"
+          disabled={upload.isPending}
+          onPress={() => void attachPhoto('camera')}
+          style={{ minHeight: touch.minimum, justifyContent: 'center' }}
+        >
+          <Text
+            style={{
+              fontFamily: fonts.mono.bold,
+              fontSize: 11,
+              letterSpacing: 0.88,
+              color: upload.isPending ? colors.textDim : colors.accent,
+            }}
+          >
+            TAKE PHOTO
+          </Text>
+        </Pressable>
+        <Pressable
+          accessibilityRole="button"
+          disabled={upload.isPending}
+          onPress={() => void attachPhoto('library')}
+          style={{ minHeight: touch.minimum, justifyContent: 'center' }}
+        >
+          <Text
+            style={{
+              fontFamily: fonts.mono.bold,
+              fontSize: 11,
+              letterSpacing: 0.88,
+              color: upload.isPending ? colors.textDim : colors.accent,
+            }}
+          >
+            CHOOSE PHOTO
+          </Text>
+        </Pressable>
+        {upload.isPending ? (
+          <Text style={{ fontFamily: fonts.sans.regular, fontSize: 12, color: colors.textDim }}>
+            Uploading…
+          </Text>
+        ) : null}
+      </View>
       <SwitchRow
         title="This is my go-to product for its category (preferred)"
         value={isPreferred}
