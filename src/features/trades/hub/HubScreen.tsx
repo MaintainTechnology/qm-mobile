@@ -42,6 +42,11 @@ import {
   type HubSectionId,
   type HubTrade,
 } from './sections';
+import { AirconToolScreen } from '../aircon/AirconToolScreen';
+import { PaintingSavedJobs } from '../tools/PaintingSavedJobs';
+import { RoofingSavedJobs } from '../tools/RoofingSavedJobs';
+import { SignageTools } from '../tools/SignageTools';
+import { SolarTools } from '../tools/SolarTools';
 import { EstimatorBetaCard, ToolsWebOnly } from './SectionsContent';
 import { CatalogueSection } from './sections/CatalogueSection';
 import { EstimatingSection } from './sections/EstimatingSection';
@@ -56,7 +61,8 @@ function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrad
     case 'tools':
       // Web parity (page.tsx:17209-17322): electrical = job quoter + the
       // plan-upload estimator beta; plumbing = job quoter; roofing = measure
-      // tool; every other hub trade links out to its web tool.
+      // tool + saved jobs; signage/painting/aircon/solar have native panels;
+      // commercial paint links out until its upload pipeline ships.
       if (trade === 'electrical')
         return (
           <View style={{ gap: spacing.lg }}>
@@ -65,7 +71,17 @@ function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrad
           </View>
         );
       if (trade === 'plumbing') return <JobQuoteScreen trades={[trade]} />;
-      if (trade === 'roofing') return <RoofMeasureScreen />;
+      if (trade === 'roofing')
+        return (
+          <View style={{ gap: spacing.lg }}>
+            <RoofMeasureScreen />
+            <RoofingSavedJobs />
+          </View>
+        );
+      if (trade === 'signage') return <SignageTools />;
+      if (trade === 'painting') return <PaintingSavedJobs />;
+      if (trade === 'aircon') return <AirconToolScreen />;
+      if (trade === 'solar') return <SolarTools />;
       return <ToolsWebOnly trade={trade} />;
     case 'pricing':
       return <PricingSection trade={trade} />;

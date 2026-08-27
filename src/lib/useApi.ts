@@ -67,7 +67,7 @@ type ApiMutationOptions<TBody, TResult> = Omit<
   UseMutationOptions<TResult, unknown, TBody, unknown>,
   'mutationFn'
 > & {
-  method?: 'POST' | 'PATCH' | 'DELETE';
+  method?: 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   invalidates?: readonly (readonly unknown[])[];
   /** Budget for slow non-idempotent calls (activation, LLM drafts) — see apiRequest.timeoutMs. */
   timeoutMs?: number;

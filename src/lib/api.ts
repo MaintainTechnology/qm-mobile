@@ -37,7 +37,7 @@ export class ApiSchemaError extends Error {
 type RequestOptions = {
   signal?: AbortSignal;
   body?: unknown;
-  method?: 'GET' | 'POST' | 'PATCH' | 'DELETE';
+  method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   /**
    * Bearer token for this request. Clerk session tokens are short-lived, so
    * callers fetch one per request via useAuth().getToken() rather than storing
