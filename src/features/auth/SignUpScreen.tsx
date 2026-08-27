@@ -22,6 +22,7 @@ import { isClerkAPIResponseError, useAuth, useClerk, useUser } from '@clerk/expo
 // Core 3 keeps at /legacy. Porting to signals is a rewrite of the whole flow, not an
 // import swap.
 import { useSignIn, useSignUp } from '@clerk/expo/legacy';
+import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import {
@@ -137,7 +138,12 @@ export function SignUpScreen() {
   const { signUp, setActive: activateSignUpSession, isLoaded: signUpLoaded } = useSignUp();
   const { signIn, isLoaded: signInLoaded } = useSignIn();
   const clerk = useClerk();
-  const { userId: authUserId, sessionId: authSessionId, getToken: getAuthToken } = useAuth();
+  const {
+    userId: authUserId,
+    sessionId: authSessionId,
+    getToken: getAuthToken,
+    signOut,
+  } = useAuth();
 
   const [resumeEntry, setResumeEntry] = useState(params.resume === '1');
   const [identity, setIdentity] = useState<{ clerkUserId: string; sessionId: string | null }>(
@@ -149,6 +155,8 @@ export function SignUpScreen() {
   const [codeChecking, setCodeChecking] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeNote, setCodeNote] = useState<string | null>(null);
+  const [switchingAccount, setSwitchingAccount] = useState(false);
+  const queryClient = useQueryClient();
 
   const [step, setStep] = useState<1 | 2 | 3 | 4>(resumeEntry ? 2 : 1);
   const [phase, setPhase] = useState<'form' | 'verify'>('form');
@@ -510,7 +518,10 @@ export function SignUpScreen() {
       return;
     }
     if (!codeAccepted) {
-      router.back();
+      // The A2/A3 resume entries arrive here via a redirect, which leaves no history — going back
+      // would throw "GO_BACK was not handled by any navigator". Leave the flow instead.
+      if (router.canGoBack()) router.back();
+      else router.replace('/welcome');
       return;
     }
     const firstStep = resumeEntry ? 2 : 1;
@@ -519,6 +530,24 @@ export function SignUpScreen() {
       return;
     }
     setStep((step - 1) as typeof step);
+  }
+
+  /**
+   * The only real exit from a resumed sign-up. A signed-in tradie with no tenant row is sent here
+   * by the `(tabs)` guard on every cold start, so without this they can never reach sign-in again —
+   * which is exactly what a stale session from an abandoned sign-up looks like.
+   */
+  async function switchAccount() {
+    if (switchingAccount) return;
+    setSwitchingAccount(true);
+    try {
+      await signOut();
+      queryClient.clear();
+      router.replace('/welcome');
+    } catch {
+      setCodeError('Could not sign out. Check your signal and try again.');
+      setSwitchingAccount(false);
+    }
   }
 
   const reviewRows: { label: string; value: string }[] = [
@@ -566,7 +595,9 @@ export function SignUpScreen() {
     <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
       <AuthHeader>
         <View style={styles.headerLeft}>
-          <BackButton onPress={back} />
+          {/* A resumed sign-up (spec A2/A3) is a signed-in tradie with no tenant: the guards send
+              them straight back here, so back has no destination until the code is accepted. */}
+          {resumeEntry && !codeAccepted ? null : <BackButton onPress={back} />}
           <BrandMark height={22} body={colors.logoBody} notch={colors.logoNotch} />
         </View>
         <View style={{ flex: 1 }} />
@@ -630,6 +661,18 @@ export function SignUpScreen() {
                   loading={codeChecking}
                 />
               </View>
+              {resumeEntry ? (
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void switchAccount()}
+                  disabled={switchingAccount}
+                  style={styles.switchAccount}
+                >
+                  <Text style={[styles.switchAccountText, { color: colors.accentText }]}>
+                    {switchingAccount ? 'Signing out…' : 'Sign in with a different account'}
+                  </Text>
+                </Pressable>
+              ) : null}
             </>
           ) : (
             <>
@@ -1431,6 +1474,15 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sans.semiBold,
     fontSize: 13.5,
     lineHeight: 19,
+  },
+  switchAccount: {
+    marginTop: 18,
+    minHeight: touch.minimum,
+    justifyContent: 'center',
+  },
+  switchAccountText: {
+    fontFamily: fonts.sans.semiBold,
+    fontSize: 13.5,
   },
   reviewCard: {
     borderWidth: 1,

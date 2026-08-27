@@ -111,7 +111,7 @@ function PulseDot({ color, size = 6 }: { color: string; size?: number }) {
 
 // ── The screen ─────────────────────────────────────────────────────────────
 
-export function HomeScreen() {
+export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
   const { colors, isDark } = useTheme();
   const toggleTheme = useThemeToggle();
   const insets = useSafeAreaInsets();
@@ -174,6 +174,17 @@ export function HomeScreen() {
     <View style={{ flex: 1, backgroundColor: colors.inkDeep, paddingTop: insets.top }}>
       {/* Header */}
       <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
+        {onBack ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Back"
+            onPress={onBack}
+            hitSlop={8}
+            style={[styles.iconBtn, { borderColor: colors.inkLine }]}
+          >
+            <Text style={[styles.backGlyph, { color: colors.textSec }]}>‹</Text>
+          </Pressable>
+        ) : null}
         <BrandMark height={24} body={colors.logoBody} notch={colors.logoNotch} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={[styles.brandName, { color: colors.logoBody }]}>QUOTEMAX</Text>
@@ -205,7 +216,9 @@ export function HomeScreen() {
             LOADING YOUR DASHBOARD…
           </Text>
         </View>
-      ) : isError ? (
+      ) : isError && !me ? (
+        // Only when there is nothing cached to show — a failed refresh must never blank a
+        // dashboard the tradie is part-way through reading.
         <View style={styles.centerFill}>
           <Text style={[styles.errorTitle, { color: colors.textPri }]}>
             COULDN’T LOAD YOUR DASHBOARD
@@ -214,7 +227,7 @@ export function HomeScreen() {
             {apiErrorMessage(error)}
           </Text>
           <View style={styles.retryBtn}>
-            <PrimaryCta label="Retry" onPress={() => void refetch()} />
+            <PrimaryCta label="Retry" loading={isRefetching} onPress={() => void refetch()} />
           </View>
         </View>
       ) : me && stats ? (
@@ -602,6 +615,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  backGlyph: { fontFamily: fonts.sans.extraBold, fontSize: 22, lineHeight: 24, marginTop: -2 },
   avatar: {
     width: 32,
     height: 32,

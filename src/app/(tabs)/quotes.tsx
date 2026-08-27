@@ -94,7 +94,7 @@ export default function QuotesRoute() {
         <View style={styles.centered}>
           <ActivityIndicator color={colors.accent} />
         </View>
-      ) : me.isError ? (
+      ) : me.isError && quotes.length === 0 ? (
         <View style={styles.centered}>
           <Text style={[styles.errorText, { color: colors.textSec }]}>
             {apiErrorMessage(me.error, 'Couldn’t load your quotes — check your connection.')}

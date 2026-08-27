@@ -17,17 +17,39 @@ import type { z } from 'zod';
 
 import { apiRequest } from '@/lib/api';
 
+/**
+ * Minting a Clerk token can itself hit the network (session tokens are short-lived), and that
+ * happens BEFORE apiRequest starts its own clock — so without this an unreachable network adds an
+ * unbounded, invisible prefix to every attempt.
+ */
+const TOKEN_TIMEOUT_MS = 5000;
+
+async function tokenWithin(getToken: () => Promise<string | null>): Promise<string | undefined> {
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const token = await Promise.race([
+      getToken(),
+      new Promise<null>(resolve => {
+        timer = setTimeout(() => resolve(null), TOKEN_TIMEOUT_MS);
+      }),
+    ]);
+    return token ?? undefined;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export function useApiQuery<T>(
   key: readonly unknown[],
   path: string,
   schema: z.ZodType<T>,
-  opts: { enabled?: boolean } = {},
+  { timeoutMs, ...opts }: { enabled?: boolean; timeoutMs?: number } = {},
 ) {
   const { getToken } = useAuth();
   return useQuery({
     queryKey: key,
     queryFn: async ({ signal }) =>
-      apiRequest(path, schema, { signal, token: (await getToken()) ?? undefined }),
+      apiRequest(path, schema, { signal, timeoutMs, token: await tokenWithin(getToken) }),
     ...opts,
   });
 }
@@ -61,7 +83,7 @@ export function useApiMutation<TBody, TResult>(
         method,
         body,
         timeoutMs,
-        token: (await getToken()) ?? undefined,
+        token: await tokenWithin(getToken),
       }),
     ...mutationOptions,
     onSuccess: (data, variables, context, mutation) => {

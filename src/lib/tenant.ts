@@ -37,6 +37,15 @@ export const QuoteRowSchema = z.looseObject({
   deposit_paid: z.boolean().nullish(),
   channel: z.enum(['sms', 'voice']).nullish(),
   scope_of_works: z.string().nullish(),
+  /** Legacy twin of needs_inspection — the web treats either flag as "inspection". */
+  inspection_required: z.boolean().nullish(),
+  /** e.g. 'tradie_review' | 'inspection_required'; detail pane shows it title-cased. */
+  routing_decision: z.string().nullish(),
+  estimated_timeframe: z.string().nullish(),
+  /** Per-quote customer-page layout override; null inherits the tenant default. */
+  display_mode: z.enum(['itemised', 'summary']).nullish(),
+  /** Roofing-only: site-relative link to the measure tool's results page. */
+  measure_href: z.string().nullish(),
   good: TierSchema,
   better: TierSchema,
   best: TierSchema,
@@ -73,20 +82,63 @@ export const TenantMeSchema = z.looseObject({
     .nullish(),
   quotes: z.array(QuoteRowSchema).default([]),
   licences: z.array(z.looseObject({ trade: z.string() })).nullish(),
+  /** Shared + custom assemblies merged server-side; the hub's Services & brands section. */
+  services: z
+    .array(
+      z.looseObject({
+        id: z.string().nullish(),
+        assembly_id: z.string().nullish(),
+        name: z.string().nullish(),
+        description: z.string().nullish(),
+        trade: z.string().nullish(),
+        enabled: z.boolean().nullish(),
+        default_unit: z.string().nullish(),
+        default_unit_price_ex_gst: z.number().nullish(),
+      }),
+    )
+    .nullish(),
+  /** Brand vocabulary per material category (web ServicesTab "brands" half). */
+  material_categories: z
+    .array(
+      z.looseObject({
+        trade: z.string().nullish(),
+        category: z.string().nullish(),
+        brands: z.array(z.string()).nullish(),
+      }),
+    )
+    .nullish(),
+  /** category → preferred brand, tenant-chosen. */
+  material_preferences: z.record(z.string(), z.string()).nullish(),
 });
 export type TenantMe = z.infer<typeof TenantMeSchema>;
+export type ServiceRow = NonNullable<TenantMe['services']>[number];
 
 export const TENANT_ME_KEY = ['tenant', 'me'] as const;
 
+/**
+ * The dashboard's data AND the signed-in/onboarded decision, so it is the app's most
+ * latency-critical read. A tighter budget than the 15s default: three attempts at 8s beats one
+ * attempt at 15s when the answer decides whether a tradie sees their day at all.
+ */
 export function useTenantMe(opts: { enabled?: boolean } = {}) {
-  // Retry policy is the shared query.ts predicate: 404 (no tenant) never
-  // retries there; 5xx/timeouts keep their tuned retries.
-  return useApiQuery(TENANT_ME_KEY, '/api/tenant/me', TenantMeSchema, opts);
+  // Retry policy is the shared query.ts predicate: a 4xx (including the no-tenant 404) never
+  // retries; timeouts and 5xx get the tuned ladder.
+  return useApiQuery(TENANT_ME_KEY, '/api/tenant/me', TenantMeSchema, { timeoutMs: 8000, ...opts });
 }
 
-/** 404 from /api/tenant/me = signed in but no tenant row → resume onboarding (spec A2). */
+/**
+ * Signed in but no tenant row → resume onboarding (spec A2).
+ *
+ * Requires QuoteMax's own `{ error: 'no_tenant' }` marker, NOT a bare 404. Any 404 would otherwise
+ * push the tradie into the invitation-code gate — and a 404 is exactly what you get when
+ * `EXPO_PUBLIC_API_URL` points somewhere that isn't the QuoteMax API: a typo, a proxy, a stale
+ * tunnel, or another app on the port. Trapping a fully onboarded tradie in onboarding because the
+ * base URL was wrong is far worse than showing them a shell that fails to load.
+ */
 export function isTenantMissing(error: unknown): boolean {
-  return error instanceof ApiError && error.status === 404;
+  if (!(error instanceof ApiError) || error.status !== 404) return false;
+  const body = error.body as { error?: unknown } | null | undefined;
+  return body?.error === 'no_tenant';
 }
 
 /** Trades enabled for the tenant — `trades[]` with the legacy single `trade` fallback. */

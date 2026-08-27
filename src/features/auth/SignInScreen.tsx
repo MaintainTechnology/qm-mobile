@@ -145,10 +145,20 @@ export function SignInScreen() {
     }
   }
 
+  /**
+   * A `<Redirect>` or `router.replace` leaves no history, so this screen is often the first one on
+   * the stack — `router.back()` then throws "GO_BACK was not handled by any navigator". Fall back
+   * to the auth entry point rather than dead-ending the tradie.
+   */
+  function goBack() {
+    if (router.canGoBack()) router.back();
+    else router.replace('/welcome');
+  }
+
   return (
     <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
       <AuthHeader>
-        <BackButton onPress={() => router.back()} />
+        <BackButton onPress={goBack} />
         <Text style={[styles.headerLabel, { color: colors.textDim }]}>SIGN IN</Text>
       </AuthHeader>
 

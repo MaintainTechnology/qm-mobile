@@ -66,7 +66,7 @@ export function TradeHubScreen() {
         >
           {tenantMe.isPending ? (
             <Notice tone="accent" label="Loading your trades…" />
-          ) : tenantMe.isError && !isTenantMissing(tenantMe.error) ? (
+          ) : tenantMe.isError && !tenantMe.data && !isTenantMissing(tenantMe.error) ? (
             <Notice
               tone="danger"
               label="Could not load your account"

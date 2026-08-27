@@ -1,5 +1,29 @@
+import { ApiError } from './api';
 import { centsFromApiDollars } from './money';
-import { isAccepted, overviewStats, tenantTrades } from './tenant';
+import { isAccepted, isTenantMissing, overviewStats, tenantTrades } from './tenant';
+
+describe('isTenantMissing', () => {
+  it('is true only for QuoteMax’s own no_tenant marker', () => {
+    expect(
+      isTenantMissing(new ApiError('x', 404, '/api/tenant/me', { error: 'no_tenant' })),
+    ).toBe(true);
+  });
+
+  it('is FALSE for a bare 404 — a wrong base URL must not trap a tradie in onboarding', () => {
+    expect(isTenantMissing(new ApiError('x', 404, '/api/tenant/me', undefined))).toBe(false);
+    // What another app running on the port actually returns: an HTML page, so no parsed body.
+    expect(isTenantMissing(new ApiError('x', 404, '/api/tenant/me', { error: 'not_found' }))).toBe(
+      false,
+    );
+  });
+
+  it('is false for unauthorised and for non-ApiError failures', () => {
+    expect(isTenantMissing(new ApiError('x', 401, '/api/tenant/me', { error: 'unauthorized' }))).toBe(
+      false,
+    );
+    expect(isTenantMissing(new TypeError('Network request failed'))).toBe(false);
+  });
+});
 
 const quote = (over: Record<string, unknown>) => ({
   id: 'q1',

@@ -72,3 +72,42 @@ export function useSendQuote() {
 export function actionErrorMessage(error: unknown): string {
   return apiErrorMessage(error, 'That didn’t go through — try again.');
 }
+
+export type DisplayMode = 'itemised' | 'summary' | null;
+
+/**
+ * PATCH /api/quote/[id]/display-mode — the web detail pane's "Layout for this
+ * quote" toggle (page.tsx QuoteDisplayModeToggle): null inherits the tenant
+ * default, else forces the customer page itemised/summary. Same optimistic
+ * write-through the status actions use, on the same shared cache.
+ */
+export function useSetDisplayMode() {
+  const queryClient = useQueryClient();
+  // Vars double as the PATCH body: the route's BodySchema reads `display_mode`
+  // and ignores the ride-along `quoteId` (same shape trick as useSendQuote).
+  return useApiMutation<{ quoteId: string; display_mode: DisplayMode }, ActionResult>(
+    vars => `/api/quote/${vars.quoteId}/display-mode`,
+    ActionResultSchema,
+    {
+      method: 'PATCH',
+      invalidates: [TENANT_ME_KEY],
+      onMutate: async vars => {
+        await queryClient.cancelQueries({ queryKey: TENANT_ME_KEY });
+        const snapshot = queryClient.getQueryData<TenantMe>(TENANT_ME_KEY);
+        if (snapshot) {
+          queryClient.setQueryData<TenantMe>(TENANT_ME_KEY, {
+            ...snapshot,
+            quotes: snapshot.quotes.map(q =>
+              q.id === vars.quoteId ? { ...q, display_mode: vars.display_mode } : q,
+            ),
+          });
+        }
+        return { snapshot } satisfies OptimisticCtx;
+      },
+      onError: (_err, _vars, ctx) => {
+        const snapshot = (ctx as OptimisticCtx | undefined)?.snapshot;
+        if (snapshot) queryClient.setQueryData(TENANT_ME_KEY, snapshot);
+      },
+    },
+  );
+}

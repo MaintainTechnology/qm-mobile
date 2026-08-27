@@ -68,7 +68,7 @@ export async function apiRequest<T>(
   const timer = setTimeout(() => controller.abort(), timeoutMs);
   if (signal) {
     if (signal.aborted) controller.abort();
-    else signal.addEventListener('abort', () => controller.abort());
+    else signal.addEventListener('abort', () => controller.abort(), { once: true });
   }
   try {
     const response = await fetch(apiUrl(path), {
@@ -76,10 +76,14 @@ export async function apiRequest<T>(
       signal: controller.signal,
       headers: {
         Accept: 'application/json',
-        ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
+        // FormData sets its own multipart boundary — forcing a Content-Type here
+        // would break the upload. JSON keeps the explicit header.
+        ...(body === undefined || body instanceof FormData
+          ? {}
+          : { 'Content-Type': 'application/json' }),
         ...(token ? { Authorization: `Bearer ${token}` } : await authHeader()),
       },
-      body: body === undefined ? undefined : JSON.stringify(body),
+      body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
     });
 
     if (!response.ok) {
@@ -126,6 +130,20 @@ export function apiErrorMessage(
       return `That didn't go through (${body.error.replace(/_/g, ' ')}). Try again.`;
     }
     if (error.status >= 500) return 'QuoteMax is having trouble on their end. Try again shortly.';
+  }
+  // In development, name the URL that actually failed. The shipped line blames the tradie's
+  // signal, which is badly misleading when the real cause is a backend that isn't running or a
+  // dev server that moved port — the exact trap this project has already lost a day to.
+  // Append, never replace: the tradie-facing sentence is the same in every build, and dev just
+  // gets the detail bolted on. Swapping the copy out would make the shipped wording untested.
+  if (__DEV__) {
+    const target = apiUrl('');
+    if (error instanceof Error && error.name === 'AbortError') {
+      return `${fallback} [dev: no response from ${target} — is the QuoteMax server running?]`;
+    }
+    if (error instanceof TypeError) {
+      return `${fallback} [dev: could not connect to ${target} — is the QuoteMax server running?]`;
+    }
   }
   return fallback;
 }

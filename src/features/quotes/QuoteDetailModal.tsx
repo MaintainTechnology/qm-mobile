@@ -12,8 +12,10 @@
  * ever offers Approve, never a second Send button, since approving IS the send. A tap arms the
  * button; a second tap within a few seconds fires it — guards a fat-thumb tap on a live send.
  *
- * Gap vs. the web detail pane (honest, not silent): no status-history array on the mobile
- * `QuoteRow` schema, so the sheet has no timeline section, just the tier chip and messages.
+ * Web detail-pane parity (page.tsx QuoteDetail, ~9384-9737): the Details grid
+ * (Work/Service/Drafted/Routing), estimated timeframe, the per-quote layout toggle
+ * (PATCH display-mode) and the Activity timeline — which the web synthesises from
+ * status fields, not a history array, so mobile synthesises identically.
  */
 import { useEffect, useMemo, useState } from 'react';
 import {
@@ -21,6 +23,7 @@ import {
   Modal,
   Pressable,
   ScrollView,
+  Share,
   StyleSheet,
   Text,
   View,
@@ -30,12 +33,22 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { relativeTime } from '@/features/chats/format';
+import { LinkOutButton } from '@/features/trades/hub/LinkOut';
+import { apiUrl } from '@/lib/env';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 import type { QuoteRow } from '@/lib/tenant';
-import { fonts, radius, spacing, type } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
+import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
-import { actionErrorMessage, useApproveQuote, useSendQuote } from './api';
+import { TRADE_LABELS } from '../trades/hub/sections';
+import {
+  actionErrorMessage,
+  useApproveQuote,
+  useSendQuote,
+  useSetDisplayMode,
+  type DisplayMode,
+} from './api';
 import {
   canApprove,
   canSend,
@@ -102,6 +115,268 @@ function selectedTierLineItems(
     }
   }
   return null;
+}
+
+/** "7/8/2026, 3:45 am" pieces for the Drafted cell — en-AU day-first, never US order. */
+function draftedAt(iso: string): { date: string; time: string } {
+  const d = new Date(iso);
+  const date = `${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}/${d.getFullYear()}`;
+  const hours24 = d.getHours();
+  const hours12 = hours24 % 12 === 0 ? 12 : hours24 % 12;
+  const time = `${String(hours12).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${hours24 < 12 ? 'am' : 'pm'}`;
+  return { date, time };
+}
+
+/** GET /api/tenant/historical-quotes/hint?job_type= — HintResult: count 0 marker
+ *  or full stats. Dollars on the wire, like every quote money field. */
+const HistoryHintSchema = z.looseObject({
+  count: z.number().default(0),
+  avg_price_inc_gst: z.number().nullish(),
+  min_price_inc_gst: z.number().nullish(),
+  max_price_inc_gst: z.number().nullish(),
+  most_recent_quoted_at: z.string().nullish(),
+});
+
+/** "Aug 2026" for the hint's "last …" tail (web formats Mon YYYY). */
+function monthYear(iso: string): string {
+  const d = new Date(iso);
+  const months = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+  ] as const;
+  return `${months[d.getMonth()]} ${d.getFullYear()}`;
+}
+
+/**
+ * Web HistoricalHint parity: the accent-tinted YOUR HISTORY strip — "Avg for
+ * {job}: $X inc GST · N jobs · $min–$max · last Mon YYYY". Renders nothing when
+ * there's no history, and a fetch failure stays silent (web: best-effort, a
+ * hint must never block the quote view).
+ */
+function HistoryHintStrip({ jobType }: { jobType: string | null | undefined }) {
+  const { colors } = useTheme();
+  const hint = useApiQuery(
+    ['tenant', 'history-hint', jobType ?? ''],
+    `/api/tenant/historical-quotes/hint?job_type=${encodeURIComponent(jobType ?? '')}`,
+    HistoryHintSchema,
+    { enabled: !!jobType },
+  );
+  const data = hint.data;
+  if (!jobType || !data || data.count === 0 || data.avg_price_inc_gst == null) return null;
+  const money = (dollars: number) => formatAud(centsFromApiDollars(dollars));
+  const range =
+    data.min_price_inc_gst != null && data.max_price_inc_gst != null
+      ? ` · ${money(data.min_price_inc_gst)}–${money(data.max_price_inc_gst)}`
+      : '';
+  const last = data.most_recent_quoted_at ? ` · last ${monthYear(data.most_recent_quoted_at)}` : '';
+  return (
+    // Accent-tinted band (web: border accent/40 on accent/5) — literal alpha
+    // suffixes because RN styles can't tint a token any other way.
+    <View
+      style={[
+        styles.historyStrip,
+        { borderColor: `${colors.accent}66`, backgroundColor: `${colors.accent}14` },
+      ]}
+    >
+      <Text style={[styles.historyLead, { color: colors.accentText }]}>YOUR HISTORY</Text>
+      <Text style={[styles.historyBody, { color: colors.textSec }]}>
+        Avg for {formatJobType(jobType)}:{' '}
+        <Text style={{ fontFamily: fonts.sans.bold, color: colors.textPri }}>
+          {money(data.avg_price_inc_gst)} inc GST
+        </Text>
+        {` · ${data.count} ${data.count === 1 ? 'job' : 'jobs'}`}
+        {range}
+        {last}
+      </Text>
+    </View>
+  );
+}
+
+/** Web MetaCell grid + timeframe + layout toggle (QuoteDetail "Details" block). */
+function DetailsBlock({ quote }: { quote: QuoteRow }) {
+  const { colors } = useTheme();
+  const setMode = useSetDisplayMode();
+  const drafted = draftedAt(quote.created_at);
+  const tradeLabel = quote.trade
+    ? (TRADE_LABELS[quote.trade.toLowerCase() as keyof typeof TRADE_LABELS] ??
+      formatJobType(quote.trade))
+    : '—';
+  const cells: { label: string; value: string; sub?: string }[] = [
+    { label: 'WORK', value: formatJobType(quote.job_type) },
+    { label: 'SERVICE', value: tradeLabel },
+    { label: 'DRAFTED', value: drafted.date, sub: drafted.time },
+    { label: 'ROUTING', value: formatJobType(quote.routing_decision) },
+  ];
+  const modes: { key: DisplayMode; label: string }[] = [
+    { key: null, label: 'Inherit default' },
+    { key: 'itemised', label: 'Itemised' },
+    { key: 'summary', label: 'Summary' },
+  ];
+  const currentMode = quote.display_mode ?? null;
+
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionLabel, { color: colors.textDim }]}>DETAILS</Text>
+      <View style={[styles.metaGrid, { borderColor: colors.inkLine }]}>
+        {cells.map((cell, i) => (
+          <View
+            key={cell.label}
+            style={[
+              styles.metaCell,
+              {
+                backgroundColor: colors.inkCard,
+                borderColor: colors.inkLine,
+                borderRightWidth: i % 2 === 0 ? 1 : 0,
+                borderTopWidth: i > 1 ? 1 : 0,
+              },
+            ]}
+          >
+            <Text style={[styles.metaLabel, { color: colors.textDim }]}>{cell.label}</Text>
+            <Text style={[styles.metaValue, { color: colors.textPri }]} numberOfLines={2}>
+              {cell.value}
+            </Text>
+            {cell.sub ? (
+              <Text style={[styles.metaSub, { color: colors.textDim }]}>{cell.sub}</Text>
+            ) : null}
+          </View>
+        ))}
+      </View>
+
+      <HistoryHintStrip jobType={quote.job_type} />
+
+      {quote.estimated_timeframe ? (
+        <View style={{ marginTop: spacing.md }}>
+          <Text style={[styles.sectionLabel, { color: colors.textDim }]}>ESTIMATED TIMEFRAME</Text>
+          <Text style={[styles.sectionBody, { color: colors.textSec }]}>
+            {quote.estimated_timeframe}
+          </Text>
+        </View>
+      ) : null}
+
+      <View style={{ marginTop: spacing.md }}>
+        <Text style={[styles.sectionLabel, { color: colors.textDim }]}>LAYOUT FOR THIS QUOTE</Text>
+        <View style={styles.layoutRow}>
+          {modes.map(mode => {
+            const active = currentMode === mode.key;
+            return (
+              <Pressable
+                key={mode.label}
+                accessibilityRole="button"
+                accessibilityState={{ selected: active }}
+                disabled={setMode.isPending}
+                onPress={() => {
+                  if (!active) setMode.mutate({ quoteId: quote.id, display_mode: mode.key });
+                }}
+                style={[
+                  styles.layoutBtn,
+                  {
+                    borderColor: active ? colors.accent : colors.inkLine,
+                    backgroundColor: active ? colors.ink : 'transparent',
+                  },
+                ]}
+              >
+                <Text
+                  style={[
+                    styles.layoutBtnText,
+                    { color: active ? colors.accentText : colors.textDim },
+                  ]}
+                >
+                  {mode.label.toUpperCase()}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
+        {setMode.isSuccess ? (
+          <Text style={[styles.layoutNote, { color: colors.accentText }]}>✓ Saved</Text>
+        ) : setMode.isError ? (
+          <Text style={[styles.layoutNote, { color: colors.dangerBright }]}>
+            {actionErrorMessage(setMode.error)}
+          </Text>
+        ) : null}
+      </View>
+    </View>
+  );
+}
+
+/** Web Activity timeline, synthesised from status fields exactly as the web does
+ *  (page.tsx:9456-9464): drafted → sent → deposit paid / accepted. */
+function ActivityBlock({ quote }: { quote: QuoteRow }) {
+  const { colors } = useTheme();
+  const drafted = draftedAt(quote.created_at);
+  const status = (quote.status ?? 'draft').toLowerCase();
+  const wasSent = quote.deposit_paid === true || ['sent', 'accepted', 'paid'].includes(status);
+  const events: { label: string; when?: string }[] = [
+    { label: 'Drafted by QuoteMax', when: `${drafted.date} · ${drafted.time}` },
+  ];
+  if (wasSent) events.push({ label: 'Sent to customer' });
+  if (quote.deposit_paid) events.push({ label: 'Deposit paid' });
+  else if (status === 'accepted') events.push({ label: 'Accepted' });
+
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionLabel, { color: colors.textDim }]}>ACTIVITY</Text>
+      <View style={{ marginTop: spacing.sm, gap: spacing.sm }}>
+        {events.map(event => (
+          <View key={event.label} style={styles.activityRow}>
+            <View style={[styles.activityDot, { backgroundColor: colors.accent }]} />
+            <Text style={[styles.activityLabel, { color: colors.textSec }]}>{event.label}</Text>
+            {event.when ? (
+              <Text style={[styles.activityWhen, { color: colors.textDim }]}>{event.when}</Text>
+            ) : null}
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+/**
+ * Web pinned action bar parity (page.tsx:9660-9733): Customer page,
+ * Measurement results (roofing), View PDF · Edit, Download PDF and the deposit
+ * link — each opening the web page mobile doesn't render. Deposit/PDF links
+ * hide for inspection-routed quotes, exactly as the web hides them; the web's
+ * copy-to-clipboard deposit link becomes the native share sheet.
+ */
+function LinksBlock({ quote }: { quote: QuoteRow }) {
+  const { colors } = useTheme();
+  const token = quote.share_token;
+  const inspection = quote.needs_inspection === true || quote.inspection_required === true;
+  if (!token && !quote.measure_href) return null;
+  const depositPath = token ? `/r/${token}/${quote.selected_tier ?? 'better'}` : null;
+  return (
+    <View style={styles.section}>
+      <Text style={[styles.sectionLabel, { color: colors.textDim }]}>QUICK LINKS</Text>
+      <View style={styles.linksWrap}>
+        {token ? <LinkOutButton label="Customer page" path={`/q/${token}`} /> : null}
+        {quote.measure_href ? (
+          <LinkOutButton label="Measurement results" path={quote.measure_href} />
+        ) : null}
+        {token && !inspection ? (
+          <LinkOutButton label="View PDF · Edit" path={`/dashboard/quote/${token}`} />
+        ) : null}
+        {token && !inspection ? (
+          <LinkOutButton label="Download PDF" path={`/api/q/${token}/pdf`} />
+        ) : null}
+        {depositPath && !inspection ? (
+          <LinkOutButton
+            label="Share deposit link"
+            onPress={() => void Share.share({ message: apiUrl(depositPath) })}
+          />
+        ) : null}
+      </View>
+    </View>
+  );
 }
 
 export function QuoteDetailModal({
@@ -278,6 +553,12 @@ export function QuoteDetailModal({
             </View>
           ) : null}
 
+          <DetailsBlock quote={quote} />
+
+          <ActivityBlock quote={quote} />
+
+          <LinksBlock quote={quote} />
+
           {quote.messages && quote.messages.length > 0 ? (
             <View style={styles.section}>
               <Text style={[styles.sectionLabel, { color: colors.textDim }]}>
@@ -445,6 +726,60 @@ const styles = StyleSheet.create({
   section: { marginTop: spacing.xl },
   sectionLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1.2 },
   sectionBody: { marginTop: 8, fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 21 },
+  metaGrid: {
+    marginTop: spacing.sm,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    borderWidth: 1,
+    borderRadius: radius.chip,
+    overflow: 'hidden',
+  },
+  metaCell: { width: '50%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2 },
+  metaLabel: {
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 10,
+    letterSpacing: 0.8, // .08em @ 10
+  },
+  metaValue: { marginTop: 4, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 19 },
+  metaSub: {
+    marginTop: 2,
+    fontFamily: fonts.mono.medium,
+    fontSize: 11,
+    fontVariant: ['tabular-nums'],
+  },
+  layoutRow: { marginTop: spacing.sm, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  layoutBtn: {
+    minHeight: touch.minimum,
+    justifyContent: 'center',
+    borderWidth: 1,
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+  },
+  layoutBtnText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  layoutNote: { marginTop: spacing.sm, fontFamily: fonts.sans.medium, fontSize: 12 },
+  linksWrap: { marginTop: spacing.sm, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  historyStrip: {
+    marginTop: spacing.md,
+    borderWidth: 1,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm + 2,
+    gap: 3,
+  },
+  historyLead: {
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 10,
+    letterSpacing: 1.2, // .12em @ 10 — the web's tracking-wider lead badge
+  },
+  historyBody: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
+  activityRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  activityDot: { width: 5, height: 5, borderRadius: radius.pill },
+  activityLabel: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
+  activityWhen: {
+    marginLeft: 'auto',
+    fontFamily: fonts.mono.medium,
+    fontSize: 11,
+    fontVariant: ['tabular-nums'],
+  },
   itemsCard: { marginTop: 8, borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
   itemRow: {
     flexDirection: 'row',
