@@ -26,9 +26,11 @@ import {
 } from '@/lib/lock';
 import { fonts } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { unregisterPushToken } from '@/lib/notifications';
+import { signOutWithCleanup } from '@/lib/sign-out';
 
 export function BiometricGate() {
-  const { isSignedIn, signOut } = useAuth();
+  const { isSignedIn, signOut, getToken } = useAuth();
   const queryClient = useQueryClient();
   const router = useRouter();
   const { colors } = useTheme();
@@ -77,17 +79,17 @@ export function BiometricGate() {
     }
   }, [armed, state.status, unlock]);
 
-  // Same flow as MenuScreen's sign out: end the Clerk session, drop every
-  // cached query so the next account never sees this tenant's data, land on welcome.
+  // Same shared flow as MenuScreen: retire push while Clerk can still mint a
+  // token, then clear tenant cache and land on welcome.
   async function onSignOut() {
     if (signingOut) return;
     setSigningOut(true);
-    try {
-      await signOut();
-      queryClient.clear();
-    } finally {
-      router.replace('/welcome');
-    }
+    await signOutWithCleanup({
+      unregisterPush: () => unregisterPushToken(getToken),
+      clerkSignOut: signOut,
+      clearQueryCache: () => queryClient.clear(),
+      navigateToWelcome: () => router.replace('/welcome'),
+    });
   }
 
   if (!armed || state.status === 'unlocked') return null;
