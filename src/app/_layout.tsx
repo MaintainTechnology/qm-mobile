@@ -28,6 +28,7 @@ import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { BiometricGate } from '@/features/auth/BiometricGate';
 import { clerkPublishableKey } from '@/lib/env';
+import { useNotificationObserver, usePushRegistration } from '@/lib/notifications';
 import { usePurchases } from '@/lib/purchases';
 import { asyncStoragePersister, queryClient } from '@/lib/query';
 import { themes } from '@/lib/theme';
@@ -60,6 +61,13 @@ const navLight = {
   },
 };
 
+/** Null render: push registration + tap routing need Clerk and router context from this tree. */
+function PushBridge() {
+  usePushRegistration();
+  useNotificationObserver();
+  return null;
+}
+
 /** Inside ThemeControlProvider so the in-app toggle restyles navigation too. */
 function ThemedApp() {
   const { isDark } = useTheme();
@@ -71,6 +79,7 @@ function ThemedApp() {
       <Stack screenOptions={{ headerShown: false }} />
       {/* Overlay, not a route: deep links keep resolving underneath the lock. */}
       <BiometricGate />
+      <PushBridge />
       <StatusBar style={isDark ? 'light' : 'dark'} />
     </ThemeProvider>
   );

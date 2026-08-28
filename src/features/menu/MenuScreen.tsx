@@ -24,6 +24,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { openWebPath } from '@/features/trades/hub/LinkOut';
 import { SECTION_GROUPS, type SectionRow } from '@/features/sections/registry';
+import { unregisterPushToken } from '@/lib/notifications';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -72,7 +73,7 @@ export function MenuScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const { signOut } = useAuth();
+  const { signOut, getToken } = useAuth();
   const queryClient = useQueryClient();
   const [signingOut, setSigningOut] = useState(false);
 
@@ -81,6 +82,9 @@ export function MenuScreen() {
     if (signingOut) return;
     setSigningOut(true);
     try {
+      // Retire this device's push token BEFORE the session dies — after signOut() no Clerk
+      // token can be minted to authorise the DELETE. Best-effort: it must not block sign-out.
+      await unregisterPushToken(getToken).catch(() => undefined);
       await signOut();
       // Clear every cached query — without this, the next account signed into on this device
       // would see the previous tenant's quotes/chats/rates until each query happened to refetch.
