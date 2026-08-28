@@ -138,6 +138,7 @@ const responseFixture = {
     notes: ['Geocoded by Google.'],
   },
   recommendation: {
+    pricing_status: 'priced',
     sizing: {
       rooms: [{ room_type: 'bedroom', area_m2: 12, volume_m3: 28.8, kw: 1.3 }],
       conditioned_zones: 1,
@@ -194,7 +195,9 @@ describe('RecommendResponseSchema', () => {
       connected_kw_low: 1.1,
       ducted_kw: 1.1,
     });
-    const option = parsed.data.recommendation.options[0];
+    expect(parsed.data.recommendation.pricing_status).toBe('priced');
+    if (parsed.data.recommendation.pricing_status !== 'priced') return;
+    const option = parsed.data.recommendation.options[0]!;
     expect(option).toMatchObject({ cons: ['One head per room'] });
     expect(parsed.data.plan == null).toBe(true);
   });
@@ -203,6 +206,40 @@ describe('RecommendResponseSchema', () => {
     expect(RecommendResponseSchema.safeParse({ ...responseFixture, ok: false }).success).toBe(
       false,
     );
+  });
+
+  it('parses a tenant-pricing-required response with no monetary options', () => {
+    const recommendation = responseFixture.recommendation;
+    const parsed = RecommendResponseSchema.safeParse({
+      ...responseFixture,
+      recommendation: {
+        pricing_status: 'tenant_pricing_required',
+        sizing: recommendation.sizing,
+        routing: recommendation.routing,
+        confidence: 'high',
+        pricing_setup_reason: 'Complete the air-conditioning rate card.',
+      },
+    });
+    expect(parsed.success).toBe(true);
+    if (!parsed.success) return;
+    expect(parsed.data.recommendation.pricing_status).toBe('tenant_pricing_required');
+    expect('options' in parsed.data.recommendation).toBe(false);
+  });
+
+  it.each([true, false])('preserves priced GST registration state %s', gstRegistered => {
+    const parsed = RecommendResponseSchema.parse({
+      ...responseFixture,
+      recommendation: {
+        ...responseFixture.recommendation,
+        options: responseFixture.recommendation.options.map(option => ({
+          ...option,
+          pricing: { ...option.pricing, gst_registered: gstRegistered },
+        })),
+      },
+    });
+    expect(parsed.recommendation.pricing_status).toBe('priced');
+    if (parsed.recommendation.pricing_status !== 'priced') return;
+    expect(parsed.recommendation.options[0]!.pricing.gst_registered).toBe(gstRegistered);
   });
 });
 

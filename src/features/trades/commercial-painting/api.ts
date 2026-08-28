@@ -20,6 +20,7 @@ import * as FileSystem from 'expo-file-system/legacy';
 import { z } from 'zod';
 
 import type { PickedFile } from '@/lib/media';
+import { ApiError } from '@/lib/api';
 import { TENANT_ME_KEY } from '@/lib/tenant';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 
@@ -171,6 +172,24 @@ const PricedBomSchema = z.looseObject({
 });
 export type PricedBom = z.infer<typeof PricedBomSchema>;
 
+export type PaintPricingBlock = 'inspection_required' | 'tenant_pricing_required';
+
+/** PURE — maps only the server's stable authority failures; transport errors stay generic. */
+export function classifyPaintPricingBlock(error: unknown): PaintPricingBlock | null {
+  if (!(error instanceof ApiError) || !error.body || typeof error.body !== 'object') return null;
+  const code = (error.body as { error?: unknown }).error;
+  return code === 'inspection_required' || code === 'tenant_pricing_required' ? code : null;
+}
+
+/** PURE — the server remains final authority, while the CTA mirrors obvious blocked states. */
+export function canSavePaintQuote(
+  bom: Pick<PricedBom, 'unmatched'> | null | undefined,
+  block: PaintPricingBlock | null,
+  usesSeedDefaults = false,
+): boolean {
+  return Boolean(bom && bom.unmatched.length === 0 && !block && !usesSeedDefaults);
+}
+
 const SignedTargetSchema = z.looseObject({
   uploadId: z.string(),
   filename: z.string(),
@@ -208,6 +227,7 @@ const ExtractSchema = z.looseObject({ ok: z.literal(true), extractionId: z.strin
 const PriceSchema = z.looseObject({
   ok: z.literal(true),
   bom: PricedBomSchema,
+  gst_registered: z.boolean(),
   usesSeedDefaults: z.boolean().nullish(),
 });
 

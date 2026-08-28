@@ -71,6 +71,9 @@ const ApplySchema = z.looseObject({ ok: z.literal(true), applied: z.number().nul
 const money = (dollars: number | null | undefined) =>
   dollars == null ? '—' : formatAud(centsFromApiDollars(dollars));
 
+export const historyPriceLabel = (dollars: number | null | undefined) =>
+  `${money(dollars)} inc GST`;
+
 function CalibrationCard() {
   const { colors } = useTheme();
   const [proposals, setProposals] = useState<Proposal[] | null>(null);
@@ -258,7 +261,7 @@ export function HistoryScreen() {
                   {formatJobType(row.job_type)}
                 </Text>
                 <Text style={[styles.statAvg, { color: colors.textPri }]}>
-                  {money(row.avg_price_inc_gst)}
+                  {historyPriceLabel(row.avg_price_inc_gst)}
                 </Text>
               </View>
               <Text style={[styles.proposalMeta, { color: colors.textSec }]}>
@@ -298,7 +301,7 @@ export function HistoryScreen() {
                 </Text>
               </View>
               <Text style={[styles.statAvg, { color: colors.textPri }]}>
-                {money(q.price_inc_gst)}
+                {historyPriceLabel(q.price_inc_gst)}
               </Text>
             </View>
           ))}

@@ -5,10 +5,13 @@
  * persistence used to survive an app kill mid-pipeline.
  */
 import type { PickedFile } from '@/lib/media';
+import { ApiError } from '@/lib/api';
 
 import {
   buildCompleteBody,
   buildSignBody,
+  canSavePaintQuote,
+  classifyPaintPricingBlock,
   initialPipeline,
   loadPersistedRunId,
   persistRunId,
@@ -232,5 +235,31 @@ describe('run-id persistence', () => {
 
   it('uses the agreed storage key', () => {
     expect(RUN_ID_STORAGE_KEY).toBe('quotemax.cpaint.run-id');
+  });
+});
+
+describe('commercial-paint pricing authority', () => {
+  const matchedBom = { unmatched: [], lines: [{}] } as never;
+
+  it('classifies the two stable server authority codes', () => {
+    expect(
+      classifyPaintPricingBlock(
+        new ApiError('blocked', 422, '/price', { error: 'inspection_required' }),
+      ),
+    ).toBe('inspection_required');
+    expect(
+      classifyPaintPricingBlock(
+        new ApiError('blocked', 422, '/price', { error: 'tenant_pricing_required' }),
+      ),
+    ).toBe('tenant_pricing_required');
+    expect(classifyPaintPricingBlock(new Error('offline'))).toBeNull();
+  });
+
+  it('only enables quote save for a matched, authority-approved BOM', () => {
+    expect(canSavePaintQuote(matchedBom, null)).toBe(true);
+    expect(canSavePaintQuote(null, null)).toBe(false);
+    expect(canSavePaintQuote({ unmatched: [{ surface: 'wall' }] } as never, null)).toBe(false);
+    expect(canSavePaintQuote(matchedBom, 'inspection_required')).toBe(false);
+    expect(canSavePaintQuote(matchedBom, 'tenant_pricing_required')).toBe(false);
   });
 });

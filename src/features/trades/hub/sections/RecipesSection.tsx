@@ -28,6 +28,7 @@ import { useTheme } from '@/lib/useTheme';
 
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../../ui';
 import { LinkOutButton } from '../LinkOut';
+import { RecipePricingAuthority } from './RecipePricingAuthority';
 import { TRADE_LABELS, type HubTrade } from '../sections';
 import { canWritePricingEngine, gatedWriteCopy, recipeTradesFor } from '../write-gate';
 import {
@@ -73,7 +74,7 @@ function withoutKey(map: Record<string, string>, key: string): Record<string, st
   return next;
 }
 
-export function RecipesSection({ trade }: { trade: HubTrade }) {
+export function RecipesSection({ trade, onOpenCatalogue = () => {} }: { trade: HubTrade; onOpenCatalogue?: () => void }) {
   const { colors } = useTheme();
   const me = useTenantMe();
   // The gate is static per trade (TRADE_ENUM), so a non-writable hub never
@@ -235,6 +236,7 @@ export function RecipesSection({ trade }: { trade: HubTrade }) {
         lines={jobLines}
         baseline={jobBaseline}
         catalogueCategories={data.catalogue_categories}
+        onOpenCatalogue={onOpenCatalogue}
       />
     </View>
   );
@@ -533,12 +535,14 @@ function PartsPanel({
   lines,
   baseline,
   catalogueCategories,
+  onOpenCatalogue,
 }: {
   trade: HubTrade;
   assembly: RecipeAssembly;
   lines: BomLine[];
   baseline: BaselineLine[];
   catalogueCategories: string[];
+  onOpenCatalogue: () => void;
 }) {
   const { colors } = useTheme();
   const create = useCreateBomLine();
@@ -555,6 +559,9 @@ function PartsPanel({
   const [description, setDescription] = useState('');
   const [required, setRequired] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
+  const missingPriceCount = lines.filter(
+    line => resolveCatalogueBadge(line.material_category, catalogueCategories) !== 'catalogue',
+  ).length;
 
   const busyId = update.isPending
     ? update.variables.id
@@ -638,23 +645,15 @@ function PartsPanel({
       <SectionLabel>{`${assembly.name} — parts`}</SectionLabel>
       <Text style={[styles.blurb, { color: colors.textSec }]}>
         The parts this job always needs. Each line prices from your catalogue product in that
-        category when you have one — otherwise the AI falls back to a generic price.
+        category. Missing tenant catalogue prices route the estimate to inspection.
       </Text>
 
-      {forkGaps && (forkGaps.count > 0 || forkGaps.detectionFailed) ? (
+      {(forkGaps?.detectionFailed || (forkGaps?.count ?? 0) > 0 || missingPriceCount > 0) ? (
         <View style={{ marginBottom: spacing.md }}>
-          <Notice
-            tone="warn"
-            label={
-              forkGaps.detectionFailed
-                ? 'Catalogue check skipped'
-                : `${forkGaps.count} ${forkGaps.count === 1 ? 'line needs' : 'lines need'} a catalogue product`
-            }
-            body={
-              forkGaps.detectionFailed
-                ? "We couldn't check your catalogue for this recipe — some lines may fall back to a generic price."
-                : 'These copied lines have no matching product in your catalogue, so the AI will use a generic price until you add one in the Catalogue section. Look for the marker below.'
-            }
+          <RecipePricingAuthority
+            count={Math.max(forkGaps?.count ?? 0, missingPriceCount)}
+            detectionFailed={forkGaps?.detectionFailed ?? false}
+            onOpenCatalogue={onOpenCatalogue}
           />
         </View>
       ) : null}
@@ -728,7 +727,7 @@ function PartsPanel({
                     { color: badge === 'catalogue' ? colors.textDim : colors.warningBright },
                   ]}
                 >
-                  {badge === 'catalogue' ? '✓ YOUR CATALOGUE' : '⚠ GENERIC PRICE'}
+                  {badge === 'catalogue' ? '✓ YOUR CATALOGUE' : '⚠ PRICE NEEDED'}
                 </Text>
                 {gapHere ? (
                   <Text style={[styles.rowTag, { color: colors.warningBright }]}>
@@ -795,7 +794,7 @@ function PartsPanel({
           <PillGroup options={categoryOptions} value={category} onChange={setCategory} />
           <Text style={[styles.hint, { color: colors.textDim, marginTop: spacing.sm }]}>
             What part the job needs. Add a product in this category under Catalogue and the AI
-            uses your product and your price; otherwise it falls back to a generic price.
+            uses your product and your price; otherwise the estimate routes to inspection.
           </Text>
         </View>
         <Field

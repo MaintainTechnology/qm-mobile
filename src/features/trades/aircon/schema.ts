@@ -296,11 +296,26 @@ const OptionSchema = z.looseObject({
 });
 export type AcOption = z.infer<typeof OptionSchema>;
 
-const RecommendationSchema = z.looseObject({
+const PricedRecommendationSchema = z.looseObject({
+  pricing_status: z.literal('priced'),
   sizing: SizingSchema,
-  options: z.array(OptionSchema).default([]),
+  options: z.array(OptionSchema),
   routing: z.looseObject({ reason: z.string() }),
+  confidence: z.enum(['high', 'medium', 'low']),
 });
+
+const UnpricedRecommendationSchema = z.looseObject({
+  pricing_status: z.literal('tenant_pricing_required'),
+  sizing: SizingSchema,
+  routing: z.looseObject({ reason: z.string() }),
+  confidence: z.enum(['high', 'medium', 'low']),
+  pricing_setup_reason: z.string(),
+});
+
+const RecommendationSchema = z.discriminatedUnion('pricing_status', [
+  PricedRecommendationSchema,
+  UnpricedRecommendationSchema,
+]);
 
 // Location evidence: every branch of the web unions carries `ok`; the success
 // fields are nullish here so a failure branch parses too. Display only.

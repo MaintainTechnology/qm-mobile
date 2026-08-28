@@ -27,6 +27,8 @@ import {
   ACCEPTED_DOC_MIME,
   buildCompleteBody,
   buildSignBody,
+  canSavePaintQuote,
+  classifyPaintPricingBlock,
   DOC_TYPES,
   initialPipeline,
   loadPersistedRunId,
@@ -47,6 +49,7 @@ import {
   useSignUploads,
   zipUploads,
   type PaintDocType,
+  type PaintPricingBlock,
   type PricedBom,
   type RunListItem,
   type SavedQuote,
@@ -92,6 +95,7 @@ export function CommercialPaintingScreen() {
   const [siteAddress, setSiteAddress] = useState('');
   const [note, setNote] = useState<string | null>(null);
   const [savedQuote, setSavedQuote] = useState<SavedQuote | null>(null);
+  const [pricingBlock, setPricingBlock] = useState<PaintPricingBlock | null>(null);
 
   const sign = useSignUploads();
   const complete = useCompleteUploads();
@@ -227,11 +231,14 @@ export function CommercialPaintingScreen() {
     const extractionId = extraction?.id;
     if (!runId || !extractionId || price.isPending) return;
     setNote(null);
+    setPricingBlock(null);
     try {
       await price.mutateAsync({ paintRunId: runId, extractionId });
       dispatch({ type: 'PRICED' });
     } catch (error) {
-      setNote(apiErrorMessage(error, 'Pricing failed. The takeoff is safe — try again.'));
+      const block = classifyPaintPricingBlock(error);
+      setPricingBlock(block);
+      if (!block) setNote(apiErrorMessage(error, 'Pricing failed. The takeoff is safe — try again.'));
     } finally {
       refreshRun(runId);
     }
@@ -239,7 +246,7 @@ export function CommercialPaintingScreen() {
 
   async function saveAsQuote() {
     const extractionId = extraction?.id;
-    if (!runId || !extractionId || saveQuote.isPending) return;
+    if (!runId || !extractionId || saveQuote.isPending || !canSavePaintQuote(bom, pricingBlock)) return;
     setNote(null);
     try {
       const saved = await saveQuote.mutateAsync({ paintRunId: runId, extractionId });
@@ -287,6 +294,7 @@ export function CommercialPaintingScreen() {
     setSiteAddress('');
     setNote(null);
     setSavedQuote(null);
+    setPricingBlock(null);
   }
 
   function startNewRun() {
@@ -298,6 +306,7 @@ export function CommercialPaintingScreen() {
     setSiteAddress('');
     setNote(null);
     setSavedQuote(null);
+    setPricingBlock(null);
   }
 
   const uploadLabel =
@@ -484,11 +493,11 @@ export function CommercialPaintingScreen() {
               body="It's in your quote queue — open the Quotes tab to send it or take a deposit."
             />
           ) : (
-            <PrimaryCta
-              label="Save as quote"
-              onPress={() => void saveAsQuote()}
-              loading={saveQuote.isPending}
-              disabled={uploadBusy || extracting || price.isPending}
+            <PaintPricingGate
+              bom={bom}
+              block={pricingBlock}
+              busy={uploadBusy || extracting || price.isPending || saveQuote.isPending}
+              onSave={() => void saveAsQuote()}
             />
           )}
           <Pressable
@@ -499,6 +508,12 @@ export function CommercialPaintingScreen() {
           >
             <Text style={[styles.textBtnLabel, { color: colors.textDim }]}>START A NEW RUN</Text>
           </Pressable>
+        </Card>
+      ) : null}
+
+      {!bom && pricingBlock ? (
+        <Card>
+          <PaintPricingGate bom={null} block={pricingBlock} busy onSave={() => {}} />
         </Card>
       ) : null}
 
@@ -657,7 +672,47 @@ function SumRow({ label, value, bold }: { label: string; value: string; bold?: b
   );
 }
 
-function PricedSummary({ bom }: { bom: PricedBom }) {
+export function PaintPricingGate({
+  bom,
+  block,
+  busy,
+  onSave,
+}: {
+  bom: PricedBom | null;
+  block: PaintPricingBlock | null;
+  busy: boolean;
+  onSave: () => void;
+}) {
+  return (
+    <View style={{ gap: spacing.md }}>
+      {block === 'inspection_required' || (bom?.unmatched.length ?? 0) > 0 ? (
+        <Notice
+          tone="warn"
+          label="On-site assessment required"
+          body="One or more surfaces have no authoritative rate. No customer quote can be saved until an on-site assessment confirms the scope and rate."
+        />
+      ) : null}
+      {block === 'tenant_pricing_required' ? (
+        <WebOnlyCard
+          label="Set your own commercial-paint rates"
+          body="Price needed — adopt or enter your business's commercial-paint rates before saving a customer quote."
+          path="/dashboard?tab=pricing"
+          cta="Open pricing setup"
+        />
+      ) : null}
+      {bom ? (
+        <PrimaryCta
+          label="Save as quote"
+          onPress={onSave}
+          loading={busy}
+          disabled={busy || !canSavePaintQuote(bom, block)}
+        />
+      ) : null}
+    </View>
+  );
+}
+
+export function PricedSummary({ bom }: { bom: PricedBom }) {
   const { colors } = useTheme();
   return (
     <View style={{ gap: spacing.md }}>
@@ -765,10 +820,13 @@ function PricedSummary({ bom }: { bom: PricedBom }) {
 
       <View style={[styles.block, { borderTopColor: colors.inkLine }]}>
         <SumRow label="Subtotal ex GST" value={aud(bom.subtotalExGst)} />
-        <SumRow label="GST" value={aud(bom.gst)} />
+        <SumRow
+          label={bom.gstRegistered ? 'GST' : 'No GST charged'}
+          value={aud(bom.gst)}
+        />
         <View style={styles.sumRow}>
           <Text style={[styles.sumLabel, styles.boldLabel, { color: colors.textPri }]}>
-            TOTAL INC GST
+            {bom.gstRegistered ? 'TOTAL INC GST' : 'TOTAL — NO GST CHARGED'}
           </Text>
           <Text style={[styles.totalValue, { color: colors.accentText }]}>
             {aud(bom.totalIncGst)}

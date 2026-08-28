@@ -198,6 +198,10 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
 
 // ── Service row ─────────────────────────────────────────────────────────────
 
+export function servicePriceLabel(price: number, unit: string | null | undefined): string {
+  return `${formatAud(centsFromApiDollars(price))}${unit ? ` / ${unit}` : ''} · ex GST`;
+}
+
 function ServiceToggleRow({
   row,
   onToggle,
@@ -215,7 +219,7 @@ function ServiceToggleRow({
   const price = row.default_unit_price_ex_gst;
   const meta = [
     price != null
-      ? `${formatAud(centsFromApiDollars(price))}${row.default_unit ? ` / ${row.default_unit}` : ''}`
+      ? servicePriceLabel(price, row.default_unit)
       : null,
     extras.labourHours != null && extras.labourHours > 0 ? `${extras.labourHours}h labour` : null,
     extras.alwaysInspection ? 'Inspection only' : null,
@@ -345,7 +349,7 @@ function CustomServiceForm({
       />
       <Field label="Unit" value={unit} onChangeText={setUnit} placeholder="each" maxLength={30} />
       <Field
-        label="Sundries / equipment price (ex-GST)"
+        label="Default unit price (ex GST)"
         value={priceStr}
         onChangeText={setPriceStr}
         placeholder="80.00"

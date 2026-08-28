@@ -29,6 +29,11 @@ type TradeValues = { hourly: string; callOut: string; markup: string };
 
 const BLANK: TradeValues = { hourly: '', callOut: '', markup: '' };
 
+export const LABOUR_RATE_LABELS = {
+  hourly: 'Hourly rate (ex GST)',
+  callOut: 'Call-out minimum (ex GST)',
+} as const;
+
 function tradeLabel(trade: string): string {
   return trade.charAt(0).toUpperCase() + trade.slice(1);
 }
@@ -153,7 +158,7 @@ export function LabourRatesCard({
               </Text>
             ) : null}
             <Field
-              label="Hourly rate"
+              label={LABOUR_RATE_LABELS.hourly}
               value={v.hourly}
               onChangeText={t => setField(trade, 'hourly', t)}
               prefix="A$"
@@ -162,7 +167,7 @@ export function LabourRatesCard({
               error={errors.hourly}
             />
             <Field
-              label="Call-out minimum"
+              label={LABOUR_RATE_LABELS.callOut}
               value={v.callOut}
               onChangeText={t => setField(trade, 'callOut', t)}
               prefix="A$"

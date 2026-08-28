@@ -56,7 +56,7 @@ import { PricingSection } from './sections/PricingSection';
 import { RecipesSection } from './sections/RecipesSection';
 import { ServicesSection } from './sections/ServicesSection';
 
-function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrade }) {
+function SectionBody({ section, trade, onSelectSection }: { section: HubSectionId; trade: HubTrade; onSelectSection: (section: HubSectionId) => void }) {
   switch (section) {
     case 'quotes':
       return <QuoteQueueSection trade={trade} />;
@@ -93,7 +93,7 @@ function SectionBody({ section, trade }: { section: HubSectionId; trade: HubTrad
     case 'catalogue':
       return <CatalogueSection trade={trade} />;
     case 'recipes':
-      return <RecipesSection trade={trade} />;
+      return <RecipesSection trade={trade} onOpenCatalogue={() => onSelectSection('catalogue')} />;
     case 'estimating':
       return <EstimatingSection trade={trade} />;
   }
@@ -231,7 +231,7 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
                 })}
               </ScrollView>
 
-              <SectionBody section={section} trade={trade} />
+              <SectionBody section={section} trade={trade} onSelectSection={setSection} />
             </>
           )}
         </ScrollView>

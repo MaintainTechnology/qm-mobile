@@ -113,7 +113,7 @@ export function AirconToolScreen() {
   }
 
   async function savePdf() {
-    if (!result || pdfBusy) return;
+    if (!result || result.recommendation.pricing_status !== 'priced' || pdfBusy) return;
     setPdfBusy(true);
     setPdfError(null);
     try {
@@ -309,15 +309,22 @@ export function AirconToolScreen() {
           <LocationCard result={result} />
           <SizingCard result={result} />
           {result.plan ? <PlanCard plan={result.plan} /> : null}
-          <View style={{ gap: spacing.lg }}>
-            {result.recommendation.options.map(option => (
-              <OptionCardView
-                key={option.system_type}
-                option={option}
-                rooms={result.recommendation.sizing.rooms}
-              />
-            ))}
-          </View>
+          {result.recommendation.pricing_status === 'priced' ? (
+            <View style={{ gap: spacing.lg }}>
+              {result.recommendation.options.map(option => (
+                <OptionCardView
+                  key={option.system_type}
+                  option={option}
+                  rooms={result.recommendation.sizing.rooms}
+                />
+              ))}
+            </View>
+          ) : (
+            <AirconPricingRequiredCard
+              setupReason={result.recommendation.pricing_setup_reason}
+              routingReason={result.recommendation.routing.reason}
+            />
+          )}
           <Card style={{ gap: spacing.md }}>
             <SectionLabel>Next step</SectionLabel>
             <Text style={[styles.nextTitle, { color: colors.textPri }]}>
@@ -326,16 +333,18 @@ export function AirconToolScreen() {
             <Text style={[styles.body, { color: colors.textSec }]}>
               {result.recommendation.routing.reason}
             </Text>
-            <Pressable
-              accessibilityRole="button"
-              onPress={() => void savePdf()}
-              disabled={pdfBusy}
-              style={[styles.borderedBtn, { borderColor: colors.ctlLine }, pdfBusy && styles.dimmed]}
-            >
-              <Text style={[styles.textBtnLabel, { color: colors.textPri }]}>
-                {pdfBusy ? 'PREPARING PDF…' : 'SAVE PDF'}
-              </Text>
-            </Pressable>
+            {result.recommendation.pricing_status === 'priced' ? (
+              <Pressable
+                accessibilityRole="button"
+                onPress={() => void savePdf()}
+                disabled={pdfBusy}
+                style={[styles.borderedBtn, { borderColor: colors.ctlLine }, pdfBusy && styles.dimmed]}
+              >
+                <Text style={[styles.textBtnLabel, { color: colors.textPri }]}>
+                  {pdfBusy ? 'PREPARING PDF…' : 'SAVE PDF'}
+                </Text>
+              </Pressable>
+            ) : null}
             {pdfError ? (
               <Notice
                 tone="danger"
@@ -561,7 +570,31 @@ function PlanCard({ plan }: { plan: NonNullable<AirconResult['plan']> }) {
   );
 }
 
-function OptionCardView({ option, rooms }: { option: AcOption; rooms: RoomLoad[] }) {
+export function AirconPricingRequiredCard({
+  setupReason,
+  routingReason,
+}: {
+  setupReason: string;
+  routingReason: string;
+}) {
+  return (
+    <Card style={{ gap: spacing.md }}>
+      <Notice
+        tone="warn"
+        label="Price needed"
+        body={`${setupReason} ${routingReason}`}
+      />
+      <WebOnlyCard
+        label="Set up air-conditioning pricing"
+        body="Complete your tenant rate card before presenting or saving a customer price. Book the site visit to confirm sizing and access."
+        path="/dashboard?tab=pricing"
+        cta="Open pricing setup"
+      />
+    </Card>
+  );
+}
+
+export function OptionCardView({ option, rooms }: { option: AcOption; rooms: RoomLoad[] }) {
   const { colors } = useTheme();
   const [showBreakdown, setShowBreakdown] = useState(false);
   const p = option.pricing;
@@ -585,7 +618,7 @@ function OptionCardView({ option, rooms }: { option: AcOption; rooms: RoomLoad[]
         {`${aud(option.price.low)} – ${aud(option.price.high)}`}
       </Text>
       <Text style={[styles.priceSub, { color: colors.textDim }]}>
-        {`INC GST · INDICATIVE · POINT ${aud(p.point_estimate_inc_gst)} ±${p.confidence_band_pct}%`}
+        {`${p.gst_registered ? 'INC GST' : 'NO GST CHARGED'} · INDICATIVE · POINT ${aud(p.point_estimate_inc_gst)} ±${p.confidence_band_pct}%`}
       </Text>
 
       <Pressable
@@ -646,16 +679,14 @@ function OptionCardView({ option, rooms }: { option: AcOption; rooms: RoomLoad[]
               {aud(p.point_estimate_ex_gst)}
             </Text>
           </View>
-          {p.gst_registered ? (
-            <View style={styles.compRow}>
-              <Text style={[styles.noteLine, styles.bold, { flex: 1, color: colors.textPri }]}>
-                + 10% GST
-              </Text>
-              <Text style={[styles.compTotal, styles.boldNum, { color: colors.accentText }]}>
-                {aud(p.point_estimate_inc_gst)}
-              </Text>
-            </View>
-          ) : null}
+          <View style={styles.compRow}>
+            <Text style={[styles.noteLine, styles.bold, { flex: 1, color: colors.textPri }]}>
+              {p.gst_registered ? 'POINT ESTIMATE INC GST' : 'NO GST CHARGED'}
+            </Text>
+            <Text style={[styles.compTotal, styles.boldNum, { color: colors.accentText }]}>
+              {aud(p.point_estimate_inc_gst)}
+            </Text>
+          </View>
           <Text style={[styles.roomMeta, { color: colors.textDim }]}>{p.band_reason}</Text>
           <Text style={[styles.roomMeta, { color: colors.textDim }]}>
             {`SIZED FROM ${rooms.length} CONDITIONED ${rooms.length === 1 ? 'ZONE' : 'ZONES'} · LAYOUT SCHEMATIC ON THE WEB`}
