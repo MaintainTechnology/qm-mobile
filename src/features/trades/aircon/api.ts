@@ -18,7 +18,12 @@ import { apiUrl } from '@/lib/env';
 import { appendFile, type PickedFile } from '@/lib/media';
 import { useApiMutation } from '@/lib/useApi';
 
-import { RecommendResponseSchema, type AirconResult, type RecommendRequest } from './schema';
+import {
+  buildAirconPdfRequest,
+  RecommendResponseSchema,
+  type AirconResult,
+  type RecommendRequest,
+} from './schema';
 
 /** The recommend route geocodes + reads Google Weather/Solar — well past the
  *  15s default on a slow day, and a client-side abort would retry a call that
@@ -56,20 +61,16 @@ const PDF_PATH = '/api/aircon/pdf';
 const PDF_FILENAME = 'aircon-recommendation.pdf';
 
 /**
- * POST the on-screen recommendation to /api/aircon/pdf and hand the returned
- * document to the OS share sheet. The recommendation is sent back VERBATIM
- * (the response schema is loose, so unknown fields survive the round trip).
+ * POST the server-owned recommendation id to /api/aircon/pdf and hand the
+ * returned document to the OS share sheet. The server reloads tenant-owned
+ * priced money; the caller never sends recommendation totals.
  * Throws ApiError on a non-2xx so callers get apiErrorMessage copy.
  */
 export async function downloadAirconPdf({
-  address,
-  recommendation,
-  climateZone,
+  recommendationId,
   token,
 }: {
-  address: string;
-  recommendation: AirconResult['recommendation'];
-  climateZone: string;
+  recommendationId: string;
   token?: string;
 }): Promise<void> {
   const controller = new AbortController();
@@ -82,7 +83,7 @@ export async function downloadAirconPdf({
         'Content-Type': 'application/json',
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-      body: JSON.stringify({ address, recommendation, climateZone }),
+      body: JSON.stringify(buildAirconPdfRequest(recommendationId)),
     });
     if (!response.ok) {
       const errorBody: unknown = await response.json().catch(() => undefined);

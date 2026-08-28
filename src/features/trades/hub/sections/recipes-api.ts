@@ -4,10 +4,11 @@
  *
  *   parts (BOM lines) → GET/POST /api/tenant/bom, PATCH/DELETE /api/tenant/bom/[id],
  *     POST /api/tenant/bom/fork. GET returns { assemblies, lines, baselines,
- *     catalogue_categories } — assemblies already narrowed server-side by
+ *     catalogue_categories_by_trade } — assemblies already narrowed server-side by
  *     recipeTradesFor, lines are the tenant's own rows, baselines the shared
- *     starting points keyed by assembly_id, catalogue_categories the categories
- *     the tradie has a priced active product for (drives the priced/generic badge).
+ *     starting points keyed by assembly_id, catalogue_categories_by_trade the
+ *     categories the tradie has a finite priced active product for (drives the
+ *     priced/generic badge without cross-trade collisions).
  *   steps (task checklist) → the same five shapes on /api/tenant/tasks, minus
  *     the catalogue-gap apparatus (steps carry no category and no price BY
  *     DESIGN — the estimator never reads them).
@@ -35,6 +36,14 @@ import { ApiError } from '@/lib/api';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 
 import { ESTIMATION_KEY } from './estimating-api';
+import { normaliseCategory } from './bom-readiness';
+export {
+  missingRequiredPriceCategories,
+  normaliseCategory,
+  resolveCatalogueBadge,
+  type CatalogueBadge,
+  type CatalogueCategoriesByTrade,
+} from './bom-readiness';
 
 export const BOM_KEY = ['tenant', 'bom'] as const;
 export const TASKS_KEY = ['tenant', 'tasks'] as const;
@@ -67,6 +76,7 @@ const BomLineSchema = z.looseObject({
   description: z.string().nullish(),
   quantity: z.coerce.number(),
   required: z.boolean().nullish(),
+  include_when: z.record(z.string(), z.unknown()).nullish(),
   sort: z.coerce.number().default(0),
 });
 export type BomLine = z.infer<typeof BomLineSchema>;
@@ -76,6 +86,7 @@ const BaselineLineSchema = z.looseObject({
   description: z.string().nullish(),
   quantity: z.coerce.number(),
   required: z.boolean().nullish(),
+  include_when: z.record(z.string(), z.unknown()).nullish(),
   sort: z.coerce.number().default(0),
 });
 export type BaselineLine = z.infer<typeof BaselineLineSchema>;
@@ -84,7 +95,7 @@ export const BomResponseSchema = z.looseObject({
   assemblies: z.array(AssemblySchema).default([]),
   lines: z.array(BomLineSchema).default([]),
   baselines: z.record(z.string(), z.array(BaselineLineSchema)).default({}),
-  catalogue_categories: z.array(z.string()).default([]),
+  catalogue_categories_by_trade: z.record(z.string(), z.array(z.string())).default({}),
 });
 
 export function useBom(opts: { enabled?: boolean } = {}) {
@@ -241,11 +252,6 @@ export function useForkTaskBaseline() {
 
 // ── Pure helpers ────────────────────────────────────────────────────────────
 
-/** Canonical category form (web lib/estimate/catalogue.ts normaliseCategory). */
-export function normaliseCategory(category: string | null | undefined): string {
-  return (category ?? '').trim().toLowerCase();
-}
-
 /** This assembly's rows, in recipe order. A fork copies the baseline's sorts
  *  verbatim (duplicates possible), so ties keep their server order. */
 export function sortedForAssembly<T extends { assembly_id?: string | null; sort?: number }>(
@@ -327,17 +333,6 @@ export function reorderPlan<T extends { id: string; sort?: number }>(
 /** Web resolveCatalogueBadge (lib/dashboard/badge-state.ts): does this line's
  *  category have a priced, active catalogue product? Display-only — the badge
  *  never computes or shows a price. */
-export type CatalogueBadge = 'catalogue' | 'generic';
-
-export function resolveCatalogueBadge(
-  lineCategory: string | null | undefined,
-  catalogueCategories: readonly string[],
-): CatalogueBadge {
-  const target = normaliseCategory(lineCategory);
-  if (!target) return 'generic';
-  return catalogueCategories.some(c => normaliseCategory(c) === target) ? 'catalogue' : 'generic';
-}
-
 /** The just-forked catalogue-gap report, mapped for per-line lookup (web
  *  lib/dashboard/fork-gaps.ts mapForkGaps at mobile scope). When detection
  *  failed we surface NO per-line markers — we genuinely don't know — and the

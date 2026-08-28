@@ -369,8 +369,8 @@ const PlanReadoutSchema = z.looseObject({
 /**
  * One schema for both routes — /api/aircon/plan adds `plan` (and `design`,
  * which stays web-only: the overlay SVG needs the uploaded page rendered).
- * looseObject passes unknown keys through, so `recommendation` can be POSTed
- * back to /api/aircon/pdf byte-for-byte complete.
+ * The persistence result is required because PDF generation is authorized by
+ * the server-owned recommendation id, never by the on-screen money payload.
  */
 export const RecommendResponseSchema = z.looseObject({
   ok: z.literal(true),
@@ -378,9 +378,14 @@ export const RecommendResponseSchema = z.looseObject({
   climate_note: z.string(),
   location: LocationSchema,
   recommendation: RecommendationSchema,
+  saved: z.object({ id: z.string().min(1), public_token: z.string().min(1) }).nullable(),
   plan: PlanReadoutSchema.nullish(),
 });
 export type AirconResult = z.infer<typeof RecommendResponseSchema>;
+
+export function buildAirconPdfRequest(recommendationId: string): { recommendationId: string } {
+  return { recommendationId: recommendationId.trim() };
+}
 
 // ── Result display helpers (pure) ───────────────────────────────────────────
 

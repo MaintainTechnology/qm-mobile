@@ -29,7 +29,6 @@ import {
   DEFAULT_FORM,
   FLOOR_AREA_SOURCE_LABEL,
   INSULATIONS,
-  pdfAddress,
   PLAN_MEDIA_TYPES,
   planFileProblem,
   roomLabels,
@@ -113,14 +112,12 @@ export function AirconToolScreen() {
   }
 
   async function savePdf() {
-    if (!result || result.recommendation.pricing_status !== 'priced' || pdfBusy) return;
+    if (!result || result.recommendation.pricing_status !== 'priced' || !result.saved || pdfBusy) return;
     setPdfBusy(true);
     setPdfError(null);
     try {
       await downloadAirconPdf({
-        address: pdfAddress(result, form.address.trim()),
-        recommendation: result.recommendation,
-        climateZone: result.climate_zone,
+        recommendationId: result.saved.id,
         token: (await getToken()) ?? undefined,
       });
     } catch (error) {
@@ -333,7 +330,7 @@ export function AirconToolScreen() {
             <Text style={[styles.body, { color: colors.textSec }]}>
               {result.recommendation.routing.reason}
             </Text>
-            {result.recommendation.pricing_status === 'priced' ? (
+            {result.recommendation.pricing_status === 'priced' && result.saved ? (
               <Pressable
                 accessibilityRole="button"
                 onPress={() => void savePdf()}

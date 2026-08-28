@@ -7,6 +7,7 @@
  */
 import {
   buildRecommendRequest,
+  buildAirconPdfRequest,
   DEFAULT_FORM,
   MAX_PLAN_BYTES,
   parseCount,
@@ -183,6 +184,7 @@ const responseFixture = {
     routing: { decision: 'book_assessment', reason: 'Every result needs a site assessment.' },
     confidence: 'high',
   },
+  saved: { id: 'recommendation-1', public_token: 'public-token-1' },
 };
 
 describe('RecommendResponseSchema', () => {
@@ -196,6 +198,7 @@ describe('RecommendResponseSchema', () => {
       ducted_kw: 1.1,
     });
     expect(parsed.data.recommendation.pricing_status).toBe('priced');
+    expect(parsed.data.saved).toEqual({ id: 'recommendation-1', public_token: 'public-token-1' });
     if (parsed.data.recommendation.pricing_status !== 'priced') return;
     const option = parsed.data.recommendation.options[0]!;
     expect(option).toMatchObject({ cons: ['One head per room'] });
@@ -206,6 +209,11 @@ describe('RecommendResponseSchema', () => {
     expect(RecommendResponseSchema.safeParse({ ...responseFixture, ok: false }).success).toBe(
       false,
     );
+  });
+
+  it('requires the server persistence result used to authorize PDF generation', () => {
+    const { saved: _saved, ...withoutSaved } = responseFixture;
+    expect(RecommendResponseSchema.safeParse(withoutSaved).success).toBe(false);
   });
 
   it('parses a tenant-pricing-required response with no monetary options', () => {
@@ -240,6 +248,14 @@ describe('RecommendResponseSchema', () => {
     expect(parsed.recommendation.pricing_status).toBe('priced');
     if (parsed.recommendation.pricing_status !== 'priced') return;
     expect(parsed.recommendation.options[0]!.pricing.gst_registered).toBe(gstRegistered);
+  });
+});
+
+describe('buildAirconPdfRequest', () => {
+  it('sends only the server-owned recommendation identifier', () => {
+    expect(buildAirconPdfRequest(' recommendation-1 ')).toEqual({
+      recommendationId: 'recommendation-1',
+    });
   });
 });
 

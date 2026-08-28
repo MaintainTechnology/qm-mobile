@@ -58,6 +58,9 @@ import {
 } from './api';
 import { WebOnlyCard } from '../hub/SectionsContent';
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../ui';
+import { repriceAndProveFreshBom } from './pricing-freshness';
+
+export { repriceAndProveFreshBom } from './pricing-freshness';
 
 /** API dollars → displayed AUD. Display conversion only — never arithmetic. */
 function aud(dollars: number): string {
@@ -96,6 +99,7 @@ export function CommercialPaintingScreen() {
   const [note, setNote] = useState<string | null>(null);
   const [savedQuote, setSavedQuote] = useState<SavedQuote | null>(null);
   const [pricingBlock, setPricingBlock] = useState<PaintPricingBlock | null>(null);
+  const [pricingVerified, setPricingVerified] = useState(true);
 
   const sign = useSignUploads();
   const complete = useCompleteUploads();
@@ -232,21 +236,39 @@ export function CommercialPaintingScreen() {
     if (!runId || !extractionId || price.isPending) return;
     setNote(null);
     setPricingBlock(null);
-    try {
-      await price.mutateAsync({ paintRunId: runId, extractionId });
+    setPricingVerified(false);
+    const verification = await repriceAndProveFreshBom(
+      () => price.mutateAsync({ paintRunId: runId, extractionId }),
+      () => runQuery.refetch(),
+      extractionId,
+    );
+    if (verification.ok) {
       dispatch({ type: 'PRICED' });
-    } catch (error) {
-      const block = classifyPaintPricingBlock(error);
+      setPricingVerified(true);
+    } else {
+      const block = classifyPaintPricingBlock(verification.error);
       setPricingBlock(block);
-      if (!block) setNote(apiErrorMessage(error, 'Pricing failed. The takeoff is safe — try again.'));
-    } finally {
-      refreshRun(runId);
+      if (!block) {
+        setNote(
+          apiErrorMessage(
+            verification.error,
+            'Pricing failed. Re-price successfully before saving this takeoff.',
+          ),
+        );
+      }
     }
+    void queryClient.invalidateQueries({ queryKey: [...RUNS_KEY] });
   }
 
   async function saveAsQuote() {
     const extractionId = extraction?.id;
-    if (!runId || !extractionId || saveQuote.isPending || !canSavePaintQuote(bom, pricingBlock)) return;
+    if (
+      !runId ||
+      !extractionId ||
+      saveQuote.isPending ||
+      !pricingVerified ||
+      !canSavePaintQuote(bom, pricingBlock)
+    ) return;
     setNote(null);
     try {
       const saved = await saveQuote.mutateAsync({ paintRunId: runId, extractionId });
@@ -295,6 +317,7 @@ export function CommercialPaintingScreen() {
     setNote(null);
     setSavedQuote(null);
     setPricingBlock(null);
+    setPricingVerified(true);
   }
 
   function startNewRun() {
@@ -307,6 +330,7 @@ export function CommercialPaintingScreen() {
     setNote(null);
     setSavedQuote(null);
     setPricingBlock(null);
+    setPricingVerified(true);
   }
 
   const uploadLabel =
@@ -497,6 +521,7 @@ export function CommercialPaintingScreen() {
               bom={bom}
               block={pricingBlock}
               busy={uploadBusy || extracting || price.isPending || saveQuote.isPending}
+              pricingVerified={pricingVerified}
               onSave={() => void saveAsQuote()}
             />
           )}
@@ -676,11 +701,13 @@ export function PaintPricingGate({
   bom,
   block,
   busy,
+  pricingVerified = true,
   onSave,
 }: {
   bom: PricedBom | null;
   block: PaintPricingBlock | null;
   busy: boolean;
+  pricingVerified?: boolean;
   onSave: () => void;
 }) {
   return (
@@ -700,12 +727,19 @@ export function PaintPricingGate({
           cta="Open pricing setup"
         />
       ) : null}
+      {!pricingVerified ? (
+        <Notice
+          tone="warn"
+          label="Re-price required"
+          body="Re-price must finish successfully before this quote can be saved."
+        />
+      ) : null}
       {bom ? (
         <PrimaryCta
           label="Save as quote"
           onPress={onSave}
           loading={busy}
-          disabled={busy || !canSavePaintQuote(bom, block)}
+          disabled={busy || !pricingVerified || !canSavePaintQuote(bom, block)}
         />
       ) : null}
     </View>

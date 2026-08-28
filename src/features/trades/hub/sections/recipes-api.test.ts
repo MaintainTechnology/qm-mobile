@@ -9,8 +9,10 @@
  *   vocabulary  → web lib/estimate/material-vocabulary.ts
  */
 import {
+  BomResponseSchema,
   forkWouldNoOp,
   mapForkGaps,
+  missingRequiredPriceCategories,
   materialCategoriesFor,
   nextSort,
   parseQuantity,
@@ -22,6 +24,51 @@ import {
   sortedForAssembly,
   TITLE_MAX,
 } from './recipes-api';
+
+describe('BOM catalogue authority contract', () => {
+  it('parses trade-keyed catalogue categories and recipe inclusion metadata', () => {
+    const parsed = BomResponseSchema.parse({
+      assemblies: [],
+      lines: [
+        {
+          id: 'line-1',
+          assembly_id: 'asm-1',
+          material_category: 'downlight',
+          quantity: 1,
+          required: true,
+          include_when: { answer: 'yes' },
+        },
+      ],
+      baselines: {},
+      catalogue_categories_by_trade: {
+        electrical: ['downlight'],
+        plumbing: ['downlight'],
+      },
+    });
+
+    expect(parsed.catalogue_categories_by_trade).toEqual({
+      electrical: ['downlight'],
+      plumbing: ['downlight'],
+    });
+    expect(parsed.lines[0]?.include_when).toEqual({ answer: 'yes' });
+  });
+
+  it('only blocks unconditionally required lines using prices from the selected trade', () => {
+    const lines = [
+      { material_category: 'downlight', required: true, include_when: null },
+      { material_category: 'optional_sensor', required: false, include_when: null },
+      { material_category: 'conditional_fan', required: true, include_when: { room: 'bathroom' } },
+      { material_category: 'empty_condition', required: true, include_when: {} },
+    ];
+    const byTrade = {
+      electrical: ['empty_condition'],
+      plumbing: ['downlight', 'optional_sensor', 'conditional_fan'],
+    };
+
+    expect(missingRequiredPriceCategories(lines, byTrade, 'electrical')).toEqual(['downlight']);
+    expect(missingRequiredPriceCategories(lines, byTrade, 'plumbing')).toEqual(['empty_condition']);
+  });
+});
 
 describe('forkWouldNoOp — mirror of the server 409 already_customised guard', () => {
   it('no existing rows: the fork may fire', () => {

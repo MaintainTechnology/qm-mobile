@@ -38,6 +38,7 @@ import {
   isDuplicate,
   isNoBaseline,
   mapForkGaps,
+  missingRequiredPriceCategories,
   materialCategoriesFor,
   nextSort,
   NOTES_MAX,
@@ -235,7 +236,7 @@ export function RecipesSection({ trade, onOpenCatalogue = () => {} }: { trade: H
         assembly={selected}
         lines={jobLines}
         baseline={jobBaseline}
-        catalogueCategories={data.catalogue_categories}
+        catalogueCategoriesByTrade={data.catalogue_categories_by_trade}
         onOpenCatalogue={onOpenCatalogue}
       />
     </View>
@@ -534,14 +535,14 @@ function PartsPanel({
   assembly,
   lines,
   baseline,
-  catalogueCategories,
+  catalogueCategoriesByTrade,
   onOpenCatalogue,
 }: {
   trade: HubTrade;
   assembly: RecipeAssembly;
   lines: BomLine[];
   baseline: BaselineLine[];
-  catalogueCategories: string[];
+  catalogueCategoriesByTrade: Readonly<Record<string, readonly string[]>>;
   onOpenCatalogue: () => void;
 }) {
   const { colors } = useTheme();
@@ -559,8 +560,11 @@ function PartsPanel({
   const [description, setDescription] = useState('');
   const [required, setRequired] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
-  const missingPriceCount = lines.filter(
-    line => resolveCatalogueBadge(line.material_category, catalogueCategories) !== 'catalogue',
+  const catalogueCategories = catalogueCategoriesByTrade[trade] ?? [];
+  const missingPriceCount = missingRequiredPriceCategories(
+    lines,
+    catalogueCategoriesByTrade,
+    trade,
   ).length;
 
   const busyId = update.isPending
