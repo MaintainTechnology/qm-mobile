@@ -25,7 +25,7 @@ import { useTheme } from '@/lib/useTheme';
 
 import { Notice, PillGroup } from '../trades/ui';
 import { FollowupThread } from './FollowupThread';
-import { SectionScreen } from './SectionScreen';
+import { SectionEmpty, SectionGroup, SectionLoading, SectionScreen } from './SectionScreen';
 
 const FOLLOWUPS_KEY = ['tenant', 'followups'] as const;
 
@@ -143,7 +143,7 @@ function FollowupRow({ item }: { item: FollowupItem }) {
   return (
     <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
       <View style={styles.rowTop}>
-        <Text style={[styles.name, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.name, { color: colors.textPri }]} numberOfLines={2}>
           {itemName(item)}
         </Text>
         <Text style={[styles.age, { color: colors.textDim }]}>{ageLabel(item.age_hours)}</Text>
@@ -156,71 +156,76 @@ function FollowupRow({ item }: { item: FollowupItem }) {
       <Text style={[styles.meta, { color: colors.textSec }]} numberOfLines={2}>
         {item.kind === 'lead'
           ? 'SMS enquiry, no quote yet'
-          : [
-              item.job_type?.replace(/_/g, ' '),
-              item.customer?.suburb,
-              amount && `${amount} inc GST`,
-            ]
-              .filter(Boolean)
-              .join(' · ')}
+          : [item.job_type?.replace(/_/g, ' '), item.customer?.suburb].filter(Boolean).join(' · ')}
         {item.needs_inspection ? ' · Inspection' : ''}
       </Text>
+      {item.kind === 'quote' && amount ? (
+        <Text style={[styles.amount, { color: colors.textPri }]}>{amount} inc GST</Text>
+      ) : null}
 
-      <View style={styles.actions}>
-        <ActionBtn
-          label={call.isPending ? 'Calling…' : 'Call'}
-          disabled={!phoneOk || busy}
-          primary
-          onPress={() => {
-            setNote(null);
-            call.mutate(idBody);
-          }}
-        />
-        <ActionBtn
-          label="Text"
-          disabled={!phoneOk || busy}
-          onPress={() => {
-            setNote(null);
-            setComposing(v => !v);
-          }}
-        />
-        <ActionBtn
-          label={threadOpen ? 'Hide messages' : 'Messages'}
-          onPress={() => setThreadOpen(v => !v)}
-        />
-        {item.quote_id ? (
-          contacted ? (
-            <ActionBtn
-              label={reopen.isPending ? 'Saving…' : 'Reopen'}
-              disabled={busy}
-              onPress={() => {
-                setNote(null);
-                reopen.mutate({ quoteId: item.quote_id, action: 'reopen' });
-              }}
-            />
-          ) : (
-            <ActionBtn
-              label={logging ? 'Cancel' : 'Mark contacted'}
-              disabled={busy}
-              onPress={() => {
-                setNote(null);
-                setLogging(v => !v);
-              }}
-            />
-          )
-        ) : null}
+      <View style={[styles.actions, { borderTopColor: colors.inkLine }]}>
+        <View style={styles.actionPair}>
+          <ActionBtn
+            label={call.isPending ? 'Calling…' : 'Call'}
+            disabled={!phoneOk || busy}
+            inline
+            onPress={() => {
+              setNote(null);
+              call.mutate(idBody);
+            }}
+          />
+          <ActionBtn
+            label="Text"
+            inline
+            disabled={!phoneOk || busy}
+            onPress={() => {
+              setNote(null);
+              setComposing(v => !v);
+            }}
+          />
+        </View>
+        <View style={styles.actionPair}>
+          <ActionBtn
+            label={threadOpen ? 'Hide messages' : 'Messages'}
+            inline
+            onPress={() => setThreadOpen(v => !v)}
+          />
+          {item.quote_id ? (
+            contacted ? (
+              <ActionBtn
+                label={reopen.isPending ? 'Saving…' : 'Reopen'}
+                inline
+                disabled={busy}
+                onPress={() => {
+                  setNote(null);
+                  reopen.mutate({ quoteId: item.quote_id, action: 'reopen' });
+                }}
+              />
+            ) : (
+              <ActionBtn
+                label={logging ? 'Cancel' : 'Mark contacted'}
+                inline
+                disabled={busy}
+                onPress={() => {
+                  setNote(null);
+                  setLogging(v => !v);
+                }}
+              />
+            )
+          ) : null}
+        </View>
       </View>
 
       {logging && item.quote_id ? (
-        <View style={{ gap: spacing.sm }}>
+        <View style={[styles.inlineForm, { borderTopColor: colors.inkLine }]}>
           <Text style={[styles.formLabel, { color: colors.textDim }]}>
-            LOG TOUCH — WHAT HAPPENED?
+            LOG TOUCH · WHAT HAPPENED?
           </Text>
           <PillGroup options={NOTE_OUTCOMES} value={outcome} onChange={setOutcome} />
           <TextInput
             value={logNote}
             onChangeText={v => setLogNote(v.slice(0, 500))}
-            placeholder="Note (optional) — e.g. call back after 3pm"
+            placeholder="Optional note, e.g. call back after 3pm"
             placeholderTextColor={colors.textDim}
             multiline
             accessibilityLabel="Touch note"
@@ -250,7 +255,8 @@ function FollowupRow({ item }: { item: FollowupItem }) {
       ) : null}
 
       {composing ? (
-        <View style={{ gap: spacing.sm }}>
+        <View style={[styles.inlineForm, { borderTopColor: colors.inkLine }]}>
+          <Text style={[styles.formLabel, { color: colors.textDim }]}>MESSAGE</Text>
           <TextInput
             value={text}
             onChangeText={v => setText(v.slice(0, 640))}
@@ -282,11 +288,13 @@ function ActionBtn({
   onPress,
   disabled = false,
   primary = false,
+  inline = false,
 }: {
   label: string;
   onPress: () => void;
   disabled?: boolean;
   primary?: boolean;
+  inline?: boolean;
 }) {
   const { colors } = useTheme();
   return (
@@ -297,6 +305,8 @@ function ActionBtn({
       onPress={onPress}
       style={({ pressed }) => [
         styles.actionBtn,
+        inline && styles.inlineAction,
+        primary && styles.primaryAction,
         {
           opacity: disabled ? 0.45 : 1,
           borderColor: primary ? colors.accent : colors.ctlLine,
@@ -310,10 +320,7 @@ function ActionBtn({
         },
       ]}
     >
-      <Text
-        style={[styles.actionText, { color: primary ? colors.accentInk : colors.textPri }]}
-        numberOfLines={1}
-      >
+      <Text style={[styles.actionText, { color: primary ? colors.accentInk : colors.textPri }]}>
         {label.toUpperCase()}
       </Text>
     </Pressable>
@@ -365,7 +372,7 @@ export function FollowupsScreen() {
   return (
     <SectionScreen
       title="Follow-ups"
-      subtitle="Quotes and enquiries that went quiet, oldest first — chase them before they go cold."
+      subtitle="Pick up quiet quotes and enquiries, with the oldest first."
       refreshing={query.isFetching}
       onRefresh={() => {
         setVisible(PAGE_SIZE);
@@ -373,7 +380,7 @@ export function FollowupsScreen() {
       }}
     >
       {query.isPending ? (
-        <Notice tone="accent" label="Loading follow-ups…" />
+        <SectionLoading label="Loading follow-ups" />
       ) : query.isError && !query.data ? (
         <Notice
           tone="danger"
@@ -403,33 +410,34 @@ export function FollowupsScreen() {
               },
             ]}
           />
-          <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-            TO CHASE · {toChase.length}
-          </Text>
-          {toChase.length === 0 ? (
-            <Text style={[styles.empty, { color: colors.textDim }]}>
-              Nothing to chase — every live quote has been followed up.
-            </Text>
-          ) : (
-            shownChase.map(item => (
-              <FollowupRow
-                key={item.quote_id ?? item.conversation_id ?? itemName(item)}
-                item={item}
+          <SectionGroup title="To chase" count={toChase.length}>
+            {toChase.length === 0 ? (
+              <SectionEmpty
+                title={search.trim() ? 'No matching follow-ups' : 'You’re up to date'}
+                body={
+                  search.trim()
+                    ? 'Try a different name, suburb or phone number.'
+                    : 'Every live quote has been followed up.'
+                }
               />
-            ))
-          )}
+            ) : (
+              shownChase.map(item => (
+                <FollowupRow
+                  key={item.quote_id ?? item.conversation_id ?? itemName(item)}
+                  item={item}
+                />
+              ))
+            )}
+          </SectionGroup>
           {shownDone.length > 0 ? (
-            <>
-              <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-                CONTACTED · {contacted.length} — STILL NO PAYMENT
-              </Text>
+            <SectionGroup title="Contacted · awaiting payment" count={contacted.length}>
               {shownDone.map(item => (
                 <FollowupRow
                   key={item.quote_id ?? item.conversation_id ?? itemName(item)}
                   item={item}
                 />
               ))}
-            </>
+            </SectionGroup>
           ) : null}
           {ordered.length > shown.length ? (
             <ActionBtn
@@ -448,55 +456,80 @@ const styles = StyleSheet.create({
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: spacing.md,
-    fontFamily: fonts.mono.regular,
-    fontSize: 12,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    fontFamily: fonts.sans.regular,
+    fontSize: 16,
+    lineHeight: 24,
   },
-  groupLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
-    marginTop: spacing.sm,
-  },
-  empty: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 },
   row: {
     borderWidth: 1,
     borderRadius: radius.card,
+    borderCurve: 'continuous',
     padding: spacing.lg,
-    gap: spacing.sm,
+    gap: spacing.md,
   },
-  rowTop: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.md },
-  name: { flex: 1, fontFamily: fonts.sans.bold, fontSize: 15 },
-  age: { fontFamily: fonts.mono.medium, fontSize: 11 },
-  reason: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  meta: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
-  actions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.xs },
+  rowTop: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  name: { flex: 1, minWidth: 0, fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  age: {
+    fontFamily: fonts.mono.regular,
+    fontSize: 12,
+    lineHeight: 20,
+    fontVariant: ['tabular-nums'],
+  },
+  reason: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.5 },
+  meta: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  amount: {
+    fontFamily: fonts.mono.bold,
+    fontSize: 16,
+    lineHeight: 24,
+    fontVariant: ['tabular-nums'],
+  },
+  actions: { gap: spacing.sm, paddingTop: spacing.lg, borderTopWidth: 1 },
+  actionPair: { flexDirection: 'row', gap: spacing.sm },
+  inlineAction: { flex: 1, minWidth: 0 },
+  primaryAction: { minHeight: touch.primaryCta },
+  inlineForm: { gap: spacing.md, borderTopWidth: 1, paddingTop: spacing.lg },
   actionBtn: {
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
-  actionText: { fontFamily: fonts.mono.bold, fontSize: 11, letterSpacing: 0.88 },
+  actionText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
   composer: {
     minHeight: 88,
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     padding: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
     textAlignVertical: 'top',
   },
-  note: { fontFamily: fonts.sans.medium, fontSize: 12.5 },
-  formLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
+  note: { fontFamily: fonts.sans.medium, fontSize: 14, lineHeight: 20 },
+  formLabel: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.6 },
   logNote: {
-    minHeight: 56,
+    minHeight: 88,
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     padding: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
     textAlignVertical: 'top',
   },
 });

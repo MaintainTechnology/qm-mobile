@@ -20,7 +20,7 @@
  * (PATCH display-mode) and the Activity timeline — which the web synthesises from
  * status fields, not a history array, so mobile synthesises identically.
  */
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
   KeyboardAvoidingView,
@@ -37,6 +37,7 @@ import {
 import Svg, { Path } from 'react-native-svg';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
+import { useReducedMotion } from 'react-native-reanimated';
 
 import { relativeTime } from '@/features/chats/format';
 import { LinkOutButton } from '@/features/trades/hub/LinkOut';
@@ -50,6 +51,7 @@ import { useTheme } from '@/lib/useTheme';
 import { TRADE_LABELS } from '../trades/hub/sections';
 import {
   actionErrorMessage,
+  quoteActionNotice,
   sendQuoteVars,
   useApproveQuote,
   useSendQuote,
@@ -189,15 +191,10 @@ function HistoryHintStrip({ jobType }: { jobType: string | null | undefined }) {
       : '';
   const last = data.most_recent_quoted_at ? ` · last ${monthYear(data.most_recent_quoted_at)}` : '';
   return (
-    // Accent-tinted band (web: border accent/40 on accent/5) — literal alpha
-    // suffixes because RN styles can't tint a token any other way.
     <View
-      style={[
-        styles.historyStrip,
-        { borderColor: `${colors.accent}66`, backgroundColor: `${colors.accent}14` },
-      ]}
+      style={[styles.historyStrip, { borderColor: colors.inkLine, backgroundColor: colors.ink }]}
     >
-      <Text style={[styles.historyLead, { color: colors.accentText }]}>YOUR HISTORY</Text>
+      <Text style={[styles.historyLead, { color: colors.textSec }]}>YOUR HISTORY</Text>
       <Text style={[styles.historyBody, { color: colors.textSec }]}>
         Avg for {formatJobType(jobType)}:{' '}
         <Text style={{ fontFamily: fonts.sans.bold, color: colors.textPri }}>
@@ -251,9 +248,7 @@ function DetailsBlock({ quote }: { quote: QuoteRow }) {
             ]}
           >
             <Text style={[styles.metaLabel, { color: colors.textDim }]}>{cell.label}</Text>
-            <Text style={[styles.metaValue, { color: colors.textPri }]} numberOfLines={2}>
-              {cell.value}
-            </Text>
+            <Text style={[styles.metaValue, { color: colors.textPri }]}>{cell.value}</Text>
             {cell.sub ? (
               <Text style={[styles.metaSub, { color: colors.textDim }]}>{cell.sub}</Text>
             ) : null}
@@ -274,14 +269,23 @@ function DetailsBlock({ quote }: { quote: QuoteRow }) {
 
       <View style={{ marginTop: spacing.md }}>
         <Text style={[styles.sectionLabel, { color: colors.textDim }]}>LAYOUT FOR THIS QUOTE</Text>
-        <View style={styles.layoutRow}>
+        <View
+          accessibilityRole="radiogroup"
+          accessibilityLabel="Quote layout"
+          style={styles.layoutRow}
+        >
           {modes.map(mode => {
             const active = currentMode === mode.key;
             return (
               <Pressable
                 key={mode.label}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
+                accessibilityRole="radio"
+                aria-checked={active}
+                accessibilityState={{
+                  checked: active,
+                  disabled: setMode.isPending,
+                  busy: setMode.isPending,
+                }}
                 disabled={setMode.isPending}
                 onPress={() => {
                   if (!active) setMode.mutate({ quoteId: quote.id, display_mode: mode.key });
@@ -289,7 +293,7 @@ function DetailsBlock({ quote }: { quote: QuoteRow }) {
                 style={[
                   styles.layoutBtn,
                   {
-                    borderColor: active ? colors.accent : colors.inkLine,
+                    borderColor: active ? colors.ctlLine : colors.inkLine,
                     backgroundColor: active ? colors.ink : 'transparent',
                   },
                 ]}
@@ -297,10 +301,10 @@ function DetailsBlock({ quote }: { quote: QuoteRow }) {
                 <Text
                   style={[
                     styles.layoutBtnText,
-                    { color: active ? colors.accentText : colors.textDim },
+                    { color: active ? colors.textPri : colors.textDim },
                   ]}
                 >
-                  {mode.label.toUpperCase()}
+                  {mode.label}
                 </Text>
               </Pressable>
             );
@@ -338,11 +342,13 @@ function ActivityBlock({ quote }: { quote: QuoteRow }) {
       <View style={{ marginTop: spacing.sm, gap: spacing.sm }}>
         {events.map(event => (
           <View key={event.label} style={styles.activityRow}>
-            <View style={[styles.activityDot, { backgroundColor: colors.accent }]} />
-            <Text style={[styles.activityLabel, { color: colors.textSec }]}>{event.label}</Text>
-            {event.when ? (
-              <Text style={[styles.activityWhen, { color: colors.textDim }]}>{event.when}</Text>
-            ) : null}
+            <View style={[styles.activityDot, { backgroundColor: colors.textDim }]} />
+            <View style={styles.activityContent}>
+              <Text style={[styles.activityLabel, { color: colors.textSec }]}>{event.label}</Text>
+              {event.when ? (
+                <Text style={[styles.activityWhen, { color: colors.textDim }]}>{event.when}</Text>
+              ) : null}
+            </View>
           </View>
         ))}
       </View>
@@ -397,6 +403,9 @@ export function QuoteDetailModal({
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
+  const reduceMotion = useReducedMotion();
+  const scrollRef = useRef<ScrollView>(null);
+  const [deliveryOffset, setDeliveryOffset] = useState(0);
   const approve = useApproveQuote();
   const send = useSendQuote();
   /** The primary action needs an explicit second tap to fire (web `confirmSendCta` parity). */
@@ -447,18 +456,28 @@ export function QuoteDetailModal({
       ? 'send'
       : null;
   const pending = approve.isPending || send.isPending;
-  const justApproved = approve.isSuccess && !approve.isPending;
-  const justSent = send.isSuccess && !send.isPending;
+  const actionNotice = approve.isSuccess
+    ? quoteActionNotice(approve.data, 'approve')
+    : send.isSuccess
+      ? quoteActionNotice(send.data, 'send')
+      : null;
   const error = approve.error ?? send.error;
-  // Hides the action row the instant a tap fires (the optimistic cache update in ./api already
-  // flips the quote's status) and keeps it hidden through success. A sent quote stays sendable
-  // (resend), so the row only comes back on the next open of the sheet — deliberate: it stops an
-  // absent-minded second nudge seconds after the first.
-  const showActionRow = primaryAction !== null && !pending && !justApproved && !justSent;
+  // Keep the row unavailable while the mutation refetches the canonical quote. A sent quote stays
+  // sendable (resend), so success remains acknowledged until this sheet is reopened; this stops an
+  // absent-minded second nudge without inventing a local Sent state.
+  const showActionRow = primaryAction !== null && !pending && actionNotice == null;
 
   const quoteId = quote.id;
   const resend = isResend(quote);
   const onFilePhone = quote.customer_phone?.trim() ? quote.customer_phone.trim() : null;
+  const deliverySummary =
+    channel === 'sms'
+      ? onFilePhone || phone.trim()
+        ? `Text to ${onFilePhone ?? phone.trim()}`
+        : 'Add a customer mobile'
+      : email.trim()
+        ? `Email to ${email.trim()}`
+        : 'Email to address on file';
   // Web `smsReady` parity: SMS needs a number — on file or typed. Email may go up blank: the
   // server resolves the on-file address through its contact chain and 400s with its own
   // plain-language message when there is none.
@@ -493,317 +512,383 @@ export function QuoteDetailModal({
         : 'SEND TO CUSTOMER';
 
   return (
-    <Modal visible animationType="slide" onRequestClose={onClose}>
-      {/* The recipient inputs live in the pinned bottom bar — without this the iOS keyboard
-          covers exactly the field being typed into (Android resizes the window itself). */}
+    <Modal visible animationType={reduceMotion ? 'none' : 'slide'} onRequestClose={onClose}>
+      {/* Delivery fields scroll above the keyboard; only the final action stays pinned. */}
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-      <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
-        <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
-          <Text style={[styles.headerTitle, { color: colors.textPri }]}>QUOTE DETAIL</Text>
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel="Close"
-            onPress={onClose}
-            hitSlop={10}
-            style={[styles.closeBtn, { borderColor: colors.inkLine }]}
-          >
-            <CloseIcon color={colors.textSec} />
-          </Pressable>
-        </View>
-
-        <ScrollView style={{ flex: 1 }} contentContainerStyle={styles.body}>
-          <Text style={[styles.name, { color: colors.textPri }]}>{customerLabel(quote)}</Text>
-          <Text style={[styles.job, { color: colors.textSec }]}>
-            {formatJobType(quote.job_type)}
-            {quote.suburb ? ` · ${quote.suburb}` : ''}
-          </Text>
-          <Text style={[styles.meta, { color: colors.textDim }]}>
-            Drafted {quoteAge(quote.created_at)}
-            {quote.channel ? ` · ${quote.channel === 'voice' ? 'Voice' : 'SMS'}` : ''}
-          </Text>
-
-          <View style={[styles.chip, { borderColor: tone, alignSelf: 'flex-start' }]}>
-            <View style={[styles.chipDot, { backgroundColor: tone }]} />
-            <Text style={[styles.chipText, { color: tone }]}>{badge.label.toUpperCase()}</Text>
+        <View
+          accessibilityViewIsModal
+          style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}
+        >
+          <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
+            <Text
+              accessibilityRole="header"
+              style={[styles.headerTitle, { color: colors.textPri }]}
+            >
+              Quote detail
+            </Text>
+            <Pressable
+              accessibilityRole="button"
+              accessibilityLabel="Close"
+              onPress={onClose}
+              style={({ pressed }) => [
+                styles.closeBtn,
+                {
+                  borderColor: colors.inkLine,
+                  backgroundColor: pressed ? colors.ink : 'transparent',
+                },
+              ]}
+            >
+              <CloseIcon color={colors.textSec} />
+            </Pressable>
           </View>
 
-          <View
-            style={[
-              styles.amountCard,
-              { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
-            ]}
+          <ScrollView
+            ref={scrollRef}
+            keyboardShouldPersistTaps="handled"
+            style={{ flex: 1 }}
+            contentContainerStyle={styles.body}
           >
-            <Text style={[styles.amountLabel, { color: colors.textDim }]}>TOTAL INC GST</Text>
-            <Text style={[styles.amountValue, { color: colors.accentText }]}>{amount ?? '—'}</Text>
-            {quote.selected_tier ? (
-              <Text style={[styles.tierNote, { color: colors.textSec }]}>
-                {quote.selected_tier.charAt(0).toUpperCase() + quote.selected_tier.slice(1)} tier
-                selected
-              </Text>
-            ) : null}
-          </View>
+            <Text style={[styles.name, { color: colors.textPri }]}>{customerLabel(quote)}</Text>
+            <Text style={[styles.job, { color: colors.textSec }]}>
+              {formatJobType(quote.job_type)}
+              {quote.suburb ? ` · ${quote.suburb}` : ''}
+            </Text>
+            <Text style={[styles.meta, { color: colors.textDim }]}>
+              Drafted {quoteAge(quote.created_at)}
+              {quote.channel ? ` · ${quote.channel === 'voice' ? 'Voice' : 'SMS'}` : ''}
+            </Text>
 
-          {tierLineItems ? (
-            <View style={styles.section}>
-              <Text style={[styles.sectionLabel, { color: colors.textDim }]}>
-                {tierLineItems.label.toUpperCase()} — LINE ITEMS
-              </Text>
-              <View style={[styles.itemsCard, { borderColor: colors.inkLine }]}>
-                {tierLineItems.items.map((item, i) => (
-                  <View key={i} style={[styles.itemRow, { borderBottomColor: colors.inkLine }]}>
-                    <Text style={[styles.itemDesc, { color: colors.textSec }]}>
-                      {item.description}
-                    </Text>
-                    <Text style={[styles.itemQty, { color: colors.textDim }]}>
-                      {item.quantity ?? 1}
-                      {item.unit_price_ex_gst != null
-                        ? ` × ${formatAud(centsFromApiDollars(item.unit_price_ex_gst))}`
-                        : ''}
-                      {item.unit ? ` ${item.unit}` : ''}
-                    </Text>
-                  </View>
-                ))}
-                {tierLineItems.totalIncGstCents != null ? (
-                  <View style={[styles.itemsTotalRow, { backgroundColor: colors.ink }]}>
-                    <Text style={[styles.itemsTotalLabel, { color: colors.textDim }]}>
-                      TOTAL INC GST
-                    </Text>
-                    <Text style={[styles.itemsTotalValue, { color: colors.accentText }]}>
-                      {formatAud(tierLineItems.totalIncGstCents)}
-                    </Text>
-                  </View>
-                ) : null}
-              </View>
-              <Text style={[styles.itemsCaption, { color: colors.textDim }]}>
-                Unit prices shown ex GST.
-              </Text>
+            <View style={[styles.chip, { borderColor: tone, alignSelf: 'flex-start' }]}>
+              <Text style={[styles.chipText, { color: tone }]}>{badge.label.toUpperCase()}</Text>
             </View>
-          ) : null}
 
-          {quote.scope_of_works ? (
-            <View style={styles.section}>
-              <Text style={[styles.sectionLabel, { color: colors.textDim }]}>SCOPE OF WORKS</Text>
-              <Text style={[styles.sectionBody, { color: colors.textSec }]}>
-                {quote.scope_of_works}
+            <View
+              style={[
+                styles.amountCard,
+                { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
+              ]}
+            >
+              <Text style={[styles.amountLabel, { color: colors.textDim }]}>TOTAL INC GST</Text>
+              <Text style={[styles.amountValue, { color: colors.textPri }]}>
+                {amount ?? 'Not priced'}
               </Text>
+              {quote.selected_tier ? (
+                <Text style={[styles.tierNote, { color: colors.textSec }]}>
+                  {quote.selected_tier.charAt(0).toUpperCase() + quote.selected_tier.slice(1)} tier
+                  selected
+                </Text>
+              ) : null}
             </View>
-          ) : null}
 
-          <DetailsBlock quote={quote} />
-
-          <ActivityBlock quote={quote} />
-
-          <LinksBlock quote={quote} />
-
-          {quote.messages && quote.messages.length > 0 ? (
-            <View style={styles.section}>
-              <Text style={[styles.sectionLabel, { color: colors.textDim }]}>
-                {quote.channel === 'voice' ? 'VOICE CALL TRANSCRIPT' : 'SMS CONVERSATION'}
-              </Text>
-              <View style={{ marginTop: spacing.sm, gap: spacing.sm }}>
-                {quote.messages.map((m, i) => {
-                  // ChatThread parity: inbound (customer) reads on the left, outbound (AI) on the
-                  // right — this sheet had them swapped.
-                  const inbound = m.direction === 'inbound';
-                  return (
-                    <View
-                      key={i}
-                      style={[
-                        styles.bubble,
-                        {
-                          alignSelf: inbound ? 'flex-start' : 'flex-end',
-                          borderColor: inbound ? colors.inkLine : colors.accent,
-                          backgroundColor: inbound ? colors.inkCard : colors.ink,
-                        },
-                      ]}
-                    >
-                      <Text style={[styles.bubbleBody, { color: colors.textPri }]}>{m.body}</Text>
-                      <Text style={[styles.bubbleMeta, { color: colors.textDim }]}>
-                        {inbound ? 'Customer' : 'AI'} · {relativeTime(m.created_at)}
+            {tierLineItems ? (
+              <View style={styles.section}>
+                <Text style={[styles.sectionLabel, { color: colors.textDim }]}>
+                  {tierLineItems.label.toUpperCase()} · LINE ITEMS
+                </Text>
+                <View style={[styles.itemsCard, { borderColor: colors.inkLine }]}>
+                  {tierLineItems.items.map((item, i) => (
+                    <View key={i} style={[styles.itemRow, { borderBottomColor: colors.inkLine }]}>
+                      <Text style={[styles.itemDesc, { color: colors.textSec }]}>
+                        {item.description}
+                      </Text>
+                      <Text style={[styles.itemQty, { color: colors.textDim }]}>
+                        {item.quantity ?? 1}
+                        {item.unit_price_ex_gst != null
+                          ? ` × ${formatAud(centsFromApiDollars(item.unit_price_ex_gst))}`
+                          : ''}
+                        {item.unit ? ` ${item.unit}` : ''}
                       </Text>
                     </View>
-                  );
-                })}
-              </View>
-            </View>
-          ) : null}
-        </ScrollView>
-
-        {(primaryAction || pending || justApproved || justSent || error != null) && (
-          <View
-            style={[
-              styles.actionBar,
-              {
-                borderTopColor: colors.inkLine,
-                paddingBottom: Math.max(insets.bottom, spacing.lg),
-              },
-            ]}
-          >
-            {error ? (
-              <Text style={[styles.errorText, { color: colors.dangerBright }]}>
-                {actionErrorMessage(error)}
-              </Text>
-            ) : justApproved ? (
-              <Text style={[styles.okText, { color: colors.successBright }]}>
-                Approved and sent.
-              </Text>
-            ) : justSent ? (
-              <Text style={[styles.okText, { color: colors.successBright }]}>
-                Sent to the customer.
-              </Text>
-            ) : armed ? (
-              <Text style={[styles.hintText, { color: colors.warningBright }]}>
-                Tap again to confirm.
-              </Text>
-            ) : null}
-
-            {pending ? (
-              <View style={styles.pendingRow}>
-                <ActivityIndicator color={colors.textPri} />
-                <Text style={[styles.pendingLabel, { color: colors.textSec }]}>
-                  {approve.isPending ? 'Approving…' : 'Sending…'}
+                  ))}
+                  {tierLineItems.totalIncGstCents != null ? (
+                    <View style={[styles.itemsTotalRow, { backgroundColor: colors.ink }]}>
+                      <Text style={[styles.itemsTotalLabel, { color: colors.textDim }]}>
+                        TOTAL INC GST
+                      </Text>
+                      <Text style={[styles.itemsTotalValue, { color: colors.textPri }]}>
+                        {formatAud(tierLineItems.totalIncGstCents)}
+                      </Text>
+                    </View>
+                  ) : null}
+                </View>
+                <Text style={[styles.itemsCaption, { color: colors.textDim }]}>
+                  Unit prices shown ex GST.
                 </Text>
               </View>
-            ) : showActionRow ? (
-              <>
-                {primaryAction === 'send' ? (
-                  <View style={styles.channelBlock}>
-                    {/* Web SendQuotePanel rows as pills: Text message / Email (PDF attached). */}
-                    <View style={styles.channelRow}>
-                      {(
-                        [
-                          { key: 'sms', label: 'TEXT MESSAGE' },
-                          { key: 'email', label: 'EMAIL' },
-                        ] as const
-                      ).map(option => {
-                        const active = channel === option.key;
-                        return (
-                          <Pressable
-                            key={option.key}
-                            accessibilityRole="button"
-                            accessibilityState={{ selected: active }}
-                            onPress={() => {
-                              setChannel(option.key);
-                              // A confirm armed for one channel must never fire the other.
-                              setArmed(false);
-                            }}
-                            style={[
-                              styles.channelBtn,
-                              {
-                                borderColor: active ? colors.accent : colors.inkLine,
-                                backgroundColor: active ? colors.ink : 'transparent',
-                              },
-                            ]}
-                          >
-                            <Text
-                              style={[
-                                styles.channelBtnText,
-                                { color: active ? colors.accentText : colors.textDim },
-                              ]}
-                            >
-                              {option.label}
-                            </Text>
-                          </Pressable>
-                        );
-                      })}
-                    </View>
-                    {channel === 'sms' ? (
-                      onFilePhone ? (
-                        <Text style={[styles.recipientOnFile, { color: colors.textSec }]}>
-                          To {onFilePhone}
-                        </Text>
-                      ) : (
-                        <TextInput
-                          value={phone}
-                          onChangeText={setPhone}
-                          keyboardType="phone-pad"
-                          placeholder="Customer mobile, e.g. 04xx xxx xxx"
-                          placeholderTextColor={colors.textDim}
-                          style={[
-                            styles.recipientInput,
-                            { borderColor: colors.inkLine, color: colors.textPri },
-                          ]}
-                        />
-                      )
-                    ) : (
-                      <>
-                        <TextInput
-                          value={email}
-                          onChangeText={setEmail}
-                          keyboardType="email-address"
-                          autoCapitalize="none"
-                          autoCorrect={false}
-                          placeholder="customer@example.com"
-                          placeholderTextColor={colors.textDim}
-                          style={[
-                            styles.recipientInput,
-                            { borderColor: colors.inkLine, color: colors.textPri },
-                          ]}
-                        />
-                        <Text style={[styles.recipientHint, { color: colors.textDim }]}>
-                          PDF attached. Leave blank to use the address on file.
-                        </Text>
-                      </>
-                    )}
-                  </View>
-                ) : null}
-                <View style={styles.actionRow}>
-                  <Pressable
-                    accessibilityRole="button"
-                    accessibilityState={{ disabled: sendBlocked }}
-                    accessibilityLabel={
-                      primaryAction === 'approve'
-                        ? 'Approve and send'
-                        : resend
-                          ? 'Resend to customer'
-                          : 'Send to customer'
-                    }
-                    disabled={sendBlocked}
-                    onPress={firePrimaryAction}
-                    style={({ pressed }) =>
-                      primaryAction === 'approve'
-                        ? [
-                            styles.ghostBtn,
-                            {
-                              borderColor: armed
-                                ? colors.warningBright
-                                : pressed
-                                  ? colors.accent
-                                  : colors.inkLine,
-                            },
-                          ]
-                        : [
-                            styles.primaryBtn,
-                            sendBlocked ? styles.btnDisabled : null,
-                            {
-                              backgroundColor: armed
-                                ? colors.warningBright
-                                : pressed
-                                  ? colors.accentPress
-                                  : colors.accent,
-                            },
-                          ]
-                    }
-                  >
-                    <Text
-                      style={
-                        primaryAction === 'approve'
-                          ? [styles.ghostBtnLabel, { color: colors.textPri }]
-                          : [styles.primaryBtnLabel, { color: colors.accentInk }]
-                      }
-                    >
-                      {actionLabel}
-                    </Text>
-                  </Pressable>
-                </View>
-              </>
             ) : null}
-          </View>
-        )}
-      </View>
+
+            {quote.scope_of_works ? (
+              <View style={styles.section}>
+                <Text style={[styles.sectionLabel, { color: colors.textDim }]}>SCOPE OF WORKS</Text>
+                <Text style={[styles.sectionBody, { color: colors.textSec }]}>
+                  {quote.scope_of_works}
+                </Text>
+              </View>
+            ) : null}
+
+            <DetailsBlock quote={quote} />
+
+            <ActivityBlock quote={quote} />
+
+            <LinksBlock quote={quote} />
+
+            {quote.messages && quote.messages.length > 0 ? (
+              <View style={styles.section}>
+                <Text style={[styles.sectionLabel, { color: colors.textDim }]}>
+                  {quote.channel === 'voice' ? 'VOICE CALL TRANSCRIPT' : 'SMS CONVERSATION'}
+                </Text>
+                <View style={{ marginTop: spacing.sm, gap: spacing.sm }}>
+                  {quote.messages.map((m, i) => {
+                    // ChatThread parity: inbound (customer) reads on the left, outbound (AI) on the
+                    // right — this sheet had them swapped.
+                    const inbound = m.direction === 'inbound';
+                    return (
+                      <View
+                        key={i}
+                        style={[
+                          styles.bubble,
+                          {
+                            alignSelf: inbound ? 'flex-start' : 'flex-end',
+                            borderColor: inbound ? colors.inkLine : colors.ctlLine,
+                            backgroundColor: inbound ? colors.inkCard : colors.ink,
+                          },
+                        ]}
+                      >
+                        <Text style={[styles.bubbleBody, { color: colors.textPri }]}>{m.body}</Text>
+                        <Text style={[styles.bubbleMeta, { color: colors.textDim }]}>
+                          {inbound ? 'Customer' : 'AI'} · {relativeTime(m.created_at)}
+                        </Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </View>
+            ) : null}
+            {showActionRow && primaryAction === 'send' ? (
+              <View
+                style={[styles.section, styles.channelBlock]}
+                onLayout={event => setDeliveryOffset(event.nativeEvent.layout.y)}
+              >
+                <Text
+                  accessibilityRole="header"
+                  style={[styles.sectionLabel, { color: colors.textSec }]}
+                >
+                  DELIVERY
+                </Text>
+                {/* Same delivery choices as the web SendQuotePanel. */}
+                <View
+                  accessibilityRole="radiogroup"
+                  accessibilityLabel="Delivery channel"
+                  style={styles.channelRow}
+                >
+                  {(
+                    [
+                      { key: 'sms', label: 'Text message' },
+                      { key: 'email', label: 'Email' },
+                    ] as const
+                  ).map(option => {
+                    const active = channel === option.key;
+                    return (
+                      <Pressable
+                        key={option.key}
+                        accessibilityRole="radio"
+                        accessibilityState={{ checked: active }}
+                        aria-checked={active}
+                        onPress={() => {
+                          setChannel(option.key);
+                          // A confirm armed for one channel must never fire the other.
+                          setArmed(false);
+                        }}
+                        style={[
+                          styles.channelBtn,
+                          {
+                            borderColor: active ? colors.ctlLine : colors.inkLine,
+                            backgroundColor: active ? colors.ink : 'transparent',
+                          },
+                        ]}
+                      >
+                        <Text
+                          style={[
+                            styles.channelBtnText,
+                            { color: active ? colors.textPri : colors.textDim },
+                          ]}
+                        >
+                          {option.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+                {channel === 'sms' ? (
+                  onFilePhone ? (
+                    <Text style={[styles.recipientOnFile, { color: colors.textSec }]}>
+                      To {onFilePhone}
+                    </Text>
+                  ) : (
+                    <View style={{ gap: spacing.sm }}>
+                      <Text style={[styles.recipientLabel, { color: colors.textSec }]}>
+                        Customer mobile
+                      </Text>
+                      <TextInput
+                        accessibilityLabel="Customer mobile"
+                        value={phone}
+                        onChangeText={setPhone}
+                        keyboardType="phone-pad"
+                        placeholder="Customer mobile, e.g. 04xx xxx xxx"
+                        placeholderTextColor={colors.textDim}
+                        style={[
+                          styles.recipientInput,
+                          {
+                            borderColor: colors.ctlLine,
+                            backgroundColor: colors.ink,
+                            color: colors.textPri,
+                          },
+                        ]}
+                      />
+                    </View>
+                  )
+                ) : (
+                  <>
+                    <Text style={[styles.recipientLabel, { color: colors.textSec }]}>
+                      Customer email
+                    </Text>
+                    <TextInput
+                      accessibilityLabel="Customer email"
+                      value={email}
+                      onChangeText={setEmail}
+                      keyboardType="email-address"
+                      autoCapitalize="none"
+                      autoCorrect={false}
+                      placeholder="customer@example.com"
+                      placeholderTextColor={colors.textDim}
+                      style={[
+                        styles.recipientInput,
+                        {
+                          borderColor: colors.ctlLine,
+                          backgroundColor: colors.ink,
+                          color: colors.textPri,
+                        },
+                      ]}
+                    />
+                    <Text style={[styles.recipientHint, { color: colors.textDim }]}>
+                      PDF attached. Leave blank to use the address on file.
+                    </Text>
+                  </>
+                )}
+              </View>
+            ) : null}
+          </ScrollView>
+
+          {(primaryAction || pending || actionNotice || error != null) && (
+            <View
+              style={[
+                styles.actionBar,
+                {
+                  borderTopColor: colors.inkLine,
+                  paddingBottom: Math.max(insets.bottom, spacing.lg),
+                },
+              ]}
+            >
+              {error ? (
+                <Text
+                  accessibilityLiveRegion="polite"
+                  style={[styles.errorText, { color: colors.dangerBright }]}
+                >
+                  {actionErrorMessage(error)}
+                </Text>
+              ) : actionNotice ? (
+                <Text
+                  accessibilityLiveRegion="polite"
+                  style={[
+                    styles.okText,
+                    {
+                      color:
+                        actionNotice.kind === 'sent' ? colors.successBright : colors.warningBright,
+                    },
+                  ]}
+                >
+                  {actionNotice.message}
+                </Text>
+              ) : armed ? (
+                <Text
+                  accessibilityLiveRegion="polite"
+                  style={[styles.hintText, { color: colors.warningBright }]}
+                >
+                  Tap again to confirm.
+                </Text>
+              ) : null}
+
+              {pending ? (
+                <View style={styles.pendingRow}>
+                  <ActivityIndicator color={colors.textPri} />
+                  <Text style={[styles.pendingLabel, { color: colors.textSec }]}>
+                    {approve.isPending ? 'Approving…' : 'Sending…'}
+                  </Text>
+                </View>
+              ) : showActionRow ? (
+                <>
+                  {primaryAction === 'send' ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityLabel={`Change delivery. ${deliverySummary}`}
+                      accessibilityHint="Choose text message or email and check the customer’s contact details"
+                      onPress={() =>
+                        scrollRef.current?.scrollTo({ y: deliveryOffset, animated: !reduceMotion })
+                      }
+                      style={styles.deliveryShortcut}
+                    >
+                      <Text
+                        numberOfLines={2}
+                        ellipsizeMode="tail"
+                        style={[styles.deliverySummary, { color: colors.textSec }]}
+                      >
+                        {deliverySummary}
+                      </Text>
+                      <Text style={[styles.deliveryChange, { color: colors.accentText }]}>
+                        Change
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                  <View style={styles.actionRow}>
+                    <View style={styles.footerTotal}>
+                      <Text style={[styles.amountLabel, { color: colors.textDim }]}>INC GST</Text>
+                      <Text style={[styles.footerAmount, { color: colors.textPri }]}>
+                        {amount ?? 'Not priced'}
+                      </Text>
+                    </View>
+                    <Pressable
+                      accessibilityRole="button"
+                      accessibilityState={{ disabled: sendBlocked }}
+                      accessibilityLabel={
+                        armed
+                          ? 'Tap again to confirm'
+                          : primaryAction === 'approve'
+                            ? 'Approve and send'
+                            : resend
+                              ? 'Resend to customer'
+                              : 'Send to customer'
+                      }
+                      disabled={sendBlocked}
+                      onPress={firePrimaryAction}
+                      style={({ pressed }) => [
+                        styles.primaryBtn,
+                        sendBlocked ? styles.btnDisabled : null,
+                        { backgroundColor: pressed ? colors.accentPress : colors.accent },
+                      ]}
+                    >
+                      <Text style={[styles.primaryBtnLabel, { color: colors.accentInk }]}>
+                        {actionLabel}
+                      </Text>
+                    </Pressable>
+                  </View>
+                </>
+              ) : null}
+            </View>
+          )}
+        </View>
       </KeyboardAvoidingView>
     </Modal>
   );
@@ -812,26 +897,28 @@ export function QuoteDetailModal({
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   header: {
-    height: 52,
+    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
+    gap: spacing.md,
     borderBottomWidth: 1,
   },
-  headerTitle: { fontFamily: fonts.mono.semiBold, fontSize: 11, letterSpacing: 1.5 },
+  headerTitle: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24, flexShrink: 1 },
   closeBtn: {
-    width: 36,
-    height: 36,
+    width: touch.minimum,
+    height: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  body: { padding: spacing.lg, paddingBottom: spacing.xxl },
-  name: { ...type.title, fontSize: 20 },
+  body: { padding: spacing.xl, paddingBottom: spacing.xxl },
+  name: { ...type.title, fontSize: 22, lineHeight: 30 },
   job: { marginTop: 4, fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
-  meta: { marginTop: 6, fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 1 },
+  meta: { marginTop: spacing.sm, fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18 },
   chip: {
     marginTop: spacing.md,
     flexDirection: 'row',
@@ -842,39 +929,45 @@ const styles = StyleSheet.create({
     paddingVertical: 5,
     paddingHorizontal: 8,
   },
-  chipDot: { width: 5, height: 5, borderRadius: 2.5 },
-  chipText: { fontFamily: fonts.mono.bold, fontSize: 12, letterSpacing: 0.9 },
+  chipText: { fontFamily: fonts.mono.bold, fontSize: 12, lineHeight: 18, flexShrink: 1 },
   amountCard: {
-    marginTop: spacing.lg,
+    marginTop: spacing.xxl,
     borderWidth: 1,
     borderRadius: radius.card,
-    padding: spacing.lg,
+    padding: spacing.xl,
   },
-  amountLabel: { fontFamily: fonts.sans.semiBold, fontSize: 10.5, letterSpacing: 1.05 },
+  amountLabel: { ...type.label, letterSpacing: 0.6 },
   amountValue: { ...type.price, marginTop: 8 },
-  tierNote: { marginTop: 8, fontFamily: fonts.sans.regular, fontSize: 13 },
-  section: { marginTop: spacing.xl },
-  sectionLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1.2 },
-  sectionBody: { marginTop: 8, fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 21 },
+  tierNote: { marginTop: spacing.sm, ...type.bodySm },
+  section: { marginTop: spacing.xxl },
+  sectionLabel: { ...type.label, letterSpacing: 0.8 },
+  sectionBody: { marginTop: spacing.sm, ...type.body },
   metaGrid: {
     marginTop: spacing.sm,
     flexDirection: 'row',
     flexWrap: 'wrap',
     borderWidth: 1,
-    borderRadius: radius.chip,
+    borderRadius: radius.card,
     overflow: 'hidden',
   },
-  metaCell: { width: '50%', paddingHorizontal: spacing.md, paddingVertical: spacing.sm + 2 },
+  metaCell: { width: '50%', padding: spacing.md },
   metaLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
-  metaValue: { marginTop: 4, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 19 },
+  metaValue: {
+    marginTop: spacing.xs,
+    fontFamily: fonts.sans.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   metaSub: {
     marginTop: 2,
     fontFamily: fonts.mono.medium,
-    fontSize: 11,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
   layoutRow: { marginTop: spacing.sm, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
@@ -882,116 +975,156 @@ const styles = StyleSheet.create({
     minHeight: touch.minimum,
     justifyContent: 'center',
     borderWidth: 1,
+    borderRadius: radius.control,
+    flexGrow: 1,
+    alignItems: 'center',
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  layoutBtnText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
-  layoutNote: { marginTop: spacing.sm, fontFamily: fonts.sans.medium, fontSize: 12 },
+  layoutBtnText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  layoutNote: { marginTop: spacing.sm, ...type.bodySm },
   linksWrap: { marginTop: spacing.sm, flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   historyStrip: {
     marginTop: spacing.md,
     borderWidth: 1,
+    borderRadius: radius.control,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm + 2,
     gap: 3,
   },
   historyLead: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 1.2, // .12em @ 10 — the web's tracking-wider lead badge
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.6,
   },
-  historyBody: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
-  activityRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
-  activityDot: { width: 5, height: 5, borderRadius: radius.pill },
-  activityLabel: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
+  historyBody: { ...type.bodySm },
+  activityRow: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    paddingVertical: spacing.xs,
+  },
+  activityDot: { width: 5, height: 5, borderRadius: radius.pill, marginTop: 8 },
+  activityContent: { flex: 1, gap: spacing.xs },
+  activityLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   activityWhen: {
-    marginLeft: 'auto',
     fontFamily: fonts.mono.medium,
-    fontSize: 11,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
   itemsCard: { marginTop: 8, borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
   itemRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: spacing.md,
-    paddingVertical: 10,
-    paddingHorizontal: spacing.md,
+    gap: spacing.xs,
+    padding: spacing.lg,
     borderBottomWidth: 1,
   },
-  itemDesc: { flex: 1, fontFamily: fonts.sans.regular, fontSize: 13 },
+  itemDesc: { ...type.bodySm },
   itemQty: {
     fontFamily: fonts.mono.medium,
-    fontSize: 11,
-    letterSpacing: 0.4,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
   itemsTotalRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 10,
-    paddingHorizontal: spacing.md,
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
-  itemsTotalLabel: { fontFamily: fonts.sans.semiBold, fontSize: 11, letterSpacing: 0.6 },
+  itemsTotalLabel: { ...type.label, letterSpacing: 0.6 },
   itemsTotalValue: {
     fontFamily: fonts.mono.bold,
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 24,
     fontVariant: ['tabular-nums'],
   },
-  itemsCaption: { marginTop: 6, fontFamily: fonts.sans.regular, fontSize: 12 },
-  bubble: { maxWidth: '82%', borderWidth: 1, borderRadius: 10, padding: 10 },
-  bubbleBody: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 19 },
-  bubbleMeta: { marginTop: 5, fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.9 },
+  itemsCaption: { marginTop: spacing.sm, ...type.bodySm },
+  bubble: { maxWidth: '90%', borderWidth: 1, borderRadius: radius.card, padding: spacing.md },
+  bubbleBody: { ...type.body },
+  bubbleMeta: {
+    marginTop: spacing.sm,
+    fontFamily: fonts.mono.medium,
+    fontSize: 12,
+    lineHeight: 18,
+  },
   actionBar: {
     borderTopWidth: 1,
-    paddingHorizontal: spacing.lg,
+    paddingHorizontal: spacing.xl,
     paddingTop: spacing.md,
     gap: spacing.sm,
   },
   channelBlock: { gap: spacing.sm },
-  channelRow: { flexDirection: 'row', gap: spacing.sm },
+  channelRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   channelBtn: {
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
+    flexGrow: 1,
+    borderRadius: radius.control,
     borderWidth: 1,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  channelBtnText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
-  recipientOnFile: { fontFamily: fonts.sans.regular, fontSize: 13 },
+  channelBtnText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  recipientOnFile: { ...type.bodySm },
+  recipientLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   recipientInput: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
   },
-  recipientHint: { fontFamily: fonts.sans.regular, fontSize: 12 },
+  recipientHint: { ...type.bodySm },
   btnDisabled: { opacity: 0.4 },
-  errorText: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
-  okText: { fontFamily: fonts.sans.semiBold, fontSize: 13 },
-  hintText: { fontFamily: fonts.sans.semiBold, fontSize: 13 },
-  pendingRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm, height: 52 },
-  pendingLabel: { fontFamily: fonts.sans.semiBold, fontSize: 13 },
-  actionRow: { flexDirection: 'row', gap: spacing.sm },
-  ghostBtn: {
-    flex: 1,
-    height: 52,
-    borderWidth: 1,
-    borderRadius: radius.control,
+  errorText: { ...type.bodySm },
+  okText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  hintText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  pendingRow: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
+    gap: spacing.sm,
+    minHeight: touch.primaryCta,
   },
-  ghostBtnLabel: { fontFamily: fonts.sans.bold, fontSize: 12.5, letterSpacing: 0.75 },
+  pendingLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  deliveryShortcut: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: touch.minimum,
+  },
+  deliverySummary: { ...type.bodySm, flex: 1 },
+  deliveryChange: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  actionRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.md },
+  footerTotal: { flexGrow: 1, gap: spacing.xs },
+  footerAmount: {
+    fontFamily: fonts.mono.bold,
+    fontSize: 18,
+    lineHeight: 26,
+    fontVariant: ['tabular-nums'],
+  },
   primaryBtn: {
-    flex: 1,
-    height: 52,
+    flexGrow: 1,
+    flexBasis: 168,
+    minHeight: touch.primaryCta,
+    padding: spacing.md,
     borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  primaryBtnLabel: { fontFamily: fonts.sans.bold, fontSize: 12.5, letterSpacing: 0.75 },
+  primaryBtnLabel: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
+    flexShrink: 1,
+    letterSpacing: 0.4,
+  },
 });

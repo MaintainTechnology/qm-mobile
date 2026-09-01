@@ -1,10 +1,8 @@
 /**
  * Small pieces shared by the trade tools (roofing measure + job quoter, spec
- * web-parity F1–F3). Not in `src/features/auth/ui.tsx` because that file is
- * scoped to the three auth screens (see its own header) — these are new,
- * general-purpose primitives for this feature only.
+ * web-parity F1–F3), using the same design tokens as the shared form controls.
  */
-import type { ReactNode } from 'react';
+import { useState, type ReactNode } from 'react';
 import {
   Pressable,
   StyleSheet,
@@ -15,24 +13,19 @@ import {
   type ViewStyle,
 } from 'react-native';
 
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 /** The one server-error → copy mapper — re-exported so trade screens keep importing
  *  it from here alongside Card/Notice/PillGroup rather than reaching into `@/lib/api`. */
 export { apiErrorMessage } from '@/lib/api';
 
-/** Raised surface, same lift treatment as HomeScreen's cards. */
+/** A quiet surface separated by the design system's warm hairline. */
 export function Card({ children, style }: { children: ReactNode; style?: StyleProp<ViewStyle> }) {
-  const { colors, isDark } = useTheme();
-  const lift = isDark ? 'inset 0 1px 0 rgba(255,255,255,0.06)' : '0 1px 2px rgba(43,36,34,0.06)';
+  const { colors } = useTheme();
   return (
     <View
-      style={[
-        styles.card,
-        { borderColor: colors.inkLine, backgroundColor: colors.inkCard, boxShadow: lift },
-        style,
-      ]}
+      style={[styles.card, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }, style]}
     >
       {children}
     </View>
@@ -41,7 +34,11 @@ export function Card({ children, style }: { children: ReactNode; style?: StylePr
 
 export function SectionLabel({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
-  return <Text style={[styles.sectionLabel, { color: colors.accentText }]}>{children}</Text>;
+  return (
+    <Text accessibilityRole="header" style={[styles.sectionLabel, { color: colors.textPri }]}>
+      {children}
+    </Text>
+  );
 }
 
 /** One radio-style pill — for single-select option rows (state, material, pitch...). */
@@ -58,17 +55,19 @@ export function PillOption({
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ selected }}
+      accessibilityState={{ checked: selected, selected }}
+      aria-checked={selected}
       onPress={onPress}
-      style={[
+      style={({ pressed }) => [
         styles.pill,
         {
-          backgroundColor: selected ? 'rgba(255,196,0,0.12)' : colors.ink,
-          borderColor: selected ? colors.accent : colors.inkLine,
+          backgroundColor: selected || pressed ? colors.inkCard : colors.ink,
+          borderColor: selected ? colors.accentSoft : colors.ctlLine,
+          opacity: pressed ? 0.75 : 1,
         },
       ]}
     >
-      <Text style={[styles.pillLabel, { color: selected ? colors.accentText : colors.textSec }]}>
+      <Text style={[styles.pillLabel, { color: selected ? colors.textPri : colors.textSec }]}>
         {label}
       </Text>
     </Pressable>
@@ -87,7 +86,7 @@ export function PillGroup({
   onChange: (next: string) => void;
 }) {
   return (
-    <View style={styles.pillRow}>
+    <View accessibilityRole="radiogroup" style={styles.pillRow}>
       {options.map(([v, label]) => (
         <PillOption key={v} label={label} selected={value === v} onPress={() => onChange(v)} />
       ))}
@@ -113,16 +112,25 @@ export function Notice({
       ? colors.dangerBright
       : tone === 'warn'
         ? colors.warningBright
-        : colors.accentText;
+        : colors.textPri;
   return (
-    <View style={[styles.notice, { borderColor: toneColor, backgroundColor: colors.inkCard }]}>
+    <View
+      accessibilityLiveRegion={tone === 'danger' ? 'assertive' : 'polite'}
+      style={[
+        styles.notice,
+        {
+          borderColor: tone === 'accent' ? colors.inkLine : toneColor,
+          backgroundColor: colors.ink,
+        },
+      ]}
+    >
       <Text style={[styles.noticeLabel, { color: toneColor }]}>{label}</Text>
       {body ? <Text style={[styles.noticeBody, { color: colors.textSec }]}>{body}</Text> : null}
       {onRetry ? (
         <Pressable
           accessibilityRole="button"
           onPress={onRetry}
-          style={styles.noticeRetry}
+          style={({ pressed }) => [styles.noticeRetry, { opacity: pressed ? 0.65 : 1 }]}
           hitSlop={8}
         >
           <Text style={[styles.noticeRetryLabel, { color: toneColor }]}>TRY AGAIN</Text>
@@ -145,19 +153,28 @@ export function MultilineField({
   placeholder?: string;
 }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <View>
       <Text style={[styles.fieldLabel, { color: colors.textPri }]}>{label.toUpperCase()}</Text>
       <TextInput
+        accessibilityLabel={label}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colors.textDim}
+        selectionColor={colors.accentSoft}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         multiline
         numberOfLines={4}
         style={[
           styles.textarea,
-          { backgroundColor: colors.ink, borderColor: colors.inkLine, color: colors.textPri },
+          {
+            backgroundColor: colors.ink,
+            borderColor: focused ? colors.accentSoft : colors.ctlLine,
+            color: colors.textPri,
+          },
         ]}
       />
     </View>
@@ -165,51 +182,57 @@ export function MultilineField({
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: 14, padding: 16 },
+  card: { minWidth: 0, borderWidth: 1, borderRadius: radius.card, padding: spacing.xl },
   sectionLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 1.5,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 1.2,
     textTransform: 'uppercase',
   },
-  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  pillRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   pill: {
     minHeight: touch.minimum,
-    paddingHorizontal: 14,
+    maxWidth: '100%',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  pillLabel: { fontFamily: fonts.mono.bold, fontSize: 12, letterSpacing: 0.6 },
-  notice: { borderWidth: 1, borderRadius: 14, padding: 16, gap: 6 },
+  pillLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20, textAlign: 'center' },
+  notice: { borderWidth: 1, borderRadius: radius.control, padding: spacing.lg, gap: spacing.sm },
   noticeLabel: {
     fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
+    fontSize: 14,
+    lineHeight: 20,
   },
-  noticeBody: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 19 },
+  noticeBody: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   noticeRetry: {
     marginTop: 4,
     alignSelf: 'flex-start',
     minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    paddingRight: spacing.lg,
     justifyContent: 'center',
   },
-  noticeRetryLabel: { fontFamily: fonts.sans.bold, fontSize: 12, letterSpacing: 0.8 },
+  noticeRetryLabel: { fontFamily: fonts.sans.bold, fontSize: 14, letterSpacing: 0.6 },
   fieldLabel: {
     marginBottom: 8,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   textarea: {
-    minHeight: 90,
+    minHeight: 112,
     borderWidth: 1,
-    borderRadius: 8,
-    padding: 14,
+    borderRadius: radius.control,
+    padding: spacing.lg,
     fontFamily: fonts.sans.regular,
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 24,
     textAlignVertical: 'top',
   },
 });

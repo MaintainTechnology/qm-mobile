@@ -51,11 +51,18 @@ export function AccountCard({ me }: { me: TenantMe }) {
   ];
 
   return (
-    <CardBox title="ACCOUNT">
+    <CardBox title="BUSINESS DETAILS">
       {rows.map(row => (
         <View key={row.label} style={[styles.row, { borderTopColor: colors.inkLine }]}>
           <Text style={[styles.label, { color: colors.textDim }]}>{row.label.toUpperCase()}</Text>
-          <Text style={[styles.value, { color: colors.textPri }]} numberOfLines={1}>
+          <Text
+            selectable
+            style={[
+              styles.value,
+              { color: colors.textPri },
+              row.label === 'AI line' ? styles.phone : null,
+            ]}
+          >
             {row.value}
           </Text>
         </View>
@@ -66,14 +73,22 @@ export function AccountCard({ me }: { me: TenantMe }) {
 
 const styles = StyleSheet.create({
   row: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
     borderTopWidth: 1,
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  label: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1.2 },
-  value: { flexShrink: 1, textAlign: 'right', fontFamily: fonts.sans.semiBold, fontSize: 14 },
+  label: {
+    width: 76,
+    paddingTop: 2,
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.5,
+  },
+  value: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 22 },
+  phone: { fontFamily: fonts.mono.regular, fontVariant: ['tabular-nums'] },
 });

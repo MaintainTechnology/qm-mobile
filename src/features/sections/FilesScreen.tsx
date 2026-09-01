@@ -21,7 +21,7 @@ import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice } from '../trades/ui';
-import { SectionScreen } from './SectionScreen';
+import { SectionEmpty, SectionGroup, SectionLoading, SectionScreen } from './SectionScreen';
 
 const FILES_KEY = ['tenant', 'files'] as const;
 
@@ -136,7 +136,7 @@ export function FilesScreen() {
   return (
     <SectionScreen
       title="Files"
-      subtitle="Archived quotes, invoices and your documents — ask them questions."
+      subtitle="Find your archived quotes and invoices, or ask a question about them."
       refreshing={files.isFetching}
       onRefresh={() => void files.refetch()}
     >
@@ -144,7 +144,9 @@ export function FilesScreen() {
       <View
         style={[styles.askCard, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}
       >
-        <Text style={[styles.groupLabel, { color: colors.textDim }]}>ASK YOUR DOCUMENTS</Text>
+        <Text accessibilityRole="header" style={[styles.cardTitle, { color: colors.textPri }]}>
+          ASK YOUR DOCUMENTS
+        </Text>
         <TextInput
           value={question}
           onChangeText={setQuestion}
@@ -174,7 +176,7 @@ export function FilesScreen() {
           ]}
         >
           <Text style={[styles.askBtnText, { color: colors.accentInk }]}>
-            {ask.isPending ? 'SEARCHING…' : 'ASK'}
+            {ask.isPending ? 'SEARCHING…' : 'ASK DOCUMENTS'}
           </Text>
         </Pressable>
         {ask.isError ? (
@@ -183,7 +185,7 @@ export function FilesScreen() {
           </Text>
         ) : null}
         {asked?.answer ? (
-          <>
+          <View style={[styles.answerBlock, { borderTopColor: colors.inkLine }]}>
             <Text style={[styles.answer, { color: colors.textSec }]}>{asked.answer}</Text>
             {asked.citations.length > 0 ? (
               <Text style={[styles.sources, { color: colors.textDim }]}>
@@ -194,13 +196,13 @@ export function FilesScreen() {
                   .join(' · ')}
               </Text>
             ) : null}
-          </>
+          </View>
         ) : null}
       </View>
 
       {/* Document list. */}
       {files.isPending ? (
-        <Notice tone="accent" label="Loading your documents…" />
+        <SectionLoading label="Loading your documents" />
       ) : files.isError && !files.data ? (
         <Notice
           tone="danger"
@@ -209,16 +211,12 @@ export function FilesScreen() {
           onRetry={() => void files.refetch()}
         />
       ) : documents.length === 0 ? (
-        <Notice
-          tone="accent"
-          label="No documents yet"
+        <SectionEmpty
+          title="No documents yet"
           body="Approved quotes archive here automatically, and invoices you upload on the web join them."
         />
       ) : (
-        <>
-          <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-            YOUR DOCUMENTS · {documents.length}
-          </Text>
+        <SectionGroup title="Your documents" count={documents.length}>
           {failed ? (
             <Notice
               tone="danger"
@@ -235,11 +233,11 @@ export function FilesScreen() {
                 { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
               ]}
             >
-              <View style={{ flex: 1, minWidth: 0 }}>
-                <Text style={[styles.docName, { color: colors.textPri }]} numberOfLines={1}>
+              <View style={{ minWidth: 0, gap: spacing.xs }}>
+                <Text style={[styles.docName, { color: colors.textPri }]} numberOfLines={2}>
                   {doc.display_name ?? 'Document'}
                 </Text>
-                <Text style={[styles.docMeta, { color: colors.textDim }]} numberOfLines={1}>
+                <Text style={[styles.docMeta, { color: colors.textDim }]}>
                   {[
                     doc.source_kind?.toUpperCase(),
                     doc.trade,
@@ -251,93 +249,135 @@ export function FilesScreen() {
                     .join(' · ')}
                 </Text>
               </View>
-              <Text
-                style={[styles.stateChip, { color: colors.textSec, borderColor: colors.inkLine }]}
-              >
-                {stateLabel(doc.state)}
-              </Text>
-              <Pressable
-                accessibilityRole="button"
-                accessibilityLabel={`Download ${doc.display_name ?? 'document'}`}
-                disabled={downloadingId != null}
-                onPress={() => void download(doc)}
-                style={({ pressed }) => [
-                  styles.downloadBtn,
-                  {
-                    borderColor: colors.ctlLine,
-                    backgroundColor: pressed ? colors.ink : 'transparent',
-                    opacity: downloadingId != null && downloadingId !== doc.id ? 0.45 : 1,
-                  },
-                ]}
-              >
-                {downloadingId === doc.id ? (
-                  <ActivityIndicator size="small" color={colors.accent} />
-                ) : (
-                  <Text style={[styles.downloadText, { color: colors.textPri }]}>SAVE</Text>
-                )}
-              </Pressable>
+              <View style={[styles.docActions, { borderTopColor: colors.inkLine }]}>
+                <Text
+                  style={[
+                    styles.stateChip,
+                    {
+                      color:
+                        doc.state === 'active'
+                          ? colors.successBright
+                          : doc.state === 'failed'
+                            ? colors.dangerBright
+                            : colors.textSec,
+                      borderColor:
+                        doc.state === 'active'
+                          ? colors.successBright
+                          : doc.state === 'failed'
+                            ? colors.dangerBright
+                            : colors.ctlLine,
+                    },
+                  ]}
+                >
+                  {stateLabel(doc.state)}
+                </Text>
+                <Pressable
+                  accessibilityRole="button"
+                  accessibilityLabel={`Download ${doc.display_name ?? 'document'}`}
+                  disabled={downloadingId != null}
+                  onPress={() => void download(doc)}
+                  style={({ pressed }) => [
+                    styles.downloadBtn,
+                    {
+                      borderColor: colors.ctlLine,
+                      backgroundColor: pressed ? colors.ink : 'transparent',
+                      opacity: downloadingId != null && downloadingId !== doc.id ? 0.45 : 1,
+                    },
+                  ]}
+                >
+                  {downloadingId === doc.id ? (
+                    <ActivityIndicator size="small" color={colors.accent} />
+                  ) : (
+                    <Text style={[styles.downloadText, { color: colors.textPri }]}>DOWNLOAD</Text>
+                  )}
+                </Pressable>
+              </View>
             </View>
           ))}
           <LinkOutButton label="Viewer & comments on the web" path="/dashboard?tab=files" />
-        </>
+        </SectionGroup>
       )}
     </SectionScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  groupLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+  cardTitle: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24, letterSpacing: -0.36 },
+  askCard: {
+    borderWidth: 1,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    padding: spacing.xl,
+    gap: spacing.lg,
   },
-  askCard: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.md },
   askInput: {
-    minHeight: 64,
+    minHeight: 104,
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     padding: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
     textAlignVertical: 'top',
   },
   askBtn: {
-    minHeight: touch.minimum,
-    alignSelf: 'flex-start',
+    minHeight: touch.primaryCta,
+    alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
   },
-  askBtnText: { fontFamily: fonts.mono.bold, fontSize: 11, letterSpacing: 0.88 },
-  answer: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 20 },
-  sources: { fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.8 },
+  askBtnText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.8,
+    textAlign: 'center',
+  },
+  answerBlock: { gap: spacing.md, borderTopWidth: 1, paddingTop: spacing.lg },
+  answer: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 22 },
+  sources: { fontFamily: fonts.mono.regular, fontSize: 12, lineHeight: 18, letterSpacing: 0.3 },
   docRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.lg,
     borderWidth: 1,
     borderRadius: radius.card,
-    padding: spacing.md,
+    borderCurve: 'continuous',
+    padding: spacing.lg,
   },
-  docName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
-  docMeta: { marginTop: 2, fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.5 },
+  docName: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  docMeta: { fontFamily: fonts.mono.regular, fontSize: 12, lineHeight: 18, letterSpacing: 0.2 },
+  docActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    borderTopWidth: 1,
+    paddingTop: spacing.md,
+  },
   downloadBtn: {
     minHeight: touch.minimum,
-    minWidth: 56,
+    minWidth: 112,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: spacing.sm,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
-  downloadText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  downloadText: { fontFamily: fonts.sans.bold, fontSize: 14, lineHeight: 20, letterSpacing: 0.4 },
   stateChip: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 7,
+    paddingHorizontal: spacing.sm,
     paddingVertical: 4,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
 });

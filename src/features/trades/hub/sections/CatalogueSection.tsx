@@ -20,15 +20,22 @@
  * pricing (supplier RRP) happens server-side.
  */
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
-import { appendFile, pickImage, sizeOk } from '@/lib/media';
+import {
+  appendUploadFiles,
+  pickImageForUpload,
+  uploadFailureNotice,
+  uploadSelectionNote,
+} from '@/lib/media';
 import { apiDollarsFromCents, centsFromApiDollars, formatAud, parseAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
+import { ThemedSwitch } from '@/components/ThemedSwitch';
 import { useTheme } from '@/lib/useTheme';
 
 import {
   BULK_ADD_MAX,
+  CATALOGUE_PHOTO_POLICY,
   filterCatalogueRows,
   filterSupplierRows,
   groupByCategory,
@@ -94,7 +101,9 @@ export function CatalogueSection({ trade }: { trade: HubTrade }) {
       <PillGroup
         options={modeOptions}
         value={mode}
-        onChange={next => setMode(next === 'browse' ? 'browse' : next === 'ladder' ? 'ladder' : 'mine')}
+        onChange={next =>
+          setMode(next === 'browse' ? 'browse' : next === 'ladder' ? 'ladder' : 'mine')
+        }
       />
       {mode === 'mine' ? (
         <MinePanel trade={trade} />
@@ -133,9 +142,7 @@ function MinePanel({ trade }: { trade: HubTrade }) {
     );
 
   const canWrite = canWritePricingEngine(trade);
-  const rows = (query.data?.catalogue ?? []).filter(
-    r => (r.trade ?? '').toLowerCase() === trade,
-  );
+  const rows = (query.data?.catalogue ?? []).filter(r => (r.trade ?? '').toLowerCase() === trade);
 
   // Web hub-mode dead end for non-catalogue trades (page.tsx:11763-11773) —
   // shown only when there is nothing to list; stray rows still render below.
@@ -163,7 +170,10 @@ function MinePanel({ trade }: { trade: HubTrade }) {
     ['all', `All (${rows.length})`],
     ...[...counts.keys()]
       .sort()
-      .map((c): readonly [string, string] => [c, `${materialCategoryLabel(c)} (${counts.get(c) ?? 0})`]),
+      .map((c): readonly [string, string] => [
+        c,
+        `${materialCategoryLabel(c)} (${counts.get(c) ?? 0})`,
+      ]),
   ];
 
   const filtered = filterCatalogueRows(rows, { category, search });
@@ -191,12 +201,12 @@ function MinePanel({ trade }: { trade: HubTrade }) {
         />
       ) : null}
 
-      <Card>
+      <Card style={{ gap: spacing.lg }}>
         <SectionLabel>{`Product catalogue · ${rows.length}`}</SectionLabel>
         <Text style={[styles.blurb, { color: colors.textSec }]}>
-          Your real branded products and prices. The AI quotes these ahead of generic items and
-          maps brand + range to a tier (e.g. Clipsal Iconic → Better, Clipsal 2000 → Good). Off
-          rows are never offered.
+          Your real branded products and prices. The AI quotes these ahead of generic items and maps
+          brand + range to a tier (e.g. Clipsal Iconic → Better, Clipsal 2000 → Good). Off rows are
+          never offered.
         </Text>
 
         {canWrite && rows.length < 10 ? <EssentialsBlock empty={rows.length === 0} /> : null}
@@ -327,8 +337,11 @@ function CoverageCard({ trade }: { trade: HubTrade }) {
       {cats.map(c => (
         <View key={c.category} style={[styles.coverageRow, { borderTopColor: colors.inkLine }]}>
           <Text
-            style={[styles.coverageCat, { color: c.covered ? colors.textPri : colors.warningBright }]}
-            numberOfLines={1}
+            style={[
+              styles.coverageCat,
+              { color: c.covered ? colors.textPri : colors.warningBright },
+            ]}
+            numberOfLines={2}
           >
             {materialCategoryLabel(c.category)}
           </Text>
@@ -356,7 +369,9 @@ function EssentialsBlock({ empty }: { empty: boolean }) {
         ),
     });
   return (
-    <View style={[styles.essentials, { borderLeftColor: colors.accent, backgroundColor: colors.ink }]}>
+    <View
+      style={[styles.essentials, { borderTopColor: colors.inkLine, backgroundColor: colors.ink }]}
+    >
       <Text style={[styles.essentialsLabel, { color: colors.accentText }]}>
         {empty ? 'GET STARTED IN ONE CLICK' : 'QUICK START'}
       </Text>
@@ -366,7 +381,9 @@ function EssentialsBlock({ empty }: { empty: boolean }) {
           : 'Stock common products in one click — covers the most-quoted categories with one good-tier SKU each. Already-stocked items are skipped.'}
       </Text>
       {message ? (
-        <Text style={[styles.essentialsMsg, { color: colors.textDim }]}>{message.toUpperCase()}</Text>
+        <Text style={[styles.essentialsMsg, { color: colors.textDim }]}>
+          {message.toUpperCase()}
+        </Text>
       ) : null}
       {essentials.isError ? (
         <Notice
@@ -436,7 +453,7 @@ function ProductRow({
           <ActionButton label="Delete" tone="danger" onPress={onDelete} disabled={busy} />
         </View>
       </View>
-      <Switch
+      <ThemedSwitch
         accessibilityLabel={`${row.name} — ${active ? 'active, tap to turn off' : 'off, tap to turn on'}`}
         value={active}
         disabled={busy}
@@ -505,8 +522,9 @@ function ProductForm({
     initial?.properties?.integrated_driver === true,
   );
   const [formError, setFormError] = useState<string | null>(null);
+  const [uploadNote, setUploadNote] = useState<string | null>(null);
 
-  const busy = create.isPending || update.isPending;
+  const busy = create.isPending || update.isPending || upload.isPending;
   const categoryOptions = materialCategoryOptionsFor(trade);
 
   /** '' → null (PATCH clears) / undefined (create omits); junk → error. */
@@ -523,24 +541,40 @@ function ProductForm({
     return { ok: true, value: apiDollarsFromCents(cents) };
   };
 
-  /** Snap or choose a product photo → POST catalogue/upload (multipart 'file',
-   *  JPG/PNG/WebP) → the returned public URL fills the photo field. The 8MB
-   *  guard mirrors the server's cap. */
+  /** Snap or choose a product photo using the route's exact multipart policy. */
   const attachPhoto = async (source: 'camera' | 'library') => {
-    const picked = await pickImage(source);
-    if (!picked) return;
-    if (!sizeOk(picked, 8 * 1024 * 1024)) {
-      setFormError('Photo must be under 8 MB.');
+    const result = await pickImageForUpload(source, CATALOGUE_PHOTO_POLICY);
+    if (result.kind === 'cancelled') return;
+    if (result.kind === 'denied' || result.kind === 'failed') {
+      setUploadNote(null);
+      setFormError(result.message);
       return;
     }
+    if (result.kind === 'rejected') {
+      setUploadNote(null);
+      setFormError(result.problem.message);
+      return;
+    }
+
     const form = new FormData();
-    appendFile(form, 'file', picked);
+    const appended = appendUploadFiles(form, CATALOGUE_PHOTO_POLICY, result.files);
+    if (!appended.ok) {
+      setUploadNote(null);
+      setFormError(appended.problem.message);
+      return;
+    }
+    setFormError(null);
+    setUploadNote(uploadSelectionNote(result));
     upload.mutate(form, {
       onSuccess: r => {
         setImagePath(r.url);
         setFormError(null);
+        setUploadNote(null);
       },
-      onError: error => setFormError(apiErrorMessage(error)),
+      onError: error => {
+        setUploadNote(null);
+        setFormError(uploadFailureNotice(error, CATALOGUE_PHOTO_POLICY.purpose).message);
+      },
     });
   };
 
@@ -624,8 +658,8 @@ function ProductForm({
         <Text style={[styles.fieldLabel, { color: colors.textPri }]}>CATEGORY</Text>
         <PillGroup options={categoryOptions} value={category} onChange={setCategory} />
         <Text style={[styles.hint, { color: colors.textDim }]}>
-          What this product actually is. The AI matches it to the same category on your Recipes,
-          so a job that needs this part prices from your product and your price.
+          What this product actually is. The AI matches it to the same category on your Recipes, so
+          a job that needs this part prices from your product and your price.
         </Text>
       </View>
       <Field
@@ -635,7 +669,13 @@ function ProductForm({
         placeholder="e.g. Clipsal Iconic GPO"
         maxLength={120}
       />
-      <Field label="Brand" value={brand} onChangeText={setBrand} placeholder="Clipsal" maxLength={60} />
+      <Field
+        label="Brand"
+        value={brand}
+        onChangeText={setBrand}
+        placeholder="Clipsal"
+        maxLength={60}
+      />
       <Field
         label="Range / series"
         value={rangeSeries}
@@ -692,7 +732,9 @@ function ProductForm({
         placeholder="Paste an image URL (https://…)"
         maxLength={300}
       />
-      <View style={{ flexDirection: 'row', alignItems: 'center', gap: spacing.lg }}>
+      <View
+        style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.lg }}
+      >
         <Pressable
           accessibilityRole="button"
           disabled={upload.isPending}
@@ -702,9 +744,10 @@ function ProductForm({
           <Text
             style={{
               fontFamily: fonts.mono.bold,
-              fontSize: 11,
-              letterSpacing: 0.88,
-              color: upload.isPending ? colors.textDim : colors.accent,
+              fontSize: 14,
+              lineHeight: 20,
+              letterSpacing: 0.4,
+              color: upload.isPending ? colors.textDim : colors.accentText,
             }}
           >
             TAKE PHOTO
@@ -719,9 +762,10 @@ function ProductForm({
           <Text
             style={{
               fontFamily: fonts.mono.bold,
-              fontSize: 11,
-              letterSpacing: 0.88,
-              color: upload.isPending ? colors.textDim : colors.accent,
+              fontSize: 14,
+              lineHeight: 20,
+              letterSpacing: 0.4,
+              color: upload.isPending ? colors.textDim : colors.accentText,
             }}
           >
             CHOOSE PHOTO
@@ -733,6 +777,9 @@ function ProductForm({
           </Text>
         ) : null}
       </View>
+      {uploadNote ? (
+        <Text style={[styles.hint, { color: colors.textDim }]}>{uploadNote}</Text>
+      ) : null}
       <SwitchRow
         title="This is my go-to product for its category (preferred)"
         value={isPreferred}
@@ -761,7 +808,15 @@ function ProductForm({
         <ActionButton label="Cancel" onPress={onClose} />
         <ActionButton
           tone="accent"
-          label={busy ? 'Saving…' : editingId ? 'Save changes' : 'Add to catalogue'}
+          label={
+            upload.isPending
+              ? 'Uploading photo…'
+              : create.isPending || update.isPending
+                ? 'Saving…'
+                : editingId
+                  ? 'Save changes'
+                  : 'Add to catalogue'
+          }
           onPress={submit}
           disabled={busy}
         />
@@ -849,8 +904,8 @@ function BrowsePanel({ trade }: { trade: HubTrade }) {
     <Card>
       <SectionLabel>Browse supplier catalogue</SectionLabel>
       <Text style={[styles.blurb, { color: colors.textSec }]}>
-        Tick what you stock, then add it in one go. Prices default to the supplier RRP — edit
-        them from My catalogue after.
+        Tick what you stock, then add it in one go. Prices default to the supplier RRP — edit them
+        from My catalogue after.
       </Text>
 
       <PillGroup
@@ -866,7 +921,12 @@ function BrowsePanel({ trade }: { trade: HubTrade }) {
           <PillGroup options={brandChips} value={brand} onChange={setBrand} />
         </View>
       ) : null}
-      <Field label="Search" value={search} onChangeText={setSearch} placeholder="Search materials…" />
+      <Field
+        label="Search"
+        value={search}
+        onChangeText={setSearch}
+        placeholder="Search materials…"
+      />
 
       <Text style={[styles.matchLine, { color: colors.textSec }]}>
         {`${filtered.length} matching · ${selected.length} selected`}
@@ -889,7 +949,9 @@ function BrowsePanel({ trade }: { trade: HubTrade }) {
 
       {filtered.length === 0 ? (
         <Text style={[styles.blurb, { color: colors.textSec }]}>
-          {search.trim() ? `No materials match “${search.trim()}”.` : 'No materials match these filters.'}
+          {search.trim()
+            ? `No materials match “${search.trim()}”.`
+            : 'No materials match these filters.'}
         </Text>
       ) : (
         shown.map(r => (
@@ -914,7 +976,11 @@ function BrowsePanel({ trade }: { trade: HubTrade }) {
       <View style={styles.formActions}>
         <ActionButton
           tone="accent"
-          label={bulk.isPending ? 'Adding…' : `+ Add ${selected.length || ''} to my catalogue`.replace('  ', ' ')}
+          label={
+            bulk.isPending
+              ? 'Adding…'
+              : `+ Add ${selected.length || ''} to my catalogue`.replace('  ', ' ')
+          }
           onPress={addSelected}
           disabled={selected.length === 0 || bulk.isPending}
         />
@@ -969,11 +1035,16 @@ function SupplierRowItem({
           },
         ]}
       >
-        {selected ? <Text style={[styles.checkboxTick, { color: colors.accentInk }]}>✓</Text> : null}
+        {selected ? (
+          <Text style={[styles.checkboxTick, { color: colors.accentInk }]}>✓</Text>
+        ) : null}
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
         <View style={styles.supplierNameRow}>
-          <Text style={[styles.rowName, { color: colors.textPri, flexShrink: 1 }]} numberOfLines={2}>
+          <Text
+            style={[styles.rowName, { color: colors.textPri, flexShrink: 1 }]}
+            numberOfLines={2}
+          >
             {row.name}
           </Text>
           {row.tier_hint ? (
@@ -1040,7 +1111,8 @@ function LadderPanel({ trade }: { trade: HubTrade }) {
   }
 
   const slotByKey = new Map<string, string>();
-  for (const l of query.data?.ladder ?? []) slotByKey.set(`${l.category}::${l.tier}`, l.catalogue_id);
+  for (const l of query.data?.ladder ?? [])
+    slotByKey.set(`${l.category}::${l.tier}`, l.catalogue_id);
   const allProducts = Object.values(byCategory).flat();
   const busyKey = set.isPending
     ? `${set.variables.category}::${set.variables.tier}`
@@ -1111,7 +1183,12 @@ function LadderPanel({ trade }: { trade: HubTrade }) {
                     </Text>
                   </Pressable>
                   {open ? (
-                    <View style={[styles.slotPicker, { borderColor: colors.ctlLine, backgroundColor: colors.ink }]}>
+                    <View
+                      style={[
+                        styles.slotPicker,
+                        { borderColor: colors.ctlLine, backgroundColor: colors.ink },
+                      ]}
+                    >
                       <PickerOption
                         label="— inference fallback —"
                         selected={currentId === ''}
@@ -1155,10 +1232,7 @@ function PickerOption({
       style={styles.pickerOption}
     >
       <Text
-        style={[
-          styles.pickerOptionLabel,
-          { color: selected ? colors.accentText : colors.textPri },
-        ]}
+        style={[styles.pickerOptionLabel, { color: selected ? colors.accentText : colors.textPri }]}
         numberOfLines={2}
       >
         {selected ? '● ' : '○ '}
@@ -1186,8 +1260,9 @@ function Field({
   maxLength?: number;
 }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
-    <View style={{ marginTop: spacing.sm }}>
+    <View>
       <Text style={[styles.fieldLabel, { color: colors.textPri }]}>{label.toUpperCase()}</Text>
       <TextInput
         value={value}
@@ -1197,9 +1272,16 @@ function Field({
         keyboardType={keyboardType}
         maxLength={maxLength}
         accessibilityLabel={label}
+        selectionColor={colors.accentSoft}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         style={[
           styles.input,
-          { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textPri },
+          {
+            backgroundColor: colors.ink,
+            borderColor: focused ? colors.accentSoft : colors.ctlLine,
+            color: colors.textPri,
+          },
         ]}
       />
     </View>
@@ -1219,7 +1301,7 @@ function SwitchRow({
   return (
     <View style={styles.switchRow}>
       <Text style={[styles.switchTitle, { color: colors.textPri }]}>{title}</Text>
-      <Switch
+      <ThemedSwitch
         accessibilityLabel={title}
         value={value}
         onValueChange={onValueChange}
@@ -1256,6 +1338,7 @@ function ActionButton({
         styles.actionBtn,
         {
           opacity: disabled ? 0.5 : 1,
+          minHeight: accent ? touch.primaryCta : touch.minimum,
           borderColor: accent
             ? colors.accent
             : tone === 'danger'
@@ -1271,9 +1354,7 @@ function ActionButton({
         },
       ]}
     >
-      <Text style={[styles.actionLabel, { color: textColor }]} numberOfLines={1}>
-        {label.toUpperCase()}
-      </Text>
+      <Text style={[styles.actionLabel, { color: textColor }]}>{label.toUpperCase()}</Text>
     </Pressable>
   );
 }
@@ -1283,21 +1364,22 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     marginBottom: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
   hint: {
     marginTop: spacing.xs,
     fontFamily: fonts.sans.regular,
-    fontSize: 11.5,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 20,
   },
   gateBlock: { marginTop: spacing.md, gap: spacing.md },
   groupHeader: {
-    marginTop: spacing.md,
+    marginTop: spacing.xl,
     fontFamily: fonts.mono.bold,
-    fontSize: 10.5,
-    letterSpacing: 0.84, // .08em @ 10.5
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.5,
   },
   row: {
     flexDirection: 'row',
@@ -1306,62 +1388,69 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
   },
-  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
+  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
   rowMeta: {
     marginTop: 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
-    lineHeight: 14,
+    fontSize: 12,
+    letterSpacing: 0.4,
+    lineHeight: 18,
   },
   rowDescription: {
     marginTop: 2,
     fontFamily: fonts.sans.regular,
-    fontSize: 12,
-    lineHeight: 16,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  rowActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
-  form: { marginTop: spacing.md, marginBottom: spacing.sm, gap: spacing.md },
+  rowActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md },
+  form: { marginTop: spacing.xl, marginBottom: spacing.lg, gap: spacing.xl },
   fieldLabel: {
     marginBottom: spacing.sm,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   input: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing.lg,
     fontFamily: fonts.sans.regular,
-    fontSize: 15,
+    fontSize: 16,
   },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: spacing.xs,
+    minHeight: touch.listRow,
   },
-  switchTitle: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 13, lineHeight: 17 },
+  switchTitle: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   formActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'flex-end',
     gap: spacing.sm,
     marginTop: spacing.md,
   },
   actionBtn: {
     minHeight: touch.minimum,
+    maxWidth: '100%',
+    flexShrink: 1,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.md,
   },
   actionLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
+    textAlign: 'center',
   },
   // Coverage
   coverageHeadRow: {
@@ -1370,13 +1459,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  coverageHead: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
+  coverageHead: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
   coveragePct: { fontFamily: fonts.mono.bold, fontSize: 15, fontVariant: ['tabular-nums'] },
   coverageMissing: {
     marginTop: 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   coverageRow: {
     flexDirection: 'row',
@@ -1387,36 +1477,39 @@ const styles = StyleSheet.create({
     paddingTop: spacing.sm,
     borderTopWidth: 1,
   },
-  coverageCat: { flexShrink: 1, fontFamily: fonts.sans.semiBold, fontSize: 12.5 },
+  coverageCat: { flexShrink: 1, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   coverageCount: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   // Essentials
   essentials: {
     marginTop: spacing.md,
-    borderLeftWidth: 2,
+    borderTopWidth: 1,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
     gap: spacing.sm,
   },
   essentialsLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   essentialsMsg: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
-    lineHeight: 14,
+    fontSize: 12,
+    letterSpacing: 0.4,
+    lineHeight: 18,
   },
   // Browse
   matchLine: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.semiBold,
-    fontSize: 12.5,
+    fontSize: 14,
+    lineHeight: 20,
   },
   supplierRow: {
     flexDirection: 'row',
@@ -1446,11 +1539,12 @@ const styles = StyleSheet.create({
   badge: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   // Ladder
   slotRow: {
@@ -1467,11 +1561,18 @@ const styles = StyleSheet.create({
   slotTier: {
     width: 56,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  slotValue: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 13, lineHeight: 17 },
-  slotChevron: { fontFamily: fonts.mono.semiBold, fontSize: 10 },
+  slotValue: {
+    flex: 1,
+    minWidth: 0,
+    fontFamily: fonts.sans.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  slotChevron: { fontFamily: fonts.mono.semiBold, fontSize: 12 },
   slotPicker: {
     marginTop: spacing.xs,
     borderWidth: 1,
@@ -1480,6 +1581,6 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.xs,
   },
   pickerOption: { minHeight: touch.minimum, justifyContent: 'center' },
-  pickerOptionLabel: { fontFamily: fonts.sans.semiBold, fontSize: 13, lineHeight: 17 },
+  pickerOptionLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   dimmed: { opacity: 0.5 },
 });

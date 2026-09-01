@@ -19,8 +19,9 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as FileSystem from 'expo-file-system/legacy';
 import { z } from 'zod';
 
-import type { PickedFile } from '@/lib/media';
 import { ApiError } from '@/lib/api';
+import { UploadTransferError, type PickedFile, type UploadPolicy } from '@/lib/media';
+import { captureAppError } from '@/lib/monitoring';
 import { TENANT_ME_KEY } from '@/lib/tenant';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 
@@ -35,6 +36,17 @@ export const ACCEPTED_DOC_MIME = [
   'image/jpeg',
   'image/webp',
 ] as const;
+/** Mirrors the sign and complete routes' MAX_FILES. */
+export const MAX_DOC_FILES = 12;
+/** `files` is the sign/complete JSON metadata field; bytes use direct signed PUTs. */
+export const COMMERCIAL_PAINT_DOCUMENT_POLICY = {
+  purpose: 'painting document',
+  field: 'files',
+  allowedMimeTypes: ACCEPTED_DOC_MIME,
+  allowedTypeLabel: 'a PDF, PNG, JPEG or WebP file',
+  maxBytes: MAX_DOC_BYTES,
+  maxFiles: MAX_DOC_FILES,
+} as const satisfies UploadPolicy<'files'>;
 
 /** Server PAINT_DOC_TYPES — the PATCH route rejects anything else. */
 export const DOC_TYPES = [
@@ -392,10 +404,11 @@ export function usePrice() {
 /** AI "after repaint" render from the run's site photo. Data-URL strings in
  *  the response; failure is non-blocking — the quote stands without it. */
 export function usePreview() {
-  return useApiMutation<
-    { paintRunId: string; colour?: string },
-    z.infer<typeof PreviewSchema>
-  >(`${BASE}/preview`, PreviewSchema, { timeoutMs: PREVIEW_TIMEOUT_MS });
+  return useApiMutation<{ paintRunId: string; colour?: string }, z.infer<typeof PreviewSchema>>(
+    `${BASE}/preview`,
+    PreviewSchema,
+    { timeoutMs: PREVIEW_TIMEOUT_MS },
+  );
 }
 
 /** Saving invalidates the tenant snapshot so the new quote appears in the hub
@@ -414,16 +427,11 @@ export function useSaveQuote() {
  *  while the server reports 'extracting', so a takeoff finishes into the UI
  *  even after an app kill or dropped connection. */
 export function useRun(runId: string | null) {
-  return useApiQuery(
-    runKey(runId ?? ''),
-    `${BASE}/run/${runId ?? ''}`,
-    RunDetailSchema,
-    {
-      enabled: runId != null,
-      refetchInterval: query =>
-        query.state.data?.run.status === 'extracting' ? EXTRACT_POLL_MS : false,
-    },
-  );
+  return useApiQuery(runKey(runId ?? ''), `${BASE}/run/${runId ?? ''}`, RunDetailSchema, {
+    enabled: runId != null,
+    refetchInterval: query =>
+      query.state.data?.run.status === 'extracting' ? EXTRACT_POLL_MS : false,
+  });
 }
 
 export function useRuns() {
@@ -435,13 +443,64 @@ export function useRuns() {
  * the URL is absolute and pre-authorised — no Bearer, no JSON. x-upsert makes
  * a retry after a mid-pipeline failure overwrite rather than 409.
  */
+export function signedUploadResponseProblem(
+  status: number,
+  body: string,
+  fileName: string,
+): UploadTransferError | null {
+  if (status >= 200 && status < 300) return null;
+  const response = body.trim().toLowerCase();
+  const targetExpired =
+    [401, 403, 410].includes(status) ||
+    /(expired|invalid).{0,24}(signature|token|upload)|(?:signature|token).{0,24}(expired|invalid)/.test(
+      response,
+    );
+  if (targetExpired) {
+    return new UploadTransferError(
+      'signed_target_expired',
+      `The secure upload target for ${fileName} expired or was rejected.`,
+      status,
+    );
+  }
+  if (status >= 400 && status < 500) {
+    return new UploadTransferError(
+      'rejected',
+      `Storage rejected ${fileName} (HTTP ${status}). Choose the file again or request a new upload.`,
+      status,
+    );
+  }
+  return new UploadTransferError(
+    'unknown_outcome',
+    `Storage did not confirm ${fileName} (HTTP ${status}).`,
+    status,
+  );
+}
+
+function transferException(error: unknown, fileName: string): UploadTransferError {
+  if (error instanceof UploadTransferError) return error;
+  const detail = error instanceof Error ? `${error.name} ${error.message}`.toLowerCase() : '';
+  const kind = /(network|offline|connection|internet|timed?\s*out|nsurl)/.test(detail)
+    ? 'network'
+    : 'unknown_outcome';
+  return new UploadTransferError(kind, `Storage did not confirm ${fileName}.`);
+}
+
 export async function putSignedFile(signedUrl: string, file: PickedFile): Promise<void> {
-  const result = await FileSystem.uploadAsync(signedUrl, file.uri, {
-    httpMethod: 'PUT',
-    headers: { 'Content-Type': file.type, 'x-upsert': 'true' },
-  });
-  if (result.status < 200 || result.status >= 300) {
-    throw new Error(`Uploading ${file.name} failed (HTTP ${result.status}). Try again.`);
+  try {
+    const result = await FileSystem.uploadAsync(signedUrl, file.uri, {
+      httpMethod: 'PUT',
+      headers: { 'Content-Type': file.type, 'x-upsert': 'true' },
+    });
+    const problem = signedUploadResponseProblem(result.status, result.body, file.name);
+    if (problem) throw problem;
+  } catch (error) {
+    const failure = transferException(error, file.name);
+    captureAppError(failure, {
+      kind: 'upload',
+      operationId: 'commercial-painting.upload.put',
+      route: '/tools',
+    });
+    throw failure;
   }
 }
 
@@ -495,7 +554,7 @@ export function buildCompleteBody(
 
 // ── PURE: pipeline state machine ────────────────────────────────────────────
 // idle → signing → uploading(fileIdx) → completing → classified →
-// extracting(runId) → review → priced → saved | failed(stage, resumable).
+// extracting(runId) → review → priced → saved | failed(stage, run context).
 // Server run status re-syncs the machine via RESUME (resume-from-runId), so a
 // killed app lands back on the true step.
 
@@ -520,8 +579,8 @@ export type PipelineState = {
   fileIdx: number;
   fileCount: number;
   failedStage: FailedStage | null;
-  /** The run survives the failure server-side — a retry appends to it. */
-  resumable: boolean;
+  /** Server run context survives; file bytes themselves never resume. */
+  runRecoverable: boolean;
 };
 
 export const initialPipeline: PipelineState = {
@@ -530,7 +589,7 @@ export const initialPipeline: PipelineState = {
   fileIdx: 0,
   fileCount: 0,
   failedStage: null,
-  resumable: false,
+  runRecoverable: false,
 };
 
 export type PipelineEvent =
@@ -575,7 +634,7 @@ export function pipelineReducer(state: PipelineState, event: PipelineEvent): Pip
         fileCount: event.fileCount,
         fileIdx: 0,
         failedStage: null,
-        resumable: false,
+        runRecoverable: false,
       };
     case 'SIGNED':
       if (state.step !== 'signing') return state;
@@ -592,7 +651,13 @@ export function pipelineReducer(state: PipelineState, event: PipelineEvent): Pip
       return { ...state, step: 'classified' };
     case 'EXTRACT_START':
       if (CLIENT_BUSY.includes(state.step)) return state;
-      return { ...state, step: 'extracting', runId: event.runId, failedStage: null, resumable: false };
+      return {
+        ...state,
+        step: 'extracting',
+        runId: event.runId,
+        failedStage: null,
+        runRecoverable: false,
+      };
     case 'EXTRACTED':
       if (state.step !== 'extracting') return state;
       return { ...state, step: 'review' };
@@ -605,13 +670,13 @@ export function pipelineReducer(state: PipelineState, event: PipelineEvent): Pip
     case 'FAILED': {
       const stage = stageOf(state.step);
       if (!stage) return state;
-      return { ...state, step: 'failed', failedStage: stage, resumable: state.runId != null };
+      return { ...state, step: 'failed', failedStage: stage, runRecoverable: state.runId != null };
     }
     case 'RESUME': {
       // Never downgrade a mid-flight client op, and 'saved' is client-only —
       // the server still says 'priced' after a save.
       if (CLIENT_BUSY.includes(state.step) || state.step === 'saved') return state;
-      const base = { ...state, runId: event.runId, failedStage: null, resumable: false };
+      const base = { ...state, runId: event.runId, failedStage: null, runRecoverable: false };
       switch (event.status) {
         case 'draft':
           return { ...base, step: 'classified' };
@@ -623,7 +688,13 @@ export function pipelineReducer(state: PipelineState, event: PipelineEvent): Pip
           return { ...base, step: 'priced' };
         case 'failed':
           // Only the extract path marks a run failed; retrying re-claims it.
-          return { ...state, runId: event.runId, step: 'failed', failedStage: 'extract', resumable: true };
+          return {
+            ...state,
+            runId: event.runId,
+            step: 'failed',
+            failedStage: 'extract',
+            runRecoverable: true,
+          };
         default:
           return { ...state, runId: event.runId };
       }

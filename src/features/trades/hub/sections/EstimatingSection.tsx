@@ -71,6 +71,7 @@ function NumField({
   onChangeText: (next: string) => void;
 }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <View style={styles.field}>
       <Text style={[styles.fieldLabel, { color: colors.textDim }]}>{label.toUpperCase()}</Text>
@@ -79,10 +80,17 @@ function NumField({
         onChangeText={onChangeText}
         keyboardType="decimal-pad"
         accessibilityLabel={label}
+        selectionColor={colors.accentSoft}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         placeholderTextColor={colors.textDim}
         style={[
           styles.input,
-          { backgroundColor: colors.inkCard, borderColor: colors.ctlLine, color: colors.textPri },
+          {
+            backgroundColor: colors.inkCard,
+            borderColor: focused ? colors.accentSoft : colors.ctlLine,
+            color: colors.textPri,
+          },
         ]}
       />
     </View>
@@ -139,8 +147,12 @@ export function EstimatingSection({ trade }: { trade: HubTrade }) {
   // pre-fill the same way so tweaking from the global default is one tap.
   function startEdit(j: EstimationJob) {
     setEditingId(j.assembly_id);
-    setLabourInput(j.effective.labour_hours.value == null ? '' : String(j.effective.labour_hours.value));
-    setMarkupInput(j.effective.markup_pct.value == null ? '' : String(j.effective.markup_pct.value));
+    setLabourInput(
+      j.effective.labour_hours.value == null ? '' : String(j.effective.labour_hours.value),
+    );
+    setMarkupInput(
+      j.effective.markup_pct.value == null ? '' : String(j.effective.markup_pct.value),
+    );
     setFormError(null);
     save.reset();
     clear.reset();
@@ -181,7 +193,10 @@ export function EstimatingSection({ trade }: { trade: HubTrade }) {
         onPress: () =>
           clear.mutate(
             { assembly_id: j.assembly_id },
-            { onSuccess: () => setEditingId(current => (current === j.assembly_id ? null : current)) },
+            {
+              onSuccess: () =>
+                setEditingId(current => (current === j.assembly_id ? null : current)),
+            },
           ),
       },
     ]);
@@ -292,7 +307,9 @@ export function EstimatingSection({ trade }: { trade: HubTrade }) {
             ) : null}
 
             {editing ? (
-              <View style={[styles.editor, { borderColor: colors.accent, backgroundColor: colors.ink }]}>
+              <View
+                style={[styles.editor, { borderColor: colors.accent, backgroundColor: colors.ink }]}
+              >
                 <View style={styles.fieldRow}>
                   <NumField
                     label={`Labour hours (global: ${fmt(gLab)})`}
@@ -320,11 +337,7 @@ export function EstimatingSection({ trade }: { trade: HubTrade }) {
                     accessibilityRole="button"
                     onPress={() => saveEdit(j)}
                     disabled={busy}
-                    style={[
-                      styles.saveBtn,
-                      { borderColor: colors.accent },
-                      busy && styles.dimmed,
-                    ]}
+                    style={[styles.saveBtn, { borderColor: colors.accent }, busy && styles.dimmed]}
                   >
                     <Text style={[styles.textBtnLabel, { color: colors.accentText }]}>
                       {busy && save.isPending ? 'SAVING…' : 'SAVE OVERRIDES'}
@@ -353,20 +366,21 @@ const styles = StyleSheet.create({
   intro: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 14,
+    lineHeight: 20,
   },
   jobRow: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
+    marginTop: spacing.xl,
+    paddingTop: spacing.xl,
     borderTopWidth: 1,
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
-  jobName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
+  jobName: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
   jobMeta: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   effRow: {
     flexDirection: 'row',
@@ -377,22 +391,25 @@ const styles = StyleSheet.create({
   },
   effLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   effValue: {
     fontFamily: fonts.mono.bold,
-    fontSize: 13,
+    fontSize: 16,
+    lineHeight: 22,
     fontVariant: ['tabular-nums'],
   },
   badge: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   actionRow: {
     flexDirection: 'row',
@@ -401,14 +418,21 @@ const styles = StyleSheet.create({
     gap: spacing.lg,
     marginTop: spacing.xs,
   },
-  textBtn: { minHeight: touch.minimum, justifyContent: 'center' },
+  textBtn: {
+    minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    maxWidth: '100%',
+    justifyContent: 'center',
+  },
   textBtnLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   saveBtn: {
     minHeight: touch.minimum,
+    maxWidth: '100%',
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
@@ -423,12 +447,13 @@ const styles = StyleSheet.create({
     gap: spacing.sm,
   },
   fieldRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
-  field: { flexGrow: 1, flexBasis: 140 },
+  field: { flexGrow: 1, flexBasis: 140, minWidth: 0 },
   fieldLabel: {
     marginBottom: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   input: {
     minHeight: touch.minimum,
@@ -436,13 +461,12 @@ const styles = StyleSheet.create({
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
     fontFamily: fonts.mono.medium,
-    fontSize: 15,
+    fontSize: 16,
     fontVariant: ['tabular-nums'],
   },
   errorLine: {
     fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 0.4,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

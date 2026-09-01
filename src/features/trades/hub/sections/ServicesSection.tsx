@@ -11,11 +11,12 @@
  * Money renders via centsFromApiDollars + formatAud and submits as plain wire dollars.
  */
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { apiDollarsFromCents, centsFromApiDollars, formatAud, parseAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTenantMe, type ServiceRow } from '@/lib/tenant';
+import { ThemedSwitch } from '@/components/ThemedSwitch';
 import { useTheme } from '@/lib/useTheme';
 
 import { apiErrorMessage, Card, MultilineField, Notice, PillGroup, SectionLabel } from '../../ui';
@@ -83,7 +84,9 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
     if (!key) return;
     const next = row.enabled === false;
     patchMe.mutate(
-      serviceExtras(row).isCustom ? { custom_services: { [key]: next } } : { services: { [key]: next } },
+      serviceExtras(row).isCustom
+        ? { custom_services: { [key]: next } }
+        : { services: { [key]: next } },
     );
   };
 
@@ -101,7 +104,7 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
   };
 
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View style={{ gap: spacing.xl }}>
       {patchMe.isError || deleteService.isError ? (
         <Notice
           tone="danger"
@@ -113,7 +116,9 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
       <Card>
         <SectionLabel>{`Auto-quote services · ${enabledCount} of ${services.length} on`}</SectionLabel>
         <Text style={[styles.blurb, { color: colors.textSec }]}>
-          {"Tick the work your AI can auto-quote. Unticked services still get inspections — they just won't auto-draft a price."}
+          {
+            "Tick the work your AI can auto-quote. Unticked services still get inspections — they just won't auto-draft a price."
+          }
         </Text>
 
         {form ? (
@@ -163,7 +168,9 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
         <Card>
           <SectionLabel>Preferred brands</SectionLabel>
           <Text style={[styles.blurb, { color: colors.textSec }]}>
-            {"Your AI quote draft will lean toward these brands when the customer's tier and specs allow. Soft hint — never starves a quote."}
+            {
+              "Your AI quote draft will lean toward these brands when the customer's tier and specs allow. Soft hint — never starves a quote."
+            }
           </Text>
           {brandRows.map((c, i) => {
             const category = c.category;
@@ -184,7 +191,9 @@ export function ServicesSection({ trade }: { trade: HubTrade }) {
                   value={current}
                   onChange={next => {
                     if (next === current) return;
-                    patchMe.mutate({ material_preferences: { [category]: next === '' ? null : next } });
+                    patchMe.mutate({
+                      material_preferences: { [category]: next === '' ? null : next },
+                    });
                   }}
                 />
               </View>
@@ -218,9 +227,7 @@ function ServiceToggleRow({
   const enabled = row.enabled !== false;
   const price = row.default_unit_price_ex_gst;
   const meta = [
-    price != null
-      ? servicePriceLabel(price, row.default_unit)
-      : null,
+    price != null ? servicePriceLabel(price, row.default_unit) : null,
     extras.labourHours != null && extras.labourHours > 0 ? `${extras.labourHours}h labour` : null,
     extras.alwaysInspection ? 'Inspection only' : null,
     extras.isCustom ? 'Custom' : null,
@@ -237,9 +244,7 @@ function ServiceToggleRow({
           {row.name ?? '—'}
         </Text>
         {meta ? (
-          <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={1}>
-            {meta.toUpperCase()}
-          </Text>
+          <Text style={[styles.rowMeta, { color: colors.textDim }]}>{meta.toUpperCase()}</Text>
         ) : null}
         {extras.isCustom ? (
           <View style={styles.rowActions}>
@@ -248,7 +253,7 @@ function ServiceToggleRow({
           </View>
         ) : null}
       </View>
-      <Switch
+      <ThemedSwitch
         accessibilityLabel={`${row.name ?? 'Service'} — ${enabled ? 'on, tap to turn off' : 'off, tap to turn on'}`}
         value={enabled}
         onValueChange={onToggle}
@@ -378,7 +383,7 @@ function CustomServiceForm({
             inspection instead.
           </Text>
         </View>
-        <Switch
+        <ThemedSwitch
           accessibilityLabel="Always route to paid inspection"
           value={alwaysInspection}
           onValueChange={setAlwaysInspection}
@@ -418,19 +423,28 @@ function Field({
   maxLength?: number;
 }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <View>
       <Text style={[styles.fieldLabel, { color: colors.textPri }]}>{label.toUpperCase()}</Text>
       <TextInput
+        accessibilityLabel={label}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colors.textDim}
         keyboardType={keyboardType}
         maxLength={maxLength}
+        selectionColor={colors.accentSoft}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         style={[
           styles.input,
-          { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textPri },
+          {
+            backgroundColor: colors.ink,
+            borderColor: focused ? colors.accentSoft : colors.ctlLine,
+            color: colors.textPri,
+          },
         ]}
       />
     </View>
@@ -463,6 +477,7 @@ function ActionButton({
         styles.actionBtn,
         {
           opacity: disabled ? 0.5 : 1,
+          minHeight: accent ? touch.primaryCta : touch.minimum,
           borderColor: accent
             ? colors.accent
             : tone === 'danger'
@@ -478,9 +493,7 @@ function ActionButton({
         },
       ]}
     >
-      <Text style={[styles.actionLabel, { color: textColor }]} numberOfLines={1}>
-        {label.toUpperCase()}
-      </Text>
+      <Text style={[styles.actionLabel, { color: textColor }]}>{label.toUpperCase()}</Text>
     </Pressable>
   );
 }
@@ -513,58 +526,80 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     marginBottom: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     paddingVertical: spacing.md,
+    minHeight: touch.listRow,
     borderBottomWidth: 1,
   },
-  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
+  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
   rowMeta: {
     marginTop: 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  rowActions: { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.sm },
+  rowActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm, marginTop: spacing.md },
   gateBlock: { marginTop: spacing.md, gap: spacing.md },
-  brandBlock: { paddingVertical: spacing.md, gap: spacing.sm },
-  brandLabel: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
-  form: { marginTop: spacing.md, marginBottom: spacing.sm, gap: spacing.md },
+  brandBlock: { paddingVertical: spacing.lg, gap: spacing.md },
+  brandLabel: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
+  form: { marginTop: spacing.xl, marginBottom: spacing.lg, gap: spacing.xl },
   fieldLabel: {
     marginBottom: spacing.sm,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   input: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing.lg,
     fontFamily: fonts.sans.regular,
-    fontSize: 15,
+    fontSize: 16,
   },
-  inspectRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  inspectTitle: { fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
-  inspectHint: { marginTop: 2, fontFamily: fonts.sans.regular, fontSize: 12, lineHeight: 17 },
-  formActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: spacing.sm },
+  inspectRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.md,
+    minHeight: touch.listRow,
+  },
+  inspectTitle: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  inspectHint: {
+    marginTop: spacing.xs,
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  formActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    gap: spacing.sm,
+  },
   actionBtn: {
     minHeight: touch.minimum,
+    maxWidth: '100%',
+    flexShrink: 1,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.md,
   },
   actionLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
+    textAlign: 'center',
   },
 });

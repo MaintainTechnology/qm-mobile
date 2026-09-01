@@ -14,19 +14,22 @@ import {
   mapForkGaps,
   missingRequiredPriceCategories,
   materialCategoriesFor,
+  NATIVE_RECIPE_FORK_IS_LOSSLESS,
   nextSort,
   parseQuantity,
   parseStepTitle,
+  quantityForItemCount,
   QUANTITY_MAX,
   reorderPlan,
   resolveCatalogueBadge,
   sortedBaseline,
   sortedForAssembly,
+  TasksResponseSchema,
   TITLE_MAX,
 } from './recipes-api';
 
 describe('BOM catalogue authority contract', () => {
-  it('parses trade-keyed catalogue categories and recipe inclusion metadata', () => {
+  it('round-trips condition, ratio and pin metadata from custom and baseline BOM rows', () => {
     const parsed = BomResponseSchema.parse({
       assemblies: [],
       lines: [
@@ -37,9 +40,21 @@ describe('BOM catalogue authority contract', () => {
           quantity: 1,
           required: true,
           include_when: { answer: 'yes' },
+          quantity_per: '4',
+          catalogue_id: 'catalogue-1',
         },
       ],
-      baselines: {},
+      baselines: {
+        'asm-1': [
+          {
+            material_category: 'driver',
+            quantity: 1,
+            required: true,
+            include_when: { integrated_driver: false },
+            quantity_per: '4',
+          },
+        ],
+      },
       catalogue_categories_by_trade: {
         electrical: ['downlight'],
         plumbing: ['downlight'],
@@ -51,9 +66,23 @@ describe('BOM catalogue authority contract', () => {
       plumbing: ['downlight'],
     });
     expect(parsed.lines[0]?.include_when).toEqual({ answer: 'yes' });
+    expect(parsed.lines[0]?.quantity_per).toBe(4);
+    expect(parsed.lines[0]?.catalogue_id).toBe('catalogue-1');
+    expect(parsed.baselines['asm-1']?.[0]).toMatchObject({
+      include_when: { integrated_driver: false },
+      quantity_per: 4,
+    });
+
+    const quantityPatch = { quantity: 2 };
+    expect({ ...parsed.lines[0], ...quantityPatch }).toMatchObject({
+      include_when: { answer: 'yes' },
+      quantity_per: 4,
+      catalogue_id: 'catalogue-1',
+      quantity: 2,
+    });
   });
 
-  it('only blocks unconditionally required lines using prices from the selected trade', () => {
+  it('keeps required conditional categories fail-closed without product context', () => {
     const lines = [
       { material_category: 'downlight', required: true, include_when: null },
       { material_category: 'optional_sensor', required: false, include_when: null },
@@ -65,12 +94,51 @@ describe('BOM catalogue authority contract', () => {
       plumbing: ['downlight', 'optional_sensor', 'conditional_fan'],
     };
 
-    expect(missingRequiredPriceCategories(lines, byTrade, 'electrical')).toEqual(['downlight']);
+    expect(missingRequiredPriceCategories(lines, byTrade, 'electrical')).toEqual([
+      'downlight',
+      'conditional_fan',
+    ]);
     expect(missingRequiredPriceCategories(lines, byTrade, 'plumbing')).toEqual(['empty_condition']);
+  });
+
+  it('round-trips task conditions so safe title/note patches do not erase them', () => {
+    const parsed = TasksResponseSchema.parse({
+      assemblies: [],
+      lines: [
+        {
+          id: 'task-1',
+          assembly_id: 'asm-1',
+          title: 'Pair smart dimmer',
+          required: true,
+          include_when: { smart: true },
+          sort: 2,
+        },
+      ],
+      baselines: {
+        'asm-1': [
+          {
+            title: 'Pair smart dimmer',
+            required: true,
+            include_when: { smart: true },
+            sort: 2,
+          },
+        ],
+      },
+    });
+    expect(parsed.lines[0]?.include_when).toEqual({ smart: true });
+    expect(parsed.baselines['asm-1']?.[0]?.include_when).toEqual({ smart: true });
+    expect({ ...parsed.lines[0], title: 'Pair and test smart dimmer' }).toMatchObject({
+      include_when: { smart: true },
+      title: 'Pair and test smart dimmer',
+    });
   });
 });
 
 describe('forkWouldNoOp — mirror of the server 409 already_customised guard', () => {
+  it('blocks native baseline forks while the server omits quoting semantics', () => {
+    expect(NATIVE_RECIPE_FORK_IS_LOSSLESS).toBe(false);
+  });
+
   it('no existing rows: the fork may fire', () => {
     expect(forkWouldNoOp([])).toBe(false);
   });
@@ -104,6 +172,20 @@ describe('parseQuantity — TenantBomLineSchema bounds', () => {
     expect(parseQuantity('3x')).toBeNull();
     expect(parseQuantity('NaN')).toBeNull();
     expect(parseQuantity('Infinity')).toBeNull();
+  });
+});
+
+describe('quantityForItemCount — quantity_per ratio semantics', () => {
+  it('rounds a ratio up so ten items at one-per-four needs three parts', () => {
+    expect(quantityForItemCount({ quantity: 1, quantity_per: 4 }, 10)).toBe(3);
+    expect(quantityForItemCount({ quantity: 1, quantity_per: '4' }, 8)).toBe(2);
+    expect(quantityForItemCount({ quantity: 1, quantity_per: 4 }, 1)).toBe(1);
+  });
+
+  it('retains stored quantity when the ratio or item count is absent/invalid', () => {
+    expect(quantityForItemCount({ quantity: 6, quantity_per: null }, 10)).toBe(6);
+    expect(quantityForItemCount({ quantity: 6, quantity_per: 0 }, 10)).toBe(6);
+    expect(quantityForItemCount({ quantity: 6, quantity_per: 4 }, null)).toBe(6);
   });
 });
 

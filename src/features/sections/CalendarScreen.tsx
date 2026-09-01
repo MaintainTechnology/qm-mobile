@@ -16,9 +16,19 @@ import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice } from '../trades/ui';
-import { SectionScreen } from './SectionScreen';
+import { SectionEmpty, SectionGroup, SectionLoading, SectionScreen } from './SectionScreen';
 
 const CALENDAR_KEY = ['tenant', 'calendar'] as const;
+const DEFAULT_TENANT_TZ = 'Australia/Sydney';
+
+export function isSupportedTimeZone(value: string): boolean {
+  try {
+    new Intl.DateTimeFormat('en-AU', { timeZone: value }).format(0);
+    return true;
+  } catch {
+    return false;
+  }
+}
 
 const CalendarEventSchema = z.looseObject({
   quoteId: z.string(),
@@ -36,11 +46,12 @@ const CalendarEventSchema = z.looseObject({
 });
 type CalendarEvent = z.infer<typeof CalendarEventSchema>;
 
-const CalendarSchema = z.looseObject({
+export const CalendarSchema = z.looseObject({
   events: z.array(CalendarEventSchema).default([]),
   toSchedule: z.array(CalendarEventSchema).default([]),
   awaitingBooking: z.array(CalendarEventSchema).default([]),
   reviewCount: z.number().nullish(),
+  tenantTz: z.string().min(1).refine(isSupportedTimeZone, 'Unsupported tenant timezone'),
 });
 
 const ConfirmSchema = z.looseObject({ ok: z.literal(true) });
@@ -53,15 +64,61 @@ function eventMeta(ev: CalendarEvent): string {
   return [ev.jobType?.replace(/_/g, ' '), ev.suburb].filter(Boolean).join(' · ');
 }
 
-/** "MON 07/08" + "09:30 am" pieces, device-local (au-conventions: day-first). */
-function slotLabel(iso: string): { day: string; time: string } {
+function part(parts: Intl.DateTimeFormatPart[], type: Intl.DateTimeFormatPartTypes): string {
+  return parts.find(item => item.type === type)?.value ?? '';
+}
+
+/** Tenant-local YYYY-MM-DD key. The instant remains UTC; only labels/grouping use the business zone. */
+export function calendarDayKey(iso: string, tenantTz: string): string {
   const d = new Date(iso);
-  const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'] as const;
-  const day = `${days[d.getDay()]} ${String(d.getDate()).padStart(2, '0')}/${String(d.getMonth() + 1).padStart(2, '0')}`;
-  const h24 = d.getHours();
-  const h12 = h24 % 12 === 0 ? 12 : h24 % 12;
-  const time = `${String(h12).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')} ${h24 < 12 ? 'am' : 'pm'}`;
-  return { day, time };
+  const parts = new Intl.DateTimeFormat('en-AU', {
+    timeZone: tenantTz,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).formatToParts(d);
+  return `${part(parts, 'year')}-${part(parts, 'month')}-${part(parts, 'day')}`;
+}
+
+/** "MON 07/08" + "09:30 am" pieces in the server-returned tenant timezone. */
+export function calendarSlotLabel(iso: string, tenantTz: string): { day: string; time: string } {
+  const parts = new Intl.DateTimeFormat('en-AU', {
+    timeZone: tenantTz,
+    weekday: 'short',
+    day: '2-digit',
+    month: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  }).formatToParts(new Date(iso));
+  return {
+    day: `${part(parts, 'weekday').toUpperCase()} ${part(parts, 'day')}/${part(parts, 'month')}`,
+    time: `${part(parts, 'hour').padStart(2, '0')}:${part(parts, 'minute')} ${part(parts, 'dayPeriod').toLowerCase()}`,
+  };
+}
+
+type CalendarDayGroup = { key: string; label: string; events: CalendarEvent[] };
+
+function groupByTenantDay(
+  events: CalendarEvent[],
+  tenantTz: string,
+  newestFirst = false,
+): CalendarDayGroup[] {
+  const groups = new Map<string, CalendarDayGroup>();
+  for (const event of events) {
+    const scheduledAt = event.scheduledAt as string;
+    const key = calendarDayKey(scheduledAt, tenantTz);
+    const group = groups.get(key) ?? {
+      key,
+      label: calendarSlotLabel(scheduledAt, tenantTz).day,
+      events: [],
+    };
+    group.events.push(event);
+    groups.set(key, group);
+  }
+  return [...groups.values()].sort((a, b) =>
+    newestFirst ? b.key.localeCompare(a.key) : a.key.localeCompare(b.key),
+  );
 }
 
 function EventRow({ ev, timeLabel }: { ev: CalendarEvent; timeLabel: string }) {
@@ -72,7 +129,7 @@ function EventRow({ ev, timeLabel }: { ev: CalendarEvent; timeLabel: string }) {
     { invalidates: [CALENDAR_KEY] },
   );
   // Web kindOf(): inspection → accent, requested/reserved → dim, else success.
-  const bar =
+  const statusColor =
     ev.needsInspection || ev.paidTier === 'inspection'
       ? colors.accent
       : ev.bookingState === 'requested' || ev.bookingState === 'reserved'
@@ -80,50 +137,62 @@ function EventRow({ ev, timeLabel }: { ev: CalendarEvent; timeLabel: string }) {
         : colors.successBright;
   const target = ev.href ?? (ev.shareToken ? `/q/${ev.shareToken}` : null);
   return (
-    <Pressable
-      accessibilityRole="button"
-      accessibilityLabel={`${eventTitle(ev)}, ${timeLabel}`}
-      disabled={!target}
-      onPress={() => target && openWebPath(target)}
-      style={({ pressed }) => [
-        styles.row,
-        {
-          borderColor: colors.inkLine,
-          backgroundColor: pressed ? colors.ink : colors.inkCard,
-        },
-      ]}
-    >
-      <View style={[styles.bar, { backgroundColor: bar }]} />
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={1}>
-          {eventTitle(ev)}
-        </Text>
-        <Text style={[styles.rowMeta, { color: colors.textSec }]} numberOfLines={1}>
-          {eventMeta(ev) || '—'}
-        </Text>
-        {confirm.isError ? (
-          <Text style={[styles.rowMeta, { color: colors.dangerBright }]}>
-            {apiErrorMessage(confirm.error)}
+    <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel={`${eventTitle(ev)}, ${timeLabel}`}
+        disabled={!target}
+        onPress={() => target && openWebPath(target)}
+        style={({ pressed }) => [styles.rowMain, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <View style={[styles.statusDot, { backgroundColor: statusColor }]} />
+        <View style={styles.details}>
+          <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={2}>
+            {eventTitle(ev)}
           </Text>
-        ) : null}
-      </View>
-      <View style={{ alignItems: 'flex-end', gap: spacing.xs }}>
-        <Text style={[styles.time, { color: colors.textPri }]}>{timeLabel}</Text>
+          <Text style={[styles.rowMeta, { color: colors.textSec }]}>
+            {eventMeta(ev) || 'Customer booking'}
+          </Text>
+        </View>
+      </Pressable>
+      <View style={[styles.rowFooter, { borderTopColor: colors.inkLine }]}>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`${timeLabel} for ${eventTitle(ev)}`}
+          disabled={!target}
+          onPress={() => target && openWebPath(target)}
+          style={({ pressed }) => [styles.timeLink, { opacity: pressed ? 0.7 : 1 }]}
+        >
+          <Text style={[styles.time, { color: colors.textPri }]}>{timeLabel}</Text>
+        </Pressable>
         {ev.bookingState === 'requested' ? (
           <Pressable
             accessibilityRole="button"
             accessibilityLabel="Confirm booking"
             disabled={confirm.isPending}
             onPress={() => confirm.mutate({ quoteId: ev.quoteId })}
-            style={[styles.confirmBtn, { backgroundColor: colors.accent }]}
+            accessibilityState={{ disabled: confirm.isPending, busy: confirm.isPending }}
+            style={({ pressed }) => [
+              styles.confirmBtn,
+              {
+                borderColor: colors.ctlLine,
+                backgroundColor: pressed ? colors.ink : 'transparent',
+                opacity: confirm.isPending ? 0.6 : 1,
+              },
+            ]}
           >
-            <Text style={[styles.confirmText, { color: colors.accentInk }]}>
+            <Text style={[styles.confirmText, { color: colors.textPri }]}>
               {confirm.isPending ? 'CONFIRMING…' : 'CONFIRM'}
             </Text>
           </Pressable>
         ) : null}
       </View>
-    </Pressable>
+      {confirm.isError ? (
+        <Text style={[styles.rowMeta, { color: colors.dangerBright }]}>
+          {apiErrorMessage(confirm.error)}
+        </Text>
+      ) : null}
+    </View>
   );
 }
 
@@ -131,6 +200,7 @@ export function CalendarScreen() {
   const { colors } = useTheme();
   const [showPast, setShowPast] = useState(false);
   const query = useApiQuery(CALENDAR_KEY, '/api/tenant/calendar', CalendarSchema);
+  const tenantTz = query.data?.tenantTz ?? DEFAULT_TENANT_TZ;
 
   const { upcoming, past } = useMemo(() => {
     const events = (query.data?.events ?? []).filter(e => e.scheduledAt);
@@ -145,6 +215,8 @@ export function CalendarScreen() {
 
   const toSchedule = query.data?.toSchedule ?? [];
   const awaiting = query.data?.awaitingBooking ?? [];
+  const upcomingGroups = useMemo(() => groupByTenantDay(upcoming, tenantTz), [tenantTz, upcoming]);
+  const pastGroups = useMemo(() => groupByTenantDay(past, tenantTz, true), [past, tenantTz]);
 
   return (
     <SectionScreen
@@ -154,7 +226,7 @@ export function CalendarScreen() {
       onRefresh={() => void query.refetch()}
     >
       {query.isPending ? (
-        <Notice tone="accent" label="Loading your calendar…" />
+        <SectionLoading label="Loading your calendar" />
       ) : query.isError && !query.data ? (
         <Notice
           tone="danger"
@@ -164,63 +236,86 @@ export function CalendarScreen() {
         />
       ) : (
         <>
+          <Text
+            accessibilityLabel={`Times shown in business timezone ${tenantTz}`}
+            style={[styles.timeZone, { color: colors.textDim }]}
+          >
+            TIMES · {tenantTz}
+          </Text>
           {toSchedule.length > 0 ? (
-            <>
-              <Text style={[styles.groupLabel, { color: colors.warningBright }]}>
-                PAID · NEEDS A TIME · {toSchedule.length}
-              </Text>
+            <SectionGroup title="Paid · needs a time" count={toSchedule.length}>
               {toSchedule.map(ev => (
                 <EventRow key={`ts-${ev.quoteId}`} ev={ev} timeLabel="SET TIME" />
               ))}
-            </>
+            </SectionGroup>
           ) : null}
 
           {awaiting.length > 0 ? (
-            <>
-              <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-                SITE VISITS · AWAITING CUSTOMER BOOKING · {awaiting.length}
-              </Text>
+            <SectionGroup title="Awaiting customer booking" count={awaiting.length}>
               {awaiting.map(ev => (
                 <EventRow key={`aw-${ev.quoteId}`} ev={ev} timeLabel="$99" />
               ))}
-            </>
+            </SectionGroup>
           ) : null}
 
-          <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-            UPCOMING · {upcoming.length}
-          </Text>
-          {upcoming.length === 0 ? (
-            <Text style={[styles.empty, { color: colors.textDim }]}>
-              Nothing booked yet — confirmed jobs and site visits land here.
-            </Text>
-          ) : (
-            upcoming.map(ev => {
-              const slot = slotLabel(ev.scheduledAt as string);
-              return <EventRow key={ev.quoteId} ev={ev} timeLabel={`${slot.day} · ${slot.time}`} />;
-            })
-          )}
+          <SectionGroup title="Upcoming" count={upcoming.length}>
+            {upcoming.length === 0 ? (
+              <SectionEmpty
+                title="No upcoming bookings"
+                body="Confirmed jobs and site visits will appear here."
+              />
+            ) : (
+              upcomingGroups.map(group => (
+                <View key={group.key} style={styles.dayGroup}>
+                  <Text style={[styles.dayHeading, { color: colors.textSec }]}>{group.label}</Text>
+                  {group.events.map(ev => {
+                    const slot = calendarSlotLabel(ev.scheduledAt as string, tenantTz);
+                    return (
+                      <EventRow key={ev.quoteId} ev={ev} timeLabel={`${slot.day} · ${slot.time}`} />
+                    );
+                  })}
+                </View>
+              ))
+            )}
+          </SectionGroup>
 
           {past.length > 0 ? (
             <Pressable
               accessibilityRole="button"
+              accessibilityState={{ expanded: showPast }}
               onPress={() => setShowPast(v => !v)}
-              style={styles.pastToggle}
+              style={({ pressed }) => [
+                styles.pastToggle,
+                {
+                  borderColor: colors.ctlLine,
+                  backgroundColor: pressed ? colors.inkCard : 'transparent',
+                },
+              ]}
             >
-              <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-                PAST · {past.length} {showPast ? '▾' : '▸'}
+              <Text style={[styles.confirmText, { color: colors.textSec }]}>
+                {showPast ? 'HIDE' : 'SHOW'} PAST BOOKINGS · {past.length}
               </Text>
             </Pressable>
           ) : null}
-          {showPast
-            ? past.map(ev => {
-                const slot = slotLabel(ev.scheduledAt as string);
-                return (
-                  <View key={`past-${ev.quoteId}`} style={{ opacity: 0.6 }}>
-                    <EventRow ev={ev} timeLabel={`${slot.day} · ${slot.time}`} />
-                  </View>
-                );
-              })
-            : null}
+          {showPast ? (
+            <View style={{ gap: spacing.md }}>
+              {pastGroups.map(group => (
+                <View key={`past-${group.key}`} style={styles.dayGroup}>
+                  <Text style={[styles.dayHeading, { color: colors.textSec }]}>{group.label}</Text>
+                  {group.events.map(ev => {
+                    const slot = calendarSlotLabel(ev.scheduledAt as string, tenantTz);
+                    return (
+                      <EventRow
+                        key={`past-${ev.quoteId}`}
+                        ev={ev}
+                        timeLabel={`${slot.day} · ${slot.time}`}
+                      />
+                    );
+                  })}
+                </View>
+              ))}
+            </View>
+          ) : null}
         </>
       )}
     </SectionScreen>
@@ -228,37 +323,74 @@ export function CalendarScreen() {
 }
 
 const styles = StyleSheet.create({
-  groupLabel: {
+  timeZone: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
-    marginTop: spacing.sm,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  empty: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 },
+  dayGroup: { gap: spacing.md },
+  dayHeading: {
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.6,
+  },
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
     gap: spacing.md,
     borderWidth: 1,
     borderRadius: radius.card,
-    padding: spacing.md,
-    overflow: 'hidden',
+    borderCurve: 'continuous',
+    padding: spacing.lg,
   },
-  bar: { width: 3, alignSelf: 'stretch', borderRadius: 2 },
-  rowTitle: { fontFamily: fonts.sans.bold, fontSize: 14.5 },
-  rowMeta: { marginTop: 2, fontFamily: fonts.sans.regular, fontSize: 12.5 },
+  rowMain: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    gap: spacing.md,
+    minHeight: touch.listRow,
+  },
+  details: { flex: 1, minWidth: 0, gap: spacing.xs },
+  statusDot: { width: 8, height: 8, borderRadius: radius.pill, marginTop: spacing.sm },
+  rowTitle: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  rowMeta: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  rowFooter: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
+    borderTopWidth: 1,
+    paddingTop: spacing.md,
+  },
   time: {
     fontFamily: fonts.mono.bold,
-    fontSize: 11,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 0.4,
     fontVariant: ['tabular-nums'],
   },
+  timeLink: { minHeight: touch.minimum, maxWidth: '100%', justifyContent: 'center' },
   confirmBtn: {
-    minHeight: touch.minimum - 16,
+    minHeight: touch.minimum,
     justifyContent: 'center',
+    borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.md,
   },
-  confirmText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
-  pastToggle: { minHeight: touch.minimum, justifyContent: 'center' },
+  confirmText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  pastToggle: {
+    minHeight: touch.minimum,
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+  },
 });

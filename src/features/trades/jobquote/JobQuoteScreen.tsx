@@ -13,7 +13,7 @@ import { StyleSheet, Text, View } from 'react-native';
 
 import { Field, PrimaryCta } from '@/features/auth/ui';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
-import { fonts } from '@/lib/theme';
+import { fonts, spacing, type as typeScale } from '@/lib/theme';
 import { useTenantMe } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
 
@@ -123,7 +123,15 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
   }
 
   return (
-    <View style={{ gap: 16 }}>
+    <View style={{ gap: spacing.xl }}>
+      <View style={{ gap: spacing.sm }}>
+        <Text accessibilityRole="header" style={[typeScale.title, { color: colors.textPri }]}>
+          Create a quote
+        </Text>
+        <Text style={[styles.hint, { color: colors.textSec }]}>
+          Set the job scope, then draft using your pricing book.
+        </Text>
+      </View>
       {hasElectrical && hasPlumbing ? (
         <Card style={{ gap: 10 }}>
           <SectionLabel>Trade</SectionLabel>
@@ -138,7 +146,7 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
         </Card>
       ) : null}
 
-      <Card style={{ gap: 14 }}>
+      <Card style={{ gap: spacing.xl }}>
         <SectionLabel>Job type</SectionLabel>
         <PillGroup
           options={jobTypes.map(jt => [jt, formatJobType(jt)] as const)}
@@ -146,7 +154,7 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           onChange={pickJobType}
         />
         {spec.usuallyInspection ? (
-          <Text style={[styles.hint, { color: colors.textSec, borderLeftColor: colors.accent }]}>
+          <Text style={[styles.hint, { color: colors.textSec }]}>
             This job type has no standard priced assembly, so unless you have added your own it will
             usually come back as an on-site inspection quote rather than a price.
           </Text>
@@ -175,9 +183,7 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
         )}
 
         {spec.catalogueCategory && catalogue.isPending ? (
-          <Text style={[styles.hint, { color: colors.textSec, borderLeftColor: colors.accent }]}>
-            Loading your catalogue…
-          </Text>
+          <Text style={[styles.hint, { color: colors.textSec }]}>Loading your catalogue…</Text>
         ) : null}
 
         {spec.catalogueCategory && catalogue.isError ? (
@@ -212,8 +218,8 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
         ) : null}
       </Card>
 
-      <Card style={{ gap: 16 }}>
-        <SectionLabel>Where and who</SectionLabel>
+      <Card style={{ gap: spacing.xl }}>
+        <SectionLabel>Property details</SectionLabel>
         <Field label="Address" value={address} onChangeText={setAddress} required height={54} />
         <Field label="Suburb" value={suburb} onChangeText={setSuburb} required height={54} />
         <MultilineField
@@ -222,9 +228,13 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           onChangeText={setNotes}
           placeholder="Access, existing wiring, age of the property — anything that changes the price."
         />
-        <Text style={[styles.hint, { color: colors.textSec, borderLeftColor: colors.accent }]}>
-          Customer details are optional. Adding them now means sending the quote later is one tap —
-          nothing is sent to the customer until you press Send on the quote.
+      </Card>
+
+      <Card style={{ gap: spacing.xl }}>
+        <SectionLabel>Customer details · optional</SectionLabel>
+        <Text style={[styles.hint, { color: colors.textSec }]}>
+          Add contact details now to make sending easier. Nothing is sent until you review the quote
+          and press Send.
         </Text>
         <Field
           label="Customer name"
@@ -305,16 +315,15 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   hint: {
-    borderLeftWidth: 2,
-    paddingLeft: 10,
     fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
   },
   priceValue: { fontFamily: fonts.mono.bold, fontSize: 28, fontVariant: ['tabular-nums'] },
-  priceSub: { fontFamily: fonts.mono.medium, fontSize: 11, letterSpacing: 0.8 },
+  priceSub: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18, letterSpacing: 0.6 },
 });

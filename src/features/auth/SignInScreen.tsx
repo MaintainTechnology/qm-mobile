@@ -9,7 +9,7 @@ import { isClerkAPIResponseError, useAuth } from '@clerk/expo';
 // create() resolves to { error }. The resource-shaped hooks this flow is built on
 // moved to /legacy — see the note in SignUpScreen.
 import { useSignIn } from '@clerk/expo/legacy';
-import { useRouter } from 'expo-router';
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
 import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import {
@@ -23,8 +23,9 @@ import {
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-import { AuthHeader, BackButton, Field, PrimaryCta } from '@/features/auth/ui';
-import { fonts } from '@/lib/theme';
+import { AUTH_GUTTER, AuthHeader, BackButton, Field, PrimaryCta } from '@/features/auth/ui';
+import { safeDestination } from '@/lib/destinations';
+import { fonts, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 /** A Clerk failure, worded for a tradie rather than an API consumer. */
@@ -46,6 +47,7 @@ export function SignInScreen() {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
+  const { intent } = useLocalSearchParams<{ intent?: string | string[] }>();
   const { signIn, setActive, isLoaded } = useSignIn();
   const { signOut } = useAuth();
 
@@ -57,6 +59,12 @@ export function SignInScreen() {
   // phone must be confirmed with an emailed six-digit code before a session exists.
   const [stage, setStage] = useState<'credentials' | 'verify'>('credentials');
   const [code, setCode] = useState('');
+
+  function destinationAfterSignIn(): Href {
+    const rawIntent = Array.isArray(intent) ? intent[0] : intent;
+    const destination = rawIntent ? safeDestination(rawIntent) : null;
+    return destination?.audience === 'authenticated' ? (destination.href as Href) : '/';
+  }
 
   /** Email the device-trust code for the pending sign-in. False when Clerk offers no email factor. */
   async function prepareDeviceCode(): Promise<boolean> {
@@ -95,7 +103,7 @@ export function SignInScreen() {
       }
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
-        router.replace('/');
+        router.replace(destinationAfterSignIn());
       } else if (attempt.status === 'needs_client_trust' && (await prepareDeviceCode())) {
         setStage('verify');
       } else {
@@ -124,7 +132,7 @@ export function SignInScreen() {
       });
       if (attempt.status === 'complete') {
         await setActive({ session: attempt.createdSessionId });
-        router.replace('/');
+        router.replace(destinationAfterSignIn());
       } else {
         setError('That code does not match. Check the newest email and try again.');
       }
@@ -168,14 +176,21 @@ export function SignInScreen() {
       >
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + 34 }]}
+          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + spacing.xxl }]}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
           {stage === 'credentials' ? (
             <>
-              <Text style={[styles.h2, { color: colors.textPri }]}>WELCOME BACK</Text>
+              <Text
+                accessibilityRole="header"
+                maxFontSizeMultiplier={1.4}
+                style={[styles.h2, { color: colors.textPri }]}
+              >
+                WELCOME BACK
+              </Text>
               <Text style={[styles.sub, { color: colors.textSec }]}>
-                Your AI line has been answering while you were on the tools.
+                Sign in to review your quotes and keep work moving.
               </Text>
 
               <View style={styles.fields}>
@@ -196,38 +211,46 @@ export function SignInScreen() {
                 />
               </View>
 
-              <View style={{ marginTop: 26 }}>
+              <Pressable
+                accessibilityRole="link"
+                onPress={() =>
+                  WebBrowser.openBrowserAsync('https://www.quotemax.com.au/forgot-password')
+                }
+                style={({ pressed }) => [styles.forgotLink, { opacity: pressed ? 0.6 : 1 }]}
+              >
+                <Text style={[styles.linkText, { color: colors.textSec }]}>
+                  Forgot your password?
+                </Text>
+              </Pressable>
+
+              <View style={styles.primaryAction}>
                 <PrimaryCta label="Sign in" onPress={submit} loading={submitting} />
               </View>
 
-              <View style={styles.links}>
+              <View style={[styles.accountLinks, { borderTopColor: colors.inkLine }]}>
+                <Text style={[styles.signupLine, { color: colors.textDim }]}>New to QuoteMax?</Text>
                 <Pressable
                   accessibilityRole="link"
-                  onPress={() =>
-                    WebBrowser.openBrowserAsync('https://www.quotemax.com.au/forgot-password')
-                  }
+                  onPress={() => router.push('/sign-up')}
+                  style={({ pressed }) => [styles.linkButton, { opacity: pressed ? 0.6 : 1 }]}
                 >
-                  <Text style={[styles.forgot, { color: colors.accentText }]}>
-                    Forgot your password?
+                  <Text style={[styles.linkText, { color: colors.textPri }]}>
+                    Create an account
                   </Text>
                 </Pressable>
-                <Text style={[styles.signupLine, { color: colors.textDim }]}>
-                  No account yet?{' '}
-                  <Text
-                    style={{ color: colors.accentText }}
-                    onPress={() => router.push('/sign-up')}
-                  >
-                    Get your QuoteMax
-                  </Text>
-                </Text>
               </View>
             </>
           ) : (
             <>
-              <Text style={[styles.h2, { color: colors.textPri }]}>NEW PHONE?</Text>
+              <Text
+                accessibilityRole="header"
+                maxFontSizeMultiplier={1.4}
+                style={[styles.h2, { color: colors.textPri }]}
+              >
+                CHECK YOUR EMAIL
+              </Text>
               <Text style={[styles.sub, { color: colors.textSec }]}>
-                First sign-in on this phone. We emailed you a six-digit code — enter it to
-                continue.
+                First sign-in on this phone. Enter the six-digit code we sent to {email.trim()}.
               </Text>
 
               <View style={styles.fields}>
@@ -236,17 +259,26 @@ export function SignInScreen() {
                   value={code}
                   onChangeText={setCode}
                   keyboardType="number-pad"
+                  autoComplete="one-time-code"
                   error={error}
                 />
               </View>
 
-              <View style={{ marginTop: 26 }}>
-                <PrimaryCta label="Verify and sign in" onPress={verifyDevice} loading={submitting} />
+              <View style={styles.primaryAction}>
+                <PrimaryCta
+                  label="Verify and sign in"
+                  onPress={verifyDevice}
+                  loading={submitting}
+                />
               </View>
 
               <View style={styles.links}>
-                <Pressable accessibilityRole="button" onPress={() => void resendDeviceCode()}>
-                  <Text style={[styles.forgot, { color: colors.accentText }]}>Send a new code</Text>
+                <Pressable
+                  accessibilityRole="button"
+                  onPress={() => void resendDeviceCode()}
+                  style={({ pressed }) => [styles.linkButton, { opacity: pressed ? 0.6 : 1 }]}
+                >
+                  <Text style={[styles.linkText, { color: colors.textSec }]}>Send a new code</Text>
                 </Pressable>
               </View>
             </>
@@ -260,35 +292,23 @@ export function SignInScreen() {
 const styles = StyleSheet.create({
   screen: { flex: 1 },
   headerLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 1.6, // .16em @ 10
+    ...type.label,
+    letterSpacing: 1.2,
   },
-  body: { paddingTop: 30, paddingHorizontal: 26 },
-  h2: {
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 30,
-    lineHeight: 32, // kit /1; floored at 1.05 so RN cannot clip the caps
-    letterSpacing: -1.05, // -.035em @ 30
+  body: { flexGrow: 1, paddingTop: spacing.gap, paddingHorizontal: AUTH_GUTTER },
+  h2: { ...type.headline },
+  sub: { ...type.body, marginTop: spacing.md },
+  fields: { marginTop: spacing.gap, gap: spacing.xxl },
+  primaryAction: { marginTop: spacing.xxl },
+  links: { marginTop: spacing.md, alignItems: 'center' },
+  forgotLink: { minHeight: touch.minimum, alignSelf: 'flex-end', justifyContent: 'center' },
+  linkButton: { minHeight: touch.minimum, justifyContent: 'center' },
+  linkText: { ...type.bodySm, fontFamily: fonts.sans.semiBold },
+  accountLinks: {
+    marginTop: spacing.gap,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    alignItems: 'center',
   },
-  sub: {
-    marginTop: 11,
-    fontFamily: fonts.sans.regular,
-    fontSize: 14.5,
-    lineHeight: 22, // 1.55
-  },
-  fields: { marginTop: 26, gap: 18 },
-  links: {
-    marginTop: 24,
-    gap: 12,
-    alignItems: 'flex-start',
-  },
-  forgot: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 12.5,
-  },
-  signupLine: {
-    fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-  },
+  signupLine: { ...type.bodySm },
 });

@@ -78,7 +78,9 @@ function ChipText({ tone, label }: { tone: SignageChipTone; label: string }) {
       : tone === 'warn'
         ? colors.warningBright
         : colors.textDim;
-  return <Text style={[styles.chip, { color: colour, borderColor: colour }]}>{label.toUpperCase()}</Text>;
+  return (
+    <Text style={[styles.chip, { color: colour, borderColor: colour }]}>{label.toUpperCase()}</Text>
+  );
 }
 
 function RequestRow({ req }: { req: RecentSignageRequest }) {
@@ -102,17 +104,19 @@ function RequestRow({ req }: { req: RecentSignageRequest }) {
       ]}
     >
       <View style={styles.rowMain}>
-        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={2}>
           {req.studio_name}
         </Text>
-        <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={1}>
+        <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={2}>
           {`${req.sweep_name} · ${formatJobDate(req.sweep_created_at)}`.toUpperCase()}
         </Text>
       </View>
-      <ChipText tone={chip.tone} label={chip.label} />
-      {assessmentId != null ? (
-        <Text style={[styles.rowChevron, { color: colors.accentText }]}>→</Text>
-      ) : null}
+      <View style={styles.rowFooter}>
+        <ChipText tone={chip.tone} label={chip.label} />
+        {assessmentId != null ? (
+          <Text style={[styles.rowChevron, { color: colors.textDim }]}>→</Text>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -155,8 +159,8 @@ export function SignageTools() {
         </SectionLabel>
         {recent.length === 0 ? (
           <Text style={[styles.emptyBody, { color: colors.textSec }]}>
-            No requests yet. Run a sweep to send your studios their upload links — each one shows
-            up here as it responds.
+            No requests yet. Run a sweep to send your studios their upload links — each one shows up
+            here as it responds.
           </Text>
         ) : (
           shown.map(r => <RequestRow key={r.id} req={r} />)
@@ -179,14 +183,14 @@ export function SignageTools() {
 }
 
 const styles = StyleSheet.create({
-  stack: { gap: spacing.md },
+  stack: { gap: spacing.xl },
   statRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: spacing.lg,
     marginTop: spacing.md,
   },
-  stat: { flexGrow: 1, flexBasis: 84 },
+  stat: { flexGrow: 1, flexBasis: 120, minWidth: 0 },
   statValue: {
     fontFamily: fonts.mono.bold,
     fontSize: 20,
@@ -195,53 +199,63 @@ const styles = StyleSheet.create({
   statLabel: {
     marginTop: 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  linkRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  linkRow: { gap: spacing.md },
   row: {
+    alignItems: 'stretch',
+    gap: spacing.sm,
+    marginTop: spacing.lg,
+    paddingTop: spacing.lg,
+    borderTopWidth: 1,
+    minHeight: touch.listRow,
+  },
+  rowMain: { minWidth: 0, gap: spacing.xs },
+  rowFooter: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: spacing.sm,
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
-    borderTopWidth: 1,
-    minHeight: touch.minimum,
+    justifyContent: 'space-between',
+    gap: spacing.md,
   },
-  rowMain: { flex: 1, minWidth: 0 },
-  rowTitle: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
+  rowTitle: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
   rowMeta: {
     marginTop: 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   chip: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   rowChevron: { fontFamily: fonts.mono.bold, fontSize: 14 },
   pressed: { opacity: 0.6 },
   emptyBody: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 13.5,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
   },
   showMore: {
     marginTop: spacing.sm,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   showMoreLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
 });

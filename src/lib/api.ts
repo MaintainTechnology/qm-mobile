@@ -8,6 +8,7 @@
 import type { z } from 'zod';
 
 import { apiUrl } from '@/lib/env';
+import { captureAppError } from '@/lib/monitoring';
 import { authHeader } from '@/lib/session';
 
 export class ApiError extends Error {
@@ -51,6 +52,11 @@ type RequestOptions = {
    * client-side and the retry double-fires the action.
    */
   timeoutMs?: number;
+  /**
+   * Stable, non-sensitive label for endpoints whose concrete path contains a
+   * capability token. Fetch still uses `path`; errors and monitoring use this.
+   */
+  diagnosticPath?: string;
 };
 
 /**
@@ -62,7 +68,14 @@ const REQUEST_TIMEOUT_MS = 15000;
 export async function apiRequest<T>(
   path: string,
   schema: z.ZodType<T>,
-  { signal, body, method = 'GET', token, timeoutMs = REQUEST_TIMEOUT_MS }: RequestOptions = {},
+  {
+    signal,
+    body,
+    method = 'GET',
+    token,
+    timeoutMs = REQUEST_TIMEOUT_MS,
+    diagnosticPath = path,
+  }: RequestOptions = {},
 ): Promise<T> {
   const controller = new AbortController();
   const timer = setTimeout(() => controller.abort(), timeoutMs);
@@ -88,14 +101,34 @@ export async function apiRequest<T>(
 
     if (!response.ok) {
       const errorBody: unknown = await response.json().catch(() => undefined);
-      throw new ApiError(`${method} ${path} failed`, response.status, path, errorBody);
+      throw new ApiError(
+        `${method} ${diagnosticPath} failed`,
+        response.status,
+        diagnosticPath,
+        errorBody,
+      );
     }
 
     const parsed = schema.safeParse(await response.json());
     if (!parsed.success) {
-      throw new ApiSchemaError(path, parsed.error.issues);
+      throw new ApiSchemaError(diagnosticPath, parsed.error.issues);
     }
     return parsed.data;
+  } catch (error) {
+    if (error instanceof ApiSchemaError) {
+      captureAppError(error, {
+        kind: 'schema',
+        operationId: 'api.response.schema',
+        route: diagnosticPath,
+      });
+    } else if (body instanceof FormData) {
+      captureAppError(error, {
+        kind: 'upload',
+        operationId: 'api.upload.request',
+        route: diagnosticPath,
+      });
+    }
+    throw error;
   } finally {
     clearTimeout(timer);
   }

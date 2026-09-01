@@ -10,8 +10,8 @@
  *     categories the tradie has a finite priced active product for (drives the
  *     priced/generic badge without cross-trade collisions).
  *   steps (task checklist) → the same five shapes on /api/tenant/tasks, minus
- *     the catalogue-gap apparatus (steps carry no category and no price BY
- *     DESIGN — the estimator never reads them).
+ *     the catalogue-gap apparatus. Steps carry no category or price, but the
+ *     estimator does consume their include_when conditions.
  *
  * Write gating: POST bodies validate `trade` against TRADE_ENUM (electrical +
  * plumbing — see ../write-gate.ts); the [id] PATCH routes never see `trade`.
@@ -38,6 +38,8 @@ import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { ESTIMATION_KEY } from './estimating-api';
 import { normaliseCategory } from './bom-readiness';
 export {
+  assessRecipePriceReadiness,
+  evaluateRecipeCondition,
   missingRequiredPriceCategories,
   normaliseCategory,
   resolveCatalogueBadge,
@@ -77,6 +79,8 @@ const BomLineSchema = z.looseObject({
   quantity: z.coerce.number(),
   required: z.boolean().nullish(),
   include_when: z.record(z.string(), z.unknown()).nullish(),
+  quantity_per: z.coerce.number().positive().nullish(),
+  catalogue_id: z.string().nullish(),
   sort: z.coerce.number().default(0),
 });
 export type BomLine = z.infer<typeof BomLineSchema>;
@@ -87,6 +91,7 @@ const BaselineLineSchema = z.looseObject({
   quantity: z.coerce.number(),
   required: z.boolean().nullish(),
   include_when: z.record(z.string(), z.unknown()).nullish(),
+  quantity_per: z.coerce.number().positive().nullish(),
   sort: z.coerce.number().default(0),
 });
 export type BaselineLine = z.infer<typeof BaselineLineSchema>;
@@ -109,6 +114,7 @@ const TaskLineSchema = z.looseObject({
   title: z.string(),
   notes: z.string().nullish(),
   required: z.boolean().nullish(),
+  include_when: z.record(z.string(), z.unknown()).nullish(),
   sort: z.coerce.number().default(0),
 });
 export type TaskLine = z.infer<typeof TaskLineSchema>;
@@ -117,6 +123,7 @@ const BaselineTaskSchema = z.looseObject({
   title: z.string(),
   notes: z.string().nullish(),
   required: z.boolean().nullish(),
+  include_when: z.record(z.string(), z.unknown()).nullish(),
   sort: z.coerce.number().default(0),
 });
 export type BaselineTask = z.infer<typeof BaselineTaskSchema>;
@@ -193,6 +200,14 @@ export const ForkResultSchema = z.looseObject({
   gap_detection_failed: z.boolean().default(false),
 });
 export type ForkResult = z.infer<typeof ForkResultSchema>;
+
+/**
+ * Current web fork routes omit BOM include_when/quantity_per and task
+ * include_when. The baseline GETs omit some of those fields too, so mobile
+ * cannot prove a particular baseline is safe to copy. Native fork controls
+ * therefore stay blocked rather than silently changing quote semantics.
+ */
+export const NATIVE_RECIPE_FORK_IS_LOSSLESS = false;
 
 export function useForkBomBaseline() {
   return useApiMutation<{ assembly_id: string }, ForkResult>(
@@ -286,6 +301,26 @@ export function parseQuantity(input: string): number | null {
   const n = Number(trimmed);
   if (!Number.isFinite(n) || n <= 0 || n > QUANTITY_MAX) return null;
   return n;
+}
+
+/** Web `scaleBomToItemCount` ratio rule at row scope: ten items ÷ four, rounded up, is three. */
+export function quantityForItemCount(
+  row: { quantity: number | string; quantity_per?: number | string | null },
+  itemCount: number | null | undefined,
+): number {
+  const stored = Number(row.quantity);
+  const per = Number(row.quantity_per);
+  const count = Number(itemCount);
+  if (
+    Number.isInteger(count) &&
+    count > 0 &&
+    count <= QUANTITY_MAX &&
+    Number.isFinite(per) &&
+    per > 0
+  ) {
+    return Math.ceil(count / per);
+  }
+  return stored;
 }
 
 /** Step-title input → trimmed title, or null when unusable (server bound:

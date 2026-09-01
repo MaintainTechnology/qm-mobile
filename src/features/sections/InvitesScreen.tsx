@@ -17,7 +17,7 @@ import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice, PillGroup } from '../trades/ui';
-import { SectionScreen } from './SectionScreen';
+import { SectionEmpty, SectionGroup, SectionLoading, SectionScreen } from './SectionScreen';
 
 const QR_KEY = ['marketing', 'qr'] as const;
 const CODES_KEY = ['marketing', 'codes'] as const;
@@ -68,11 +68,11 @@ function QrRow({ qr }: { qr: Qr }) {
   const shareUrl = apiUrl(`/s/${qr.short_code}`);
   return (
     <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={1}>
+      <View style={{ minWidth: 0, gap: spacing.xs }}>
+        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={2}>
           {qr.label ?? qr.short_code}
         </Text>
-        <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={1}>
+        <Text style={[styles.rowMeta, { color: colors.textDim }]}>
           {DEST_LABELS[qr.destination_type ?? '']?.toUpperCase() ?? ''} · {qr.scan_count ?? 0} SCANS
           · {(qr.status ?? 'active').toUpperCase()}
         </Text>
@@ -82,20 +82,23 @@ function QrRow({ qr }: { qr: Qr }) {
           </Text>
         ) : null}
       </View>
-      <SmallBtn
-        label="Share"
-        primary
-        onPress={() =>
-          void Share.share({
-            message: `${shareUrl}\nQR image: ${apiUrl(`/api/dashboard/marketing/qr/${qr.id}/image?format=png`)}`,
-          })
-        }
-      />
-      <SmallBtn
-        label={paused ? 'Resume' : 'Pause'}
-        disabled={patch.isPending}
-        onPress={() => patch.mutate({ id: qr.id, status: paused ? 'active' : 'paused' })}
-      />
+      <View style={[styles.rowActions, { borderTopColor: colors.inkLine }]}>
+        <SmallBtn
+          label="Share"
+          expand
+          onPress={() =>
+            void Share.share({
+              message: `${shareUrl}\nQR image: ${apiUrl(`/api/dashboard/marketing/qr/${qr.id}/image?format=png`)}`,
+            })
+          }
+        />
+        <SmallBtn
+          label={paused ? 'Resume' : 'Pause'}
+          expand
+          disabled={patch.isPending}
+          onPress={() => patch.mutate({ id: qr.id, status: paused ? 'active' : 'paused' })}
+        />
+      </View>
     </View>
   );
 }
@@ -121,49 +124,54 @@ function CodeRow({ code }: { code: Code }) {
   );
   return (
     <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
-      <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
+      <View style={{ minWidth: 0, gap: spacing.xs }}>
         <Text style={[styles.codeText, { color: colors.textPri }]}>{code.code}</Text>
-        <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={1}>
+        <Text style={[styles.rowMeta, { color: colors.textDim }]}>
           {code.campaign?.toUpperCase() ?? ''} · USED {code.quota_used ?? 0}/{code.quota_total ?? 0}{' '}
           · {(code.status ?? 'active').toUpperCase()}
         </Text>
-        {sendOpen ? (
-          <View style={{ gap: spacing.sm }}>
-            <TextInput
-              value={recipient}
-              onChangeText={setRecipient}
-              placeholder="Mobile or email…"
-              placeholderTextColor={colors.textDim}
-              autoCapitalize="none"
-              accessibilityLabel="Invite recipient"
-              style={[
-                styles.input,
-                { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
-              ]}
-            />
-            <View style={{ flexDirection: 'row', gap: spacing.sm }}>
-              <SmallBtn
-                label="Send SMS"
-                primary
-                disabled={send.isPending || recipient.trim().length === 0}
-                onPress={() => send.mutate({ id: code.id, channel: 'sms', to: recipient.trim() })}
-              />
-              <SmallBtn
-                label="Send email"
-                disabled={send.isPending || recipient.trim().length === 0}
-                onPress={() => send.mutate({ id: code.id, channel: 'email', to: recipient.trim() })}
-              />
-            </View>
-          </View>
-        ) : null}
-        {note ? <Text style={[styles.rowMeta, { color: colors.textSec }]}>{note}</Text> : null}
       </View>
-      <SmallBtn
-        label="Share"
-        primary
-        onPress={() => void Share.share({ message: apiUrl(`/signup?code=${code.code}`) })}
-      />
-      <SmallBtn label={sendOpen ? 'Close' : 'Send'} onPress={() => setSendOpen(v => !v)} />
+      <View style={[styles.rowActions, { borderTopColor: colors.inkLine }]}>
+        <SmallBtn
+          label="Share"
+          expand
+          onPress={() => void Share.share({ message: apiUrl(`/signup?code=${code.code}`) })}
+        />
+        <SmallBtn label={sendOpen ? 'Close' : 'Send'} expand onPress={() => setSendOpen(v => !v)} />
+      </View>
+      {sendOpen ? (
+        <View style={[styles.sendForm, { borderTopColor: colors.inkLine }]}>
+          <Text style={[styles.fieldLabel, { color: colors.textSec }]}>RECIPIENT</Text>
+          <TextInput
+            value={recipient}
+            onChangeText={setRecipient}
+            placeholder="Mobile or email…"
+            placeholderTextColor={colors.textDim}
+            autoCapitalize="none"
+            accessibilityLabel="Invite recipient"
+            style={[
+              styles.input,
+              { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
+            ]}
+          />
+          <View style={styles.sendActions}>
+            <SmallBtn
+              label="Send SMS"
+              primary
+              expand
+              disabled={send.isPending || recipient.trim().length === 0}
+              onPress={() => send.mutate({ id: code.id, channel: 'sms', to: recipient.trim() })}
+            />
+            <SmallBtn
+              label="Send email"
+              expand
+              disabled={send.isPending || recipient.trim().length === 0}
+              onPress={() => send.mutate({ id: code.id, channel: 'email', to: recipient.trim() })}
+            />
+          </View>
+        </View>
+      ) : null}
+      {note ? <Text style={[styles.rowMeta, { color: colors.textSec }]}>{note}</Text> : null}
     </View>
   );
 }
@@ -173,11 +181,13 @@ function SmallBtn({
   onPress,
   primary = false,
   disabled = false,
+  expand = false,
 }: {
   label: string;
   onPress: () => void;
   primary?: boolean;
   disabled?: boolean;
+  expand?: boolean;
 }) {
   const { colors } = useTheme();
   return (
@@ -188,6 +198,8 @@ function SmallBtn({
       onPress={onPress}
       style={({ pressed }) => [
         styles.smallBtn,
+        expand && styles.expand,
+        primary && styles.primaryBtn,
         {
           opacity: disabled ? 0.45 : 1,
           borderColor: primary ? colors.accent : colors.ctlLine,
@@ -255,148 +267,225 @@ export function InvitesScreen() {
       }}
     >
       {qrs.data?.slug ? (
-        <Text style={[styles.slug, { color: colors.textSec }]}>
-          Your landing page: {apiUrl(`/t/${qrs.data.slug}`)}
-        </Text>
+        <View
+          style={[styles.landingPage, { borderColor: colors.inkLine, backgroundColor: colors.ink }]}
+        >
+          <Text style={[styles.fieldLabel, { color: colors.textDim }]}>YOUR LANDING PAGE</Text>
+          <Text selectable style={[styles.slug, { color: colors.textPri }]}>
+            {apiUrl(`/t/${qrs.data.slug}`)}
+          </Text>
+        </View>
       ) : null}
 
-      <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-        QR CODES · {activeQrs.length}
-      </Text>
-      {qrs.isPending ? (
-        <Notice tone="accent" label="Loading QR codes…" />
-      ) : qrs.isError && !qrs.data ? (
-        <Notice
-          tone="danger"
-          label="Could not load QR codes"
-          body={apiErrorMessage(qrs.error)}
-          onRetry={() => void qrs.refetch()}
-        />
-      ) : (
-        <>
-          {activeQrs.map(qr => (
-            <QrRow key={qr.id} qr={qr} />
-          ))}
-          <View
-            style={[styles.form, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}
-          >
-            <Text style={[styles.groupLabel, { color: colors.textDim }]}>NEW QR CODE</Text>
-            <TextInput
-              value={qrLabel}
-              onChangeText={v => setQrLabel(v.slice(0, 60))}
-              placeholder="Label — e.g. Ute rear window"
-              placeholderTextColor={colors.textDim}
-              accessibilityLabel="QR label"
-              style={[
-                styles.input,
-                { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
-              ]}
-            />
-            <PillGroup
-              options={[
-                ['sms', 'Text me a quote'],
-                ['landing', 'Landing page'],
-              ]}
-              value={qrDest}
-              onChange={v => setQrDest(v as 'sms' | 'landing')}
-            />
-            <SmallBtn
-              label={createQr.isPending ? 'Creating…' : 'Create QR'}
-              primary
-              disabled={qrLabel.trim().length === 0 || createQr.isPending}
-              onPress={() => {
-                setQrNote(null);
-                createQr.mutate({ label: qrLabel.trim(), destination_type: qrDest });
-              }}
-            />
-            {qrNote ? (
-              <Text style={[styles.rowMeta, { color: colors.textSec }]}>{qrNote}</Text>
+      <SectionGroup title="QR codes" count={activeQrs.length}>
+        {qrs.isPending ? (
+          <SectionLoading label="Loading QR codes" />
+        ) : qrs.isError && !qrs.data ? (
+          <Notice
+            tone="danger"
+            label="Could not load QR codes"
+            body={apiErrorMessage(qrs.error)}
+            onRetry={() => void qrs.refetch()}
+          />
+        ) : (
+          <>
+            {activeQrs.length === 0 ? (
+              <SectionEmpty
+                title="Create your first QR code"
+                body="Add a code to your ute or printed materials so customers can reach you."
+              />
             ) : null}
-          </View>
-        </>
-      )}
+            {activeQrs.map(qr => (
+              <QrRow key={qr.id} qr={qr} />
+            ))}
+            <View
+              style={[
+                styles.form,
+                { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
+              ]}
+            >
+              <Text
+                accessibilityRole="header"
+                style={[styles.formTitle, { color: colors.textPri }]}
+              >
+                NEW QR CODE
+              </Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSec }]}>LABEL</Text>
+              <TextInput
+                value={qrLabel}
+                onChangeText={v => setQrLabel(v.slice(0, 60))}
+                placeholder="e.g. Ute rear window"
+                placeholderTextColor={colors.textDim}
+                accessibilityLabel="QR label"
+                style={[
+                  styles.input,
+                  {
+                    borderColor: colors.ctlLine,
+                    backgroundColor: colors.ink,
+                    color: colors.textPri,
+                  },
+                ]}
+              />
+              <Text style={[styles.fieldLabel, { color: colors.textSec }]}>DESTINATION</Text>
+              <PillGroup
+                options={[
+                  ['sms', 'Text me a quote'],
+                  ['landing', 'Landing page'],
+                ]}
+                value={qrDest}
+                onChange={v => setQrDest(v as 'sms' | 'landing')}
+              />
+              <SmallBtn
+                label={createQr.isPending ? 'Creating…' : 'Create QR'}
+                primary
+                disabled={qrLabel.trim().length === 0 || createQr.isPending}
+                onPress={() => {
+                  setQrNote(null);
+                  createQr.mutate({ label: qrLabel.trim(), destination_type: qrDest });
+                }}
+              />
+              {qrNote ? (
+                <Text style={[styles.rowMeta, { color: colors.textSec }]}>{qrNote}</Text>
+              ) : null}
+            </View>
+          </>
+        )}
+      </SectionGroup>
 
-      <Text style={[styles.groupLabel, { color: colors.textDim }]}>
-        INVITE CODES · {codeRows.length}
-      </Text>
-      {codes.isPending ? (
-        <Notice tone="accent" label="Loading invite codes…" />
-      ) : codes.isError && !codes.data ? (
-        <Notice
-          tone="danger"
-          label="Could not load invite codes"
-          body={apiErrorMessage(codes.error)}
-          onRetry={() => void codes.refetch()}
-        />
-      ) : (
-        <>
-          {codeRows.map(code => (
-            <CodeRow key={code.id} code={code} />
-          ))}
-          <View
-            style={[styles.form, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}
-          >
-            <Text style={[styles.groupLabel, { color: colors.textDim }]}>NEW INVITE CODE</Text>
-            <TextInput
-              value={campaign}
-              onChangeText={v => setCampaign(v.slice(0, 40))}
-              placeholder="Campaign — e.g. winter-mailout"
-              placeholderTextColor={colors.textDim}
-              autoCapitalize="none"
-              accessibilityLabel="Campaign name"
-              style={[
-                styles.input,
-                { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
-              ]}
-            />
-            <SmallBtn
-              label={createCode.isPending ? 'Creating…' : 'Create code'}
-              primary
-              disabled={campaign.trim().length === 0 || createCode.isPending}
-              onPress={() => {
-                setCodeNote(null);
-                createCode.mutate({ campaign: campaign.trim(), quota_total: 100 });
-              }}
-            />
-            {codeNote ? (
-              <Text style={[styles.rowMeta, { color: colors.textSec }]}>{codeNote}</Text>
+      <SectionGroup title="Invite codes" count={codeRows.length}>
+        {codes.isPending ? (
+          <SectionLoading label="Loading invite codes" />
+        ) : codes.isError && !codes.data ? (
+          <Notice
+            tone="danger"
+            label="Could not load invite codes"
+            body={apiErrorMessage(codes.error)}
+            onRetry={() => void codes.refetch()}
+          />
+        ) : (
+          <>
+            {codeRows.length === 0 ? (
+              <SectionEmpty
+                title="No invite codes yet"
+                body="Create a code for a campaign, then share it or send it to a customer."
+              />
             ) : null}
-          </View>
-        </>
-      )}
+            {codeRows.map(code => (
+              <CodeRow key={code.id} code={code} />
+            ))}
+            <View
+              style={[
+                styles.form,
+                { borderColor: colors.inkLine, backgroundColor: colors.inkCard },
+              ]}
+            >
+              <Text
+                accessibilityRole="header"
+                style={[styles.formTitle, { color: colors.textPri }]}
+              >
+                NEW INVITE CODE
+              </Text>
+              <Text style={[styles.fieldLabel, { color: colors.textSec }]}>CAMPAIGN</Text>
+              <TextInput
+                value={campaign}
+                onChangeText={v => setCampaign(v.slice(0, 40))}
+                placeholder="e.g. winter-mailout"
+                placeholderTextColor={colors.textDim}
+                autoCapitalize="none"
+                accessibilityLabel="Campaign name"
+                style={[
+                  styles.input,
+                  {
+                    borderColor: colors.ctlLine,
+                    backgroundColor: colors.ink,
+                    color: colors.textPri,
+                  },
+                ]}
+              />
+              <SmallBtn
+                label={createCode.isPending ? 'Creating…' : 'Create code'}
+                disabled={campaign.trim().length === 0 || createCode.isPending}
+                onPress={() => {
+                  setCodeNote(null);
+                  createCode.mutate({ campaign: campaign.trim(), quota_total: 100 });
+                }}
+              />
+              {codeNote ? (
+                <Text style={[styles.rowMeta, { color: colors.textSec }]}>{codeNote}</Text>
+              ) : null}
+            </View>
+          </>
+        )}
+      </SectionGroup>
     </SectionScreen>
   );
 }
 
 const styles = StyleSheet.create({
-  groupLabel: { fontFamily: fonts.mono.semiBold, fontSize: 11, letterSpacing: 0.88 },
-  slug: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18 },
-  row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.sm,
+  formTitle: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24, letterSpacing: -0.36 },
+  fieldLabel: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.6 },
+  landingPage: {
     borderWidth: 1,
     borderRadius: radius.card,
-    padding: spacing.md,
+    borderCurve: 'continuous',
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
-  rowTitle: { fontFamily: fonts.sans.bold, fontSize: 14 },
-  rowMeta: { marginTop: 2, fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.6 },
-  codeText: { fontFamily: fonts.mono.bold, fontSize: 14, letterSpacing: 0.5 },
-  form: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.md },
+  slug: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18 },
+  row: {
+    gap: spacing.lg,
+    borderWidth: 1,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    padding: spacing.lg,
+  },
+  rowTitle: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  rowMeta: { fontFamily: fonts.mono.regular, fontSize: 12, lineHeight: 18, letterSpacing: 0.2 },
+  rowActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    borderTopWidth: 1,
+    paddingTop: spacing.md,
+  },
+  sendForm: { borderTopWidth: 1, paddingTop: spacing.lg, gap: spacing.md },
+  sendActions: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  codeText: { fontFamily: fonts.mono.bold, fontSize: 18, lineHeight: 26, letterSpacing: 0.5 },
+  form: {
+    borderWidth: 1,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    padding: spacing.xl,
+    gap: spacing.lg,
+  },
   input: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: spacing.md,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
+    fontSize: 16,
+    lineHeight: 24,
   },
   smallBtn: {
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
-  smallBtnText: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  expand: { flex: 1, minWidth: 104 },
+  primaryBtn: { minHeight: touch.primaryCta },
+  smallBtnText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
+    textAlign: 'center',
+  },
 });

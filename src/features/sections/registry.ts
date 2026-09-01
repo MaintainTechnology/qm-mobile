@@ -29,7 +29,7 @@ export const SECTION_GROUPS: SectionGroup[] = [
       {
         id: 'overview',
         title: 'Overview',
-        blurb: 'Today at a glance — totals, conversion and what needs you.',
+        blurb: 'Totals, conversion and what needs your attention.',
         kind: 'screen',
         target: '/sections/overview',
       },
@@ -50,7 +50,7 @@ export const SECTION_GROUPS: SectionGroup[] = [
       {
         id: 'followups',
         title: 'Follow-ups',
-        blurb: 'Chase quotes that went quiet — call or text from here.',
+        blurb: 'Call or text customers about open quotes.',
         kind: 'screen',
         target: '/sections/followups',
       },
@@ -64,7 +64,7 @@ export const SECTION_GROUPS: SectionGroup[] = [
     ],
   },
   {
-    label: 'Trades',
+    label: 'Trades & pricing',
     rows: [
       {
         id: 'trades',
@@ -73,11 +73,6 @@ export const SECTION_GROUPS: SectionGroup[] = [
         kind: 'tab',
         target: '/',
       },
-    ],
-  },
-  {
-    label: 'Price book',
-    rows: [
       {
         id: 'pricing-book',
         title: 'General pricing',
@@ -88,14 +83,14 @@ export const SECTION_GROUPS: SectionGroup[] = [
       {
         id: 'pricing-wizard',
         title: 'Pricing wizard',
-        blurb: 'Guided rate setup — a web dashboard tool.',
+        blurb: 'Set up your rates in the web dashboard.',
         kind: 'web',
         target: '/dashboard/pricing-wizard',
       },
     ],
   },
   {
-    label: 'Business',
+    label: 'Marketing',
     rows: [
       {
         id: 'invites',
@@ -118,6 +113,11 @@ export const SECTION_GROUPS: SectionGroup[] = [
         kind: 'screen',
         target: '/sections/videos',
       },
+    ],
+  },
+  {
+    label: 'Records',
+    rows: [
       {
         id: 'files',
         title: 'Files',
@@ -132,6 +132,25 @@ export const SECTION_GROUPS: SectionGroup[] = [
         kind: 'screen',
         target: '/sections/history',
       },
+      {
+        id: 'help',
+        title: 'Help & guides',
+        blurb: 'Product guides, reference documents and downloads.',
+        kind: 'screen',
+        target: '/sections/help',
+      },
+      {
+        id: 'support',
+        title: 'Contact support',
+        blurb: 'Send QuoteMax a question without leaving the app.',
+        kind: 'screen',
+        target: '/support',
+      },
+    ],
+  },
+  {
+    label: 'Account',
+    rows: [
       {
         id: 'account',
         title: 'Account',
@@ -156,7 +175,7 @@ export const SECTION_GROUPS: SectionGroup[] = [
       {
         id: 'crm',
         title: 'CRM sync',
-        blurb: 'Connect and sync your CRM — set up on the web.',
+        blurb: 'Connect your CRM in the web dashboard.',
         kind: 'web',
         target: '/dashboard/crm',
       },

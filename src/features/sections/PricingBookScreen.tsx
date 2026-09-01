@@ -3,7 +3,7 @@
  * the existing rate editors (they own their PATCH /api/tenant/me wiring), with
  * the same per-trade gating the Menu tab used before the section split.
  */
-import { ActivityIndicator, View } from 'react-native';
+import { View } from 'react-native';
 
 import { CardBox, RetryLine } from '@/features/menu/CardChrome';
 import { LabourRatesCard } from '@/features/menu/LabourRatesCard';
@@ -13,12 +13,10 @@ import { WebOnlyCard } from '@/features/trades/hub/SectionsContent';
 import { apiErrorMessage } from '@/lib/api';
 import { spacing } from '@/lib/theme';
 import { isTenantMissing, tenantTrades, useTenantMe } from '@/lib/tenant';
-import { useTheme } from '@/lib/useTheme';
 
-import { SectionScreen } from './SectionScreen';
+import { SectionLoading, SectionScreen } from './SectionScreen';
 
 export function PricingBookScreen() {
-  const { colors } = useTheme();
   const me = useTenantMe();
   const trades = me.data ? tenantTrades(me.data) : [];
   const labourTrades = trades.filter(t => t === 'electrical' || t === 'plumbing');
@@ -26,20 +24,18 @@ export function PricingBookScreen() {
   return (
     <SectionScreen
       title="Pricing book"
-      subtitle="The only source of a price — every quote is built from these rates."
+      subtitle="Your rates, organised by trade. Every quote starts here."
       refreshing={me.isFetching}
       onRefresh={() => void me.refetch()}
     >
       {me.isPending ? (
-        <CardBox title="PRICING BOOK">
-          <ActivityIndicator color={colors.accent} />
-        </CardBox>
+        <SectionLoading label="Loading your pricing book" />
       ) : me.isError && !me.data && !isTenantMissing(me.error) ? (
         <CardBox title="PRICING BOOK">
           <RetryLine message={apiErrorMessage(me.error)} onRetry={() => void me.refetch()} />
         </CardBox>
       ) : me.data ? (
-        <View style={{ gap: spacing.lg }}>
+        <View style={{ gap: spacing.xxl }}>
           {labourTrades.length > 0 ? (
             <LabourRatesCard trades={labourTrades} pricingBooks={me.data.pricing_books} />
           ) : null}

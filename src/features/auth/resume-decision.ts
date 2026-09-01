@@ -70,6 +70,7 @@ export function successHref(params: {
   warning: string | null;
   sessionId: string | null;
   clerkUserId: string;
+  setupComplete: boolean;
 }): Href {
   return `/success${toQuery({
     name: params.firstName,
@@ -77,5 +78,6 @@ export function successHref(params: {
     warning: params.warning,
     session: params.sessionId,
     uid: params.clerkUserId,
+    ready: params.setupComplete ? '1' : '0',
   })}` as Href;
 }

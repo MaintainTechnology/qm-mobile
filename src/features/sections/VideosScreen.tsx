@@ -17,18 +17,27 @@ import { z } from 'zod';
 
 import { LinkOutButton } from '@/features/trades/hub/LinkOut';
 import { apiErrorMessage } from '@/lib/api';
-import { appendFile, pickImage, sizeOk, type PickedFile } from '@/lib/media';
+import {
+  appendUploadFiles,
+  pickImageForUpload,
+  uploadFailureNotice,
+  uploadSelectionNote,
+  type PickedFile,
+} from '@/lib/media';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice, PillGroup } from '../trades/ui';
-import { SectionScreen } from './SectionScreen';
+import { SectionLoading, SectionScreen } from './SectionScreen';
+import {
+  MAX_REFERENCE_IMAGES,
+  VIDEO_OWNER_PHOTO_POLICY,
+  VIDEO_REFERENCE_PHOTO_POLICY,
+  appendReferenceImages,
+} from './video-reference-images';
 
 const MAX_SCRIPT_CHARS = 220;
-/** Mirrors the generate route's MAX_IMAGE_BYTES so oversize photos fail before spending signal. */
-const MAX_IMAGE_BYTES = 7 * 1024 * 1024;
-
 const SlotSchema = z.looseObject({
   url: z.string().nullish(),
   /** The tradie's own clip when they have one, else the QuoteMax default — always playable. */
@@ -103,19 +112,21 @@ function SlotCard({
   slot,
   trade,
   busy,
-  onGenerated,
+  onAttemptSettled,
 }: {
   kind: 'welcome' | 'thankyou';
   slot: Slot;
   trade: string | null;
   busy: boolean;
-  onGenerated: () => void;
+  onAttemptSettled: () => void;
 }) {
   const { colors } = useTheme();
   const [script, setScript] = useState<string | null>(null);
   const [ownerPhoto, setOwnerPhoto] = useState<PickedFile | null>(null);
   const [extraImages, setExtraImages] = useState<PickedFile[]>([]);
   const [photoNote, setPhotoNote] = useState<string | null>(null);
+  const [pickerPending, setPickerPending] = useState(false);
+  const pickerOpenRef = useRef(false);
   const generate = useApiMutation<FormData, z.infer<typeof GenerateSchema>>(
     '/api/tenant/videos/generate',
     GenerateSchema,
@@ -129,14 +140,20 @@ function SlotCard({
         setOwnerPhoto(null);
         setExtraImages([]);
         setPhotoNote(null);
-        onGenerated();
+        onAttemptSettled();
+      },
+      onError: error => {
+        // Network/timeout/5xx can land after the server accepted the kick.
+        // Confirmed auth/file rejections do not need a minute of polling.
+        const failure = uploadFailureNotice(error, 'video generation', { canReconcile: true });
+        if (failure.retry === 'check_first') onAttemptSettled();
       },
     },
   );
 
   const status = slot.state?.status ?? 'idle';
   const generating = status === 'generating';
-  const locked = generating || busy || generate.isPending;
+  const locked = generating || busy || generate.isPending || pickerPending;
   const scriptValue = script ?? slot.state?.script ?? slot.default_script ?? '';
   const videoUrl = slot.effective_url ?? slot.url ?? null;
   const statusColor =
@@ -149,25 +166,46 @@ function SlotCard({
           : colors.textDim;
 
   async function attach(target: 'owner' | 'extra', source: 'camera' | 'library') {
-    const photo = await pickImage(source);
-    if (!photo) {
-      // Null covers both a cancel and a camera-permission denial — the hint is
-      // phrased as a nudge so a plain cancel isn't scolded.
-      if (source === 'camera') {
-        setPhotoNote(
-          "If the camera didn't open, allow camera access for QuoteMax in your phone's settings.",
-        );
+    if (pickerOpenRef.current) return;
+    if (target === 'extra' && extraImages.length >= MAX_REFERENCE_IMAGES) {
+      setPhotoNote('You can attach up to two reference photos. Remove one to choose another.');
+      return;
+    }
+    pickerOpenRef.current = true;
+    setPickerPending(true);
+    try {
+      const routePolicy =
+        target === 'owner' ? VIDEO_OWNER_PHOTO_POLICY : VIDEO_REFERENCE_PHOTO_POLICY;
+      const pickerPolicy =
+        target === 'extra'
+          ? { ...routePolicy, maxFiles: MAX_REFERENCE_IMAGES - extraImages.length }
+          : routePolicy;
+      const result = await pickImageForUpload(source, pickerPolicy);
+      if (result.kind === 'cancelled') return;
+      if (result.kind === 'denied' || result.kind === 'failed') {
+        setPhotoNote(result.message);
+        return;
       }
-      return;
+      if (result.kind === 'rejected') {
+        setPhotoNote(result.problem.message);
+        return;
+      }
+
+      if (target === 'owner') {
+        setOwnerPhoto(result.files[0]);
+      } else {
+        const next = appendReferenceImages(extraImages, result.files);
+        if (!next.ok) {
+          setPhotoNote('You can attach up to two reference photos. Remove one to choose another.');
+          return;
+        }
+        setExtraImages(next.files);
+      }
+      setPhotoNote(uploadSelectionNote(result));
+    } finally {
+      pickerOpenRef.current = false;
+      setPickerPending(false);
     }
-    if (!sizeOk(photo, MAX_IMAGE_BYTES)) {
-      // Mirrors the server's 400 so the tradie hears it before the upload.
-      setPhotoNote('That photo is over 7 MB. Choose a smaller photo and try again.');
-      return;
-    }
-    setPhotoNote(null);
-    if (target === 'owner') setOwnerPhoto(photo);
-    else setExtraImages(prev => [...prev, photo]);
   }
 
   function fireGenerate() {
@@ -175,15 +213,27 @@ function SlotCard({
     form.append('slot', kind);
     if (trade) form.append('trade', trade);
     form.append(kind === 'welcome' ? 'script_welcome' : 'script_thankyou', scriptValue.trim());
-    if (ownerPhoto) appendFile(form, 'owner_photo', ownerPhoto);
-    for (const photo of extraImages) appendFile(form, 'extra_image', photo);
+    if (ownerPhoto) {
+      const owner = appendUploadFiles(form, VIDEO_OWNER_PHOTO_POLICY, [ownerPhoto]);
+      if (!owner.ok) {
+        setPhotoNote(owner.problem.message);
+        return;
+      }
+    }
+    if (extraImages.length > 0) {
+      const references = appendUploadFiles(form, VIDEO_REFERENCE_PHOTO_POLICY, extraImages);
+      if (!references.ok) {
+        setPhotoNote(references.problem.message);
+        return;
+      }
+    }
     generate.mutate(form);
   }
 
   return (
     <View style={[styles.card, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
       <View style={styles.cardTop}>
-        <Text style={[styles.cardTitle, { color: colors.textPri }]}>
+        <Text accessibilityRole="header" style={[styles.cardTitle, { color: colors.textPri }]}>
           {kind === 'welcome' ? 'WELCOME VIDEO' : 'THANK-YOU VIDEO'}
         </Text>
         <Text style={[styles.status, { color: statusColor }]}>
@@ -198,6 +248,12 @@ function SlotCard({
         <SlotVideo key={videoUrl} url={videoUrl} kind={kind} />
       ) : null}
 
+      <View style={styles.scriptHeading}>
+        <Text style={[styles.photoLabel, { color: colors.textSec }]}>SCRIPT</Text>
+        <Text style={[styles.counter, { color: colors.textDim }]}>
+          {scriptValue.length}/{MAX_SCRIPT_CHARS}
+        </Text>
+      </View>
       <TextInput
         value={scriptValue}
         onChangeText={v => setScript(v.slice(0, MAX_SCRIPT_CHARS))}
@@ -211,27 +267,28 @@ function SlotCard({
           { borderColor: colors.ctlLine, backgroundColor: colors.ink, color: colors.textPri },
         ]}
       />
-      <Text style={[styles.counter, { color: colors.textDim }]}>
-        {scriptValue.length}/{MAX_SCRIPT_CHARS}
-      </Text>
 
-      <View style={styles.photoGroup}>
+      <View style={[styles.photoGroup, { borderTopColor: colors.inkLine }]}>
         <View style={styles.photoHead}>
           <Text style={[styles.photoLabel, { color: colors.textPri }]}>PRESENTER PHOTO</Text>
           <Text style={[styles.photoHint, { color: colors.textDim }]}>
             PNG, JPEG or WebP · 7 MB max
           </Text>
         </View>
+        {ownerPhoto ? (
+          <Image
+            source={{ uri: ownerPhoto.uri }}
+            style={styles.thumb}
+            contentFit="cover"
+            accessibilityLabel="Presenter photo"
+          />
+        ) : null}
         <View style={styles.photoRow}>
-          {ownerPhoto ? (
-            <Image
-              source={{ uri: ownerPhoto.uri }}
-              style={styles.thumb}
-              contentFit="cover"
-              accessibilityLabel="Presenter photo"
-            />
-          ) : null}
-          <PhotoAction label="TAKE PHOTO" onPress={() => void attach('owner', 'camera')} disabled={locked} />
+          <PhotoAction
+            label="TAKE PHOTO"
+            onPress={() => void attach('owner', 'camera')}
+            disabled={locked}
+          />
           <PhotoAction
             label="CHOOSE PHOTO"
             onPress={() => void attach('owner', 'library')}
@@ -243,34 +300,54 @@ function SlotCard({
         </View>
       </View>
 
-      <View style={styles.photoGroup}>
+      <View style={[styles.photoGroup, { borderTopColor: colors.inkLine }]}>
         <View style={styles.photoHead}>
-          <Text style={[styles.photoLabel, { color: colors.textPri }]}>REFERENCE PHOTOS</Text>
+          <Text style={[styles.photoLabel, { color: colors.textPri }]}>
+            REFERENCE PHOTOS · {extraImages.length}/{MAX_REFERENCE_IMAGES}
+          </Text>
           <Text style={[styles.photoHint, { color: colors.textDim }]}>
-            Ute or finished jobs · 7 MB each
+            PNG, JPEG or WebP · up to 2 sent to the generator · 7 MB each
           </Text>
         </View>
+        {extraImages.length > 0 ? (
+          <View style={styles.photoRow}>
+            {extraImages.map((photo, i) => (
+              <Pressable
+                key={`${photo.uri}-${i}`}
+                accessibilityRole="button"
+                accessibilityLabel={`Remove reference photo ${i + 1}`}
+                disabled={locked}
+                onPress={() => {
+                  setExtraImages(prev => prev.filter(p => p !== photo));
+                  setPhotoNote(null);
+                }}
+              >
+                <Image
+                  source={{ uri: photo.uri }}
+                  style={styles.thumb}
+                  contentFit="cover"
+                  accessibilityLabel={`Reference photo ${i + 1}`}
+                />
+              </Pressable>
+            ))}
+          </View>
+        ) : null}
         <View style={styles.photoRow}>
-          {extraImages.map((photo, i) => (
-            <Pressable
-              key={`${photo.uri}-${i}`}
-              accessibilityRole="button"
-              accessibilityLabel={`Remove reference photo ${i + 1}`}
-              disabled={locked}
-              onPress={() => setExtraImages(prev => prev.filter(p => p !== photo))}
-            >
-              <Image source={{ uri: photo.uri }} style={styles.thumb} contentFit="cover" />
-            </Pressable>
-          ))}
-          <PhotoAction label="TAKE PHOTO" onPress={() => void attach('extra', 'camera')} disabled={locked} />
+          <PhotoAction
+            label="TAKE PHOTO"
+            onPress={() => void attach('extra', 'camera')}
+            disabled={locked || extraImages.length >= MAX_REFERENCE_IMAGES}
+          />
           <PhotoAction
             label="CHOOSE PHOTO"
             onPress={() => void attach('extra', 'library')}
-            disabled={locked}
+            disabled={locked || extraImages.length >= MAX_REFERENCE_IMAGES}
           />
         </View>
         {extraImages.length > 0 ? (
-          <Text style={[styles.photoHint, { color: colors.textDim }]}>Tap a photo to remove it.</Text>
+          <Text style={[styles.photoHint, { color: colors.textDim }]}>
+            Tap a photo to remove it.
+          </Text>
         ) : null}
       </View>
 
@@ -282,7 +359,7 @@ function SlotCard({
       ) : null}
       {generate.isError ? (
         <Text style={[styles.error, { color: colors.dangerBright }]}>
-          {apiErrorMessage(generate.error)}
+          {uploadFailureNotice(generate.error, 'video generation', { canReconcile: true }).message}
         </Text>
       ) : null}
 
@@ -305,10 +382,10 @@ function SlotCard({
             : generating
               ? 'GENERATING…'
               : status === 'ready' || slot.url
-                ? 'REGENERATE'
+                ? 'REGENERATE VIDEO'
                 : status === 'failed'
                   ? 'RETRY'
-                  : 'GENERATE'}
+                  : 'GENERATE VIDEO'}
         </Text>
       </Pressable>
     </View>
@@ -350,7 +427,7 @@ export function VideosScreen() {
       onRefresh={() => void query.refetch()}
     >
       {query.isPending ? (
-        <Notice tone="accent" label="Loading your videos…" />
+        <SectionLoading label="Loading your videos" />
       ) : query.isError && !query.data ? (
         <Notice
           tone="danger"
@@ -370,7 +447,7 @@ export function VideosScreen() {
 
           {generating ? (
             <Text style={[styles.pollNote, { color: colors.textSec }]}>
-              Generation runs for a few minutes — the finished clip appears here automatically.
+              Generation takes a few minutes. The finished clip appears here automatically.
             </Text>
           ) : null}
 
@@ -379,7 +456,7 @@ export function VideosScreen() {
             slot={query.data.slots.welcome}
             trade={query.data.trade ?? null}
             busy={!!generating}
-            onGenerated={() => {
+            onAttemptSettled={() => {
               pollUntilRef.current = Date.now() + 60000;
               void query.refetch();
             }}
@@ -389,7 +466,7 @@ export function VideosScreen() {
             slot={query.data.slots.thankyou}
             trade={query.data.trade ?? null}
             busy={!!generating}
-            onGenerated={() => {
+            onAttemptSettled={() => {
               pollUntilRef.current = Date.now() + 60000;
               void query.refetch();
             }}
@@ -403,10 +480,16 @@ export function VideosScreen() {
 }
 
 const styles = StyleSheet.create({
-  card: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.sm },
-  cardTop: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'baseline' },
-  cardTitle: { fontFamily: fonts.mono.semiBold, fontSize: 11, letterSpacing: 0.88 },
-  status: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  card: {
+    borderWidth: 1,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    padding: spacing.xl,
+    gap: spacing.lg,
+  },
+  cardTop: { gap: spacing.sm },
+  cardTitle: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24, letterSpacing: -0.36 },
+  status: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.3 },
   video: {
     width: '100%',
     aspectRatio: 16 / 9,
@@ -415,49 +498,72 @@ const styles = StyleSheet.create({
     backgroundColor: '#000',
   },
   script: {
-    minHeight: 88,
+    minHeight: 128,
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     padding: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 14,
-    lineHeight: 20,
+    fontSize: 16,
+    lineHeight: 24,
     textAlignVertical: 'top',
   },
   counter: {
-    alignSelf: 'flex-end',
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
+    fontFamily: fonts.mono.regular,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
-  photoGroup: { gap: 6 },
-  photoHead: {
+  scriptHeading: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'space-between',
     alignItems: 'baseline',
+    justifyContent: 'space-between',
     gap: spacing.sm,
+    marginTop: spacing.sm,
   },
-  photoLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  photoHint: { fontFamily: fonts.sans.regular, fontSize: 11.5, lineHeight: 16 },
+  photoGroup: { gap: spacing.md, borderTopWidth: 1, paddingTop: spacing.lg },
+  photoHead: {
+    gap: spacing.xs,
+  },
+  photoLabel: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.5 },
+  photoHint: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   photoRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
-  thumb: { width: 48, height: 48, borderRadius: 8 },
+  thumb: { width: 64, height: 64, borderRadius: radius.control },
   photoBtn: {
     minHeight: touch.minimum,
+    flexGrow: 1,
+    flexBasis: 112,
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
   },
-  photoBtnLabel: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
-  error: { fontFamily: fonts.sans.medium, fontSize: 12.5 },
+  photoBtnLabel: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.3,
+    textAlign: 'center',
+  },
+  error: { fontFamily: fonts.sans.medium, fontSize: 14, lineHeight: 20 },
   generateBtn: {
-    minHeight: touch.minimum,
-    alignSelf: 'flex-start',
+    minHeight: touch.primaryCta,
+    alignItems: 'center',
     justifyContent: 'center',
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
   },
-  generateText: { fontFamily: fonts.mono.bold, fontSize: 11, letterSpacing: 0.88 },
-  pollNote: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
+  generateText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
+  pollNote: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 22 },
 });

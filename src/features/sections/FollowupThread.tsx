@@ -14,6 +14,7 @@ import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice } from '../trades/ui';
+import { SectionLoading } from './SectionScreen';
 
 const ThreadSchema = z.looseObject({
   ok: z.literal(true),
@@ -61,7 +62,7 @@ export function FollowupThread({
   );
 
   if (query.isPending) {
-    return <Notice tone="accent" label="Loading messages…" />;
+    return <SectionLoading label="Loading messages" />;
   }
   if (query.isError || !query.data) {
     return (
@@ -82,13 +83,14 @@ export function FollowupThread({
       </Text>
     );
   }
-  const customerRepliedLast = lastIn != null && (lastOut == null || new Date(lastIn) > new Date(lastOut));
+  const customerRepliedLast =
+    lastIn != null && (lastOut == null || new Date(lastIn) > new Date(lastOut));
 
   return (
     <View style={styles.thread}>
       {customerRepliedLast ? (
         <Text style={[styles.replied, { color: colors.successBright }]}>
-          CUSTOMER REPLIED — AWAITING YOUR RESPONSE
+          CUSTOMER REPLIED · AWAITING YOUR RESPONSE
         </Text>
       ) : null}
       {messages.map((m, i) => {
@@ -99,14 +101,22 @@ export function FollowupThread({
             style={[
               styles.bubble,
               mine
-                ? { alignSelf: 'flex-end', borderColor: colors.accent, backgroundColor: colors.inkDeep }
-                : { alignSelf: 'flex-start', borderColor: colors.inkLine, backgroundColor: colors.inkCard },
+                ? {
+                    alignSelf: 'flex-end',
+                    borderColor: colors.ctlLine,
+                    backgroundColor: colors.inkDeep,
+                  }
+                : {
+                    alignSelf: 'flex-start',
+                    borderColor: colors.inkLine,
+                    backgroundColor: colors.inkCard,
+                  },
             ]}
           >
             <Text style={[styles.body, { color: mine ? colors.textPri : colors.textSec }]}>
               {m.body}
             </Text>
-            <Text style={[styles.stamp, { color: mine ? colors.accentText : colors.textDim }]}>
+            <Text style={[styles.stamp, { color: colors.textDim }]}>
               {mine ? 'YOU' : 'CUSTOMER'} · {fmtSmsWhen(m.created_at)}
             </Text>
           </View>
@@ -117,17 +127,18 @@ export function FollowupThread({
 }
 
 const styles = StyleSheet.create({
-  thread: { gap: spacing.sm },
-  replied: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  empty: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
+  thread: { gap: spacing.md },
+  replied: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.4 },
+  empty: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   bubble: {
-    maxWidth: '80%',
+    maxWidth: '92%',
     borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    gap: 2,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
   },
-  body: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
-  stamp: { fontFamily: fonts.mono.medium, fontSize: 9, letterSpacing: 0.72 },
+  body: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 22 },
+  stamp: { fontFamily: fonts.mono.regular, fontSize: 12, lineHeight: 18, letterSpacing: 0.2 },
 });

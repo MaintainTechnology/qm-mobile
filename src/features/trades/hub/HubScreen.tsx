@@ -1,14 +1,7 @@
 /**
- * The trade hub — mobile mirror of the web dashboard's TradeHub
- * (quotemate-automation/app/dashboard/page.tsx:17050-17326): trade heading,
- * the web's subtitle sentence, zero-padded SECTIONS/QUOTES counters, the
- * seven section chips (Quotes active-by-default like the web), and each
- * section's content. Both the Home tab (initialSection="quotes") and the
- * Tools tab (initialSection="tools") render this one screen — same structure,
- * different landing section, exactly how the web hub treats its sections.
- *
- * The web sidebar lists one hub per trade; on a phone that collapses to a
- * pill switcher above the header for multi-trade tenants.
+ * The mobile trade hub keeps the web dashboard's trade and section routes
+ * in a compact header, optional trade switcher, and scrollable section rail.
+ * Home and Tools share this screen with different initial sections.
  */
 import { useState } from 'react';
 import {
@@ -29,14 +22,13 @@ import { useTheme } from '@/lib/useTheme';
 
 import { JobQuoteScreen } from '../jobquote/JobQuoteScreen';
 import { RoofMeasureScreen } from '../roofing/RoofMeasureScreen';
-import { apiErrorMessage, Notice, PillGroup } from '../ui';
+import { apiErrorMessage, Notice, PillOption } from '../ui';
 import { QuoteQueueSection } from './QuoteQueueSection';
 import {
   HUB_SECTION_LABELS,
   hubSections,
   hubSubtitle,
   hubTrades,
-  padCount,
   quoteCountForTrade,
   TRADE_LABELS,
   type HubSectionId,
@@ -56,7 +48,15 @@ import { PricingSection } from './sections/PricingSection';
 import { RecipesSection } from './sections/RecipesSection';
 import { ServicesSection } from './sections/ServicesSection';
 
-function SectionBody({ section, trade, onSelectSection }: { section: HubSectionId; trade: HubTrade; onSelectSection: (section: HubSectionId) => void }) {
+function SectionBody({
+  section,
+  trade,
+  onSelectSection,
+}: {
+  section: HubSectionId;
+  trade: HubTrade;
+  onSelectSection: (section: HubSectionId) => void;
+}) {
   switch (section) {
     case 'quotes':
       return <QuoteQueueSection trade={trade} />;
@@ -119,8 +119,10 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
       >
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + 32 }]}
+          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + spacing.gap }]}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
+          showsVerticalScrollIndicator={false}
           refreshControl={
             <RefreshControl
               refreshing={tenantMe.isFetching}
@@ -146,15 +148,7 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
             />
           ) : (
             <>
-              {trades.length > 1 ? (
-                <PillGroup
-                  options={trades.map(t => [t, TRADE_LABELS[t]] as [string, string])}
-                  value={trade}
-                  onChange={v => setTradeChoice(v as HubTrade)}
-                />
-              ) : null}
-
-              {/* Header — web hub h1 + subtitle + zero-padded counter strip. */}
+              {/* Keep the trade context clear without repeating navigation counts. */}
               <View style={styles.header}>
                 <Text style={[typeScale.headline, { color: colors.textPri }]}>
                   {TRADE_LABELS[trade]}
@@ -162,66 +156,63 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
                 <Text style={[styles.subtitle, { color: colors.textSec }]}>
                   {hubSubtitle(trade)}
                 </Text>
-                <View style={[styles.counters, { borderColor: colors.inkLine }]}>
-                  <View style={styles.counter}>
-                    <Text style={[styles.counterLabel, { color: colors.textDim }]}>SECTIONS</Text>
-                    <Text style={[styles.counterValue, { color: colors.textPri }]}>
-                      {padCount(sections.length)}
-                    </Text>
-                  </View>
-                  <View style={styles.counter}>
-                    <Text style={[styles.counterLabel, { color: colors.textDim }]}>QUOTES</Text>
-                    <Text style={[styles.counterValue, { color: colors.textPri }]}>
-                      {padCount(quoteCount)}
-                    </Text>
-                  </View>
-                </View>
               </View>
+
+              {trades.length > 1 ? (
+                <ScrollView
+                  horizontal
+                  showsHorizontalScrollIndicator={false}
+                  contentContainerStyle={styles.tradeRail}
+                  accessibilityLabel="Choose trade"
+                >
+                  {trades.map(t => (
+                    <PillOption
+                      key={t}
+                      label={TRADE_LABELS[t]}
+                      selected={trade === t}
+                      onPress={() => setTradeChoice(t)}
+                    />
+                  ))}
+                </ScrollView>
+              ) : null}
 
               {/* Section chips — the web's horizontal rail; Quotes carries its count. */}
               <ScrollView
                 horizontal
                 showsHorizontalScrollIndicator={false}
                 contentContainerStyle={styles.chipRail}
+                accessibilityRole="tablist"
+                accessibilityLabel="Workspace sections"
               >
                 {sections.map(id => {
                   const active = id === section;
                   return (
                     <Pressable
                       key={id}
-                      accessibilityRole="button"
+                      accessibilityRole="tab"
                       accessibilityState={{ selected: active }}
+                      aria-selected={active}
                       accessibilityLabel={HUB_SECTION_LABELS[id]}
                       onPress={() => setSection(id)}
-                      style={[
+                      style={({ pressed }) => [
                         styles.chip,
                         {
-                          borderColor: active ? colors.accent : colors.inkLine,
-                          backgroundColor: active ? colors.accent : 'transparent',
+                          borderColor: active ? colors.accentSoft : colors.inkLine,
+                          backgroundColor: active || pressed ? colors.inkCard : 'transparent',
                         },
                       ]}
                     >
                       <Text
                         style={[
                           styles.chipText,
-                          { color: active ? colors.accentInk : colors.textSec },
+                          { color: active ? colors.textPri : colors.textSec },
                         ]}
                       >
                         {HUB_SECTION_LABELS[id].toUpperCase()}
                       </Text>
                       {id === 'quotes' && quoteCount > 0 ? (
-                        <View
-                          style={[
-                            styles.chipBadge,
-                            { borderColor: active ? colors.accentInk : colors.inkLine },
-                          ]}
-                        >
-                          <Text
-                            style={[
-                              styles.chipBadgeText,
-                              { color: active ? colors.accentInk : colors.textPri },
-                            ]}
-                          >
+                        <View style={[styles.chipBadge, { borderColor: colors.inkLine }]}>
+                          <Text style={[styles.chipBadgeText, { color: colors.textPri }]}>
                             {quoteCount}
                           </Text>
                         </View>
@@ -241,33 +232,21 @@ export function HubScreen({ initialSection = 'quotes' }: { initialSection?: HubS
 }
 
 const styles = StyleSheet.create({
-  body: { padding: spacing.lg, gap: spacing.lg },
+  body: {
+    width: '100%',
+    maxWidth: 860,
+    alignSelf: 'center',
+    padding: spacing.xl,
+    gap: spacing.xl,
+  },
   header: { gap: spacing.sm },
   subtitle: {
     fontFamily: fonts.sans.regular,
     fontSize: 14,
     lineHeight: 20,
   },
-  counters: {
-    flexDirection: 'row',
-    gap: spacing.gap,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    paddingVertical: spacing.md,
-    marginTop: spacing.xs,
-  },
-  counter: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
-  counterLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
-  },
-  counterValue: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 14,
-    fontVariant: ['tabular-nums'],
-  },
-  chipRail: { gap: spacing.sm, paddingRight: spacing.lg },
+  tradeRail: { gap: spacing.sm, paddingRight: spacing.sm },
+  chipRail: { gap: spacing.sm, paddingRight: spacing.sm, paddingBottom: spacing.xs },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -275,23 +254,25 @@ const styles = StyleSheet.create({
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   chipText: {
     fontFamily: fonts.sans.bold,
-    fontSize: 12,
-    letterSpacing: 0.96, // .08em @ 12
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   chipBadge: {
     borderWidth: 1,
-    borderRadius: 5,
-    paddingHorizontal: 5,
-    paddingVertical: 1,
+    borderRadius: radius.chip,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: 2,
   },
   chipBadgeText: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
+    fontSize: 12,
+    lineHeight: 16,
     fontVariant: ['tabular-nums'],
   },
 });

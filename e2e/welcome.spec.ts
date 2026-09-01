@@ -22,6 +22,6 @@ test('routes to sign-in', async ({ page }) => {
 
 test('routes to sign-up code gate', async ({ page }) => {
   await page.getByText('Get my QuoteMax').click();
-  await expect(page.getByText('One code to start')).toBeVisible();
+  await expect(page.getByText('INVITATION CODE')).toBeVisible();
   await expect(page.getByLabel('Invitation code', { exact: true })).toBeVisible();
 });

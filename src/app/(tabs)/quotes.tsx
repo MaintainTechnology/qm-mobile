@@ -8,16 +8,19 @@
  * closed.
  */
 import { useEffect, useMemo, useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ListSkeleton, ListState } from '@/components/ListState';
+import { ScreenHeader } from '@/components/ScreenHeader';
+import { GhostButton } from '@/features/auth/ui';
 import { QuoteDetailModal } from '@/features/quotes/QuoteDetailModal';
 import { QuoteRow } from '@/features/quotes/QuoteRow';
 import { QUOTE_FILTERS, matchesFilter, type QuoteFilterKey } from '@/features/quotes/status';
 import { apiErrorMessage } from '@/lib/api';
-import { fonts, spacing, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { isTenantMissing, useTenantMe, type QuoteRow as QuoteRowData } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
 
@@ -59,74 +62,105 @@ export default function QuotesRoute() {
 
   return (
     <View style={{ flex: 1, backgroundColor: colors.inkDeep, paddingTop: insets.top }}>
-      <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
-        <Text style={[styles.title, { color: colors.textPri }]}>QUOTES</Text>
-      </View>
+      <ScreenHeader title="Quotes" subtitle="Review drafts and track customer decisions." />
 
-      <View style={styles.filterRow}>
-        {QUOTE_FILTERS.map(f => {
-          const active = filter === f.key;
-          return (
-            <Pressable
-              key={f.key}
-              accessibilityRole="button"
-              accessibilityState={{ selected: active }}
-              onPress={() => setFilter(f.key)}
-              style={[
-                styles.filterChip,
-                {
-                  borderColor: active ? colors.accent : colors.inkLine,
-                  backgroundColor: active ? colors.accent : 'transparent',
-                },
-              ]}
-            >
-              <Text
-                style={[styles.filterLabel, { color: active ? colors.accentInk : colors.textSec }]}
+      <View style={styles.filters}>
+        <View
+          accessibilityRole="tablist"
+          accessibilityLabel="Filter quotes"
+          style={[styles.filterRow, { backgroundColor: colors.ink, borderColor: colors.inkLine }]}
+        >
+          {QUOTE_FILTERS.map(f => {
+            const active = filter === f.key;
+            return (
+              <Pressable
+                key={f.key}
+                accessibilityRole="tab"
+                accessibilityLabel={f.label.toUpperCase()}
+                accessibilityState={{ selected: active }}
+                aria-selected={active}
+                onPress={() => setFilter(f.key)}
+                style={({ pressed }) => [
+                  styles.filterChip,
+                  {
+                    borderColor: active ? colors.ctlLine : 'transparent',
+                    backgroundColor: active || pressed ? colors.inkCard : 'transparent',
+                  },
+                ]}
               >
-                {f.label.toUpperCase()}
-              </Text>
-            </Pressable>
-          );
-        })}
+                <Text
+                  style={[styles.filterLabel, { color: active ? colors.textPri : colors.textSec }]}
+                >
+                  {f.label}
+                </Text>
+              </Pressable>
+            );
+          })}
+        </View>
       </View>
 
       {me.isLoading ? (
-        <View style={styles.centered}>
-          <ActivityIndicator color={colors.accent} />
-        </View>
+        <ListSkeleton label="Loading quotes" />
       ) : me.isError && quotes.length === 0 ? (
-        <View style={styles.centered}>
-          <Text style={[styles.errorText, { color: colors.textSec }]}>
-            {apiErrorMessage(me.error, 'Couldn’t load your quotes — check your connection.')}
-          </Text>
-          <Pressable
-            accessibilityRole="button"
-            onPress={() => void me.refetch()}
-            style={[styles.retryBtn, { borderColor: colors.inkLine }]}
-          >
-            <Text style={[styles.retryLabel, { color: colors.textPri }]}>RETRY</Text>
-          </Pressable>
-        </View>
-      ) : (
-        <FlashList
-          data={filtered}
-          keyExtractor={(q: QuoteRowData) => q.id}
-          renderItem={({ item }) => (
-            <QuoteRow quote={item} onPress={() => setSelectedId(item.id)} />
-          )}
-          refreshing={me.isRefetching}
-          onRefresh={() => void me.refetch()}
-          ListEmptyComponent={
-            <View style={styles.centered}>
-              <Text style={[styles.emptyText, { color: colors.textSec }]}>
-                {filter === 'all'
-                  ? 'No quotes yet — they’ll show up here the moment a lead comes in.'
-                  : 'No quotes match this filter.'}
-              </Text>
-            </View>
-          }
-          contentContainerStyle={{ paddingBottom: insets.bottom + spacing.xxl }}
+        <ListState
+          title="Quotes couldn’t load"
+          description={apiErrorMessage(me.error, 'Check your connection and try again.')}
+          action={<GhostButton label="Retry" onPress={() => void me.refetch()} />}
         />
+      ) : (
+        <>
+          {me.isError ? (
+            <View
+              style={[
+                styles.refreshBanner,
+                { borderColor: colors.inkLine, backgroundColor: colors.ink },
+              ]}
+            >
+              <Text
+                accessibilityLiveRegion="polite"
+                style={[styles.refreshText, { color: colors.textSec }]}
+              >
+                Couldn’t refresh. Showing your last loaded quotes.
+              </Text>
+              <GhostButton label="Retry" onPress={() => void me.refetch()} />
+            </View>
+          ) : null}
+          {filtered.length > 0 ? (
+            <View style={styles.listHeading}>
+              <Text style={[styles.resultCount, { color: colors.textSec }]}>
+                {filtered.length} {filtered.length === 1 ? 'quote' : 'quotes'}
+              </Text>
+              <Text style={[styles.sortLabel, { color: colors.textDim }]}>Newest first</Text>
+            </View>
+          ) : null}
+          <FlashList
+            data={filtered}
+            keyExtractor={(q: QuoteRowData) => q.id}
+            renderItem={({ item }) => (
+              <QuoteRow quote={item} onPress={() => setSelectedId(item.id)} />
+            )}
+            refreshing={me.isRefetching}
+            onRefresh={() => void me.refetch()}
+            ItemSeparatorComponent={() => <View style={{ height: spacing.md }} />}
+            ListEmptyComponent={
+              <ListState
+                inset={false}
+                title={filter === 'all' ? 'Your quotes will appear here' : 'No quotes in this view'}
+                description={
+                  filter === 'all'
+                    ? 'When a lead becomes a draft, you can review it here before it goes to your customer.'
+                    : 'Try another status or return to your full quote list.'
+                }
+                action={
+                  filter !== 'all' ? (
+                    <GhostButton label="View all quotes" onPress={() => setFilter('all')} />
+                  ) : undefined
+                }
+              />
+            }
+            contentContainerStyle={styles.listContent}
+          />
+        </>
       )}
 
       <QuoteDetailModal quote={selected} onClose={closeDetail} />
@@ -135,52 +169,47 @@ export default function QuotesRoute() {
 }
 
 const styles = StyleSheet.create({
-  header: {
-    paddingHorizontal: spacing.lg,
-    paddingBottom: spacing.md,
-    paddingTop: spacing.sm,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 22,
-    letterSpacing: -0.88,
-    textTransform: 'uppercase',
-  },
+  filters: { paddingHorizontal: spacing.xl, paddingTop: spacing.lg, paddingBottom: spacing.md },
   filterRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.sm,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    gap: spacing.xs,
+    padding: spacing.xs,
+    borderWidth: 1,
+    borderRadius: radius.control,
   },
   filterChip: {
+    flexGrow: 1,
     minHeight: touch.minimum,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 14,
+    borderRadius: radius.chip,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.sm,
   },
-  filterLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1 },
-  centered: {
-    flex: 1,
+  filterLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  listContent: { paddingHorizontal: spacing.xl, paddingBottom: spacing.xxl },
+  listHeading: {
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: spacing.xxl,
+    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.md,
+  },
+  resultCount: { ...type.bodySm, fontFamily: fonts.sans.semiBold },
+  sortLabel: { ...type.bodySm },
+  refreshBanner: {
+    flexDirection: 'row',
+    alignItems: 'center',
     gap: spacing.md,
-  },
-  errorText: { fontFamily: fonts.sans.regular, fontSize: 14, textAlign: 'center' },
-  emptyText: { fontFamily: fonts.sans.regular, fontSize: 14, textAlign: 'center', lineHeight: 20 },
-  retryBtn: {
-    minHeight: touch.minimum,
-    alignItems: 'center',
-    justifyContent: 'center',
+    marginHorizontal: spacing.xl,
+    marginBottom: spacing.md,
+    padding: spacing.md,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 10,
-    paddingHorizontal: 20,
+    borderRadius: radius.control,
   },
-  retryLabel: { fontFamily: fonts.sans.bold, fontSize: 12, letterSpacing: 0.6 },
+  refreshText: { ...type.bodySm, flex: 1 },
 });

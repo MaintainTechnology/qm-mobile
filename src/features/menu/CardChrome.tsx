@@ -13,7 +13,9 @@ export function CardBox({ title, children }: { title: string; children: ReactNod
   const { colors } = useTheme();
   return (
     <View style={[styles.card, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
-      <Text style={[styles.title, { color: colors.textDim }]}>{title}</Text>
+      <Text accessibilityRole="header" style={[styles.title, { color: colors.textPri }]}>
+        {title}
+      </Text>
       {children}
     </View>
   );
@@ -34,8 +36,10 @@ export function RetryLine({ message, onRetry }: { message: string; onRetry: () =
         accessibilityRole="button"
         accessibilityLabel="Retry"
         onPress={onRetry}
-        hitSlop={8}
-        style={styles.retryBtn}
+        style={({ pressed }) => [
+          styles.retryBtn,
+          { borderColor: colors.ctlLine, backgroundColor: pressed ? colors.ink : 'transparent' },
+        ]}
       >
         <Text style={[styles.retry, { color: colors.accentText }]}>RETRY</Text>
       </Pressable>
@@ -64,7 +68,7 @@ export function RateCard({
   return (
     <CardBox title={title}>
       {hint ? <CardHint>{hint}</CardHint> : null}
-      <View style={{ marginTop: spacing.lg, gap: spacing.lg }}>{children}</View>
+      <View style={{ marginTop: spacing.xxl, gap: spacing.xl }}>{children}</View>
       {error ? (
         <Text style={[styles.error, { color: colors.dangerBright }]}>{error}</Text>
       ) : saved && !saving ? (
@@ -73,20 +77,22 @@ export function RateCard({
       <Pressable
         accessibilityRole="button"
         accessibilityLabel={`Save ${title.toLowerCase()}`}
+        accessibilityState={{ disabled: saving, busy: saving }}
         disabled={saving}
         onPress={onSave}
         style={({ pressed }) => [
           styles.saveBtn,
           {
-            backgroundColor: pressed ? colors.accentPress : colors.accent,
+            borderColor: colors.ctlLine,
+            backgroundColor: pressed ? colors.ink : 'transparent',
             opacity: saving ? 0.6 : 1,
           },
         ]}
       >
         {saving ? (
-          <ActivityIndicator color={colors.accentInk} />
+          <ActivityIndicator color={colors.textPri} />
         ) : (
-          <Text style={[styles.saveLabel, { color: colors.accentInk }]}>SAVE</Text>
+          <Text style={[styles.saveLabel, { color: colors.textPri }]}>SAVE {title}</Text>
         )}
       </Pressable>
     </CardBox>
@@ -95,29 +101,42 @@ export function RateCard({
 
 const styles = StyleSheet.create({
   card: {
-    marginHorizontal: spacing.lg,
-    marginTop: spacing.lg,
     borderWidth: 1,
     borderRadius: radius.card,
-    padding: spacing.lg,
+    borderCurve: 'continuous',
+    padding: spacing.xl,
   },
-  title: { fontFamily: fonts.sans.semiBold, fontSize: 10.5, letterSpacing: 1.05 },
-  hint: { marginTop: 6, fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 },
-  error: { marginTop: spacing.lg, fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
-  ok: { marginTop: spacing.lg, fontFamily: fonts.sans.semiBold, fontSize: 13 },
+  title: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24, letterSpacing: -0.36 },
+  hint: { marginTop: spacing.sm, fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  error: { marginTop: spacing.lg, fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  ok: { marginTop: spacing.lg, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   retryBtn: {
     marginTop: spacing.sm,
     minHeight: touch.minimum,
     alignSelf: 'flex-start',
     justifyContent: 'center',
-  },
-  retry: { fontFamily: fonts.sans.bold, fontSize: 11, letterSpacing: 0.9 },
-  saveBtn: {
-    marginTop: spacing.lg,
-    height: 52,
+    paddingHorizontal: spacing.lg,
+    borderWidth: 1,
     borderRadius: radius.control,
+    borderCurve: 'continuous',
+  },
+  retry: { fontFamily: fonts.sans.bold, fontSize: 14, letterSpacing: 0.5 },
+  saveBtn: {
+    marginTop: spacing.xxl,
+    minHeight: touch.minimum,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    borderWidth: 1,
+    borderRadius: radius.control,
+    borderCurve: 'continuous',
     alignItems: 'center',
     justifyContent: 'center',
   },
-  saveLabel: { fontFamily: fonts.sans.bold, fontSize: 12.5, letterSpacing: 0.75 },
+  saveLabel: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.5,
+    textAlign: 'center',
+  },
 });

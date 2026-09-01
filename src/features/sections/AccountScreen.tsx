@@ -4,18 +4,19 @@
  * deeper editors (logo/photo upload, password) stay web-side and link out.
  */
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, StyleSheet, Switch, Text, View } from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 
 import { AccountCard } from '@/features/menu/AccountCard';
 import { CardBox, CardHint, RetryLine } from '@/features/menu/CardChrome';
 import { WebOnlyCard } from '@/features/trades/hub/SectionsContent';
 import { apiErrorMessage } from '@/lib/api';
 import { authenticate, isLockAvailable, isLockEnabled, setLockEnabled } from '@/lib/lock';
-import { fonts, spacing } from '@/lib/theme';
+import { fonts, spacing, touch } from '@/lib/theme';
 import { isTenantMissing, useTenantMe } from '@/lib/tenant';
+import { ThemedSwitch } from '@/components/ThemedSwitch';
 import { useTheme } from '@/lib/useTheme';
 
-import { SectionScreen } from './SectionScreen';
+import { SectionLoading, SectionScreen } from './SectionScreen';
 
 /** Device-local, so it renders regardless of how the tenant fetch is going. */
 function SecurityCard() {
@@ -62,12 +63,13 @@ function SecurityCard() {
               : 'Ask for Face ID or fingerprint when you come back to the app.'}
           </CardHint>
         </View>
-        <Switch
+        <ThemedSwitch
           accessibilityLabel="Biometric lock"
           value={enabled}
           disabled={available !== true || busy}
           onValueChange={next => void onToggle(next)}
           trackColor={{ false: colors.inkLine, true: colors.accent }}
+          style={securityStyles.switch}
         />
       </View>
     </CardBox>
@@ -76,16 +78,17 @@ function SecurityCard() {
 
 const securityStyles = StyleSheet.create({
   row: {
-    marginTop: spacing.sm,
+    marginTop: spacing.lg,
+    minHeight: touch.minimum,
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
   },
-  label: { fontFamily: fonts.sans.bold, fontSize: 14.5 },
+  label: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  switch: { minHeight: touch.minimum },
 });
 
 export function AccountScreen() {
-  const { colors } = useTheme();
   const me = useTenantMe();
 
   return (
@@ -96,15 +99,13 @@ export function AccountScreen() {
       onRefresh={() => void me.refetch()}
     >
       {me.isPending ? (
-        <CardBox title="ACCOUNT">
-          <ActivityIndicator color={colors.accent} />
-        </CardBox>
+        <SectionLoading label="Loading your account" />
       ) : me.isError && !me.data && !isTenantMissing(me.error) ? (
         <CardBox title="ACCOUNT">
           <RetryLine message={apiErrorMessage(me.error)} onRetry={() => void me.refetch()} />
         </CardBox>
       ) : me.data ? (
-        <View style={{ gap: spacing.lg }}>
+        <View style={{ gap: spacing.xxl }}>
           <AccountCard me={me.data} />
           <WebOnlyCard
             label="Logo, photo & licences"

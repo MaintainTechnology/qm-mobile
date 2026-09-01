@@ -56,11 +56,15 @@ export function LinkOutButton({
         },
       ]}
     >
+      <Text style={[styles.label, { color: accent ? colors.accentInk : colors.textPri }]}>
+        {label.toUpperCase()}
+      </Text>
       <Text
-        style={[styles.label, { color: accent ? colors.accentInk : colors.textPri }]}
-        numberOfLines={1}
+        accessibilityElementsHidden
+        importantForAccessibility="no"
+        style={[styles.arrow, { color: accent ? colors.accentInk : colors.textSec }]}
       >
-        {label.toUpperCase()} →
+        →
       </Text>
     </Pressable>
   );
@@ -69,16 +73,23 @@ export function LinkOutButton({
 const styles = StyleSheet.create({
   btn: {
     minHeight: touch.minimum,
-    alignSelf: 'flex-start',
-    justifyContent: 'center',
+    maxWidth: '100%',
+    alignSelf: 'stretch',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.md,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.md,
   },
   label: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    flexShrink: 1,
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
+  arrow: { fontFamily: fonts.mono.medium, fontSize: 18, lineHeight: 24 },
 });

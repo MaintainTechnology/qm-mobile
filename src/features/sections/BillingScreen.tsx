@@ -1,23 +1,25 @@
 /**
  * Billing — plan status and usage from GET /api/billing/status (the web
- * BillingTab's read surface). Plan purchases inside the app must go through
- * the store, so the change-plan CTA opens the RevenueCat paywall
- * (src/lib/purchases.ts) rather than Stripe Checkout; existing Stripe
- * subscribers manage their web subscription through the Stripe portal link
- * (POST /api/billing/portal → browser). Never both paths for one purchase.
+ * BillingTab's read surface). Existing Stripe subscribers manage their web
+ * subscription through the validated Stripe portal handoff. New native plan
+ * purchases stay fail-closed until server-side App Store receipt and webhook
+ * reconciliation exists, preventing a second charge path for the same account.
  */
-import { useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, View } from 'react-native';
+import { useLocalSearchParams } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { z } from 'zod';
 
 import { apiErrorMessage } from '@/lib/api';
-import { presentPaywall } from '@/lib/purchases';
+import { captureAppError } from '@/lib/monitoring';
+import { openProviderHandoff } from '@/lib/provider-handoff';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { Notice } from '../trades/ui';
-import { SectionScreen } from './SectionScreen';
+import { BILLING_PLAN_LABELS, isLiveBillingStatus, nativeStorePurchaseGate } from './billing-state';
+import { SectionLoading, SectionScreen } from './SectionScreen';
 
 const StatusSchema = z.looseObject({
   has_customer: z.boolean().nullish(),
@@ -41,17 +43,6 @@ const StatusSchema = z.looseObject({
 
 const PortalSchema = z.looseObject({ url: z.string() });
 
-const PLAN_LABELS: Record<string, string> = {
-  starter: 'Starter',
-  pro: 'Pro',
-  crew: 'Crew',
-};
-
-/** Stripe ACTIVE_STATES (web BillingTab): trialing | active | past_due. */
-function isLive(status: string | null | undefined): boolean {
-  return status === 'trialing' || status === 'active' || status === 'past_due';
-}
-
 function dateAu(iso: string | null | undefined): string {
   if (!iso) return '';
   const d = new Date(iso);
@@ -71,18 +62,21 @@ function UsageLine({
   if (used == null && limit == null) return null;
   const pct = limit ? Math.min(1, (used ?? 0) / limit) : 0;
   return (
-    <View style={{ gap: 4 }}>
-      <Text style={[styles.usageLabel, { color: colors.textDim }]}>
-        {label.toUpperCase()} · {used ?? 0}
-        {limit ? ` / ${limit}` : ''}
-      </Text>
+    <View style={{ gap: spacing.sm }}>
+      <View style={styles.usageHeading}>
+        <Text style={[styles.usageLabel, { color: colors.textSec }]}>{label}</Text>
+        <Text style={[styles.usageValue, { color: colors.textPri }]}>
+          {used ?? 0}
+          {limit ? ` / ${limit}` : ''}
+        </Text>
+      </View>
       {limit ? (
         <View style={[styles.usageTrack, { backgroundColor: colors.ink }]}>
           <View
             style={[
               styles.usageFill,
               {
-                backgroundColor: pct >= 0.9 ? colors.warningBright : colors.accent,
+                backgroundColor: pct >= 0.9 ? colors.warningBright : colors.textDim,
                 width: `${Math.round(pct * 100)}%`,
               },
             ]}
@@ -95,36 +89,65 @@ function UsageLine({
 
 export function BillingScreen() {
   const { colors } = useTheme();
-  const [paywallNote, setPaywallNote] = useState<string | null>(null);
+  const { stripe } = useLocalSearchParams<{ stripe?: string }>();
+  const [handoffError, setHandoffError] = useState<string | null>(null);
+  const [handoffNote, setHandoffNote] = useState<string | null>(null);
   const query = useApiQuery(['billing', 'status'], '/api/billing/status', StatusSchema);
-  const portal = useApiMutation<Record<string, never>, z.infer<typeof PortalSchema>>(
+  const portal = useApiMutation<{ client: 'mobile' }, z.infer<typeof PortalSchema>>(
     '/api/billing/portal',
     PortalSchema,
-    { timeoutMs: 30000, onSuccess: result => void Linking.openURL(result.url) },
+    { timeoutMs: 30000 },
   );
+  const refetchBilling = query.refetch;
 
   const status = query.data;
-  const live = isLive(status?.status);
-  const planLabel = status?.plan ? (PLAN_LABELS[status.plan] ?? status.plan) : null;
+  const live = isLiveBillingStatus(status?.status);
+  const planLabel = status?.plan ? BILLING_PLAN_LABELS[status.plan] : null;
+  const nativeStoreGate = nativeStorePurchaseGate(status);
 
-  async function changePlan() {
-    setPaywallNote(null);
-    const purchased = await presentPaywall();
-    if (purchased) {
-      setPaywallNote('Plan updated ✓');
-      void query.refetch();
+  useEffect(() => {
+    if (stripe === 'return') void refetchBilling();
+  }, [refetchBilling, stripe]);
+
+  useEffect(() => {
+    if (stripe === 'return' && query.isError) {
+      captureAppError(query.error, {
+        kind: 'background_return',
+        operationId: 'stripe.billing.return.refresh',
+        route: '/sections/billing',
+      });
+    }
+  }, [query.error, query.isError, stripe]);
+
+  async function openBillingPortal() {
+    setHandoffError(null);
+    setHandoffNote(null);
+    try {
+      const result = await portal.mutateAsync({ client: 'mobile' });
+      await openProviderHandoff(result.url, 'stripe');
+      setHandoffNote('Returned from Stripe · refreshing your billing status.');
+      await query.refetch();
+    } catch (error) {
+      setHandoffError(apiErrorMessage(error));
     }
   }
 
   return (
     <SectionScreen
       title="Billing"
-      subtitle="Your QuoteMax plan. All prices AUD ex GST — only voice minutes are metered."
+      subtitle="Your server-confirmed QuoteMax plan, usage and limits."
       refreshing={query.isFetching}
       onRefresh={() => void query.refetch()}
     >
+      {stripe === 'return' ? (
+        <Notice
+          tone="accent"
+          label="Back from Stripe"
+          body="Checking QuoteMax’s current billing record. Returning here does not by itself confirm a plan change."
+        />
+      ) : null}
       {query.isPending ? (
-        <Notice tone="accent" label="Loading your plan…" />
+        <SectionLoading label="Loading your plan" />
       ) : query.isError && !query.data ? (
         <Notice
           tone="danger"
@@ -155,11 +178,11 @@ export function BillingScreen() {
               </Text>
             ) : (
               <Text style={[styles.planMeta, { color: colors.textSec }]}>
-                Pick a plan to turn your AI line on.
+                No server-confirmed active plan.
               </Text>
             )}
             {status?.usage || status?.limits ? (
-              <View style={{ gap: spacing.sm, marginTop: spacing.sm }}>
+              <View style={[styles.usage, { borderTopColor: colors.inkLine }]}>
                 <UsageLine
                   label="Quotes this period"
                   used={status?.usage?.quotesUsed}
@@ -176,51 +199,54 @@ export function BillingScreen() {
             ) : null}
           </View>
 
-          <Pressable
-            accessibilityRole="button"
-            accessibilityLabel={live ? 'Change plan' : 'Choose a plan'}
-            onPress={() => void changePlan()}
-            style={({ pressed }) => [
-              styles.cta,
-              { backgroundColor: pressed ? colors.accentPress : colors.accent },
-            ]}
-          >
-            <Text style={[styles.ctaText, { color: colors.accentInk }]}>
-              {live ? 'CHANGE PLAN' : 'CHOOSE A PLAN'}
-            </Text>
-          </Pressable>
-          {paywallNote ? (
-            <Text style={[styles.note, { color: colors.successBright }]}>{paywallNote}</Text>
-          ) : null}
-
-          {status?.has_customer ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Manage billing on the web"
-              disabled={portal.isPending}
-              onPress={() => portal.mutate({})}
-              style={({ pressed }) => [
-                styles.portalBtn,
-                {
-                  borderColor: colors.ctlLine,
-                  backgroundColor: pressed ? colors.ink : 'transparent',
-                },
-              ]}
-            >
-              <Text style={[styles.portalText, { color: colors.textPri }]}>
-                {portal.isPending
-                  ? 'OPENING…'
-                  : live
-                    ? 'MANAGE WEB BILLING →'
-                    : 'VIEW BILLING HISTORY →'}
+          <View style={styles.actions}>
+            {status?.has_customer ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Manage billing on the web"
+                disabled={portal.isPending}
+                onPress={() => void openBillingPortal()}
+                style={({ pressed }) => [
+                  styles.cta,
+                  {
+                    backgroundColor: pressed ? colors.accentPress : colors.accent,
+                    opacity: portal.isPending ? 0.6 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.ctaText, { color: colors.accentInk }]}>
+                  {portal.isPending
+                    ? 'OPENING…'
+                    : live
+                      ? 'MANAGE WEB BILLING →'
+                      : 'VIEW BILLING HISTORY →'}
+                </Text>
+              </Pressable>
+            ) : (
+              <Notice
+                tone="warn"
+                label="Native plan purchase unavailable"
+                body={
+                  nativeStoreGate.reason === 'server-reconciliation-missing'
+                    ? 'QuoteMax has not enabled server receipt reconciliation for app-store plans yet. No purchase was started and no access is assumed.'
+                    : 'Your subscription is managed by Stripe. QuoteMax will not start a second app-store subscription.'
+                }
+              />
+            )}
+            {handoffNote ? (
+              <Text
+                accessibilityLiveRegion="polite"
+                style={[styles.note, { color: colors.textSec }]}
+              >
+                {handoffNote}
               </Text>
-            </Pressable>
-          ) : null}
-          {portal.isError ? (
-            <Text style={[styles.note, { color: colors.dangerBright }]}>
-              {apiErrorMessage(portal.error)}
-            </Text>
-          ) : null}
+            ) : null}
+            {handoffError || portal.isError ? (
+              <Text style={[styles.note, { color: colors.dangerBright }]}>
+                {handoffError ?? apiErrorMessage(portal.error)}
+              </Text>
+            ) : null}
+          </View>
         </>
       )}
     </SectionScreen>
@@ -228,15 +254,36 @@ export function BillingScreen() {
 }
 
 const styles = StyleSheet.create({
-  planCard: { borderWidth: 1, borderRadius: radius.card, padding: spacing.lg, gap: spacing.xs },
-  planLabel: { fontFamily: fonts.mono.semiBold, fontSize: 11, letterSpacing: 0.88 },
+  planCard: {
+    borderWidth: 1,
+    borderRadius: radius.card,
+    borderCurve: 'continuous',
+    padding: spacing.xl,
+    gap: spacing.sm,
+  },
+  planLabel: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.8 },
   planName: {
     fontFamily: fonts.sans.extraBold,
-    fontSize: 24,
-    letterSpacing: -0.72, // -.03em @ 24
+    fontSize: 26,
+    lineHeight: 32,
+    letterSpacing: -0.78,
   },
-  planMeta: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 19 },
-  usageLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
+  planMeta: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 22 },
+  usage: { gap: spacing.xl, marginTop: spacing.md, paddingTop: spacing.xl, borderTopWidth: 1 },
+  usageHeading: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  usageLabel: { fontFamily: fonts.sans.medium, fontSize: 14, lineHeight: 20 },
+  usageValue: {
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+    fontVariant: ['tabular-nums'],
+  },
   usageTrack: { height: 6, borderRadius: 3, overflow: 'hidden' },
   usageFill: { height: '100%', borderRadius: 3 },
   cta: {
@@ -244,15 +291,17 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: radius.control,
+    borderCurve: 'continuous',
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  ctaText: { fontFamily: fonts.mono.bold, fontSize: 12, letterSpacing: 0.96 },
-  portalBtn: {
-    minHeight: touch.minimum,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 1,
-    borderRadius: radius.control,
+  actions: { gap: spacing.md },
+  ctaText: {
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.8,
+    textAlign: 'center',
   },
-  portalText: { fontFamily: fonts.mono.semiBold, fontSize: 11, letterSpacing: 0.88 },
-  note: { fontFamily: fonts.sans.medium, fontSize: 12.5 },
+  note: { fontFamily: fonts.sans.medium, fontSize: 14, lineHeight: 20 },
 });

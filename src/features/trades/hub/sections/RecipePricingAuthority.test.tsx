@@ -6,12 +6,31 @@ describe('recipe pricing authority notice', () => {
   it('states PRICE NEEDED and routes directly to Catalogue without generic fallback copy', async () => {
     const onOpenCatalogue = jest.fn();
     const screen = await render(
-      <RecipePricingAuthority count={2} detectionFailed={false} onOpenCatalogue={onOpenCatalogue} />,
+      <RecipePricingAuthority
+        count={2}
+        conditionalCount={0}
+        detectionFailed={false}
+        onOpenCatalogue={onOpenCatalogue}
+      />,
     );
     expect(screen.getByText(/PRICE NEEDED/i)).toBeTruthy();
     expect(screen.getByText(/inspection/i)).toBeTruthy();
     expect(screen.queryByText(/generic price/i)).toBeNull();
     await fireEvent.press(screen.getByText('OPEN CATALOGUE'));
     expect(onOpenCatalogue).toHaveBeenCalledTimes(1);
+  });
+
+  it('describes unresolved conditions as product-context dependent without claiming readiness', async () => {
+    const screen = await render(
+      <RecipePricingAuthority
+        count={0}
+        conditionalCount={2}
+        detectionFailed={false}
+        onOpenCatalogue={jest.fn()}
+      />,
+    );
+    expect(screen.getByText(/PRODUCT CONTEXT NEEDED/i)).toBeTruthy();
+    expect(screen.getByText(/resolved headline product/i)).toBeTruthy();
+    expect(screen.queryByText(/PRICE NEEDED/i)).toBeNull();
   });
 });

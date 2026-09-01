@@ -8,7 +8,7 @@
  * total sums the included, quotable structures → Save persists the job,
  * Save as quote promotes it to a shareable customer quote.
  */
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
 
 import { Field, GhostButton, PrimaryCta } from '@/features/auth/ui';
@@ -21,21 +21,28 @@ import {
   ROOF_MATERIALS,
   ROOF_PITCHES,
   combinedIncludedTotals,
+  acceptsRoofMeasureRun,
   defaultIncluded,
   includedCount,
   includedIndices1Based,
   includedInspectionStructures,
+  roofMeasureFingerprint,
+  roofRunIsFresh,
+  sameRoofPricingAuthority,
   singleQuotableIncluded,
   structureKey,
   type AuState,
   type MultiRoofQuote,
+  type MeasureAllRequest,
+  type MeasureAllResponse,
   type RoofStructurePrice,
 } from './schema';
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../ui';
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type as typeScale } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 const TIER_LABELS = ['Good', 'Better', 'Best'] as const;
+type SuccessfulRoofMeasure = Extract<MeasureAllResponse, { ok: true }>;
 
 export function RoofMeasureScreen() {
   const { colors } = useTheme();
@@ -49,12 +56,43 @@ export function RoofMeasureScreen() {
   const [yearBuilt, setYearBuilt] = useState('');
   const [formError, setFormError] = useState<string | null>(null);
   const [included, setIncluded] = useState<Record<string, boolean>>({});
+  const [accepted, setAccepted] = useState<{
+    response: MeasureAllResponse;
+    request: MeasureAllRequest;
+  } | null>(null);
+  const mountedRef = useRef(true);
+  const activeRunRef = useRef(0);
+  const currentFingerprintRef = useRef('');
 
   const measure = useMeasureRoof();
   const saveRoof = useSaveRoof();
   const saveAsQuote = useSaveRoofAsQuote();
 
-  const quote: MultiRoofQuote | null = measure.data?.ok === true ? measure.data.quote : null;
+  const currentRequest = (): MeasureAllRequest => ({
+    address: { address: address.trim(), postcode: postcode.trim(), state },
+    inputs: {
+      material,
+      pitch,
+      intent,
+      building_year_built: yearBuilt.trim() ? Number(yearBuilt.trim()) : null,
+    },
+  });
+  currentFingerprintRef.current = roofMeasureFingerprint(currentRequest());
+  const acceptedIsCurrent =
+    accepted !== null &&
+    roofMeasureFingerprint(accepted.request) === currentFingerprintRef.current;
+  const measured: SuccessfulRoofMeasure | null =
+    acceptedIsCurrent && accepted?.response.ok === true ? accepted.response : null;
+  const quote: MultiRoofQuote | null = measured?.quote ?? null;
+  const runFresh = measured ? roofRunIsFresh(measured.run_expires_at) : false;
+
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      activeRunRef.current += 1;
+    },
+    [],
+  );
 
   // A fresh measurement seeds the roof-only default, preserving any explicit
   // toggle the tradie already made for a structure keyed the same way (web parity).
@@ -75,6 +113,13 @@ export function RoofMeasureScreen() {
   const singleIncluded = quote ? singleQuotableIncluded(quote, included) : null;
   const totalIncluded = quote ? includedCount(quote, included) : 0;
   const inspectionIncluded = quote ? includedInspectionStructures(quote, included) : [];
+  const canPromote =
+    measured !== null &&
+    runFresh &&
+    totalIncluded > 0 &&
+    inspectionIncluded.length === 0 &&
+    saveRoof.data?.ok === true &&
+    sameRoofPricingAuthority(saveRoof.data.pricing_authority, measured.pricing_authority);
 
   function onMeasure() {
     const trimmedAddress = address.trim();
@@ -86,85 +131,82 @@ export function RoofMeasureScreen() {
       setFormError('Postcode is 4 digits.');
       return;
     }
+    const parsedYear = yearBuilt.trim() ? Number(yearBuilt.trim()) : null;
+    if (parsedYear !== null && (!Number.isInteger(parsedYear) || parsedYear < 1850 || parsedYear > 2100)) {
+      setFormError('Year built must be from 1850 to 2100, or left blank.');
+      return;
+    }
+    const request = currentRequest();
+    const fingerprint = roofMeasureFingerprint(request);
+    const responseRun = activeRunRef.current + 1;
+    activeRunRef.current = responseRun;
     setFormError(null);
+    setAccepted(null);
     saveRoof.reset();
     saveAsQuote.reset();
-    measure.mutate({
-      address: { address: trimmedAddress, postcode: postcode.trim(), state },
-      inputs: {
-        material,
-        pitch,
-        intent,
-        building_year_built: yearBuilt.trim() ? Number(yearBuilt.trim()) : null,
+    measure.reset();
+    measure.mutate(request, {
+      onSuccess: response => {
+        if (
+          acceptsRoofMeasureRun({
+            activeRun: activeRunRef.current,
+            responseRun,
+            measuredFingerprint: fingerprint,
+            currentFingerprint: currentFingerprintRef.current,
+            mounted: mountedRef.current,
+          })
+        ) {
+          setAccepted({ response, request });
+        }
       },
     });
   }
 
   function onSave() {
-    if (!quote || measure.data?.ok !== true) return;
+    if (!quote || !measured || !runFresh) return;
     saveRoof.mutate({
-      address: { address: address.trim(), postcode: postcode.trim(), state },
-      provider: measure.data.provider,
-      structures: quote.structures.map(s => ({
-        buildingId: s.buildingId,
-        role: s.role,
-        label: s.label,
-        inputs: {
-          material: s.inputs.material,
-          pitch: s.inputs.pitch,
-          intent: s.inputs.intent,
-          building_year_built: s.inputs.building_year_built ?? null,
-        },
-      })),
+      run_token: measured.run_token,
+      address: accepted!.request.address,
+      provider: measured.provider,
       quote,
       included_indices: includedIndices1Based(quote, included),
     });
   }
 
-  // Restricted to the single-included-structure case (roof-save-as-quote-client-summed-price):
-  // no route on the backend prices a combined multi-structure job, so rather than invent that
-  // number by summing already-priced tiers client-side, this forwards the one included
-  // structure's own server-computed tiers verbatim. Multi-structure jobs promote from the web
-  // dashboard for now (singleIncluded is null and the button disables).
+  // Promotion sends only the persisted measurement capability plus the pricing
+  // revision. The server reconstructs every selected structure and money field.
   function onSaveAsQuote() {
-    if (!singleIncluded) return;
-    const s = singleIncluded;
+    if (
+      !measured ||
+      !runFresh ||
+      inspectionIncluded.length > 0 ||
+      totalIncluded === 0 ||
+      saveRoof.data?.ok !== true ||
+      !sameRoofPricingAuthority(saveRoof.data.pricing_authority, measured.pricing_authority)
+    ) {
+      return;
+    }
     saveAsQuote.mutate({
-      address: { address: address.trim(), postcode: postcode.trim(), state },
-      inputs: {
-        material: s.inputs.material,
-        pitch: s.inputs.pitch,
-        intent: s.inputs.intent,
-        building_year_built: s.inputs.building_year_built ?? null,
-      },
-      metrics: {
-        footprint_m2: s.metrics.footprint_m2,
-        sloped_area_m2: s.metrics.sloped_area_m2,
-        storeys: s.metrics.storeys,
-        form: s.metrics.form,
-        hips: s.metrics.hips,
-        valleys: s.metrics.valleys,
-        ridge_lm: s.metrics.ridge_lm ?? null,
-        polygon_geojson: s.metrics.polygon_geojson ?? null,
-        capture_date: s.metrics.capture_date ?? null,
-      },
-      price: {
-        area_m2: s.price.area_m2,
-        effective_rate_per_m2: s.price.effective_rate_per_m2,
-        tiers: s.price.tiers,
-        loadings_applied: s.price.loadings_applied,
-        routing: s.price.routing,
-      },
+      measure_token: saveRoof.data.measure_token,
+      expected_pricing_revision: measured.pricing_authority.revision,
     });
   }
 
   return (
-    <View style={{ gap: 16 }}>
-      <Card style={{ gap: 16 }}>
+    <View style={{ gap: spacing.xl }}>
+      <View style={{ gap: spacing.sm }}>
+        <Text accessibilityRole="header" style={[typeScale.title, { color: colors.textPri }]}>
+          Measure a roof
+        </Text>
+        <Text style={[styles.structureArea, { color: colors.textSec }]}>
+          Enter the property, confirm the roof scope, then review each structure.
+        </Text>
+      </View>
+      <Card style={{ gap: spacing.xl }}>
         <SectionLabel>Property</SectionLabel>
         <Field label="Address" value={address} onChangeText={setAddress} required height={54} />
         <View style={styles.row}>
-          <View style={{ flex: 1 }}>
+          <View style={styles.rowField}>
             <Field
               label="Postcode"
               value={postcode}
@@ -174,7 +216,7 @@ export function RoofMeasureScreen() {
               keyboardType="number-pad"
             />
           </View>
-          <View style={{ flex: 1 }}>
+          <View style={styles.rowField}>
             <Field
               label="Year built"
               value={yearBuilt}
@@ -194,6 +236,9 @@ export function RoofMeasureScreen() {
             onChange={v => setState(v as AuState)}
           />
         </View>
+      </Card>
+      <Card style={{ gap: spacing.xl }}>
+        <SectionLabel>Roof scope</SectionLabel>
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>DEFAULT ROOF MATERIAL</Text>
           <PillGroup options={ROOF_MATERIALS} value={material} onChange={setMaterial} />
@@ -208,13 +253,8 @@ export function RoofMeasureScreen() {
         </View>
 
         {formError ? <Notice tone="danger" label="Check the form" body={formError} /> : null}
-
-        <PrimaryCta
-          label="Measure all structures"
-          onPress={onMeasure}
-          loading={measure.isPending}
-        />
       </Card>
+      <PrimaryCta label="Measure all structures" onPress={onMeasure} loading={measure.isPending} />
 
       {measure.isError ? (
         <Notice
@@ -225,11 +265,24 @@ export function RoofMeasureScreen() {
         />
       ) : null}
 
-      {measure.data?.ok === false ? (
+      {accepted && !acceptedIsCurrent ? (
         <Notice
           tone="warn"
-          label="Measurement could not complete"
-          body={measure.data.detail ?? measure.data.error ?? 'Unknown error.'}
+          label="Measurement is stale"
+          body="The property or roof scope changed. Measure again before saving or creating a quote."
+          onRetry={onMeasure}
+        />
+      ) : null}
+
+      {acceptedIsCurrent && accepted?.response.ok === false ? (
+        <Notice
+          tone="warn"
+          label={
+            accepted.response.code === 'tenant_pricing_required'
+              ? 'Roofing pricing setup required'
+              : 'Measurement could not complete'
+          }
+          body={accepted.response.detail ?? accepted.response.error ?? 'Unknown error.'}
           onRetry={onMeasure}
         />
       ) : null}
@@ -248,12 +301,14 @@ export function RoofMeasureScreen() {
               structure={s}
               index={i}
               included={included[structureKey(s, i)] !== false}
-              onToggle={() =>
+              onToggle={() => {
+                saveRoof.reset();
+                saveAsQuote.reset();
                 setIncluded(prev => {
                   const key = structureKey(s, i);
                   return { ...prev, [key]: prev[key] === false };
-                })
-              }
+                });
+              }}
             />
           ))}
 
@@ -263,44 +318,49 @@ export function RoofMeasureScreen() {
               {totalIncluded === 1 ? '' : 's'} included
             </SectionLabel>
             {/* Area is display-only maths (fine to sum); the tier prices below are never
-                summed client-side — they render verbatim only when exactly one included,
-                quotable structure exists (the same one 'Save as quote' can act on). */}
+                summed client-side. Multi-structure promotion is reconstructed from the
+                persisted selection by the server. */}
             <Text style={[styles.combinedArea, { color: colors.textPri }]}>
               {Math.round(combined?.areaM2 ?? 0)} m² across the job
             </Text>
             {singleIncluded ? (
               <View style={styles.tierRow}>
                 {singleIncluded.price.tiers.map((t, i) => (
-                  <View
-                    key={t.tier}
-                    style={[
-                      styles.tierTile,
-                      { borderColor: colors.inkLine, backgroundColor: colors.inkDeep },
-                    ]}
-                  >
+                  <View key={t.tier} style={[styles.tierTile, { borderColor: colors.inkLine }]}>
                     <Text style={[styles.tierLabel, { color: colors.textDim }]}>
                       {TIER_LABELS[i]?.toUpperCase()}
                     </Text>
-                    <Text style={[styles.tierValue, { color: colors.accentText }]}>
-                      {formatAud(centsFromApiDollars(t.inc_gst))}
-                    </Text>
-                    <Text style={[styles.tierSub, { color: colors.textDim }]}>inc GST</Text>
+                    <View style={styles.tierAmount}>
+                      <Text style={[styles.tierValue, { color: colors.textPri }]}>
+                        {formatAud(centsFromApiDollars(t.inc_gst))}
+                      </Text>
+                      <Text style={[styles.tierSub, { color: colors.textDim }]}>inc GST</Text>
+                    </View>
                   </View>
                 ))}
               </View>
             ) : (
               <Notice
                 tone="accent"
-                label="Save as quote needs one structure"
-                body="Include exactly one priced structure to save it as a customer quote — a combined multi-structure price isn't priced server-side. Promote multi-structure jobs from the web dashboard for now."
+                label="Combined customer total stays server-side"
+                body="Save the verified measurement first. The server will reload the selected structures and create the customer quote without accepting a phone-calculated total."
               />
             )}
 
-            <PrimaryCta
+            {!runFresh ? (
+              <Notice
+                tone="warn"
+                label="Pricing proof expired"
+                body="Measure again to confirm the current tenant rate card before saving."
+                onRetry={onMeasure}
+              />
+            ) : null}
+
+            <GhostButton
               label={saveRoof.isPending ? 'Saving…' : 'Save job'}
               onPress={onSave}
               loading={saveRoof.isPending}
-              disabled={quote.structures.length === 0}
+              disabled={!runFresh || totalIncluded === 0 || quote.structures.length === 0}
             />
             {saveRoof.data?.ok === true ? (
               <Notice
@@ -326,15 +386,15 @@ export function RoofMeasureScreen() {
               />
             ) : null}
 
-            {singleIncluded && inspectionIncluded.length > 0 ? (
+            {inspectionIncluded.length > 0 ? (
               <Notice
                 tone="warn"
-                label="Site-visit structure(s) not in this quote"
-                body={`This quote covers ${singleIncluded.label} only. ${inspectionIncluded
+                label="Inspection required before customer quote"
+                body={`${inspectionIncluded
                   .map(s => s.label)
                   .join(
                     ', ',
-                  )} still ${inspectionIncluded.length === 1 ? 'needs' : 'need'} the paid on-site visit — that's a separate quote once it's done.`}
+                  )} ${inspectionIncluded.length === 1 ? 'needs' : 'need'} an on-site inspection. Remove the structure or complete and reprice the inspection before promotion.`}
               />
             ) : null}
 
@@ -342,7 +402,7 @@ export function RoofMeasureScreen() {
               label={saveAsQuote.isPending ? 'Creating quote…' : 'Save as quote'}
               onPress={onSaveAsQuote}
               loading={saveAsQuote.isPending}
-              disabled={!singleIncluded}
+              disabled={!canPromote}
             />
             {saveAsQuote.data?.ok === true
               ? (() => {
@@ -432,25 +492,23 @@ function StructureCard({
         {structure.inputs.material.replace(/_/g, ' ')}
       </Text>
 
-      <View style={styles.tierRow}>
-        {structure.price.tiers.map((t, i) => (
-          <View
-            key={t.tier}
-            style={[
-              styles.tierTile,
-              { borderColor: colors.inkLine, backgroundColor: colors.inkDeep },
-            ]}
-          >
-            <Text style={[styles.tierLabel, { color: colors.textDim }]}>
-              {TIER_LABELS[i]?.toUpperCase()}
-            </Text>
-            <Text style={[styles.tierValue, { color: colors.textPri }]}>
-              {formatAud(centsFromApiDollars(t.inc_gst))}
-            </Text>
-            <Text style={[styles.tierSub, { color: colors.textDim }]}>inc GST</Text>
-          </View>
-        ))}
-      </View>
+      {!inspection ? (
+        <View style={styles.tierRow}>
+          {structure.price.tiers.map((t, i) => (
+            <View key={t.tier} style={[styles.tierTile, { borderColor: colors.inkLine }]}>
+              <Text style={[styles.tierLabel, { color: colors.textDim }]}>
+                {TIER_LABELS[i]?.toUpperCase()}
+              </Text>
+              <View style={styles.tierAmount}>
+                <Text style={[styles.tierValue, { color: colors.textPri }]}>
+                  {formatAud(centsFromApiDollars(t.inc_gst))}
+                </Text>
+                <Text style={[styles.tierSub, { color: colors.textDim }]}>inc GST</Text>
+              </View>
+            </View>
+          ))}
+        </View>
+      ) : null}
 
       {inspection ? (
         <Notice tone="warn" label="Needs an on-site visit" body={structure.price.routing.reason} />
@@ -466,11 +524,13 @@ function StructureCard({
 }
 
 const styles = StyleSheet.create({
-  row: { flexDirection: 'row', gap: 12 },
+  row: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  rowField: { flexGrow: 1, flexBasis: 120, minWidth: 0 },
   label: {
     marginBottom: 8,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   combinedArea: {
@@ -479,31 +539,46 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: -0.4,
   },
-  tierRow: { flexDirection: 'row', gap: 10 },
-  tierTile: { flex: 1, borderWidth: 1, borderRadius: 10, padding: 12, gap: 6 },
-  tierLabel: { fontFamily: fonts.sans.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  tierValue: { fontFamily: fonts.mono.bold, fontSize: 16, fontVariant: ['tabular-nums'] },
+  tierRow: { gap: 0 },
+  tierTile: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderTopWidth: 1,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  tierLabel: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  tierAmount: { alignItems: 'flex-end', gap: spacing.xs },
+  tierValue: {
+    fontFamily: fonts.mono.bold,
+    fontSize: 18,
+    lineHeight: 24,
+    fontVariant: ['tabular-nums'],
+  },
   tierSub: {
     fontFamily: fonts.mono.medium,
-    fontSize: 9,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   structureHeader: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 10,
+    gap: spacing.md,
     minHeight: touch.minimum,
   },
   structureLabel: { marginTop: 4, fontFamily: fonts.sans.bold, fontSize: 16 },
-  structureArea: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
+  structureArea: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   checkbox: {
     width: 26,
     height: 26,
-    borderRadius: 7,
+    borderRadius: radius.chip,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  calloutNote: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
+  calloutNote: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
 });

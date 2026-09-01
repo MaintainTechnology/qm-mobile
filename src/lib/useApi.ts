@@ -17,6 +17,7 @@ import {
 import type { z } from 'zod';
 
 import { apiRequest } from '@/lib/api';
+import { requireClerkToken } from '@/lib/auth-token';
 
 /**
  * Minting a Clerk token can itself hit the network (session tokens are short-lived), and that
@@ -25,7 +26,7 @@ import { apiRequest } from '@/lib/api';
  */
 const TOKEN_TIMEOUT_MS = 5000;
 
-async function tokenWithin(getToken: () => Promise<string | null>): Promise<string | undefined> {
+async function tokenWithin(getToken: () => Promise<string | null>): Promise<string> {
   let timer: ReturnType<typeof setTimeout> | undefined;
   try {
     const token = await Promise.race([
@@ -34,7 +35,7 @@ async function tokenWithin(getToken: () => Promise<string | null>): Promise<stri
         timer = setTimeout(() => resolve(null), TOKEN_TIMEOUT_MS);
       }),
     ]);
-    return token ?? undefined;
+    return requireClerkToken(token);
   } finally {
     clearTimeout(timer);
   }

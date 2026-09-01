@@ -4,6 +4,7 @@ import {
   PricedSummary,
   repriceAndProveFreshBom,
 } from './CommercialPaintingScreen';
+import { isCurrentPaintPricingAttempt, isPaintPricingProofUnavailable } from './pricing-freshness';
 import type { PricedBom } from './api';
 
 jest.mock('@react-native-async-storage/async-storage', () => ({
@@ -13,11 +14,20 @@ jest.mock('@react-native-async-storage/async-storage', () => ({
 
 const bom = (gstRegistered: boolean, unmatched: PricedBom['unmatched'] = []): PricedBom =>
   ({
-    lines: [], unmatched, excluded: [],
+    lines: [],
+    unmatched,
+    excluded: [],
     labour: { hours: 1, ratePerHr: 80, costExGst: 80 },
-    materials: [], materialsExGst: 0, equipment: [], equipmentExGst: 0,
-    subtotalExGst: 80, gst: gstRegistered ? 8 : 0, totalIncGst: gstRegistered ? 88 : 80,
-    gstRegistered, assumptions: [], exclusions: [],
+    materials: [],
+    materialsExGst: 0,
+    equipment: [],
+    equipmentExGst: 0,
+    subtotalExGst: 80,
+    gst: gstRegistered ? 8 : 0,
+    totalIncGst: gstRegistered ? 88 : 80,
+    gstRegistered,
+    assumptions: [],
+    exclusions: [],
   }) as PricedBom;
 
 describe('commercial-paint pricing presentation', () => {
@@ -54,55 +64,116 @@ describe('commercial-paint pricing presentation', () => {
     ['500', Object.assign(new Error('server failed'), { status: 500 })],
     ['schema', new TypeError('response schema mismatch')],
     ['unknown', { unexpected: true }],
-  ])('keeps a previously-priced Save disabled after a %s repricing failure', async (_kind, error) => {
-    const refetch = jest.fn();
-    const result = await repriceAndProveFreshBom(
-      () => Promise.reject(error),
-      refetch,
-      'extract-1',
-    );
-    expect(result).toEqual({ ok: false, error });
-    expect(refetch).not.toHaveBeenCalled();
+  ])(
+    'keeps a previously-priced Save disabled after a %s repricing failure',
+    async (_kind, error) => {
+      const refetch = jest.fn();
+      const result = await repriceAndProveFreshBom(
+        () => Promise.reject(error),
+        refetch,
+        'extract-1',
+      );
+      expect(result).toEqual({ ok: false, error, previewRefreshed: false });
+      expect(refetch).not.toHaveBeenCalled();
 
+      const onSave = jest.fn();
+      const screen = await render(
+        <PaintPricingGate
+          bom={bom(true)}
+          block={null}
+          busy={false}
+          pricingVerified={result.ok}
+          onSave={onSave}
+        />,
+      );
+      await fireEvent.press(screen.getByText('Save as quote'));
+      expect(onSave).not.toHaveBeenCalled();
+      expect(screen.getByText(/VERSIONED PRICING CHECK REQUIRED/i)).toBeTruthy();
+    },
+  );
+
+  it('keeps a remounted priced preview fail-closed by default', async () => {
     const onSave = jest.fn();
     const screen = await render(
-      <PaintPricingGate
-        bom={bom(true)}
-        block={null}
-        busy={false}
-        pricingVerified={result.ok}
-        onSave={onSave}
-      />,
+      <PaintPricingGate bom={bom(true)} block={null} busy={false} onSave={onSave} />,
     );
     await fireEvent.press(screen.getByText('Save as quote'));
     expect(onSave).not.toHaveBeenCalled();
-    expect(screen.getByText(/RE-PRICE MUST FINISH SUCCESSFULLY/i)).toBeTruthy();
+    expect(screen.getByText(/VERSIONED PRICING CHECK REQUIRED/i)).toBeTruthy();
   });
 
-  it('does not verify pricing until refetch returns the current extraction BOM', async () => {
+  it('requires current persisted pricing and still blocks when the server has no revision proof', async () => {
     const current = bom(true);
     await expect(
       repriceAndProveFreshBom(
         () => Promise.resolve(),
-        () => Promise.resolve({ data: { extraction: { id: 'old-extract', priced_bom: current } } }),
+        () =>
+          Promise.resolve({
+            data: {
+              extraction: {
+                id: 'old-extract',
+                priced_bom: current,
+                priced_at: '2026-09-01T00:00:00.000Z',
+              },
+            },
+          }),
         'extract-1',
       ),
-    ).resolves.toMatchObject({ ok: false });
-    await expect(
-      repriceAndProveFreshBom(
-        () => Promise.resolve(),
-        () => Promise.resolve({ data: { extraction: { id: 'extract-1', priced_bom: current } } }),
-        'extract-1',
-      ),
-    ).resolves.toEqual({ ok: true });
+    ).resolves.toMatchObject({ ok: false, previewRefreshed: false });
+
+    const result = await repriceAndProveFreshBom(
+      () => Promise.resolve(),
+      () =>
+        Promise.resolve({
+          data: {
+            extraction: {
+              id: 'extract-1',
+              priced_bom: current,
+              priced_at: '2026-09-01T00:00:00.000Z',
+            },
+          },
+        }),
+      'extract-1',
+    );
+    expect(result.ok).toBe(false);
+    expect(result.previewRefreshed).toBe(true);
+    expect(isPaintPricingProofUnavailable(result.error)).toBe(true);
+  });
+
+  it('rejects late pricing responses after a run or request switch', () => {
+    const attempt = { sequence: 3, runId: 'run-a', extractionId: 'extract-a' };
+    expect(
+      isCurrentPaintPricingAttempt(attempt, {
+        sequence: 3,
+        runId: 'run-a',
+        extractionId: 'extract-a',
+      }),
+    ).toBe(true);
+    expect(
+      isCurrentPaintPricingAttempt(attempt, {
+        sequence: 4,
+        runId: 'run-a',
+        extractionId: 'extract-a',
+      }),
+    ).toBe(false);
+    expect(
+      isCurrentPaintPricingAttempt(attempt, {
+        sequence: 3,
+        runId: 'run-b',
+        extractionId: 'extract-b',
+      }),
+    ).toBe(false);
   });
 
   it.each([
     [true, 'TOTAL INC GST', 'GST'],
     [false, 'TOTAL — NO GST CHARGED', 'NO GST CHARGED'],
-  ] as const)('renders dynamic GST labels for registered=%s', async (registered, totalLabel, gstLabel) => {
-    const screen = await render(<PricedSummary bom={bom(registered)} />);
-    expect(screen.getByText(totalLabel)).toBeTruthy();
-    expect(screen.getByText(gstLabel)).toBeTruthy();
-  });
+  ] as const)(
+    'renders dynamic GST labels for registered=%s',
+    async (registered, totalLabel, gstLabel) => {
+      const screen = await render(<PricedSummary bom={bom(registered)} />);
+      expect(screen.getByText(totalLabel)).toBeTruthy();
+      expect(screen.getByText(gstLabel)).toBeTruthy();
+    },
+  );
 });

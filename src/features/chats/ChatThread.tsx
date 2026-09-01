@@ -76,7 +76,7 @@ export function ChatThread({
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-      keyboardVerticalOffset={Platform.OS === 'ios' ? 90 : 0}
+      keyboardVerticalOffset={Platform.OS === 'ios' ? insets.top : 0}
     >
       <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>
         <BackButton onPress={onBack} />
@@ -106,23 +106,26 @@ export function ChatThread({
       <View
         style={[
           styles.composerWrap,
-          { borderTopColor: colors.inkLine, paddingBottom: spacing.md + insets.bottom },
+          { borderTopColor: colors.inkLine, backgroundColor: colors.inkDeep },
         ]}
       >
         {allowReply ? (
           <>
+            <Text style={[styles.composerLabel, { color: colors.textDim }]}>MESSAGE</Text>
             <View style={styles.composerRow}>
               <TextInput
+                accessibilityLabel="Reply by SMS"
                 value={draft}
                 onChangeText={onDraftChange}
                 placeholder="Reply by SMS"
                 placeholderTextColor={colors.textDim}
                 editable={!mutation.isPending}
+                multiline
                 style={[
                   styles.input,
                   {
                     backgroundColor: colors.ink,
-                    borderColor: colors.inkLine,
+                    borderColor: colors.ctlLine,
                     color: colors.textPri,
                   },
                 ]}
@@ -130,6 +133,10 @@ export function ChatThread({
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Send reply"
+                accessibilityState={{
+                  disabled: !draft.trim() || mutation.isPending,
+                  busy: mutation.isPending,
+                }}
                 onPress={handleSend}
                 disabled={!draft.trim() || mutation.isPending}
                 style={({ pressed }) => [
@@ -146,7 +153,10 @@ export function ChatThread({
               </Pressable>
             </View>
             {mutation.isError ? (
-              <Text style={[styles.sendError, { color: colors.dangerBright }]}>
+              <Text
+                accessibilityLiveRegion="polite"
+                style={[styles.sendError, { color: colors.dangerBright }]}
+              >
                 {replyErrorMessage(mutation.error)}
               </Text>
             ) : null}
@@ -171,14 +181,13 @@ function MessageBubble({ message }: { message: ChatMessage }) {
           styles.bubble,
           inbound
             ? { backgroundColor: colors.inkCard, borderColor: colors.inkLine }
-            : { backgroundColor: colors.ink, borderColor: colors.accent },
+            : { backgroundColor: colors.ink, borderColor: colors.ctlLine },
         ]}
       >
-        {!inbound ? (
-          <Text style={[styles.bubbleLabel, { color: colors.accentText }]}>YOU</Text>
-        ) : null}
-        <Text style={[styles.bubbleText, { color: inbound ? colors.textSec : colors.textPri }]}>
-          {message.body}
+        <Text style={[styles.bubbleText, { color: colors.textPri }]}>{message.body}</Text>
+        <Text style={[styles.bubbleMeta, { color: colors.textDim }]}>
+          {!inbound ? 'Sent · ' : ''}
+          {relativeTime(message.created_at)}
         </Text>
       </View>
     </View>
@@ -190,39 +199,49 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
+    minHeight: 64,
     borderBottomWidth: 1,
   },
   who: { ...type.title, fontSize: 16 },
-  meta: { marginTop: 2, ...type.label, fontSize: 10, letterSpacing: 1 },
-  threadContent: { padding: spacing.lg, gap: spacing.sm },
+  meta: { marginTop: spacing.xs, fontFamily: fonts.mono.regular, fontSize: 12, lineHeight: 16 },
+  threadContent: { padding: spacing.xl },
   empty: { ...type.bodySm, textAlign: 'center', paddingTop: spacing.xxl },
-  bubbleRow: { flexDirection: 'row', marginBottom: spacing.sm },
+  bubbleRow: { flexDirection: 'row', marginBottom: spacing.md },
   bubble: {
-    maxWidth: '84%',
+    maxWidth: '88%',
     borderWidth: 1,
-    borderRadius: radius.control,
+    borderRadius: radius.card,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
   },
-  bubbleLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 9,
-    letterSpacing: 1,
-    marginBottom: 4,
+  bubbleMeta: {
+    fontFamily: fonts.mono.regular,
+    fontSize: 12,
+    lineHeight: 16,
+    marginTop: spacing.sm,
   },
-  bubbleText: { ...type.bodySm, lineHeight: 20 },
-  composerWrap: { borderTopWidth: 1, padding: spacing.md },
-  composerRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  bubbleText: { ...type.body },
+  composerWrap: {
+    borderTopWidth: 1,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
+    gap: spacing.sm,
+  },
+  composerLabel: { ...type.label, letterSpacing: 1 },
+  composerRow: { flexDirection: 'row', alignItems: 'flex-end', gap: spacing.sm },
   input: {
     flex: 1,
-    height: touch.minimum,
+    minHeight: touch.minimum,
+    maxHeight: 128,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 15,
+    fontSize: 16,
+    lineHeight: 24,
   },
   sendBtn: {
     width: touch.minimum,
@@ -234,14 +253,10 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.4 },
   sendError: {
     marginTop: spacing.sm,
-    fontFamily: fonts.mono.medium,
-    fontSize: 12,
-    letterSpacing: 0.5,
+    ...type.bodySm,
   },
   noReply: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1,
+    ...type.bodySm,
     textAlign: 'center',
     paddingVertical: spacing.sm,
   },

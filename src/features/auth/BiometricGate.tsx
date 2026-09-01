@@ -9,14 +9,14 @@
  * face/finger suddenly won't scan and who needs to hand the phone back.
  */
 import { useAuth } from '@clerk/expo';
-import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'expo-router';
 import { useCallback, useEffect, useReducer, useRef, useState } from 'react';
-import { AppState, Pressable, StyleSheet, Text, View } from 'react-native';
+import { AppState, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandMark } from '@/components/BrandMark';
-import { FaceIdIcon, PrimaryCta } from '@/features/auth/ui';
+import { AUTH_GUTTER, FaceIdIcon, PrimaryCta } from '@/features/auth/ui';
+import { clearAccountScopedState } from '@/lib/account-storage';
 import {
   authenticate,
   initialLockState,
@@ -24,14 +24,13 @@ import {
   isLockEnabled,
   lockReducer,
 } from '@/lib/lock';
-import { fonts } from '@/lib/theme';
+import { fonts, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 import { unregisterPushToken } from '@/lib/notifications';
 import { signOutWithCleanup } from '@/lib/sign-out';
 
 export function BiometricGate() {
   const { isSignedIn, signOut, getToken } = useAuth();
-  const queryClient = useQueryClient();
   const router = useRouter();
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -87,7 +86,7 @@ export function BiometricGate() {
     await signOutWithCleanup({
       unregisterPush: () => unregisterPushToken(getToken),
       clerkSignOut: signOut,
-      clearQueryCache: () => queryClient.clear(),
+      clearLocalState: clearAccountScopedState,
       navigateToWelcome: () => router.replace('/welcome'),
     });
   }
@@ -96,94 +95,95 @@ export function BiometricGate() {
 
   return (
     <View
-      style={[
-        StyleSheet.absoluteFillObject,
-        styles.screen,
-        {
-          backgroundColor: colors.inkDeep,
-          paddingTop: insets.top + 26,
-          paddingBottom: insets.bottom + 30,
-        },
-      ]}
+      accessibilityViewIsModal
+      style={[StyleSheet.absoluteFillObject, styles.screen, { backgroundColor: colors.inkDeep }]}
     >
-      <View style={styles.logoRow}>
-        <BrandMark height={34} body={colors.logoBody} notch={colors.logoNotch} />
-        <View>
-          <Text style={[styles.wordmark, { color: colors.logoBody }]}>QUOTE</Text>
-          <Text style={[styles.wordmark, { color: colors.logoBody }]}>MAX</Text>
-        </View>
-      </View>
-
-      <View style={styles.centre}>
-        <FaceIdIcon color={colors.accentText} size={44} />
-        <Text style={[styles.lockedLabel, { color: colors.textDim }]}>LOCKED</Text>
-        <Text style={[styles.body, { color: colors.textSec }]}>
-          Unlock with Face ID or fingerprint to get back to your quotes.
-        </Text>
-      </View>
-
-      <PrimaryCta
-        label="Unlock"
-        onPress={() => void unlock()}
-        loading={state.status === 'authenticating'}
-      />
-
-      <Pressable
-        accessibilityRole="button"
-        accessibilityLabel="Sign out"
-        disabled={signingOut}
-        onPress={() => void onSignOut()}
-        style={[styles.signOut, { opacity: signingOut ? 0.6 : 1 }]}
+      <ScrollView
+        style={styles.screen}
+        contentContainerStyle={[
+          styles.content,
+          { paddingTop: insets.top + spacing.xxl, paddingBottom: insets.bottom + spacing.xxl },
+        ]}
       >
-        <Text style={[styles.signOutLabel, { color: colors.textDim }]}>
-          {signingOut ? 'SIGNING OUT…' : 'NOT YOU? SIGN OUT'}
-        </Text>
-      </Pressable>
+        <View style={styles.logoRow}>
+          <BrandMark height={34} body={colors.logoBody} notch={colors.logoNotch} />
+          <Text style={[styles.wordmark, { color: colors.logoBody }]}>QUOTEMAX</Text>
+        </View>
+
+        <View style={styles.centre}>
+          <FaceIdIcon color={colors.textSec} size={40} />
+          <Text
+            accessibilityRole="header"
+            maxFontSizeMultiplier={1.4}
+            style={[styles.lockedLabel, { color: colors.textPri }]}
+          >
+            UNLOCK QUOTEMAX
+          </Text>
+          <Text style={[styles.body, { color: colors.textSec }]}>
+            Unlock with Face ID or fingerprint to get back to your quotes.
+          </Text>
+        </View>
+
+        <PrimaryCta
+          label="Unlock"
+          onPress={() => void unlock()}
+          loading={state.status === 'authenticating'}
+        />
+
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel="Sign out"
+          disabled={signingOut}
+          onPress={() => void onSignOut()}
+          style={({ pressed }) => [styles.signOut, { opacity: signingOut || pressed ? 0.6 : 1 }]}
+        >
+          <Text style={[styles.signOutLabel, { color: colors.textDim }]}>
+            {signingOut ? 'SIGNING OUT…' : 'NOT YOU? SIGN OUT'}
+          </Text>
+        </Pressable>
+      </ScrollView>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  screen: { paddingHorizontal: 26 },
+  screen: { flex: 1 },
+  content: { flexGrow: 1, paddingHorizontal: AUTH_GUTTER },
   logoRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 11,
+    gap: spacing.md,
     alignSelf: 'flex-start',
   },
   wordmark: {
     fontFamily: fonts.sans.extraBold,
-    fontSize: 21,
-    lineHeight: 18, // kit .82 leading; caps-only so no descender clipping
-    letterSpacing: -0.42, // -.02em @ 21
+    fontSize: 20,
+    lineHeight: 28,
+    letterSpacing: -0.4,
   },
   centre: {
     flex: 1,
-    alignItems: 'center',
+    alignItems: 'flex-start',
     justifyContent: 'center',
-    gap: 14,
-    paddingHorizontal: 12,
+    gap: spacing.lg,
+    paddingVertical: spacing.section,
   },
   lockedLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 1.6, // .16em @ 10
+    ...type.headline,
   },
   body: {
-    fontFamily: fonts.sans.regular,
-    fontSize: 15.5,
-    lineHeight: 24,
-    textAlign: 'center',
+    ...type.body,
   },
   signOut: {
-    marginTop: 18,
-    minHeight: 48,
+    marginTop: spacing.md,
+    minHeight: touch.minimum,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
   signOutLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 1.6,
+    ...type.bodySm,
+    fontFamily: fonts.sans.semiBold,
+    textAlign: 'center',
   },
 });

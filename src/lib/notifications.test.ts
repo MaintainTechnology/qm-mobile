@@ -11,6 +11,8 @@ describe('notificationUrl', () => {
     // Protocol-relative: starts with '/' but is an external URL.
     expect(notificationUrl({ url: '//evil.example/quotes' })).toBeNull();
     expect(notificationUrl({ url: 'quotes' })).toBeNull();
+    expect(notificationUrl({ url: '/welcome' })).toBeNull();
+    expect(notificationUrl({ url: '/quotes?unexpected=1' })).toBeNull();
   });
 
   it('rejects missing or malformed data without throwing', () => {

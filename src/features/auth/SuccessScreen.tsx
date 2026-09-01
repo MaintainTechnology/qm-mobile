@@ -18,17 +18,26 @@ import { useAuth, useSessionList } from '@clerk/expo';
 // Resource-shaped hook (setActive/isLoaded) — Core 3 keeps these at /legacy.
 import { useSignUp } from '@clerk/expo/legacy';
 import { useQueryClient } from '@tanstack/react-query';
-import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useState } from 'react';
-import { Linking, Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
+import * as Linking from 'expo-linking';
+import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { BrandMark } from '@/components/BrandMark';
-import { PrimaryCta } from '@/features/auth/ui';
+import {
+  acquisitionPostAuthDestination,
+  loadAcquisitionEnvelope,
+  saveAcquisitionEnvelope,
+  type AcquisitionEnvelope,
+  withAcquisitionProvisioningReceipt,
+} from '@/features/auth/acquisition-envelope';
+import { AUTH_GUTTER, PrimaryCta } from '@/features/auth/ui';
 import { formatAuMobileDisplay } from '@/features/auth/onboard-fields';
+import { ownerTestSmsHref, trustedSuccessState } from '@/features/auth/success-adapter';
 import { apiErrorMessage, apiRequest } from '@/lib/api';
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { TENANT_ME_KEY } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
 
@@ -37,6 +46,7 @@ const RetryProvisionResponse = z.looseObject({
   phoneNumber: z.string().nullish(),
   warning: z.string().nullish(),
   error: z.string().nullish(),
+  setupComplete: z.boolean().optional(),
 });
 
 export function SuccessScreen() {
@@ -49,23 +59,94 @@ export function SuccessScreen() {
     warning?: string;
     session?: string;
     uid?: string;
+    ready?: string;
   }>();
 
   // `setActive` is identical regardless of which Clerk hook hands it back — this screen has no
   // sign-up of its own, `useSignUp` is just the confirmed-working source elsewhere in the wizard.
   const { setActive, isLoaded } = useSignUp();
   const { sessions } = useSessionList();
-  const { getToken, sessionId: activeSessionId } = useAuth();
+  const { getToken, sessionId: activeSessionId, userId: activeUserId } = useAuth();
   const queryClient = useQueryClient();
 
   const firstName = params.name?.trim() || 'mate';
   const pendingSessionId = params.session ?? null;
-  const [phoneNumber, setPhoneNumber] = useState(params.phone ?? null);
-  const [warning, setWarning] = useState(params.warning ?? null);
+  // `phone`, `warning`, and `ready` are untrusted route hints. A crafted deep
+  // link must not manufacture success copy or an SMS CTA; the values below
+  // hydrate only from the account-bound response receipt or a fresh retry.
+  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
+  const [warning, setWarning] = useState<string | null>(null);
+  const [setupComplete, setSetupComplete] = useState(false);
+  const [hasReceipt, setHasReceipt] = useState(false);
+  const [receiptChecked, setReceiptChecked] = useState(false);
   const [retrying, setRetrying] = useState(false);
   const [retryError, setRetryError] = useState<string | null>(null);
+  const [smsError, setSmsError] = useState<string | null>(null);
   const [opening, setOpening] = useState(false);
   const [openError, setOpenError] = useState<string | null>(null);
+  const pendingSession = pendingSessionId
+    ? sessions?.find(session => session.id === pendingSessionId)
+    : undefined;
+  const receiptOwnerId =
+    activeUserId ?? pendingSession?.user?.id ?? pendingSession?.publicUserData.userId ?? null;
+  const smsHref = ownerTestSmsHref(phoneNumber, setupComplete);
+  const lineReady = smsHref !== null;
+  const statusWarning =
+    warning ??
+    (!receiptChecked
+      ? 'Confirming the saved provisioning result for this account…'
+      : !hasReceipt
+        ? 'Could not confirm a saved activation result. Retry with your authenticated session.'
+        : !lineReady
+          ? 'Your dedicated number is still being provisioned. You can open the dashboard and retry here later.'
+          : null);
+  const statusLabel = !receiptChecked
+    ? 'CHECKING ACCOUNT'
+    : hasReceipt
+      ? 'ACCOUNT CREATED'
+      : 'STATUS UNAVAILABLE';
+  const statusHeading = !receiptChecked
+    ? 'CONFIRMING SETUP.'
+    : !hasReceipt
+      ? 'SETUP STATUS UNAVAILABLE.'
+      : lineReady
+        ? "YOU'RE SET UP."
+        : 'ACCOUNT SAVED. LINE STILL PENDING.';
+  const statusSummary = !receiptChecked
+    ? 'QuoteMax is checking the activation result saved for this account.'
+    : !hasReceipt
+      ? 'This link alone does not prove activation. Retry with the authenticated account or open the dashboard.'
+      : lineReady
+        ? 'Your account and dedicated number are ready. Open your dashboard to check your pricing book and review quotes before they go out.'
+        : 'Your account was created, but the dedicated number is not ready for customer messages. You can still open your dashboard.';
+
+  useEffect(() => {
+    setReceiptChecked(false);
+    setHasReceipt(false);
+    setPhoneNumber(null);
+    setWarning(null);
+    setSetupComplete(false);
+    if (!receiptOwnerId) return;
+    let cancelled = false;
+    void loadAcquisitionEnvelope({ clerkUserId: receiptOwnerId })
+      .then(envelope => {
+        if (cancelled) return;
+        const trusted = trustedSuccessState(envelope);
+        setPhoneNumber(trusted.phoneNumber);
+        setWarning(trusted.warning);
+        setSetupComplete(trusted.setupComplete);
+        setHasReceipt(trusted.hasReceipt);
+      })
+      .catch(() => {
+        // Missing/unavailable SecureStore fails closed to pending + retry.
+      })
+      .finally(() => {
+        if (!cancelled) setReceiptChecked(true);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [receiptOwnerId]);
 
   /** A token for the pending (not-yet-active) session, or the live one if this screen was
    *  reached already signed in (the A2 resume-entry path, whose session is active throughout). */
@@ -91,11 +172,34 @@ export function SuccessScreen() {
         // Provisions a phone number — same budget as the activation call itself.
         timeoutMs: 120000,
       });
-      if (res.phoneNumber) {
-        setPhoneNumber(res.phoneNumber);
+      const nextPhoneNumber = res.phoneNumber ?? null;
+      const nextSetupComplete = res.setupComplete === true;
+      setSetupComplete(nextSetupComplete);
+      setPhoneNumber(nextPhoneNumber);
+      setHasReceipt(true);
+      setReceiptChecked(true);
+      if (ownerTestSmsHref(nextPhoneNumber, nextSetupComplete)) {
         setWarning(null);
       } else {
         setWarning(res.warning ?? res.error ?? 'Still not ready — try again shortly.');
+      }
+      if (receiptOwnerId) {
+        try {
+          const current = await loadAcquisitionEnvelope({ clerkUserId: receiptOwnerId });
+          if (current) {
+            await saveAcquisitionEnvelope(
+              withAcquisitionProvisioningReceipt(current, {
+                setupComplete: nextSetupComplete,
+                phoneNumber: nextPhoneNumber,
+                warning: res.warning ?? res.error,
+              }),
+            );
+          }
+        } catch {
+          setRetryError(
+            'The latest result is available now but could not be saved for the next app restart.',
+          );
+        }
       }
     } catch (err) {
       setRetryError(
@@ -106,12 +210,44 @@ export function SuccessScreen() {
     }
   }
 
+  async function openOwnerTestSms() {
+    setSmsError(null);
+    if (!smsHref) {
+      setSmsError('Your dedicated number is not ready for a test message yet.');
+      return;
+    }
+    try {
+      if (!(await Linking.canOpenURL(smsHref))) {
+        setSmsError('No SMS app is available on this device.');
+        return;
+      }
+      await Linking.openURL(smsHref);
+    } catch {
+      setSmsError('Could not open your SMS app. Try again from this device.');
+    }
+  }
+
   /** The only place the session becomes active (spec B6). */
   async function openDashboard() {
     if (opening) return;
     setOpening(true);
     setOpenError(null);
     try {
+      const pendingSession = pendingSessionId
+        ? sessions?.find(session => session.id === pendingSessionId)
+        : undefined;
+      const destinationOwnerId =
+        activeUserId ?? pendingSession?.user?.id ?? pendingSession?.publicUserData.userId ?? null;
+      let acquisition: AcquisitionEnvelope | null = null;
+      if (destinationOwnerId) {
+        try {
+          acquisition = await loadAcquisitionEnvelope({ clerkUserId: destinationOwnerId });
+        } catch {
+          // SecureStore continuity is helpful, but must never block an already
+          // activated account from reaching the dashboard.
+        }
+      }
+      const destination = acquisitionPostAuthDestination(acquisition) as Href;
       if (!activeSessionId && pendingSessionId && isLoaded && setActive) {
         await setActive({ session: pendingSessionId });
       }
@@ -119,7 +255,7 @@ export function SuccessScreen() {
       // pre-activate 404 from earlier in this session — clear it so the dashboard fetches fresh
       // rather than reading "no tenant" and bouncing straight back into the wizard.
       queryClient.removeQueries({ queryKey: TENANT_ME_KEY });
-      router.replace('/');
+      router.replace(destination);
     } catch {
       setOpenError("Couldn't open the dashboard — check your signal and tap again.");
     } finally {
@@ -131,79 +267,106 @@ export function SuccessScreen() {
     <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
       <ScrollView
         style={{ flex: 1 }}
-        contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + 30 }]}
+        contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + spacing.xxl }]}
       >
         <BrandMark height={26} body={colors.logoBody} notch={colors.logoNotch} />
 
         <View style={[styles.badge, { borderColor: colors.inkLine }]}>
-          <Text style={[styles.badgeText, { color: colors.accentText }]}>WELCOME TO QUOTEMAX</Text>
+          <Text style={[styles.badgeText, { color: colors.textSec }]}>{statusLabel}</Text>
         </View>
 
-        <Text style={[styles.h1, { color: colors.textPri }]}>
+        <Text
+          accessibilityRole="header"
+          maxFontSizeMultiplier={1.4}
+          style={[styles.h1, { color: colors.textPri }]}
+        >
           G&apos;DAY {firstName.toUpperCase()}.{'\n'}
-          <Text style={{ color: colors.accentText }}>YOU&apos;RE ON THE LINE.</Text>
+          {statusHeading}
         </Text>
-        <Text style={[styles.sub, { color: colors.textSec }]}>
-          You&apos;re all set. From here on, QuoteMax answers, quotes, and books your jobs round the
-          clock. You do the trade — we&apos;ll do the quoting.
-        </Text>
+        <Text style={[styles.sub, { color: colors.textSec }]}>{statusSummary}</Text>
 
-        <View style={styles.numberBlock}>
+        <View
+          style={[
+            styles.numberBlock,
+            { backgroundColor: colors.inkCard, borderColor: colors.inkLine },
+          ]}
+        >
           <Text style={[styles.numberLabel, { color: colors.textDim }]}>YOUR QUOTEMAX NUMBER</Text>
           {phoneNumber ? (
             <>
-              <Text style={[styles.number, { color: colors.textPri }]}>
+              <Text selectable style={[styles.number, { color: colors.textPri }]}>
                 {formatAuMobileDisplay(phoneNumber)}
               </Text>
               <Text style={[styles.numberHint, { color: colors.textDim }]}>
-                Real number routed to your AI receptionist
+                {lineReady
+                  ? 'This is the number your customers can contact.'
+                  : 'Provisioning detail only — this line is not ready for customer messages.'}
               </Text>
-              <Pressable
-                onPress={() => Linking.openURL(`sms:${phoneNumber}`)}
-                hitSlop={8}
-                style={styles.smsLinkRow}
-              >
-                <Text style={[styles.smsLink, { color: colors.accentText }]}>
-                  Send yourself a test text →
-                </Text>
-              </Pressable>
+              {smsHref ? (
+                <Pressable
+                  accessibilityRole="link"
+                  onPress={openOwnerTestSms}
+                  hitSlop={8}
+                  style={({ pressed }) => [styles.smsLinkRow, { opacity: pressed ? 0.6 : 1 }]}
+                >
+                  <Text style={[styles.smsLink, { color: colors.textPri }]}>
+                    Send yourself a test text →
+                  </Text>
+                </Pressable>
+              ) : null}
+              {smsError ? (
+                <Text style={[styles.smsError, { color: colors.dangerBright }]}>{smsError}</Text>
+              ) : null}
             </>
           ) : (
             <Text style={[styles.numberPending, { color: colors.warningBright }]}>
-              Number not yet assigned — provisioning didn&apos;t finish.
+              {!receiptChecked
+                ? 'Checking your saved number…'
+                : hasReceipt
+                  ? "Your number isn't ready yet. You can still open your dashboard."
+                  : 'No dedicated number has been confirmed for this link.'}
             </Text>
           )}
         </View>
 
-        {warning ? (
+        {statusWarning ? (
           <View
             style={[
               styles.warningBox,
               { borderColor: colors.warning, backgroundColor: colors.ink },
             ]}
           >
-            <Text style={[styles.warningText, { color: colors.warningBright }]}>{warning}</Text>
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Retry provisioning"
-              onPress={retry}
-              disabled={retrying}
-              style={({ pressed }) => [
-                styles.retryBtn,
-                { borderColor: pressed ? colors.accent : colors.inkLine },
-              ]}
-            >
-              <Text style={[styles.retryLabel, { color: colors.textPri }]}>
-                {retrying ? 'RETRYING…' : 'RETRY PROVISIONING'}
-              </Text>
-            </Pressable>
+            <Text style={[styles.warningText, { color: colors.warningBright }]}>
+              {statusWarning}
+            </Text>
+            {receiptChecked ? (
+              <Pressable
+                accessibilityRole="button"
+                accessibilityLabel="Retry provisioning"
+                accessibilityState={{ disabled: retrying, busy: retrying }}
+                onPress={retry}
+                disabled={retrying}
+                style={({ pressed }) => [
+                  styles.retryBtn,
+                  {
+                    borderColor: colors.ctlLine,
+                    backgroundColor: pressed ? colors.inkCard : colors.ink,
+                    opacity: retrying ? 0.5 : 1,
+                  },
+                ]}
+              >
+                <Text style={[styles.retryLabel, { color: colors.textPri }]}>
+                  {retrying ? 'RETRYING…' : 'RETRY PROVISIONING'}
+                </Text>
+              </Pressable>
+            ) : null}
             {retryError ? (
               <Text style={[styles.retryError, { color: colors.dangerBright }]}>{retryError}</Text>
             ) : null}
           </View>
         ) : null}
 
-        <View style={{ marginTop: 30 }}>
+        <View style={styles.primaryAction}>
           <PrimaryCta label="Open my dashboard" onPress={openDashboard} loading={opening} />
           {openError ? (
             <Text style={[styles.openError, { color: colors.dangerBright }]}>{openError}</Text>
@@ -216,103 +379,56 @@ export function SuccessScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  body: { paddingTop: 22, paddingHorizontal: 26 },
+  body: { flexGrow: 1, paddingTop: spacing.xxl, paddingHorizontal: AUTH_GUTTER },
   badge: {
-    marginTop: 22,
+    marginTop: spacing.gap,
     alignSelf: 'flex-start',
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 7,
-    paddingHorizontal: 12,
+    borderRadius: radius.chip,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.md,
   },
-  badgeText: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 10,
-    letterSpacing: 1.6,
+  badgeText: { ...type.label, letterSpacing: 1.2 },
+  h1: { ...type.display, marginTop: spacing.xl },
+  sub: { ...type.body, marginTop: spacing.lg },
+  numberBlock: {
+    marginTop: spacing.gap,
+    borderWidth: 1,
+    borderRadius: radius.card,
+    padding: spacing.xl,
   },
-  h1: {
-    marginTop: 20,
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 36,
-    lineHeight: 38,
-    letterSpacing: -1.44,
-  },
-  sub: {
-    marginTop: 14,
-    fontFamily: fonts.sans.regular,
-    fontSize: 15,
-    lineHeight: 23,
-  },
-  numberBlock: { marginTop: 34 },
-  numberLabel: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 10.5,
-    letterSpacing: 1.68,
-  },
+  numberLabel: { ...type.label, letterSpacing: 1.2 },
   number: {
-    marginTop: 10,
-    fontFamily: fonts.mono.bold,
-    fontSize: 34,
-    letterSpacing: -0.5,
-    fontVariant: ['tabular-nums'],
+    ...type.price,
+    marginTop: spacing.md,
+    fontSize: 24,
+    lineHeight: 32,
+    letterSpacing: -0.4,
   },
-  numberHint: {
-    marginTop: 8,
-    fontFamily: fonts.mono.regular,
-    fontSize: 10.5,
-    letterSpacing: 0.8,
-    textTransform: 'uppercase',
-  },
-  smsLinkRow: {
-    marginTop: 12,
-    minHeight: touch.minimum,
-    justifyContent: 'center',
-    alignSelf: 'flex-start',
-  },
-  smsLink: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.6,
-  },
-  numberPending: {
-    marginTop: 10,
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 15,
-    lineHeight: 21,
-  },
+  numberHint: { ...type.bodySm, marginTop: spacing.sm },
+  smsLinkRow: { marginTop: spacing.md, minHeight: touch.minimum, justifyContent: 'center' },
+  smsLink: { ...type.bodySm, fontFamily: fonts.sans.semiBold },
+  smsError: { ...type.bodySm, marginTop: spacing.sm },
+  numberPending: { ...type.body, marginTop: spacing.md },
   warningBox: {
-    marginTop: 24,
+    marginTop: spacing.lg,
     borderWidth: 1,
-    borderRadius: 12,
-    padding: 16,
-    gap: 12,
+    borderRadius: radius.card,
+    padding: spacing.lg,
+    gap: spacing.md,
   },
-  warningText: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 12,
-    lineHeight: 18,
-  },
+  warningText: { ...type.bodySm },
   retryBtn: {
-    height: touch.minimum,
+    minHeight: touch.minimum,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  retryLabel: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 12,
-    letterSpacing: 0.8,
-  },
-  retryError: {
-    fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 18,
-  },
-  openError: {
-    marginTop: 12,
-    fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 18,
-  },
+  retryLabel: { ...type.bodySm, fontFamily: fonts.sans.bold, letterSpacing: 0.6 },
+  retryError: { ...type.bodySm },
+  primaryAction: { marginTop: spacing.gap },
+  openError: { ...type.bodySm, marginTop: spacing.md },
 });

@@ -1,11 +1,7 @@
 /**
- * Auth-screen primitives, lifted value-for-value from the design kit
- * (design-system/design-kit, screens `welcome` / `signin` / `onboard`).
- *
- * Sizes here intentionally follow the kit rather than the generic component
- * specs in DESIGN.md — auth CTAs are 58px, inputs 52–54px, radius 8 — because
- * the kit is the pixel authority for these three screens. Letter-spacing is
- * the kit's em value multiplied out to dp at each font size.
+ * Shared form controls used by auth, settings and trade workflows.
+ * DESIGN.md owns the colour, typography, corner and touch-size tokens.
+ * Minimum heights let controls grow with the system text size.
  */
 import { useState, type ReactNode } from 'react';
 import {
@@ -16,17 +12,16 @@ import {
   TextInput,
   View,
   type KeyboardTypeOptions,
+  type TextInputProps,
 } from 'react-native';
 import Svg, { Circle, Path } from 'react-native-svg';
+import { useReducedMotion } from 'react-native-reanimated';
 
-import { fonts } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 /** Screen gutter on all three auth screens. */
-export const AUTH_GUTTER = 26;
-
-/** Required-field asterisk — a fixed kit colour, deliberately not a theme token. */
-const REQUIRED_PINK = '#F43F5E';
+export const AUTH_GUTTER = spacing.xl;
 
 // ── Icons (kit inline SVGs, 24×24 viewBox) ─────────────────────────────────
 
@@ -73,7 +68,7 @@ export function FaceIdIcon({ color, size = 17 }: { color: string; size?: number 
 
 // ── Buttons ────────────────────────────────────────────────────────────────
 
-/** 58px accent CTA with the trailing arrow. One per screen. */
+/** The primary action, with a 56dp floor. One per screen. */
 export function PrimaryCta({
   label,
   onPress,
@@ -86,62 +81,71 @@ export function PrimaryCta({
   disabled?: boolean;
 }) {
   const { colors } = useTheme();
+  const reduceMotion = useReducedMotion();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       onPress={onPress}
       disabled={disabled || loading}
       style={({ pressed }) => [
         styles.primaryCta,
         { backgroundColor: pressed ? colors.accentPress : colors.accent },
-        pressed && styles.pressed,
+        pressed && !reduceMotion && styles.pressed,
         disabled && !loading && styles.disabled,
       ]}
     >
-      {loading ? (
-        <ActivityIndicator color={colors.accentInk} />
-      ) : (
-        <>
-          <Text style={[styles.primaryCtaLabel, { color: colors.accentInk }]}>{label}</Text>
-          <ArrowRightIcon color={colors.accentInk} />
-        </>
-      )}
+      {loading ? <ActivityIndicator color={colors.accentInk} /> : null}
+      <Text style={[styles.primaryCtaLabel, { color: colors.accentInk }]}>{label}</Text>
+      {!loading ? <ArrowRightIcon color={colors.accentInk} /> : null}
     </Pressable>
   );
 }
 
-/** Hairline-bordered secondary button (welcome 52px, sign-in Face ID 58px). */
+/** A secondary action with the same states and touch floor as other controls. */
 export function GhostButton({
   label,
   onPress,
-  height = 52,
+  height = touch.minimum,
   icon,
+  disabled = false,
+  loading = false,
 }: {
   label: string;
   onPress: () => void;
   height?: number;
   icon?: ReactNode;
+  disabled?: boolean;
+  loading?: boolean;
 }) {
   const { colors } = useTheme();
+  const reduceMotion = useReducedMotion();
   return (
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={label}
+      accessibilityState={{ disabled: disabled || loading, busy: loading }}
       onPress={onPress}
+      disabled={disabled || loading}
       style={({ pressed }) => [
         styles.ghost,
-        { height, borderColor: pressed ? colors.accent : colors.inkLine },
-        pressed && styles.pressed,
+        {
+          minHeight: Math.max(height, touch.minimum),
+          borderColor: pressed ? colors.accentSoft : colors.ctlLine,
+          backgroundColor: pressed ? colors.ink : 'transparent',
+        },
+        pressed && !reduceMotion && styles.pressed,
+        disabled && !loading && styles.disabled,
       ]}
     >
-      {icon}
+      {loading ? <ActivityIndicator color={colors.textPri} /> : icon}
       <Text style={[styles.ghostLabel, { color: colors.textPri }]}>{label}</Text>
     </Pressable>
   );
 }
 
-/** 38×38 bordered back chevron used in the sign-in and onboarding headers. */
+/** A full 48dp back target, rather than a small icon relying on hit slop. */
 export function BackButton({ onPress }: { onPress: () => void }) {
   const { colors } = useTheme();
   return (
@@ -149,10 +153,12 @@ export function BackButton({ onPress }: { onPress: () => void }) {
       accessibilityRole="button"
       accessibilityLabel="Back"
       onPress={onPress}
-      hitSlop={6}
       style={({ pressed }) => [
         styles.back,
-        { borderColor: pressed ? colors.accent : colors.inkLine },
+        {
+          borderColor: pressed ? colors.accentSoft : colors.inkLine,
+          backgroundColor: pressed ? colors.ink : 'transparent',
+        },
       ]}
     >
       <ChevronLeftIcon color={colors.textSec} />
@@ -160,7 +166,7 @@ export function BackButton({ onPress }: { onPress: () => void }) {
   );
 }
 
-/** The 52px hairline-bottomed header bar on sign-in and onboarding. */
+/** A shared header with room for the back target and larger system text. */
 export function AuthHeader({ children }: { children: ReactNode }) {
   const { colors } = useTheme();
   return <View style={[styles.header, { borderBottomColor: colors.inkLine }]}>{children}</View>;
@@ -196,7 +202,7 @@ export type FieldProps = {
   /** Non-editable leading adornment, e.g. "$" on money fields. */
   prefix?: string;
   keyboardType?: KeyboardTypeOptions;
-  autoComplete?: 'email' | 'password' | 'new-password' | 'name' | 'tel' | 'off';
+  autoComplete?: TextInputProps['autoComplete'];
   autoCapitalize?: 'none' | 'words' | 'sentences';
   /** Error line below the field (DESIGN.md pattern; the kit ships no error state). */
   error?: string | null;
@@ -217,35 +223,30 @@ export function Field({
   autoCapitalize = 'none',
   error,
 }: FieldProps) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const [focused, setFocused] = useState(false);
   const [revealed, setRevealed] = useState(false);
   const hideText = secure !== undefined && !revealed;
 
-  // The kit's exact focus treatment: accent border + 2px soft-yellow ring.
-  // On paper the ring falls back to ink at the same alpha (accentSoft rule).
-  const ring = isDark ? 'rgba(255,210,61,0.35)' : 'rgba(43,36,34,0.35)';
-  const borderColor = error ? colors.dangerBright : focused ? colors.accent : colors.inkLine;
+  const borderColor = error ? colors.dangerBright : focused ? colors.accentSoft : colors.ctlLine;
 
   return (
     <View>
       <View style={styles.labelRow}>
         <Text style={[styles.label, { color: colors.textPri }]}>
           {label.toUpperCase()}
-          {required ? <Text style={{ color: REQUIRED_PINK }}> *</Text> : null}
+          {required ? <Text style={{ color: colors.dangerBright }}> *</Text> : null}
         </Text>
-        {hint ? (
-          <Text style={[styles.hint, { color: colors.textDim }]}>{hint.toUpperCase()}</Text>
-        ) : null}
+        {hint ? <Text style={[styles.hint, { color: colors.textDim }]}>{hint}</Text> : null}
       </View>
       <View
         style={[
           styles.inputBox,
           {
-            height,
+            minHeight: height,
             backgroundColor: colors.ink,
             borderColor,
-            boxShadow: focused ? `0 0 0 2px ${ring}` : undefined,
+            boxShadow: focused ? `0 0 0 2px ${colors.accentSoft}` : undefined,
           },
         ]}
       >
@@ -256,6 +257,7 @@ export function Field({
         ) : null}
         <TextInput
           accessibilityLabel={label}
+          accessibilityHint={error ?? hint}
           value={value}
           onChangeText={onChangeText}
           onFocus={() => setFocused(true)}
@@ -267,7 +269,8 @@ export function Field({
           autoCorrect={false}
           style={[
             styles.inputText,
-            { flex: 1, color: colors.textPri },
+            { flex: 1, minWidth: 0, color: colors.textPri },
+            prefix ? styles.moneyText : null,
             // Masked entry renders in the kit's wide-tracked mono dots.
             hideText && value.length > 0 && styles.maskedText,
           ]}
@@ -277,7 +280,7 @@ export function Field({
             accessibilityRole="button"
             accessibilityLabel={revealed ? 'Hide password' : 'Show password'}
             onPress={() => setRevealed(v => !v)}
-            hitSlop={10}
+            style={styles.revealButton}
           >
             <EyeIcon color={revealed ? colors.accentText : colors.textDim} />
           </Pressable>
@@ -287,7 +290,7 @@ export function Field({
             accessibilityRole="button"
             accessibilityLabel={revealed ? 'Hide password' : 'Show password'}
             onPress={() => setRevealed(v => !v)}
-            hitSlop={10}
+            style={styles.revealButton}
           >
             <Text style={[styles.suffix, { color: colors.textDim }]}>
               {revealed ? 'HIDE' : 'SHOW'}
@@ -297,7 +300,12 @@ export function Field({
         {suffix ? <Text style={[styles.suffix, { color: colors.textDim }]}>{suffix}</Text> : null}
       </View>
       {error ? (
-        <Text style={[styles.errorText, { color: colors.dangerBright }]}>{error}</Text>
+        <Text
+          accessibilityLiveRegion="polite"
+          style={[styles.errorText, { color: colors.dangerBright }]}
+        >
+          {error}
+        </Text>
       ) : null}
     </View>
   );
@@ -305,16 +313,21 @@ export function Field({
 
 const styles = StyleSheet.create({
   primaryCta: {
-    height: 58,
-    borderRadius: 8,
+    minHeight: touch.primaryCta,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: spacing.sm,
   },
   primaryCtaLabel: {
     fontFamily: fonts.sans.bold,
     fontSize: 14,
+    lineHeight: 20,
+    flexShrink: 1,
+    textAlign: 'center',
     letterSpacing: 0.84, // .06em @ 14
     textTransform: 'uppercase',
   },
@@ -322,76 +335,93 @@ const styles = StyleSheet.create({
   disabled: { opacity: 0.4 },
   ghost: {
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
     backgroundColor: 'transparent',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 11,
+    gap: spacing.sm,
   },
   ghostLabel: {
     fontFamily: fonts.sans.bold,
-    fontSize: 13,
-    letterSpacing: 0.78, // .06em @ 13
+    fontSize: 14,
+    lineHeight: 20,
+    flexShrink: 1,
+    textAlign: 'center',
+    letterSpacing: 0.4,
     textTransform: 'uppercase',
   },
   back: {
-    width: 38,
-    height: 38,
+    width: touch.minimum,
+    height: touch.minimum,
     borderWidth: 1,
-    borderRadius: 9,
+    borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: 'transparent',
   },
   header: {
-    height: 52,
+    minHeight: 64,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 12,
-    paddingHorizontal: 18,
+    gap: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
   },
   divider: {
-    marginVertical: 22,
+    marginVertical: spacing.xxl,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 14,
+    gap: spacing.md,
   },
   dividerLine: { flex: 1, height: 1 },
   dividerLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9.5,
-    letterSpacing: 1.52, // .16em @ 9.5
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 1.2,
   },
   labelRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 8,
+    columnGap: spacing.md,
+    rowGap: spacing.xs,
+    marginBottom: spacing.sm,
   },
   label: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1.47, // .14em @ 10.5
+    ...type.label,
+    letterSpacing: 1,
+    flexShrink: 1,
   },
   hint: {
-    fontFamily: fonts.mono.regular,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
+    ...type.bodySm,
+    flexShrink: 1,
   },
   inputBox: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
   },
   inputText: {
     fontFamily: fonts.sans.regular,
     fontSize: 16,
-    paddingVertical: 0,
+    paddingVertical: spacing.md,
+  },
+  moneyText: { fontFamily: fonts.mono.regular, fontVariant: ['tabular-nums'] },
+  revealButton: {
+    minWidth: touch.minimum,
+    minHeight: touch.minimum,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: -spacing.md,
+    marginLeft: spacing.xs,
   },
   maskedText: {
     fontFamily: fonts.mono.regular,
@@ -400,8 +430,9 @@ const styles = StyleSheet.create({
   },
   suffix: {
     fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    letterSpacing: 1, // .1em @ 10
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.6,
     textTransform: 'uppercase',
   },
   errorText: {

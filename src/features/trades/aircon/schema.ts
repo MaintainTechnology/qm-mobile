@@ -43,6 +43,7 @@ export const AcInputsSchema = z
   });
 
 export const RecommendRequestSchema = z.object({
+  request_id: z.string().min(8).max(120).regex(/^[A-Za-z0-9_-]+$/).optional(),
   address: AcAddressSchema,
   inputs: AcInputsSchema,
 });
@@ -143,7 +144,7 @@ export type BuiltRequest = { ok: true; body: RecommendRequest } | { ok: false; e
  * bounce. The final safeParse is the belt-and-braces gate: a body that fails
  * the server's own schema must never leave the phone.
  */
-export function buildRecommendRequest(form: AirconForm): BuiltRequest {
+export function buildRecommendRequest(form: AirconForm, requestId?: string): BuiltRequest {
   if (form.address.trim().length < 3) {
     return { ok: false, error: 'Enter the property address.' };
   }
@@ -175,6 +176,7 @@ export function buildRecommendRequest(form: AirconForm): BuiltRequest {
     return { ok: false, error: 'Budget must be a number up to $200,000 — or leave it blank.' };
   }
   const body: RecommendRequest = {
+    ...(requestId ? { request_id: requestId } : {}),
     address: {
       address: form.address.trim(),
       postcode: form.postcode.trim(),
@@ -195,6 +197,38 @@ export function buildRecommendRequest(form: AirconForm): BuiltRequest {
   const parsed = RecommendRequestSchema.safeParse(body);
   if (!parsed.success) return { ok: false, error: 'Check the form and try again.' };
   return { ok: true, body: parsed.data };
+}
+
+/** Client-generated idempotency key. It is not pricing authority; the server
+ * binds it to the authenticated tenant before deriving a persisted token. */
+export function newAirconRequestId(now = Date.now, random = Math.random): string {
+  return `ac_${now().toString(36)}_${random().toString(36).slice(2, 14)}`;
+}
+
+/** A form/file change invalidates any earlier result, even if its HTTP response
+ * arrives later. Kept pure so remount/run-switch behaviour is regression-tested. */
+export function airconRunFingerprint(form: AirconForm, planFile: PickedFile | null): string {
+  return JSON.stringify({
+    form,
+    plan: planFile
+      ? { uri: planFile.uri, name: planFile.name, type: planFile.type, size: planFile.size ?? null }
+      : null,
+  });
+}
+
+export function acceptsAirconRun(args: {
+  mounted: boolean;
+  activeRequestId: string | null;
+  activeFingerprint: string | null;
+  responseRequestId: string | null;
+  currentFingerprint: string;
+}): boolean {
+  return (
+    args.mounted &&
+    args.activeRequestId !== null &&
+    args.responseRequestId === args.activeRequestId &&
+    args.activeFingerprint === args.currentFingerprint
+  );
 }
 
 // ── Floor-plan file guard (server parity: /api/aircon/plan) ─────────────────
@@ -222,13 +256,17 @@ export function planFileProblem(file: PickedFile): string | null {
 
 // ── Response (routes recommend/plan — rendered verbatim, never computed) ────
 
+const finite = z.number().finite();
+const nonNegative = finite.nonnegative();
+const positive = finite.positive();
+
 const RoomLoadSchema = z.looseObject({
   room_type: z.enum(['bedroom', 'living']),
   /** Plan room name (e.g. "Bed 2") when sizing came from a floor plan. */
   name: z.string().nullish(),
-  area_m2: z.number(),
-  volume_m3: z.number(),
-  kw: z.number(),
+  area_m2: positive,
+  volume_m3: positive,
+  kw: positive,
 });
 export type RoomLoad = z.infer<typeof RoomLoadSchema>;
 
@@ -249,14 +287,14 @@ export const FLOOR_AREA_SOURCE_LABEL: Record<(typeof FLOOR_AREA_SOURCES)[number]
 
 const SizingSchema = z.looseObject({
   rooms: z.array(RoomLoadSchema).default([]),
-  conditioned_zones: z.number(),
-  total_floor_area_m2: z.number(),
+  conditioned_zones: finite.int().positive(),
+  total_floor_area_m2: positive,
   floor_area_source: z.enum(FLOOR_AREA_SOURCES),
-  total_volume_m3: z.number(),
-  ceiling_height_m: z.number(),
-  storeys: z.number(),
-  volumetric_factor_kw_m3: z.number(),
-  connected_kw: z.number(),
+  total_volume_m3: positive,
+  ceiling_height_m: positive,
+  storeys: finite.int().positive(),
+  volumetric_factor_kw_m3: positive,
+  connected_kw: positive,
   confidence: z.enum(['high', 'medium', 'low']),
   notes: z.array(z.string()).default([]),
   warnings: z.array(z.string()).default([]),
@@ -265,31 +303,44 @@ export type AcSizing = z.infer<typeof SizingSchema>;
 
 const PriceComponentSchema = z.looseObject({
   label: z.string(),
-  quantity: z.number(),
+  quantity: positive,
   unit: z.string(),
   /** Dollars ex-GST on the wire — display via centsFromApiDollars + formatAud. */
-  rate_ex_gst: z.number(),
-  total_ex_gst: z.number(),
+  rate_ex_gst: nonNegative,
+  total_ex_gst: nonNegative,
   note: z.string().nullish(),
 });
 export type AcPriceComponent = z.infer<typeof PriceComponentSchema>;
 
 const PricingSchema = z.looseObject({
-  point_estimate_ex_gst: z.number(),
-  point_estimate_inc_gst: z.number(),
-  confidence_band_pct: z.number(),
+  point_estimate_ex_gst: positive,
+  point_estimate_inc_gst: positive,
+  confidence_band_pct: finite.min(0).max(100),
   gst_registered: z.boolean(),
   formula: z.string(),
   band_reason: z.string(),
   components: z.array(PriceComponentSchema).default([]),
-  adjustments: z.array(PriceComponentSchema).default([]),
+  adjustments: z
+    .array(
+      z.looseObject({
+        label: z.string(),
+        quantity: nonNegative,
+        unit: z.string(),
+        rate_ex_gst: nonNegative,
+        total_ex_gst: finite,
+        note: z.string().nullish(),
+      }),
+    )
+    .default([]),
 });
 
 const OptionSchema = z.looseObject({
   system_type: z.enum(['ducted', 'split']),
-  capacity_kw: z.number(),
+  capacity_kw: positive,
   /** Indicative INC-GST band (lib/aircon/types.ts AcPriceRange). */
-  price: z.looseObject({ low: z.number(), high: z.number() }),
+  price: z
+    .looseObject({ low: positive, high: positive })
+    .refine(value => value.high >= value.low, { message: 'Price band is inverted.' }),
   pricing: PricingSchema,
   best_fit: z.boolean(),
   pros: z.array(z.string()).default([]),
@@ -298,8 +349,14 @@ export type AcOption = z.infer<typeof OptionSchema>;
 
 const PricedRecommendationSchema = z.looseObject({
   pricing_status: z.literal('priced'),
+  pricing_authority: z.object({
+    source: z.literal('tenant_pricing_book'),
+    tenant_id: z.string().min(1),
+    pricing_book_id: z.string().min(1),
+    revision: z.string().regex(/^[a-f0-9]{64}$/),
+  }),
   sizing: SizingSchema,
-  options: z.array(OptionSchema),
+  options: z.array(OptionSchema).min(1),
   routing: z.looseObject({ reason: z.string() }),
   confidence: z.enum(['high', 'medium', 'low']),
 });
@@ -372,15 +429,26 @@ const PlanReadoutSchema = z.looseObject({
  * The persistence result is required because PDF generation is authorized by
  * the server-owned recommendation id, never by the on-screen money payload.
  */
-export const RecommendResponseSchema = z.looseObject({
-  ok: z.literal(true),
-  climate_zone: z.enum(['cool', 'temperate', 'subtropical', 'tropical']),
-  climate_note: z.string(),
-  location: LocationSchema,
-  recommendation: RecommendationSchema,
-  saved: z.object({ id: z.string().min(1), public_token: z.string().min(1) }).nullable(),
-  plan: PlanReadoutSchema.nullish(),
-});
+export const RecommendResponseSchema = z
+  .looseObject({
+    ok: z.literal(true),
+    request_id: z.string().min(8).max(120).nullable(),
+    climate_zone: z.enum(['cool', 'temperate', 'subtropical', 'tropical']),
+    climate_note: z.string(),
+    location: LocationSchema,
+    recommendation: RecommendationSchema,
+    saved: z.object({ id: z.string().min(1), public_token: z.string().min(1) }).nullable(),
+    plan: PlanReadoutSchema.nullish(),
+  })
+  .superRefine((value, ctx) => {
+    if (value.recommendation.pricing_status === 'priced' && value.saved === null) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['saved'],
+        message: 'Priced air-conditioning results must be persisted by the server.',
+      });
+    }
+  });
 export type AirconResult = z.infer<typeof RecommendResponseSchema>;
 
 export function buildAirconPdfRequest(recommendationId: string): { recommendationId: string } {

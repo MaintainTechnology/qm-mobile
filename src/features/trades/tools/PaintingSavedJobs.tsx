@@ -31,13 +31,12 @@ function JobRow({ job }: { job: SavedPaintJob }) {
   const scopes = job.scopes ?? [];
   const href = paintJobHref(job);
   const pillColour = inspection ? colors.warningBright : colors.successBright;
-  // Web meta-line parity: price (or Inspection) · scopes · m² · confidence · date.
+  const price = inspection
+    ? 'Inspection'
+    : job.better_inc_gst == null
+      ? '—'
+      : `${formatJobPrice(job.better_inc_gst)} inc GST`;
   const meta = [
-    inspection
-      ? 'Inspection'
-      : job.better_inc_gst == null
-        ? '—'
-        : `${formatJobPrice(job.better_inc_gst)} inc GST`,
     scopes.length > 0 ? scopes.join(', ') : null,
     job.total_area_m2 ? `${Math.round(job.total_area_m2)} m²` : null,
     job.confidence ? `${job.confidence} conf` : null,
@@ -61,17 +60,22 @@ function JobRow({ job }: { job: SavedPaintJob }) {
       ]}
     >
       <View style={styles.rowMain}>
-        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.rowTitle, { color: colors.textPri }]} numberOfLines={2}>
           {job.address ?? 'Unknown address'}
         </Text>
         <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={2}>
           {meta}
         </Text>
       </View>
-      <Text style={[styles.pill, { color: pillColour, borderColor: pillColour }]}>
-        {inspection ? 'INSPECTION' : 'QUOTE'}
-      </Text>
-      {href != null ? <Text style={[styles.rowChevron, { color: colors.accentText }]}>→</Text> : null}
+      <View style={styles.rowFooter}>
+        <Text style={[styles.pill, { color: pillColour, borderColor: pillColour }]}>
+          {inspection ? 'INSPECTION' : 'QUOTE'}
+        </Text>
+        <Text style={[styles.rowPrice, { color: colors.textPri }]}>{price}</Text>
+        {href != null ? (
+          <Text style={[styles.rowChevron, { color: colors.textDim }]}>→</Text>
+        ) : null}
+      </View>
     </Pressable>
   );
 }
@@ -128,43 +132,53 @@ export function PaintingSavedJobs() {
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: spacing.sm,
     marginTop: spacing.md,
     paddingTop: spacing.md,
     borderTopWidth: 1,
-    minHeight: touch.minimum,
+    minHeight: touch.listRow,
   },
-  rowMain: { flex: 1, minWidth: 0 },
-  rowTitle: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
+  rowMain: { minWidth: 0, gap: spacing.xs },
+  rowTitle: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
+  rowFooter: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
+  rowPrice: {
+    flexGrow: 1,
+    fontFamily: fonts.mono.medium,
+    fontSize: 14,
+    lineHeight: 20,
+    fontVariant: ['tabular-nums'],
+  },
   rowMeta: {
     marginTop: 2,
     fontFamily: fonts.mono.medium,
-    fontSize: 10.5,
-    lineHeight: 15,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
   pill: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   rowChevron: { fontFamily: fonts.mono.bold, fontSize: 14 },
   pressed: { opacity: 0.6 },
   showMore: {
     marginTop: spacing.sm,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   showMoreLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
 });

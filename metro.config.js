@@ -1,6 +1,9 @@
-const { getDefaultConfig } = require('expo/metro-config');
+const { getSentryExpoConfig } = require('@sentry/react-native/metro');
 
-const config = getDefaultConfig(__dirname);
+// SDK 54's Sentry integration adds bundle Debug IDs/source-map metadata here.
+// Replay is deliberately excluded: QuoteMax reports failures, not customer
+// screens, taps, quote documents, or message content.
+const config = getSentryExpoConfig(__dirname, { includeWebReplay: false });
 
 // .claude holds ~4,500 files / 264 MB of agent and skill definitions, none of it
 // importable app code (src/ is 75 files). Metro crawls and watches the whole
@@ -13,6 +16,12 @@ const config = getDefaultConfig(__dirname);
 // Match both separators: the pattern is tested against absolute paths, which use
 // backslashes on Windows. Every entry must share the same regex flags; the Expo
 // defaults carry none, so this one must not add any either.
-config.resolver.blockList = [...config.resolver.blockList, /[\\/]\.claude[\\/]/];
+config.resolver.blockList = [
+  ...config.resolver.blockList,
+  /[\\/]\.claude[\\/]/,
+  // Playwright replaces run folders; watching them can crash Metro's Windows
+  // fallback watcher. Screenshots and traces are never application modules.
+  /[\\/](test-results|playwright-report)([\\/]|$)/,
+];
 
 module.exports = config;

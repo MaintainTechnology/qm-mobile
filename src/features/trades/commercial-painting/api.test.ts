@@ -4,6 +4,8 @@
  * state), the payload builders that feed sign/complete, and the run-id
  * persistence used to survive an app kill mid-pipeline.
  */
+import * as FileSystem from 'expo-file-system/legacy';
+
 import type { PickedFile } from '@/lib/media';
 import { ApiError } from '@/lib/api';
 
@@ -12,16 +14,80 @@ import {
   buildSignBody,
   canSavePaintQuote,
   classifyPaintPricingBlock,
+  COMMERCIAL_PAINT_DOCUMENT_POLICY,
   initialPipeline,
   loadPersistedRunId,
   persistRunId,
   pipelineReducer,
+  putSignedFile,
   RUN_ID_STORAGE_KEY,
+  signedUploadResponseProblem,
   zipUploads,
   type PipelineEvent,
   type PipelineState,
   type SignedTarget,
 } from './api';
+
+jest.mock('expo-file-system/legacy', () => ({ uploadAsync: jest.fn() }));
+const fileSystem = jest.mocked(FileSystem);
+
+describe('commercial painting document upload contract', () => {
+  it('pins the sign metadata field, formats, 32 MB cap and 12-file limit', () => {
+    expect(COMMERCIAL_PAINT_DOCUMENT_POLICY).toEqual({
+      purpose: 'painting document',
+      field: 'files',
+      allowedMimeTypes: ['application/pdf', 'image/png', 'image/jpeg', 'image/webp'],
+      allowedTypeLabel: 'a PDF, PNG, JPEG or WebP file',
+      maxBytes: 32 * 1024 * 1024,
+      maxFiles: 12,
+    });
+  });
+
+  it('discriminates expired signed targets, confirmed rejection and ambiguous server failure', () => {
+    expect(signedUploadResponseProblem(201, '', 'plan.pdf')).toBeNull();
+    expect(signedUploadResponseProblem(403, 'expired token', 'plan.pdf')).toMatchObject({
+      kind: 'signed_target_expired',
+      status: 403,
+    });
+    expect(signedUploadResponseProblem(415, 'unsupported', 'plan.pdf')).toMatchObject({
+      kind: 'rejected',
+      status: 415,
+    });
+    expect(signedUploadResponseProblem(503, 'unavailable', 'plan.pdf')).toMatchObject({
+      kind: 'unknown_outcome',
+      status: 503,
+    });
+  });
+
+  it('uploads raw bytes with the declared MIME and surfaces signed-target/network discriminators', async () => {
+    const file: PickedFile = {
+      uri: 'file:///tmp/plan.pdf',
+      name: 'plan.pdf',
+      type: 'application/pdf',
+      size: 100,
+    };
+    fileSystem.uploadAsync.mockResolvedValueOnce({ status: 201, body: '' } as never);
+    await expect(putSignedFile('https://storage.example/signed', file)).resolves.toBeUndefined();
+    expect(fileSystem.uploadAsync).toHaveBeenCalledWith(
+      'https://storage.example/signed',
+      file.uri,
+      {
+        httpMethod: 'PUT',
+        headers: { 'Content-Type': 'application/pdf', 'x-upsert': 'true' },
+      },
+    );
+
+    fileSystem.uploadAsync.mockResolvedValueOnce({ status: 403, body: 'expired token' } as never);
+    await expect(putSignedFile('https://storage.example/expired', file)).rejects.toMatchObject({
+      kind: 'signed_target_expired',
+      status: 403,
+    });
+    fileSystem.uploadAsync.mockRejectedValueOnce(new Error('Network connection lost'));
+    await expect(putSignedFile('https://storage.example/offline', file)).rejects.toMatchObject({
+      kind: 'network',
+    });
+  });
+});
 
 jest.mock('@react-native-async-storage/async-storage', () => {
   const store = new Map<string, string>();
@@ -88,7 +154,7 @@ describe('pipelineReducer', () => {
     expect(state).toMatchObject({ step: 'saved', runId: 'run-1', failedStage: null });
   });
 
-  it('marks a failure mid-file as resumable (the run already exists)', () => {
+  it('retains server run context after a mid-file failure without claiming byte resume', () => {
     const state = run([
       { type: 'SIGN_START', fileCount: 2 },
       { type: 'SIGNED', runId: 'run-1' },
@@ -98,14 +164,14 @@ describe('pipelineReducer', () => {
     expect(state).toMatchObject({
       step: 'failed',
       failedStage: 'upload',
-      resumable: true,
+      runRecoverable: true,
       runId: 'run-1',
     });
   });
 
-  it('marks a sign failure as NOT resumable (no run yet)', () => {
+  it('has no recoverable run context when signing failed before returning a run', () => {
     const state = run([{ type: 'SIGN_START', fileCount: 2 }, { type: 'FAILED' }]);
-    expect(state).toMatchObject({ step: 'failed', failedStage: 'sign', resumable: false });
+    expect(state).toMatchObject({ step: 'failed', failedStage: 'sign', runRecoverable: false });
   });
 
   it('ignores FAILED outside a tracked stage (price/save errors keep their step)', () => {
@@ -134,12 +200,12 @@ describe('pipelineReducer', () => {
     }
   });
 
-  it('resumes a server-failed run as a resumable extract failure', () => {
+  it('reopens a server-failed run with recoverable run context', () => {
     const state = run([{ type: 'RESUME', runId: 'run-9', status: 'failed' }]);
     expect(state).toMatchObject({
       step: 'failed',
       failedStage: 'extract',
-      resumable: true,
+      runRecoverable: true,
       runId: 'run-9',
     });
   });

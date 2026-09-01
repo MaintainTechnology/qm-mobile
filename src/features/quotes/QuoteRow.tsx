@@ -22,49 +22,49 @@ export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () 
   };
   const tone = toneColor[badge.tone];
   const amount =
-    quote.total_inc_gst == null ? '—' : formatAud(centsFromApiDollars(quote.total_inc_gst));
+    quote.total_inc_gst == null ? null : formatAud(centsFromApiDollars(quote.total_inc_gst));
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${customerLabel(quote)}, ${badge.label}`}
+      accessibilityLabel={`${customerLabel(quote)}, ${badge.label}${amount ? `, ${amount}` : ''}`}
+      accessibilityHint="Opens the quote for review"
       onPress={onPress}
       style={({ pressed }) => [
         styles.row,
         {
-          borderBottomColor: colors.inkLine,
-          backgroundColor: pressed ? colors.ink : 'transparent',
+          borderColor: colors.inkLine,
+          backgroundColor: pressed ? colors.ink : colors.inkCard,
         },
       ]}
     >
-      <View style={{ flex: 1, minWidth: 0 }}>
+      <View style={styles.topRow}>
         <Text style={[styles.name, { color: colors.textPri }]} numberOfLines={1}>
           {customerLabel(quote)}
         </Text>
-        <Text
-          style={[styles.job, { color: colors.textSec }]}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {formatJobType(quote.job_type)}
-          {quote.suburb ? ` · ${quote.suburb}` : ''}
-        </Text>
+        <View style={styles.right}>
+          {amount ? (
+            <>
+              <Text style={[styles.amount, { color: colors.textPri }]}>{amount}</Text>
+              <Text style={[styles.amountMeta, { color: colors.textDim }]}>inc GST</Text>
+            </>
+          ) : (
+            <Text style={[styles.amountMeta, { color: colors.textDim }]}>Price pending</Text>
+          )}
+        </View>
+      </View>
+      <Text style={[styles.job, { color: colors.textSec }]} numberOfLines={2} ellipsizeMode="tail">
+        {formatJobType(quote.job_type)}
+        {quote.suburb ? ` · ${quote.suburb}` : ''}
+      </Text>
+      <View style={styles.bottomRow}>
+        <View style={[styles.chip, { borderColor: tone }]}>
+          <Text style={[styles.chipText, { color: tone }]}>{badge.label}</Text>
+        </View>
         <Text style={[styles.meta, { color: colors.textDim }]}>
           {quote.channel ? `${quote.channel === 'voice' ? 'Voice' : 'SMS'} · ` : ''}
           {quoteAge(quote.created_at)}
         </Text>
-      </View>
-      <View style={styles.right}>
-        <Text style={[styles.amount, { color: colors.textPri }]}>{amount}</Text>
-        {quote.total_inc_gst != null ? (
-          <Text style={[styles.amountMeta, { color: colors.textDim }]}>inc GST</Text>
-        ) : null}
-        <View style={[styles.chip, { borderColor: tone }]}>
-          <View style={[styles.chipDot, { backgroundColor: tone }]} />
-          <Text style={[styles.chipText, { color: tone }]} numberOfLines={1}>
-            {badge.label.toUpperCase()}
-          </Text>
-        </View>
       </View>
     </Pressable>
   );
@@ -72,35 +72,45 @@ export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () 
 
 const styles = StyleSheet.create({
   row: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: spacing.md,
+    gap: spacing.sm,
     minHeight: touch.listRow,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
+    borderWidth: 1,
+    borderRadius: radius.card,
   },
-  name: { fontFamily: fonts.sans.bold, fontSize: 14.5, lineHeight: 18 },
-  job: { marginTop: 3, fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 17 },
+  topRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: spacing.sm },
+  bottomRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+    marginTop: spacing.xs,
+  },
+  name: { flex: 1, minWidth: 120, fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 24 },
+  job: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   meta: {
-    marginTop: 4,
     fontFamily: fonts.mono.medium,
     fontSize: 12,
-    letterSpacing: 0.6,
+    lineHeight: 16,
   },
-  right: { alignItems: 'flex-end', gap: 7 },
-  amount: { fontFamily: fonts.mono.bold, fontSize: 14.5, fontVariant: ['tabular-nums'] },
-  amountMeta: { fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.6 },
+  right: { alignItems: 'flex-end', gap: spacing.xs, marginLeft: 'auto', maxWidth: '100%' },
+  amount: {
+    fontFamily: fonts.mono.bold,
+    fontSize: 16,
+    lineHeight: 24,
+    fontVariant: ['tabular-nums'],
+  },
+  amountMeta: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 16 },
   chip: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingVertical: 4,
-    paddingHorizontal: 7,
-    maxWidth: 160,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
+    maxWidth: '100%',
   },
-  chipDot: { width: 4, height: 4, borderRadius: 2 },
-  chipText: { fontFamily: fonts.mono.bold, fontSize: 12, letterSpacing: 0.4 },
+  chipText: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 16, flexShrink: 1 },
 });

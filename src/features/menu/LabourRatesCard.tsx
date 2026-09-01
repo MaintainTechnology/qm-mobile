@@ -11,23 +11,24 @@
  * trade's own numbers — editing one trade's call-out minimum must never rewrite the other trade's
  * hourly rate.
  */
-import { useState } from 'react';
+import { useEffect, useReducer, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
 import { Field } from '@/features/auth/ui';
 import { apiErrorMessage } from '@/lib/api';
-import { apiDollarsFromCents } from '@/lib/money';
 import type { TenantMe } from '@/lib/tenant';
 import { fonts, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-import { rateToInput, useSaveLabourRates } from './api';
+import { useSaveLabourRates } from './api';
 import { RateCard } from './CardChrome';
-import { parsePercent, parseRateCents } from './validation';
-
-type TradeValues = { hourly: string; callOut: string; markup: string };
-
-const BLANK: TradeValues = { hourly: '', callOut: '', markup: '' };
+import {
+  BLANK_TRADE_VALUES,
+  buildLabourSavePlan,
+  labourEditorReducer,
+  seedLabourValues,
+  type TradeValues,
+} from './labour-rates-state';
 
 export const LABOUR_RATE_LABELS = {
   hourly: 'Hourly rate (ex GST)',
@@ -36,24 +37,6 @@ export const LABOUR_RATE_LABELS = {
 
 function tradeLabel(trade: string): string {
   return trade.charAt(0).toUpperCase() + trade.slice(1);
-}
-
-/** Seeded once per trade, from that trade's own `pricing_books` row — never shared across trades. */
-function seedValues(
-  trades: string[],
-  pricingBooks: TenantMe['pricing_books'],
-): Record<string, TradeValues> {
-  return Object.fromEntries(
-    trades.map(t => {
-      const row = pricingBooks?.find(r => r.trade === t) ?? null;
-      const values: TradeValues = {
-        hourly: rateToInput(row?.hourly_rate),
-        callOut: rateToInput(row?.call_out_minimum),
-        markup: rateToInput(row?.default_markup_pct),
-      };
-      return [t, values] as const;
-    }),
-  );
 }
 
 export function LabourRatesCard({
@@ -65,68 +48,49 @@ export function LabourRatesCard({
 }) {
   const { colors } = useTheme();
 
-  // A later refetch (e.g. after a save) must not clobber whatever the tradie is mid-typing
-  // elsewhere, so this seeds once from the first render rather than tracking pricingBooks.
-  const [seed] = useState(() => seedValues(trades, pricingBooks));
-  const [values, setValues] = useState<Record<string, TradeValues>>(() => seed);
+  const remoteSignature = JSON.stringify(seedLabourValues(trades, pricingBooks));
+  const [editor, dispatchEditor] = useReducer(labourEditorReducer, undefined, () => {
+    const initial = JSON.parse(remoteSignature) as Record<string, TradeValues>;
+    return { baseline: initial, values: initial };
+  });
   const [fieldErrors, setFieldErrors] = useState<Record<string, Partial<TradeValues>>>({});
   // Only for the "nothing changed" shortcut below, which never calls the mutation — a real save's
   // success/failure is read straight off `save.data?.ok` so a false 2xx can't show "Saved.".
   const [noopSaved, setNoopSaved] = useState(false);
   const save = useSaveLabourRates();
 
+  useEffect(() => {
+    dispatchEditor({
+      type: 'REMOTE',
+      incoming: JSON.parse(remoteSignature) as Record<string, TradeValues>,
+    });
+  }, [remoteSignature]);
+
   function setField(trade: string, key: keyof TradeValues, value: string) {
-    setValues(prev => ({ ...prev, [trade]: { ...(prev[trade] ?? BLANK), [key]: value } }));
+    setNoopSaved(false);
+    save.reset();
+    dispatchEditor({ type: 'EDIT', trade, field: key, value });
   }
 
   function onSave() {
     setNoopSaved(false);
-    const nextErrors: Record<string, Partial<TradeValues>> = {};
-    const patch: Record<
-      string,
-      { hourly_rate: number; call_out_minimum: number; default_markup_pct: number }
-    > = {};
-    let ok = true;
-
-    for (const trade of trades) {
-      const v = values[trade] ?? BLANK;
-      const hourlyResult = parseRateCents(v.hourly, { positive: true });
-      const callOutResult = parseRateCents(v.callOut, {});
-      const markupResult = parsePercent(v.markup);
-      const errors: Partial<TradeValues> = {};
-      if (hourlyResult.error) errors.hourly = hourlyResult.error;
-      if (callOutResult.error) errors.callOut = callOutResult.error;
-      if (markupResult.error) errors.markup = markupResult.error;
-      if (Object.keys(errors).length > 0) {
-        nextErrors[trade] = errors;
-        ok = false;
-        continue;
-      }
-      if (hourlyResult.cents == null || callOutResult.cents == null || markupResult.value == null) {
-        continue;
-      }
-
-      const s = seed[trade] ?? BLANK;
-      const changed =
-        v.hourly.trim() !== s.hourly.trim() ||
-        v.callOut.trim() !== s.callOut.trim() ||
-        v.markup.trim() !== s.markup.trim();
-      if (!changed) continue;
-
-      patch[trade] = {
-        hourly_rate: apiDollarsFromCents(hourlyResult.cents),
-        call_out_minimum: apiDollarsFromCents(callOutResult.cents),
-        default_markup_pct: markupResult.value,
-      };
-    }
-
-    setFieldErrors(nextErrors);
-    if (!ok) return;
-    if (Object.keys(patch).length === 0) {
+    const plan = buildLabourSavePlan(trades, editor.values, editor.baseline);
+    setFieldErrors(plan.errors);
+    if (!plan.valid) return;
+    const patchedTrades = Object.keys(plan.patch);
+    if (patchedTrades.length === 0) {
       setNoopSaved(true);
       return;
     }
-    save.mutate({ pricing_by_trade: patch });
+    const submitted = editor.values;
+    save.mutate(
+      { pricing_by_trade: plan.patch },
+      {
+        onSuccess: result => {
+          if (result.ok) dispatchEditor({ type: 'ACK', trades: patchedTrades, submitted });
+        },
+      },
+    );
   }
 
   return (
@@ -148,7 +112,7 @@ export function LabourRatesCard({
       saved={noopSaved || save.data?.ok === true}
     >
       {trades.map(trade => {
-        const v = values[trade] ?? BLANK;
+        const v = editor.values[trade] ?? BLANK_TRADE_VALUES;
         const errors = fieldErrors[trade] ?? {};
         return (
           <View key={trade} style={styles.section}>
@@ -190,11 +154,12 @@ export function LabourRatesCard({
 }
 
 const styles = StyleSheet.create({
-  section: { gap: spacing.lg },
+  section: { gap: spacing.xl },
   sectionLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1.05,
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.8,
     textTransform: 'uppercase',
   },
 });

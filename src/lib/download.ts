@@ -18,6 +18,22 @@ import { apiUrl } from '@/lib/env';
 
 /** Comfortably under every platform's ~255-byte filename cap, share-sheet titles included. */
 const MAX_FILENAME = 80;
+const DEFAULT_DOWNLOAD_TIMEOUT_MS = 30_000;
+let downloadSequence = 0;
+
+export class DownloadUnavailableError extends Error {
+  constructor(message: string) {
+    super(message);
+    this.name = 'DownloadUnavailableError';
+  }
+}
+
+export class DownloadCancelledError extends Error {
+  constructor(readonly reason: 'cancelled' | 'timeout') {
+    super(reason === 'timeout' ? 'The download timed out.' : 'The download was cancelled.');
+    this.name = 'DownloadCancelledError';
+  }
+}
 
 /**
  * A display_name is tenant-entered text, not a safe path segment. Strip path
@@ -39,6 +55,36 @@ export function sanitizeFilename(name: string): string {
   return cleaned.slice(0, Math.max(1, MAX_FILENAME - ext.length)).trimEnd() + ext;
 }
 
+/** Unique cache path while retaining the extension used by native share sheets. */
+export function uniqueCacheFilename(name: string, nonce = Date.now()): string {
+  const safeName = sanitizeFilename(name);
+  const dot = safeName.lastIndexOf('.');
+  const extension = dot > 0 ? safeName.slice(dot) : '';
+  const stem = dot > 0 ? safeName.slice(0, dot) : safeName;
+  downloadSequence = (downloadSequence + 1) % 1_000_000;
+  const suffix = `-${nonce.toString(36)}-${downloadSequence.toString(36)}`;
+  const maxStem = Math.max(1, MAX_FILENAME - extension.length - suffix.length);
+  return `${stem.slice(0, maxStem).trimEnd()}${suffix}${extension}`;
+}
+
+function responseContentType(result: FileSystem.FileSystemDownloadResult): string | null {
+  const direct = result.mimeType?.split(';', 1)[0]?.trim().toLowerCase();
+  if (direct) return direct;
+  const entry = Object.entries(result.headers ?? {}).find(
+    ([key]) => key.toLowerCase() === 'content-type',
+  );
+  return entry?.[1]?.split(';', 1)[0]?.trim().toLowerCase() ?? null;
+}
+
+export function isCompatibleDownloadMime(expected: string, actual: string | null): boolean {
+  if (!actual) return false;
+  const wanted = expected.split(';', 1)[0]?.trim().toLowerCase();
+  if (!wanted) return false;
+  if (actual === wanted) return true;
+  if (actual === 'application/octet-stream') return true;
+  return wanted.endsWith('/*') && actual.startsWith(wanted.slice(0, -1));
+}
+
 /**
  * Download `path` with the tradie's Bearer token and open the share sheet on
  * the result. Throws `ApiError` on a non-2xx status — the legacy
@@ -50,23 +96,69 @@ export async function downloadAndShare({
   filename,
   mimeType,
   token,
+  signal,
+  timeoutMs = DEFAULT_DOWNLOAD_TIMEOUT_MS,
+  onProgress,
 }: {
   path: string;
   filename: string;
   /** Android share-sheet routing; iOS infers from the extension. */
   mimeType: string;
   token?: string;
+  signal?: AbortSignal;
+  timeoutMs?: number;
+  onProgress?: (fraction: number | null) => void;
 }): Promise<void> {
   const dir = FileSystem.cacheDirectory;
   if (!dir) throw new Error('No writable cache directory on this device.');
   const safeName = sanitizeFilename(filename);
-  const result = await FileSystem.downloadAsync(apiUrl(path), dir + safeName, {
-    headers: token ? { Authorization: `Bearer ${token}` } : {},
-  });
-  if (result.status < 200 || result.status >= 300) {
-    // The body on disk is a JSON error envelope, not the document — bin it.
-    await FileSystem.deleteAsync(result.uri, { idempotent: true }).catch(() => undefined);
-    throw new ApiError(`GET ${path} failed`, result.status, path);
+  const uri = dir + uniqueCacheFilename(safeName);
+  const task = FileSystem.createDownloadResumable(
+    apiUrl(path),
+    uri,
+    { headers: token ? { Authorization: `Bearer ${token}` } : {} },
+    progress => {
+      const total = progress.totalBytesExpectedToWrite;
+      onProgress?.(total > 0 ? Math.min(1, progress.totalBytesWritten / total) : null);
+    },
+  );
+
+  let cancellation: 'cancelled' | 'timeout' | null = null;
+  const cancel = (reason: 'cancelled' | 'timeout') => {
+    cancellation ??= reason;
+    void task.cancelAsync().catch(() => undefined);
+  };
+  const onAbort = () => cancel('cancelled');
+  if (signal?.aborted) onAbort();
+  else signal?.addEventListener('abort', onAbort, { once: true });
+  const timer = setTimeout(() => cancel('timeout'), timeoutMs);
+
+  try {
+    const result = await task.downloadAsync();
+    if (cancellation || !result) throw new DownloadCancelledError(cancellation ?? 'cancelled');
+    if (result.status < 200 || result.status >= 300) {
+      throw new ApiError(`GET ${path} failed`, result.status, path);
+    }
+    const actualMime = responseContentType(result);
+    if (!isCompatibleDownloadMime(mimeType, actualMime)) {
+      throw new DownloadUnavailableError(
+        `QuoteMax returned ${actualMime ?? 'an unknown file type'} instead of ${mimeType}.`,
+      );
+    }
+    if (!(await Sharing.isAvailableAsync())) {
+      throw new DownloadUnavailableError('No native share or save destination is available.');
+    }
+    await Sharing.shareAsync(result.uri, { mimeType, dialogTitle: safeName });
+  } catch (error) {
+    if (cancellation && !(error instanceof DownloadCancelledError)) {
+      throw new DownloadCancelledError(cancellation);
+    }
+    throw error;
+  } finally {
+    clearTimeout(timer);
+    signal?.removeEventListener('abort', onAbort);
+    // A shared copy belongs to the destination app; the authenticated cache
+    // copy is temporary and must not survive account switches or collisions.
+    await FileSystem.deleteAsync(uri, { idempotent: true }).catch(() => undefined);
   }
-  await Sharing.shareAsync(result.uri, { mimeType, dialogTitle: safeName });
 }

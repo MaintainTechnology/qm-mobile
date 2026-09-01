@@ -7,9 +7,10 @@
  * inputs are a deliberate mobile cut (no system date field in RN this round).
  */
 import { useMemo, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Linking, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
+import { ChevronLeftIcon } from '@/features/auth/ui';
 import { QuoteDetailModal } from '@/features/quotes/QuoteDetailModal';
 import { QuoteRow } from '@/features/quotes/QuoteRow';
 import { quoteAge } from '@/features/quotes/status';
@@ -96,30 +97,28 @@ function JobRow({ job, hubTrade }: { job: TradeJob; hubTrade: HubTrade }) {
       style={({ pressed }) => [
         styles.jobRow,
         {
-          borderBottomColor: colors.inkLine,
-          backgroundColor: pressed ? colors.ink : 'transparent',
+          borderColor: colors.inkLine,
+          backgroundColor: pressed ? colors.ink : colors.inkCard,
         },
       ]}
     >
-      <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.jobName, { color: colors.textPri }]} numberOfLines={1}>
+      <View style={{ minWidth: 0 }}>
+        <Text style={[styles.jobName, { color: colors.textPri }]} numberOfLines={2}>
           {job.address ?? '—'}
         </Text>
         {job.headline ? (
-          <Text style={[styles.jobHeadline, { color: colors.textSec }]} numberOfLines={1}>
+          <Text style={[styles.jobHeadline, { color: colors.textSec }]} numberOfLines={2}>
             {job.headline}
           </Text>
         ) : null}
-        <Text style={[styles.jobMeta, { color: colors.textDim }]} numberOfLines={1}>
+        <Text style={[styles.jobMeta, { color: colors.textDim }]}>
           {job.createdAt ? `${quoteAge(job.createdAt)} · ` : ''}
           {TRADE_LABELS[hubTrade]} · Measure tool
         </Text>
       </View>
       <View style={[styles.jobChip, { borderColor: tone }]}>
         <View style={[styles.jobChipDot, { backgroundColor: tone }]} />
-        <Text style={[styles.jobChipText, { color: tone }]} numberOfLines={1}>
-          {badge.label.toUpperCase()}
-        </Text>
+        <Text style={[styles.jobChipText, { color: tone }]}>{badge.label.toUpperCase()}</Text>
       </View>
     </Pressable>
   );
@@ -133,6 +132,7 @@ export function QuoteQueueSection({ trade }: { trade: HubTrade }) {
   const [search, setSearch] = useState('');
   const [filter, setFilter] = useState<QueueFilter>('all');
   const [sort, setSort] = useState<QueueSort>('newest');
+  const [sortOpen, setSortOpen] = useState(false);
   const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const jobsMode = MEASURE_TRADES[trade] ?? null;
@@ -174,9 +174,11 @@ export function QuoteQueueSection({ trade }: { trade: HubTrade }) {
   }
 
   return (
-    <View style={[styles.shell, { borderColor: colors.inkLine, backgroundColor: colors.inkDeep }]}>
-      {/* Toolbar — search, status, sort (web one-row toolbar, stacked for a phone). */}
-      <View style={[styles.toolbar, { borderBottomColor: colors.inkLine }]}>
+    <View style={styles.shell}>
+      {/* Keep search and status close; reveal less-used sorting only on demand. */}
+      <View
+        style={[styles.toolbar, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}
+      >
         <TextInput
           value={search}
           onChangeText={setSearch}
@@ -194,83 +196,123 @@ export function QuoteQueueSection({ trade }: { trade: HubTrade }) {
             },
           ]}
         />
-        <View style={styles.chipRow}>
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          contentContainerStyle={styles.chipRow}
+          accessibilityLabel="Filter quotes by status"
+          accessibilityRole="tablist"
+        >
           {QUEUE_FILTERS.map(option => {
             const active = filter === option.key;
             const count = filterCount(option.key);
             return (
               <Pressable
                 key={option.key}
-                accessibilityRole="button"
+                accessibilityRole="tab"
                 accessibilityState={{ selected: active }}
+                aria-selected={active}
                 accessibilityLabel={`${option.label}, ${count} quotes`}
                 onPress={() => setFilter(option.key)}
                 style={[
                   styles.filterChip,
                   {
-                    borderColor: active ? colors.accent : colors.inkLine,
-                    backgroundColor: active ? colors.accent : 'transparent',
+                    borderColor: active ? colors.ctlLine : colors.inkLine,
+                    backgroundColor: active ? colors.ink : 'transparent',
                   },
                 ]}
               >
                 <Text
                   style={[
                     styles.filterChipText,
-                    { color: active ? colors.accentInk : colors.textSec },
+                    { color: active ? colors.textPri : colors.textSec },
                   ]}
                 >
-                  {option.label.toUpperCase()} {count}
+                  {option.label}
                 </Text>
+                <Text style={[styles.filterCount, { color: colors.textDim }]}>{count}</Text>
               </Pressable>
             );
           })}
-        </View>
-        <View style={styles.sortRow}>
-          <Text style={[styles.sortLabel, { color: colors.textDim }]}>SORT</Text>
+        </ScrollView>
+        {filtersActive ? (
+          <Pressable
+            accessibilityRole="button"
+            accessibilityLabel="Clear filters"
+            onPress={() => {
+              setSearch('');
+              setFilter('all');
+            }}
+            style={styles.clear}
+          >
+            <Text style={[styles.sortChipText, { color: colors.accentText }]}>CLEAR FILTERS</Text>
+          </Pressable>
+        ) : null}
+      </View>
+
+      {/* Queue header strip — "Quote queue · N" + active sort (web parity). */}
+      <View style={[styles.queueHeader, { borderBottomColor: colors.inkLine }]}>
+        <Text accessibilityRole="header" style={[styles.queueTitle, { color: colors.textSec }]}>
+          Quote queue · {filtered.length + jobs.length}
+        </Text>
+        <Pressable
+          accessibilityRole="button"
+          accessibilityLabel={`Sort quotes: ${sortLabel}`}
+          accessibilityState={{ expanded: sortOpen }}
+          aria-expanded={sortOpen}
+          onPress={() => setSortOpen(open => !open)}
+          style={({ pressed }) => [
+            styles.sortToggle,
+            {
+              borderColor: colors.inkLine,
+              backgroundColor: pressed ? colors.inkCard : 'transparent',
+            },
+          ]}
+        >
+          <Text style={[styles.sortChipText, { color: colors.textSec }]}>{sortLabel}</Text>
+          <View style={{ transform: [{ rotate: sortOpen ? '90deg' : '-90deg' }] }}>
+            <ChevronLeftIcon size={14} color={colors.textDim} />
+          </View>
+        </Pressable>
+      </View>
+
+      {sortOpen ? (
+        <View
+          accessibilityRole="radiogroup"
+          accessibilityLabel="Sort quotes"
+          style={styles.sortRow}
+        >
           {QUEUE_SORTS.map(option => {
             const active = sort === option.key;
             return (
               <Pressable
                 key={option.key}
-                accessibilityRole="button"
-                accessibilityState={{ selected: active }}
-                onPress={() => setSort(option.key)}
-                style={[styles.sortChip, { borderColor: active ? colors.accent : colors.inkLine }]}
+                accessibilityRole="radio"
+                accessibilityLabel={option.label}
+                accessibilityState={{ checked: active }}
+                aria-checked={active}
+                onPress={() => {
+                  setSort(option.key);
+                  setSortOpen(false);
+                }}
+                style={[
+                  styles.sortChip,
+                  {
+                    borderColor: active ? colors.ctlLine : colors.inkLine,
+                    backgroundColor: active ? colors.inkCard : 'transparent',
+                  },
+                ]}
               >
                 <Text
-                  style={[
-                    styles.sortChipText,
-                    { color: active ? colors.accentText : colors.textDim },
-                  ]}
+                  style={[styles.sortChipText, { color: active ? colors.textPri : colors.textSec }]}
                 >
-                  {option.label.toUpperCase()}
+                  {option.label}
                 </Text>
               </Pressable>
             );
           })}
-          {filtersActive ? (
-            <Pressable
-              accessibilityRole="button"
-              accessibilityLabel="Clear filters"
-              onPress={() => {
-                setSearch('');
-                setFilter('all');
-              }}
-              style={styles.clear}
-            >
-              <Text style={[styles.sortChipText, { color: colors.accentText }]}>CLEAR FILTERS</Text>
-            </Pressable>
-          ) : null}
         </View>
-      </View>
-
-      {/* Queue header strip — "Quote queue · N" + active sort (web parity). */}
-      <View style={[styles.queueHeader, { borderBottomColor: colors.inkLine }]}>
-        <Text style={[styles.queueTitle, { color: colors.textSec }]}>
-          QUOTE QUEUE · {filtered.length + jobs.length}
-        </Text>
-        <Text style={[styles.queueSort, { color: colors.textDim }]}>{sortLabel.toUpperCase()}</Text>
-      </View>
+      ) : null}
 
       {filtered.length === 0 && jobs.length === 0 ? (
         <Text style={[styles.empty, { color: colors.textDim }]}>
@@ -279,14 +321,14 @@ export function QuoteQueueSection({ trade }: { trade: HubTrade }) {
             : 'No quotes yet — they land here the moment QuoteMax drafts one.'}
         </Text>
       ) : (
-        <>
+        <View style={styles.queueRows}>
           {filtered.map(q => (
             <QuoteRow key={q.id} quote={q} onPress={() => setSelectedId(q.id)} />
           ))}
           {jobs.map(j => (
             <JobRow key={`job-${j.id}`} job={j} hubTrade={trade} />
           ))}
-        </>
+        </View>
       )}
 
       <QuoteDetailModal quote={selected} onClose={() => setSelectedId(null)} />
@@ -295,43 +337,50 @@ export function QuoteQueueSection({ trade }: { trade: HubTrade }) {
 }
 
 const styles = StyleSheet.create({
-  shell: { borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
-  toolbar: { padding: spacing.md, gap: spacing.sm, borderBottomWidth: 1 },
+  shell: { gap: spacing.lg },
+  toolbar: { padding: spacing.lg, gap: spacing.md, borderWidth: 1, borderRadius: radius.card },
+  queueRows: { gap: spacing.md },
   search: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
-    fontFamily: fonts.mono.regular,
-    fontSize: 12,
+    fontFamily: fonts.sans.regular,
+    fontSize: 16,
   },
-  chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
+  chipRow: { flexDirection: 'row', gap: spacing.sm },
   filterChip: {
     minHeight: touch.minimum,
+    flexDirection: 'row',
+    gap: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: radius.pill,
+    borderRadius: radius.control,
     paddingVertical: 8,
     paddingHorizontal: 12,
   },
-  filterChipText: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1 },
+  filterChipText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  filterCount: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18 },
   sortRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: spacing.sm },
-  sortLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
-    marginRight: 2,
+  sortToggle: {
+    minHeight: touch.minimum,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: spacing.sm,
+    paddingHorizontal: spacing.sm,
+    borderWidth: 1,
+    borderRadius: radius.control,
   },
   sortChip: {
     minHeight: touch.minimum,
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: radius.pill,
+    borderRadius: radius.control,
     paddingHorizontal: 12,
     paddingVertical: 8,
   },
-  sortChipText: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 1 },
+  sortChipText: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   clear: {
     minHeight: touch.minimum,
     justifyContent: 'center',
@@ -339,46 +388,50 @@ const styles = StyleSheet.create({
   },
   queueHeader: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: spacing.sm,
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingBottom: spacing.md,
     borderBottomWidth: 1,
   },
   queueTitle: {
     fontFamily: fonts.sans.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
-  },
-  queueSort: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   empty: {
-    padding: spacing.lg,
+    paddingVertical: spacing.xl,
     fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
   },
   jobRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: spacing.md,
     minHeight: touch.listRow,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
     paddingHorizontal: spacing.lg,
-    borderBottomWidth: 1,
+    borderWidth: 1,
+    borderRadius: radius.card,
   },
-  jobName: { fontFamily: fonts.sans.bold, fontSize: 14.5, lineHeight: 18 },
-  jobHeadline: { marginTop: 3, fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 17 },
+  jobName: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22 },
+  jobHeadline: {
+    marginTop: spacing.xs,
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   jobMeta: {
     marginTop: 4,
     fontFamily: fonts.mono.medium,
     fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 0.6,
   },
   jobChip: {
+    alignSelf: 'flex-start',
     flexDirection: 'row',
     alignItems: 'center',
     gap: 5,
@@ -386,8 +439,14 @@ const styles = StyleSheet.create({
     borderRadius: radius.chip,
     paddingVertical: 4,
     paddingHorizontal: 7,
-    maxWidth: 150,
+    maxWidth: '100%',
   },
   jobChipDot: { width: 4, height: 4, borderRadius: 2 },
-  jobChipText: { fontFamily: fonts.mono.bold, fontSize: 12, letterSpacing: 0.4 },
+  jobChipText: {
+    flexShrink: 1,
+    fontFamily: fonts.mono.bold,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
+  },
 });

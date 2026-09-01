@@ -1,19 +1,21 @@
 /**
- * The bottom tab bar, value-for-value from the design kit's `<nav>` block:
- * 62px buttons over a 1px hairline, 2px accent bar inset 22% on the active
- * tab, 21px stroke icons inheriting the label colour.
+ * Five stable destinations, with a quiet surface and the kit's active marker.
+ * Each target can grow with system text; the home indicator has its own inset.
  */
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
-import { fonts } from '@/lib/theme';
+import { fonts, spacing } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 /** Kit icon paths (24×24 viewBox, stroke 1.75, round caps and joins). */
 const TAB_META: Record<string, { label: string; d: string }> = {
   index: { label: 'Home', d: 'm3 10 9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z' },
-  tools: { label: 'Tools', d: 'M2 12 12 4l10 8M6 11v9h12v-9M10 20v-5h4v5' },
+  tools: {
+    label: 'Tools',
+    d: 'M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0L21.5 5.5a6 6 0 0 1-7.9 7.9l-7.2 7.2a2.1 2.1 0 0 1-3-3l7.2-7.2a6 6 0 0 1 7.9-7.9z',
+  },
   quotes: {
     label: 'Quotes',
     d: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M9 13h6M9 17h4',
@@ -45,8 +47,8 @@ export function TabBar({ state, navigation }: TabBarProps) {
         styles.bar,
         {
           borderTopColor: colors.inkLine,
-          backgroundColor: colors.inkDeep,
-          paddingBottom: Math.max(insets.bottom, 22),
+          backgroundColor: colors.inkCard,
+          paddingBottom: Math.max(insets.bottom, spacing.sm),
         },
       ]}
     >
@@ -61,6 +63,7 @@ export function TabBar({ state, navigation }: TabBarProps) {
             accessibilityRole="tab"
             accessibilityLabel={meta.label}
             accessibilityState={{ selected: active }}
+            aria-selected={active}
             onPress={() => {
               const event = navigation.emit({
                 type: 'tabPress',
@@ -69,7 +72,10 @@ export function TabBar({ state, navigation }: TabBarProps) {
               });
               if (!active && !event.defaultPrevented) navigation.navigate(route.name);
             }}
-            style={styles.tab}
+            style={({ pressed }) => [
+              styles.tab,
+              { backgroundColor: pressed ? colors.ink : 'transparent' },
+            ]}
           >
             <View
               style={[
@@ -102,6 +108,9 @@ const styles = StyleSheet.create({
   tab: {
     flex: 1,
     minHeight: 62,
+    minWidth: 0,
+    paddingHorizontal: spacing.xs,
+    paddingVertical: spacing.sm,
     alignItems: 'center',
     justifyContent: 'center',
     gap: 5,
@@ -115,8 +124,8 @@ const styles = StyleSheet.create({
   },
   label: {
     fontFamily: fonts.sans.bold,
-    fontSize: 12,
-    letterSpacing: 0.96, // .08em @ 12
-    textTransform: 'uppercase',
+    fontSize: 14,
+    lineHeight: 20,
+    textAlign: 'center',
   },
 });

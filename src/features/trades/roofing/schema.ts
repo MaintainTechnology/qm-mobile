@@ -45,23 +45,35 @@ export type AuState = (typeof AU_STATES)[number];
 
 // ── Response shapes (loose — H2) ──────────────────────────────────────────
 
+const finite = z.number().finite();
+const nonNegative = finite.nonnegative();
+const positive = finite.positive();
+
+export const RoofPricingAuthoritySchema = z.object({
+  source: z.literal('tenant_pricing_book'),
+  tenant_id: z.string().min(1),
+  pricing_book_id: z.string().min(1),
+  revision: z.string().regex(/^[a-f0-9]{64}$/),
+});
+export type RoofPricingAuthority = z.infer<typeof RoofPricingAuthoritySchema>;
+
 const RoofTierSchema = z.looseObject({
   tier: z.enum(['good', 'better', 'best']),
   label: z.string(),
-  ex_gst: z.number(),
-  inc_gst: z.number(),
+  ex_gst: nonNegative,
+  inc_gst: nonNegative,
   scope: z.string(),
 });
 export type RoofTier = z.infer<typeof RoofTierSchema>;
 
 const RoofMetricsSchema = z.looseObject({
-  footprint_m2: z.number(),
-  sloped_area_m2: z.number().nullable(),
-  storeys: z.number().nullable(),
+  footprint_m2: positive,
+  sloped_area_m2: positive.nullable(),
+  storeys: finite.int().positive().nullable(),
   form: z.string(),
-  hips: z.number().nullable(),
-  valleys: z.number().nullable(),
-  ridge_lm: z.number().nullable().optional(),
+  hips: finite.int().nonnegative().nullable(),
+  valleys: finite.int().nonnegative().nullable(),
+  ridge_lm: nonNegative.nullable().optional(),
   polygon_geojson: z.unknown().nullable().optional(),
   capture_date: z.string().nullable().optional(),
 });
@@ -79,30 +91,45 @@ const RoofRoutingSchema = z.looseObject({
 });
 
 const RoofPriceSchema = z.looseObject({
-  area_m2: z.number(),
-  effective_rate_per_m2: z.number(),
+  area_m2: nonNegative,
+  effective_rate_per_m2: nonNegative,
   tiers: z.tuple([RoofTierSchema, RoofTierSchema, RoofTierSchema]),
   loadings_applied: z.array(
-    z.looseObject({ code: z.string(), pct: z.number(), detail: z.string() }),
+    z.looseObject({ code: z.string(), pct: nonNegative, detail: z.string() }),
   ),
   routing: RoofRoutingSchema,
   call_out_minimum_applied: z.boolean().optional(),
 });
 
-const RoofStructurePriceSchema = z.looseObject({
-  buildingId: z.string().nullable(),
-  role: z.enum(['primary', 'secondary']),
-  label: z.string(),
-  metrics: RoofMetricsSchema,
-  inputs: RoofInputsSchema,
-  price: RoofPriceSchema,
-});
+const RoofStructurePriceSchema = z
+  .looseObject({
+    buildingId: z.string().nullable(),
+    role: z.enum(['primary', 'secondary']),
+    label: z.string(),
+    metrics: RoofMetricsSchema,
+    inputs: RoofInputsSchema,
+    price: RoofPriceSchema,
+  })
+  .superRefine((value, ctx) => {
+    if (value.price.routing.decision === 'inspection_required') return;
+    if (
+      value.price.area_m2 <= 0 ||
+      value.price.effective_rate_per_m2 <= 0 ||
+      value.price.tiers.some(tier => tier.ex_gst <= 0 || tier.inc_gst <= 0)
+    ) {
+      ctx.addIssue({
+        code: 'custom',
+        path: ['price'],
+        message: 'A quotable roof requires positive tenant-authorized money.',
+      });
+    }
+  });
 export type RoofStructurePrice = z.infer<typeof RoofStructurePriceSchema>;
 
 export const MultiRoofQuoteSchema = z.looseObject({
   structures: z.array(RoofStructurePriceSchema),
   combined: z.looseObject({
-    area_m2: z.number(),
+    area_m2: nonNegative,
     tiers: z.tuple([RoofTierSchema, RoofTierSchema, RoofTierSchema]),
   }),
   routing: RoofRoutingSchema,
@@ -114,6 +141,11 @@ export type MultiRoofQuote = z.infer<typeof MultiRoofQuoteSchema>;
 export const MeasureAllResponseSchema = z.union([
   z.looseObject({
     ok: z.literal(true),
+    pricing_status: z.literal('priced'),
+    pricing_authority: RoofPricingAuthoritySchema,
+    run_token: z.string().min(20),
+    run_id: z.string().regex(/^[a-f0-9]{32}$/),
+    run_expires_at: z.iso.datetime(),
     provider: z.enum(['geoscape', 'lidar', 'mock', 'manual']),
     quote: MultiRoofQuoteSchema,
     warnings: z.array(z.string()),
@@ -133,6 +165,8 @@ export const SaveRoofResponseSchema = z.union([
     id: z.string(),
     public_token: z.string(),
     measure_token: z.string(),
+    pricing_authority: RoofPricingAuthoritySchema,
+    existing: z.boolean().optional(),
   }),
   z.looseObject({ ok: z.literal(false), error: z.string(), detail: z.string().optional() }),
 ]);
@@ -158,45 +192,52 @@ export type MeasureAllRequest = {
 };
 
 export type SaveRoofRequest = {
+  run_token: string;
   address: RoofAddress;
   provider: string;
-  structures: {
-    buildingId: string | null;
-    role: 'primary' | 'secondary';
-    label: string;
-    inputs: {
-      material: string;
-      pitch: string;
-      intent: string;
-      building_year_built?: number | null;
-    };
-  }[];
   quote: unknown;
   included_indices: number[];
 };
 
 export type SaveAsQuoteRequest = {
-  address: RoofAddress;
-  inputs: { material: string; pitch: string; intent: string; building_year_built: number | null };
-  metrics: {
-    footprint_m2: number;
-    sloped_area_m2: number | null;
-    storeys: number | null;
-    form: string;
-    hips: number | null;
-    valleys: number | null;
-    ridge_lm: number | null;
-    polygon_geojson: unknown;
-    capture_date: string | null;
-  };
-  price: {
-    area_m2: number;
-    effective_rate_per_m2: number;
-    tiers: [RoofTier, RoofTier, RoofTier];
-    loadings_applied: { code: string; pct: number; detail: string }[];
-    routing: { decision: string; reason: string };
-  };
+  measure_token: string;
+  expected_pricing_revision: string;
 };
+
+export function roofRunIsFresh(expiresAt: string, nowMs = Date.now()): boolean {
+  const expires = Date.parse(expiresAt);
+  return Number.isFinite(expires) && expires > nowMs;
+}
+
+export function sameRoofPricingAuthority(
+  left: RoofPricingAuthority,
+  right: RoofPricingAuthority,
+): boolean {
+  return (
+    left.source === right.source &&
+    left.tenant_id === right.tenant_id &&
+    left.pricing_book_id === right.pricing_book_id &&
+    left.revision === right.revision
+  );
+}
+
+export function roofMeasureFingerprint(request: MeasureAllRequest): string {
+  return JSON.stringify(request);
+}
+
+export function acceptsRoofMeasureRun(args: {
+  activeRun: number;
+  responseRun: number;
+  measuredFingerprint: string;
+  currentFingerprint: string;
+  mounted: boolean;
+}): boolean {
+  return (
+    args.mounted &&
+    args.activeRun === args.responseRun &&
+    args.measuredFingerprint === args.currentFingerprint
+  );
+}
 
 // ── Pure helpers (structure selection + combined total) ─────────────────────
 

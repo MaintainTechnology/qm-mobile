@@ -6,9 +6,8 @@
  * funnel, weekly trends and channel / job-type splits — single column, the
  * web's flex-div bars redrawn as plain Views (no chart lib).
  *
- * Colour mapping: the web's teal-toned charts land on a warm NEUTRAL here
- * (edgeGlow) — the mobile system allows one signal colour per screen, so only
- * the accent-toned series keep Cat yellow.
+ * Charts use warm neutral tokens so the dashboard's review action remains
+ * the single yellow signal.
  */
 import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
@@ -23,7 +22,7 @@ import {
 } from '@/features/home/analytics';
 import { Card, Notice } from '@/features/trades/ui';
 import { apiErrorMessage } from '@/lib/api';
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
@@ -39,8 +38,8 @@ export function ActivityAnalytics() {
   return (
     <View style={styles.section}>
       <View style={styles.header}>
-        <Text style={[styles.sectionTitle, { color: colors.textPri }]}>
-          WHO’S REACHING OUT & WHAT’S BEEN PROCESSED
+        <Text accessibilityRole="header" style={[styles.sectionTitle, { color: colors.textPri }]}>
+          Your activity
         </Text>
         <Text style={[styles.sectionRange, { color: colors.textDim }]}>
           LAST {DEFAULT_WEEKS} WEEKS
@@ -77,10 +76,10 @@ function AnalyticsBody({ data }: { data: TradieAnalytics }) {
   if (isEmpty) {
     return (
       <Card style={styles.emptyCard}>
-        <Text style={[styles.emptyTitle, { color: colors.textPri }]}>NO ACTIVITY YET</Text>
+        <Text style={[styles.emptyTitle, { color: colors.textPri }]}>No activity yet</Text>
         <Text style={[styles.emptyBody, { color: colors.textDim }]}>
-          Hand out your QuoteMax number above — every text and call lands here as a drafted
-          quote, and this is where you’ll watch it happen.
+          Share your QuoteMax number to get started. Your messages, calls and quotes will appear
+          here as they come in.
         </Text>
       </Card>
     );
@@ -118,7 +117,7 @@ function AnalyticsBody({ data }: { data: TradieAnalytics }) {
                 <Text style={[styles.counterLabel, { color: colors.textDim }]}>
                   {label.toUpperCase()}
                 </Text>
-                <Text style={[styles.counterValue, { color: colors.accentText }]}>
+                <Text style={[styles.counterValue, { color: colors.textPri }]}>
                   {value.toLocaleString('en-AU')}
                 </Text>
                 <Text style={[styles.counterHint, { color: colors.textSec }]}>{hint}</Text>
@@ -130,28 +129,28 @@ function AnalyticsBody({ data }: { data: TradieAnalytics }) {
       </View>
 
       <SpeedCard minutes={data.speedToQuoteMinutes} />
-      <SplitBars title="Lead funnel" slices={data.funnel} barColor={colors.accent} />
+      <SplitBars title="Lead funnel" slices={data.funnel} barColor={colors.textSec} />
 
       <TrendBars
         title="Requests / week"
         points={data.weeklyTrend.map(w => ({ label: w.label, value: w.intakes }))}
-        barColor={colors.edgeGlow}
+        barColor={colors.textSec}
       />
       <TrendBars
         title="Quotes / week"
         points={data.weeklyTrend.map(w => ({ label: w.label, value: w.quotes }))}
-        barColor={colors.accent}
+        barColor={colors.textSec}
       />
 
       <SplitBars
         title="Where customers come from"
         slices={data.channelSplit}
-        barColor={colors.edgeGlow}
+        barColor={colors.textSec}
       />
       <SplitBars
         title="Top job types"
         slices={data.topJobTypes}
-        barColor={colors.accent}
+        barColor={colors.textSec}
         emptyLabel="No job types yet"
       />
     </View>
@@ -202,18 +201,15 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
   if (actions.length === 0) {
     return (
       <View
-        style={[
-          styles.caughtUp,
-          { borderColor: 'rgba(52,210,123,0.45)', backgroundColor: colors.inkCard },
-        ]}
+        style={[styles.caughtUp, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}
       >
         <View style={[styles.caughtDot, { backgroundColor: colors.successBright }]} />
-        <Text style={[styles.caughtTitle, { color: colors.successBright }]}>
-          YOU’RE ALL CAUGHT UP
-        </Text>
-        <Text style={[styles.caughtSub, { color: colors.textDim }]}>
-          NO QUOTES WAITING, NO COLD CHATS
-        </Text>
+        <View style={styles.caughtCopy}>
+          <Text style={[styles.caughtTitle, { color: colors.textPri }]}>You’re all caught up</Text>
+          <Text style={[styles.caughtSub, { color: colors.textDim }]}>
+            No quotes or chats need a follow-up.
+          </Text>
+        </View>
       </View>
     );
   }
@@ -225,21 +221,21 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
           key={a.label}
           accessibilityRole="button"
           onPress={a.onPress}
-          style={[
+          style={({ pressed }) => [
             styles.actionCard,
-            { borderColor: 'rgba(245,158,11,0.42)', backgroundColor: colors.inkCard },
+            {
+              borderColor: colors.warningBright,
+              backgroundColor: pressed ? colors.ink : colors.inkCard,
+            },
           ]}
         >
           <View style={styles.actionLeft}>
             <Text style={[styles.actionCount, { color: colors.warningBright }]}>{a.count}</Text>
-            <Text
-              style={[styles.actionLabel, { color: colors.textSec, flexShrink: 1 }]}
-              numberOfLines={1}
-            >
-              {a.label.toUpperCase()}
+            <Text style={[styles.actionLabel, { color: colors.textSec, flexShrink: 1 }]}>
+              {a.label}
             </Text>
           </View>
-          <Text style={[styles.actionCta, { color: colors.accentText }]}>{a.cta} →</Text>
+          <Text style={[styles.actionCta, { color: colors.textPri }]}>{a.cta} →</Text>
         </Pressable>
       ))}
     </View>
@@ -262,6 +258,9 @@ function TrendBars({
   const heights = barPercents(values);
   const peak = Math.max(0, ...values);
   const total = values.reduce((a, b) => a + b, 0);
+  const axisPoints = points.filter(
+    (_, i) => i === 0 || i === Math.floor((points.length - 1) / 2) || i === points.length - 1,
+  );
 
   return (
     <Card>
@@ -271,7 +270,12 @@ function TrendBars({
           {total} TOTAL · PEAK {peak}
         </Text>
       </View>
-      <View style={styles.trendBars}>
+      <View
+        accessible
+        accessibilityRole="image"
+        accessibilityLabel={`${title}. ${points.map(p => `${p.label}: ${p.value}`).join('. ')}`}
+        style={styles.trendBars}
+      >
         {points.map((p, i) => {
           const height: `${number}%` = `${heights[i] ?? 0}%`;
           return (
@@ -282,7 +286,8 @@ function TrendBars({
                   height,
                   minHeight: p.value > 0 ? 3 : 0,
                   backgroundColor: barColor,
-                  opacity: 0.75,
+                  borderTopLeftRadius: 3,
+                  borderTopRightRadius: 3,
                 }}
               />
             </View>
@@ -290,16 +295,18 @@ function TrendBars({
         })}
       </View>
       <View style={styles.trendLabels}>
-        {points.map((p, i) => (
+        {axisPoints.map((p, i) => (
           <Text
             key={`${p.label}-${i}`}
-            numberOfLines={1}
-            style={[styles.trendLabel, { color: colors.textDim }]}
+            style={[
+              styles.trendLabel,
+              {
+                color: colors.textDim,
+                textAlign: i === 0 ? 'left' : i === axisPoints.length - 1 ? 'right' : 'center',
+              },
+            ]}
           >
-            {/* Thin the axis labels when crowded; always keep first + last. */}
-            {points.length <= 8 || i % 2 === 0 || i === points.length - 1
-              ? p.label.toUpperCase()
-              : ''}
+            {p.label.toUpperCase()}
           </Text>
         ))}
       </View>
@@ -337,19 +344,19 @@ function SplitBars({
         {slices.map((s, i) => {
           const width: `${number}%` = `${widths[i] ?? 0}%`;
           return (
-            <View key={`${s.label}-${i}`} style={styles.splitRow}>
-              <Text
-                numberOfLines={1}
-                style={[styles.splitLabel, { color: colors.textDim }]}
-              >
-                {s.label.toUpperCase()}
-              </Text>
-              <View style={[styles.splitTrack, { backgroundColor: colors.ink }]}>
-                <View
-                  style={{ width, height: '100%', backgroundColor: barColor, opacity: 0.75 }}
-                />
+            <View
+              key={`${s.label}-${i}`}
+              accessible
+              accessibilityLabel={`${s.label}: ${s.count}`}
+              style={styles.splitRow}
+            >
+              <View style={styles.splitHeading}>
+                <Text style={[styles.splitLabel, { color: colors.textSec }]}>{s.label}</Text>
+                <Text style={[styles.splitCount, { color: colors.textPri }]}>{s.count}</Text>
               </View>
-              <Text style={[styles.splitCount, { color: colors.textSec }]}>{s.count}</Text>
+              <View style={[styles.splitTrack, { backgroundColor: colors.ink }]}>
+                <View style={{ width, height: '100%', backgroundColor: barColor }} />
+              </View>
             </View>
           );
         })}
@@ -365,9 +372,7 @@ function SpeedCard({ minutes }: { minutes: number | null }) {
   return (
     <Card>
       <Text style={[styles.cardLabel, { color: colors.textDim }]}>TYPICAL TIME TO QUOTE</Text>
-      <Text style={[styles.speedValue, { color: colors.accentText }]}>
-        {formatDuration(minutes)}
-      </Text>
+      <Text style={[styles.speedValue, { color: colors.textPri }]}>{formatDuration(minutes)}</Text>
       <Text style={[styles.cardCaption, { color: colors.textSec }]}>
         {minutes == null ? 'NO QUOTES YET' : 'REQUEST → DRAFTED QUOTE'}
       </Text>
@@ -381,11 +386,11 @@ function Skeleton() {
   const block = {
     borderWidth: 1,
     borderColor: colors.inkLine,
-    borderRadius: 14,
-    backgroundColor: colors.inkCard,
+    borderRadius: radius.card,
+    backgroundColor: colors.ink,
   } as const;
   return (
-    <View style={styles.stack}>
+    <View accessible accessibilityLabel="Loading activity" style={styles.stack}>
       <View style={[block, { height: 56 }]} />
       <View style={[block, { height: 168 }]} />
       <View style={[block, { height: 140 }]} />
@@ -396,133 +401,109 @@ function Skeleton() {
 // ─── Styles ────────────────────────────────────────────────────────────────
 
 const styles = StyleSheet.create({
-  section: { marginTop: 16, marginHorizontal: 16, gap: 12 },
-  stack: { gap: 12 },
+  section: { marginTop: spacing.gap, marginHorizontal: spacing.xl, gap: spacing.lg },
+  stack: { gap: spacing.lg },
   header: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    columnGap: 12,
-    rowGap: 2,
+    columnGap: spacing.md,
+    rowGap: spacing.sm,
   },
-  sectionTitle: {
-    flexShrink: 1,
-    fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    lineHeight: 15,
-    letterSpacing: 1.1, // .1em @ 11
-  },
-  sectionRange: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
+  sectionTitle: { ...type.title },
+  sectionRange: { ...type.label, letterSpacing: 0.6 },
   caughtUp: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     alignItems: 'center',
-    columnGap: 9,
-    rowGap: 4,
+    gap: spacing.md,
     borderWidth: 1,
-    borderRadius: 14,
-    paddingVertical: 14,
-    paddingHorizontal: 16,
+    borderRadius: radius.card,
+    padding: spacing.lg,
   },
-  caughtDot: { width: 6, height: 6, borderRadius: 3 },
-  caughtTitle: { fontFamily: fonts.sans.bold, fontSize: 10.5, letterSpacing: 1.05 },
-  caughtSub: { fontFamily: fonts.mono.medium, fontSize: 9, letterSpacing: 0.9 },
+  caughtDot: { width: 8, height: 8, borderRadius: 4 },
+  caughtCopy: { flex: 1, gap: spacing.xs },
+  caughtTitle: { ...type.body, fontFamily: fonts.sans.semiBold },
+  caughtSub: { ...type.bodySm },
   actionCard: {
     minHeight: touch.listRow,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: spacing.md,
     borderWidth: 1,
-    borderRadius: 14,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
+    borderRadius: radius.card,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
-  actionLeft: { flex: 1, flexDirection: 'row', alignItems: 'baseline', gap: 8 },
+  actionLeft: {
+    flexGrow: 1,
+    flexBasis: 180,
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    gap: spacing.md,
+  },
   actionCount: {
     fontFamily: fonts.mono.bold,
-    fontSize: 22,
-    lineHeight: 24,
+    fontSize: 24,
+    lineHeight: 32,
     fontVariant: ['tabular-nums'],
   },
-  actionLabel: { fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 1 },
-  actionCta: { fontFamily: fonts.sans.bold, fontSize: 10, letterSpacing: 1 },
-  counterGrid: { borderWidth: 1, borderRadius: 14, overflow: 'hidden', gap: 1 },
+  actionLabel: { ...type.bodySm, flex: 1 },
+  actionCta: { ...type.label, letterSpacing: 0.6 },
+  counterGrid: { borderWidth: 1, borderRadius: radius.card, overflow: 'hidden', gap: 1 },
   counterRow: { flexDirection: 'row', gap: 1 },
-  counterCell: { flex: 1, paddingVertical: 14, paddingHorizontal: 12 },
-  counterLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 9.5,
-    lineHeight: 12,
-    letterSpacing: 0.76, // .08em @ 9.5
-  },
+  counterCell: { flex: 1, minWidth: 0, padding: spacing.lg },
+  counterLabel: { ...type.label, letterSpacing: 0.3 },
   counterValue: {
-    marginTop: 7,
+    marginTop: spacing.md,
     fontFamily: fonts.mono.bold,
-    fontSize: 20,
+    fontSize: 26,
+    lineHeight: 32,
     fontVariant: ['tabular-nums'],
   },
-  counterHint: { marginTop: 6, fontFamily: fonts.sans.medium, fontSize: 9.5, lineHeight: 12 },
-  cardLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
-  speedValue: {
-    marginTop: 10,
-    fontFamily: fonts.mono.bold,
-    fontSize: 34,
-    lineHeight: 36,
-    fontVariant: ['tabular-nums'],
-  },
-  cardCaption: { marginTop: 8, fontFamily: fonts.mono.medium, fontSize: 9, letterSpacing: 0.9 },
+  counterHint: { ...type.bodySm, marginTop: spacing.sm },
+  cardLabel: { ...type.label, letterSpacing: 0.6, flexShrink: 1 },
+  speedValue: { ...type.price, marginTop: spacing.lg },
+  cardCaption: { ...type.bodySm, marginTop: spacing.sm },
   chartHeader: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    columnGap: spacing.md,
+    rowGap: spacing.sm,
+  },
+  chartCaption: { ...type.label, letterSpacing: 0 },
+  trendBars: {
+    marginTop: spacing.xl,
+    height: 112,
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    gap: spacing.sm,
+  },
+  trendBarSlot: { flex: 1, height: '100%', justifyContent: 'flex-end' },
+  trendLabels: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  trendLabel: { ...type.label, flex: 1, letterSpacing: 0 },
+  splitRows: { marginTop: spacing.xl, gap: spacing.lg },
+  splitEmpty: { ...type.bodySm },
+  splitRow: { gap: spacing.sm },
+  splitHeading: {
     flexDirection: 'row',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    gap: 8,
+    gap: spacing.md,
   },
-  chartCaption: { fontFamily: fonts.mono.medium, fontSize: 9, letterSpacing: 0.9 },
-  trendBars: { marginTop: 14, height: 96, flexDirection: 'row', alignItems: 'flex-end', gap: 5 },
-  trendBarSlot: { flex: 1, height: '100%', justifyContent: 'flex-end' },
-  trendLabels: { marginTop: 6, flexDirection: 'row', gap: 5 },
-  trendLabel: {
-    flex: 1,
-    textAlign: 'center',
-    fontFamily: fonts.mono.medium,
-    fontSize: 8,
-    letterSpacing: 0.4,
-  },
-  splitRows: { marginTop: 14, gap: 10 },
-  splitEmpty: { fontFamily: fonts.mono.medium, fontSize: 9.5, letterSpacing: 0.95 },
-  splitRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  splitLabel: { width: 88, fontFamily: fonts.mono.medium, fontSize: 9.5, letterSpacing: 0.8 },
-  splitTrack: { flex: 1, height: 10, borderRadius: 2, overflow: 'hidden' },
-  splitCount: {
-    width: 34,
-    textAlign: 'right',
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    fontVariant: ['tabular-nums'],
-  },
-  emptyCard: { alignItems: 'center', paddingVertical: 32 },
-  emptyTitle: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 12,
-    letterSpacing: 0.96,
-    textAlign: 'center',
-  },
-  emptyBody: {
-    marginTop: 8,
-    maxWidth: 300,
-    textAlign: 'center',
-    fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-    lineHeight: 18,
-  },
+  splitLabel: { ...type.bodySm, flex: 1 },
+  splitTrack: { height: 8, borderRadius: 3, overflow: 'hidden' },
+  splitCount: { ...type.bodySm, fontFamily: fonts.mono.semiBold, fontVariant: ['tabular-nums'] },
+  emptyCard: { paddingVertical: spacing.xxl },
+  emptyTitle: { ...type.title },
+  emptyBody: { ...type.bodySm, marginTop: spacing.sm },
 });

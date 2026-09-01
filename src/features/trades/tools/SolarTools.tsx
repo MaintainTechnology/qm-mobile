@@ -15,8 +15,9 @@
  * Confirm / re-draft / building switching stay on the web this round.
  */
 import { useEffect, useState } from 'react';
-import { Linking, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
+import { openProviderHandoff } from '@/lib/provider-handoff';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
@@ -47,7 +48,7 @@ const PAGE_SIZE = 10;
 
 export function SolarTools() {
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View style={{ gap: spacing.xl }}>
       <SolarEstimatesCard />
       <PylonHardwareSettingsCard />
       <WebOnlyCard
@@ -76,6 +77,7 @@ function StatPair({ label, value, accent }: { label: string; value: string; acce
 
 function EstimateRow({ estimate: e }: { estimate: SolarEstimate }) {
   const { colors } = useTheme();
+  const [feltError, setFeltError] = useState<string | null>(null);
   const released = e.status === 'confirmed' || e.status === 'paid';
   const feltUrl = e.feltMapUrl ?? null;
   const meta = [
@@ -137,9 +139,25 @@ function EstimateRow({ estimate: e }: { estimate: SolarEstimate }) {
       <View style={styles.actionRow}>
         <LinkOutButton label="View quote" path={`/q/solar/${encodeURIComponent(e.token)}`} />
         {feltUrl ? (
-          <LinkOutButton label="Open in Felt" onPress={() => void Linking.openURL(feltUrl)} />
+          <LinkOutButton
+            label="Open in Felt"
+            onPress={() => {
+              setFeltError(null);
+              void openProviderHandoff(feltUrl, 'felt').catch(error =>
+                setFeltError(apiErrorMessage(error)),
+              );
+            }}
+          />
         ) : null}
       </View>
+      {feltError ? (
+        <Text
+          accessibilityLiveRegion="polite"
+          style={[styles.errorLine, { color: colors.dangerBright }]}
+        >
+          {feltError}
+        </Text>
+      ) : null}
     </View>
   );
 }
@@ -213,8 +231,18 @@ const SKU_FIELDS: readonly {
   hint: string;
 }[] = [
   { key: 'module', wireKey: 'module_sku', label: 'Panel SKU', hint: 'Your standard solar module' },
-  { key: 'inverter', wireKey: 'inverter_sku', label: 'Inverter SKU', hint: 'Your standard inverter' },
-  { key: 'battery', wireKey: 'battery_sku', label: 'Battery SKU', hint: 'Optional — battery add-on' },
+  {
+    key: 'inverter',
+    wireKey: 'inverter_sku',
+    label: 'Inverter SKU',
+    hint: 'Your standard inverter',
+  },
+  {
+    key: 'battery',
+    wireKey: 'battery_sku',
+    label: 'Battery SKU',
+    hint: 'Optional — battery add-on',
+  },
 ];
 
 function PylonHardwareSettingsCard() {
@@ -277,9 +305,9 @@ function PylonHardwareSettingsCard() {
     <Card>
       <SectionLabel>Your standard hardware</SectionLabel>
       <Text style={[styles.intro, { color: colors.textDim }]}>
-        Nominate the hardware you install as standard (Pylon component SKUs). Every instant
-        estimate then shows the customer the real brand, model and manufacturer datasheet — and
-        your own Pylon prices guard against a tier quoted below hardware cost.
+        Nominate the hardware you install as standard (Pylon component SKUs). Every instant estimate
+        then shows the customer the real brand, model and manufacturer datasheet — and your own
+        Pylon prices guard against a tier quoted below hardware cost.
       </Text>
       {SKU_FIELDS.map(f => {
         const resolvedName = save.data?.resolved[f.wireKey];
@@ -346,14 +374,14 @@ const styles = StyleSheet.create({
   intro: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 12,
-    lineHeight: 17,
+    fontSize: 14,
+    lineHeight: 20,
   },
   row: {
-    marginTop: spacing.md,
-    paddingTop: spacing.md,
+    marginTop: spacing.xl,
+    paddingTop: spacing.xl,
     borderTopWidth: 1,
-    gap: spacing.xs,
+    gap: spacing.sm,
   },
   rowHead: {
     flexDirection: 'row',
@@ -362,38 +390,42 @@ const styles = StyleSheet.create({
     flexWrap: 'wrap',
     gap: spacing.sm,
   },
-  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18, flexShrink: 1 },
-  rowAddress: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 17 },
+  rowName: { fontFamily: fonts.sans.bold, fontSize: 16, lineHeight: 22, flexShrink: 1 },
+  rowAddress: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   rowMeta: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   badge: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 6,
-    paddingVertical: 1,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   statRow: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: spacing.md,
-    marginTop: spacing.xs,
+    gap: spacing.lg,
+    marginTop: spacing.sm,
   },
-  statPair: { minWidth: 132 },
+  statPair: { flexBasis: 132, flexGrow: 1, minWidth: 0, maxWidth: '100%' },
   statLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   statValue: {
-    marginTop: 2,
+    marginTop: spacing.xs,
     fontFamily: fonts.mono.bold,
-    fontSize: 13,
+    fontSize: 16,
+    lineHeight: 24,
     fontVariant: ['tabular-nums'],
   },
   flagBox: {
@@ -403,36 +435,42 @@ const styles = StyleSheet.create({
     padding: spacing.md,
     gap: spacing.xs,
   },
-  flagTitle: { fontFamily: fonts.sans.bold, fontSize: 12, lineHeight: 16 },
-  flagLine: { fontFamily: fonts.sans.regular, fontSize: 12, lineHeight: 17 },
-  flagHint: { fontFamily: fonts.sans.regular, fontSize: 11, lineHeight: 15 },
+  flagTitle: { fontFamily: fonts.sans.bold, fontSize: 14, lineHeight: 20 },
+  flagLine: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  flagHint: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   actionRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    flexWrap: 'wrap',
+    alignItems: 'stretch',
     gap: spacing.md,
     marginTop: spacing.xs,
   },
-  textBtn: { minHeight: touch.minimum, justifyContent: 'center', alignSelf: 'flex-start' },
+  textBtn: {
+    minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    justifyContent: 'center',
+    alignSelf: 'flex-start',
+  },
   textBtnLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   saveBtn: {
     minHeight: touch.minimum,
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
   },
   dimmed: { opacity: 0.5 },
-  field: { marginTop: spacing.md },
+  field: { marginTop: spacing.lg },
   fieldLabel: {
     marginBottom: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   input: {
     minHeight: touch.minimum,
@@ -440,21 +478,25 @@ const styles = StyleSheet.create({
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
     fontFamily: fonts.mono.medium,
-    fontSize: 14,
+    fontSize: 16,
   },
-  resolvedLine: { marginTop: spacing.xs, fontFamily: fonts.sans.regular, fontSize: 11.5 },
+  resolvedLine: {
+    marginTop: spacing.xs,
+    fontFamily: fonts.sans.regular,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   errorLine: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 0.4,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  statusLine: { fontFamily: fonts.sans.regular, fontSize: 12 },
+  statusLine: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   footHint: {
     marginTop: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 11,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

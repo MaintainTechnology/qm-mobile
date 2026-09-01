@@ -16,6 +16,8 @@ import { Alert, Platform } from 'react-native';
 import { z } from 'zod';
 
 import { apiRequest } from '@/lib/api';
+import { safeDestination } from '@/lib/destinations';
+import { queryClient } from '@/lib/query';
 import { useApiMutation } from '@/lib/useApi';
 
 const PUSH_TOKEN_PATH = '/api/tenant/push-token';
@@ -70,8 +72,9 @@ export function registrationDecision({
 export function notificationUrl(data: unknown): string | null {
   if (typeof data !== 'object' || data === null) return null;
   const url = (data as Record<string, unknown>).url;
-  if (typeof url !== 'string' || !url.startsWith('/') || url.startsWith('//')) return null;
-  return url;
+  if (typeof url !== 'string') return null;
+  const destination = safeDestination(url);
+  return destination?.audience === 'authenticated' ? destination.href : null;
 }
 
 // ── Registration ────────────────────────────────────────────────────────────
@@ -207,8 +210,12 @@ export function useNotificationObserver(): void {
 
     function openFromResponse(response: Notifications.NotificationResponse | null): void {
       const url = notificationUrl(response?.notification.request.content.data);
-      // Typed routes don't know runtime strings; the backend contract is the source of truth.
-      if (url) router.push(url as never);
+      if (!url) return;
+      // The resolver re-checks live auth before opening the record. Refresh active
+      // state so a payment/message push cannot land on a stale cached outcome.
+      void queryClient.invalidateQueries({ refetchType: 'active' });
+      router.push({ pathname: '/resolve-link', params: { target: url } } as never);
+      void Notifications.clearLastNotificationResponseAsync().catch(() => undefined);
     }
 
     // Cold start: the tap that launched the app arrives before any listener exists.

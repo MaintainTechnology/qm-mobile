@@ -1,14 +1,27 @@
 import {
+  acceptsRoofMeasureRun,
   combinedIncludedTotals,
   defaultIncluded,
   includedCount,
   includedIndices1Based,
   includedInspectionStructures,
+  MeasureAllResponseSchema,
+  roofMeasureFingerprint,
+  roofRunIsFresh,
+  sameRoofPricingAuthority,
+  SaveRoofResponseSchema,
   singleQuotableIncluded,
   type MultiRoofQuote,
   type RoofStructurePrice,
   type RoofTier,
 } from './schema';
+
+const AUTHORITY = {
+  source: 'tenant_pricing_book' as const,
+  tenant_id: 'tenant-1',
+  pricing_book_id: 'book-1',
+  revision: 'a'.repeat(64),
+};
 
 const NO_COMBINED_TIERS = [] as unknown as [RoofTier, RoofTier, RoofTier];
 
@@ -199,5 +212,99 @@ describe('includedCount and includedInspectionStructures', () => {
     };
     expect(includedCount(quote, { a: true, b: false })).toBe(1);
     expect(includedInspectionStructures(quote, { a: true, b: false })).toEqual([]);
+  });
+});
+
+describe('roof pricing authority and run fencing', () => {
+  const request = {
+    address: { address: '1 Test St', postcode: '4000', state: 'QLD' as const },
+    inputs: {
+      material: 'colorbond_corrugated',
+      pitch: 'standard',
+      intent: 'full_reroof',
+      building_year_built: null,
+    },
+  };
+  const primary = structure({ buildingId: 'roof-1', role: 'primary' });
+  const quote: MultiRoofQuote = {
+    structures: [primary],
+    combined: { area_m2: 120, tiers: primary.price.tiers },
+    routing: { decision: 'auto_quote', reason: 'Ready' },
+    inspection_structures: [],
+  };
+  const response = {
+    ok: true,
+    pricing_status: 'priced',
+    pricing_authority: AUTHORITY,
+    run_token: 'signed-roof-run-token-long-enough',
+    run_id: 'a'.repeat(32),
+    run_expires_at: '2030-01-01T00:00:00.000Z',
+    provider: 'geoscape',
+    quote,
+    warnings: [],
+  };
+
+  it('requires finite positive money for quotable structures but permits zero inspection tiers', () => {
+    expect(MeasureAllResponseSchema.safeParse(response).success).toBe(true);
+    for (const value of [0, null, Infinity]) {
+      const candidate = structuredClone(response);
+      candidate.quote.structures[0]!.price.tiers[1]!.inc_gst = value as number;
+      expect(MeasureAllResponseSchema.safeParse(candidate).success).toBe(false);
+    }
+    const inspection = structuredClone(response);
+    inspection.quote.structures[0]!.price.routing.decision = 'inspection_required';
+    inspection.quote.structures[0]!.price.area_m2 = 0;
+    inspection.quote.structures[0]!.price.effective_rate_per_m2 = 0;
+    inspection.quote.structures[0]!.price.tiers.forEach(tier => {
+      tier.ex_gst = 0;
+      tier.inc_gst = 0;
+    });
+    expect(MeasureAllResponseSchema.safeParse(inspection).success).toBe(true);
+  });
+
+  it('rejects missing proof metadata and accepts only matching save authority', () => {
+    const withoutAuthority = structuredClone(response) as Partial<typeof response>;
+    delete withoutAuthority.pricing_authority;
+    expect(MeasureAllResponseSchema.safeParse(withoutAuthority).success).toBe(false);
+    expect(
+      SaveRoofResponseSchema.safeParse({
+        ok: true,
+        id: 'measurement-1',
+        public_token: 'public-1',
+        measure_token: 'measure-1',
+        pricing_authority: AUTHORITY,
+      }).success,
+    ).toBe(true);
+    expect(sameRoofPricingAuthority(AUTHORITY, AUTHORITY)).toBe(true);
+    expect(sameRoofPricingAuthority(AUTHORITY, { ...AUTHORITY, tenant_id: 'tenant-2' })).toBe(false);
+    expect(
+      sameRoofPricingAuthority(AUTHORITY, { ...AUTHORITY, pricing_book_id: 'book-2' }),
+    ).toBe(false);
+  });
+
+  it('rejects expired, wrong-run, run-switched and unmounted responses', () => {
+    expect(roofRunIsFresh('2030-01-01T00:00:00.000Z', Date.parse('2029-01-01'))).toBe(true);
+    expect(roofRunIsFresh('2028-01-01T00:00:00.000Z', Date.parse('2029-01-01'))).toBe(false);
+    expect(roofRunIsFresh('not-a-date', Date.parse('2029-01-01'))).toBe(false);
+    const fingerprint = roofMeasureFingerprint(request);
+    const current = {
+      mounted: true,
+      activeRun: 2,
+      responseRun: 2,
+      measuredFingerprint: fingerprint,
+      currentFingerprint: fingerprint,
+    };
+    expect(acceptsRoofMeasureRun(current)).toBe(true);
+    expect(acceptsRoofMeasureRun({ ...current, responseRun: 1 })).toBe(false);
+    expect(
+      acceptsRoofMeasureRun({
+        ...current,
+        currentFingerprint: roofMeasureFingerprint({
+          ...request,
+          address: { ...request.address, postcode: '2000' },
+        }),
+      }),
+    ).toBe(false);
+    expect(acceptsRoofMeasureRun({ ...current, mounted: false })).toBe(false);
   });
 });

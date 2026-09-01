@@ -26,6 +26,7 @@
 import { useQueryClient } from '@tanstack/react-query';
 import { z } from 'zod';
 
+import type { UploadPolicy } from '@/lib/media';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 
 export const CATALOGUE_KEY = ['tenant', 'catalogue'];
@@ -240,9 +241,14 @@ export const SupplierCatalogueResponseSchema = z.looseObject({
 /** GET /api/supplier-catalogue — the whole library for the tenant's trades;
  *  no query params exist, all filtering is client-side (web parity). */
 export function useSupplierCatalogue(enabled = true) {
-  return useApiQuery(SUPPLIER_CATALOGUE_KEY, '/api/supplier-catalogue', SupplierCatalogueResponseSchema, {
-    enabled,
-  });
+  return useApiQuery(
+    SUPPLIER_CATALOGUE_KEY,
+    '/api/supplier-catalogue',
+    SupplierCatalogueResponseSchema,
+    {
+      enabled,
+    },
+  );
 }
 
 /** Web BrowseSupplierPanel filters, verbatim: category chip AND brand chip AND
@@ -441,6 +447,16 @@ export function useStockEssentials() {
 }
 
 // ── Product photo upload ────────────────────────────────────────────────────
+
+/** Exact multipart contract enforced by /api/tenant/catalogue/upload. */
+export const CATALOGUE_PHOTO_POLICY = {
+  purpose: 'product photo',
+  field: 'file',
+  allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+  allowedTypeLabel: 'a PNG, JPEG or WebP photo',
+  maxBytes: 8 * 1024 * 1024,
+  maxFiles: 1,
+} as const satisfies UploadPolicy<'file'>;
 
 export const CatalogueUploadResponseSchema = z.looseObject({
   ok: z.literal(true),

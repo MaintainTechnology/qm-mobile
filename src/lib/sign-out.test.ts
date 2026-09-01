@@ -1,7 +1,7 @@
 import { signOutWithCleanup } from './sign-out';
 
 describe('shared sign-out flow', () => {
-  it('unregisters push before Clerk signOut, then clears cache and navigates', async () => {
+  it('unregisters push before Clerk signOut, then clears local account state and navigates', async () => {
     const order: string[] = [];
     await signOutWithCleanup({
       unregisterPush: async () => {
@@ -10,7 +10,7 @@ describe('shared sign-out flow', () => {
       clerkSignOut: async () => {
         order.push('signOut');
       },
-      clearQueryCache: () => {
+      clearLocalState: async () => {
         order.push('clear');
       },
       navigateToWelcome: () => {
@@ -32,7 +32,7 @@ describe('shared sign-out flow', () => {
       clerkSignOut: async () => {
         order.push('signOut');
       },
-      clearQueryCache: () => {
+      clearLocalState: async () => {
         order.push('clear');
       },
       navigateToWelcome: () => {
@@ -44,7 +44,7 @@ describe('shared sign-out flow', () => {
   });
 
   it('still clears cache and navigates if Clerk signOut rejects', async () => {
-    const clearQueryCache = jest.fn();
+    const clearLocalState = jest.fn(async () => undefined);
     const navigateToWelcome = jest.fn();
 
     await expect(
@@ -53,12 +53,27 @@ describe('shared sign-out flow', () => {
         clerkSignOut: async () => {
           throw new Error('Clerk unavailable');
         },
-        clearQueryCache,
+        clearLocalState,
         navigateToWelcome,
       }),
     ).rejects.toThrow('Clerk unavailable');
 
-    expect(clearQueryCache).toHaveBeenCalledTimes(1);
+    expect(clearLocalState).toHaveBeenCalledTimes(1);
+    expect(navigateToWelcome).toHaveBeenCalledTimes(1);
+  });
+
+  it('still navigates if device storage cleanup fails', async () => {
+    const navigateToWelcome = jest.fn();
+
+    await signOutWithCleanup({
+      unregisterPush: async () => undefined,
+      clerkSignOut: async () => undefined,
+      clearLocalState: async () => {
+        throw new Error('storage unavailable');
+      },
+      navigateToWelcome,
+    });
+
     expect(navigateToWelcome).toHaveBeenCalledTimes(1);
   });
 });

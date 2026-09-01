@@ -44,8 +44,9 @@ describe('successHref (spec B6)', () => {
         warning: null,
         sessionId: null,
         clerkUserId: '',
+        setupComplete: false,
       }),
-    ).toBe('/success?name=Jean');
+    ).toBe('/success?name=Jean&ready=0');
   });
 
   it('carries every provided param, url-encoded', () => {
@@ -55,9 +56,10 @@ describe('successHref (spec B6)', () => {
       warning: 'Twilio not funded yet',
       sessionId: 'sess_1',
       clerkUserId: 'user_1',
+      setupComplete: true,
     });
     expect(href).toBe(
-      '/success?name=Jean&phone=%2B61412345678&warning=Twilio%20not%20funded%20yet&session=sess_1&uid=user_1',
+      '/success?name=Jean&phone=%2B61412345678&warning=Twilio%20not%20funded%20yet&session=sess_1&uid=user_1&ready=1',
     );
   });
 });

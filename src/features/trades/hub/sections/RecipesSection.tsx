@@ -5,12 +5,12 @@
  *     recipeTradesFor (an empty result means NO jobs, never "no filter"),
  *   • the step checklist (tasks) — ordered text steps with inline title/note
  *     edits, required/optional toggles, one-step reordering and delete. Steps
- *     carry no price and no hours BY DESIGN — nothing here feeds the estimator,
+ *     carry no price and no hours, while their conditions shape the estimator checklist,
  *   • the parts list (BOM lines) — per-line quantity edits, required/optional
  *     toggles and delete, each line badged priced-from-catalogue vs generic
  *     (display only; a recipe line has no price of its own),
- *   • fork-from-baseline for both, with the client-side no-op guard mirroring
- *     the server's 409 and the R38 catalogue-gap report surfaced after a fork.
+ *   • shared baselines shown read-only while the server's lossy condition/
+ *     ratio fork is blocked.
  *
  * Non-writable trades (the backend's TRADE_ENUM pins recipe writes to
  * electrical + plumbing) keep the read-only step counts plus gatedWriteCopy
@@ -20,10 +20,11 @@
  * never blanks the parts list, and vice versa.
  */
 import { useState } from 'react';
-import { Alert, Pressable, StyleSheet, Switch, Text, TextInput, View } from 'react-native';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 
 import { tenantTrades, useTenantMe } from '@/lib/tenant';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
+import { ThemedSwitch } from '@/components/ThemedSwitch';
 import { useTheme } from '@/lib/useTheme';
 
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../../ui';
@@ -32,17 +33,13 @@ import { RecipePricingAuthority } from './RecipePricingAuthority';
 import { TRADE_LABELS, type HubTrade } from '../sections';
 import { canWritePricingEngine, gatedWriteCopy, recipeTradesFor } from '../write-gate';
 import {
+  assessRecipePriceReadiness,
   categoryLabelFor,
   DESCRIPTION_MAX,
-  forkWouldNoOp,
   isDuplicate,
-  isNoBaseline,
-  mapForkGaps,
-  missingRequiredPriceCategories,
   materialCategoriesFor,
   nextSort,
   NOTES_MAX,
-  normaliseCategory,
   parseQuantity,
   parseStepTitle,
   reorderPlan,
@@ -55,15 +52,12 @@ import {
   useCreateTaskStep,
   useDeleteBomLine,
   useDeleteTaskStep,
-  useForkBomBaseline,
-  useForkTaskBaseline,
   useTasks,
   useUpdateBomLine,
   useUpdateTaskStep,
   type BaselineLine,
   type BaselineTask,
   type BomLine,
-  type ForkGapDisplay,
   type RecipeAssembly,
   type TaskLine,
 } from './recipes-api';
@@ -75,7 +69,13 @@ function withoutKey(map: Record<string, string>, key: string): Record<string, st
   return next;
 }
 
-export function RecipesSection({ trade, onOpenCatalogue = () => {} }: { trade: HubTrade; onOpenCatalogue?: () => void }) {
+export function RecipesSection({
+  trade,
+  onOpenCatalogue = () => {},
+}: {
+  trade: HubTrade;
+  onOpenCatalogue?: () => void;
+}) {
   const { colors } = useTheme();
   const me = useTenantMe();
   // The gate is static per trade (TRADE_ENUM), so a non-writable hub never
@@ -101,9 +101,7 @@ export function RecipesSection({ trade, onOpenCatalogue = () => {} }: { trade: H
           onRetry={() => void tasks.refetch()}
         />
       );
-    const assemblies = (tasks.data?.assemblies ?? []).filter(
-      a => a.trade.toLowerCase() === trade,
-    );
+    const assemblies = (tasks.data?.assemblies ?? []).filter(a => a.trade.toLowerCase() === trade);
     const customCounts = new Map<string, number>();
     for (const line of tasks.data?.lines ?? []) {
       if (line.assembly_id)
@@ -202,7 +200,9 @@ export function RecipesSection({ trade, onOpenCatalogue = () => {} }: { trade: H
       <Card>
         <SectionLabel>{`Job recipes · ${pool.length}`}</SectionLabel>
         <Text style={[styles.blurb, { color: colors.textSec }]}>
-          {"Define the parts and steps a job always needs so it's quoted the same way every time. These are yours — editing them never affects another tradie."}
+          {
+            "Define the parts and steps a job always needs so it's quoted the same way every time. These are yours — editing them never affects another tradie."
+          }
         </Text>
         <PillGroup
           options={pool.map((a): [string, string] => [a.id, a.name])}
@@ -258,7 +258,6 @@ function StepsPanel({
   const create = useCreateTaskStep();
   const update = useUpdateTaskStep();
   const del = useDeleteTaskStep();
-  const fork = useForkTaskBaseline();
   const [draftTitle, setDraftTitle] = useState<Record<string, string>>({});
   const [draftNotes, setDraftNotes] = useState<Record<string, string>>({});
   const [title, setTitle] = useState('');
@@ -267,18 +266,8 @@ function StepsPanel({
   const [formError, setFormError] = useState<string | null>(null);
   const [reordering, setReordering] = useState(false);
 
-  const busyId = update.isPending
-    ? update.variables.id
-    : del.isPending
-      ? del.variables.id
-      : null;
+  const busyId = update.isPending ? update.variables.id : del.isPending ? del.variables.id : null;
   const busy = busyId !== null || reordering;
-
-  const onFork = () => {
-    // Client mirror of the server's 409 guard — never fork over existing steps.
-    if (forkWouldNoOp(steps) || fork.isPending) return;
-    fork.mutate({ assembly_id: assembly.id });
-  };
 
   const moveStep = (id: string, dir: -1 | 1) => {
     if (busy) return;
@@ -337,25 +326,25 @@ function StepsPanel({
   };
 
   const rowError =
-    update.isError || del.isError ? apiErrorMessage(update.isError ? update.error : del.error) : null;
-  const forkError = fork.isError
-    ? isNoBaseline(fork.error)
-      ? "There's no standard checklist for this job yet — add the steps manually below."
-      : apiErrorMessage(fork.error)
-    : null;
-
+    update.isError || del.isError
+      ? apiErrorMessage(update.isError ? update.error : del.error)
+      : null;
   return (
     <Card>
       <SectionLabel>{`${assembly.name} — steps`}</SectionLabel>
       <Text style={[styles.blurb, { color: colors.textSec }]}>
-        {"The steps this job always involves, in order. They describe the work — they don't change the price or the hours."}
+        {
+          "The steps this job always involves, in order. They describe the work — they don't change the price or the hours."
+        }
       </Text>
 
       {steps.length === 0 ? (
         baseline.length > 0 ? (
           <View style={{ gap: spacing.md }}>
             <Text style={[styles.blurb, { color: colors.textSec }]}>
-              {"No saved steps for this job yet — here's the standard checklist. Customise it to reword, reorder or add your own."}
+              {
+                "No saved steps for this job yet — here's the standard checklist. It stays read-only until the shared fork API can preserve conditional step rules."
+              }
             </Text>
             {baseline.map((b, i) => (
               <View
@@ -369,20 +358,16 @@ function StepsPanel({
                     <Text style={[styles.rowMeta, { color: colors.textDim }]}>{b.notes}</Text>
                   ) : null}
                   <Text style={[styles.rowTag, { color: colors.textDim }]}>
-                    {`SHARED BASELINE · ${b.required !== false ? 'REQUIRED' : 'OPTIONAL'}`}
+                    {`SHARED BASELINE · ${b.required !== false ? 'REQUIRED' : 'OPTIONAL'}${b.include_when && Object.keys(b.include_when).length > 0 ? ' · CONDITIONAL' : ''}`}
                   </Text>
                 </View>
               </View>
             ))}
-            <ActionButton
-              tone="accent"
-              label={fork.isPending ? 'Copying steps…' : 'Customise these steps'}
-              onPress={onFork}
-              disabled={fork.isPending}
+            <Notice
+              tone="warn"
+              label="Lossless copy is not available"
+              body="The current shared fork API omits task conditions in every client. QuoteMax will not turn conditional standard steps into unconditional custom steps."
             />
-            <Text style={[styles.hint, { color: colors.textDim }]}>
-              {`Copies these ${baseline.length} step${baseline.length === 1 ? '' : 's'} into your checklist so you can reword, reorder, or add your own.`}
-            </Text>
           </View>
         ) : (
           <Text style={[styles.blurb, { color: colors.textSec }]}>
@@ -399,6 +384,9 @@ function StepsPanel({
             <View key={step.id} style={[styles.row, { borderBottomColor: colors.inkLine }]}>
               <Text style={[styles.stepNum, { color: colors.textDim }]}>{`${idx + 1}.`}</Text>
               <View style={{ flex: 1, minWidth: 0, gap: spacing.xs }}>
+                {step.include_when && Object.keys(step.include_when).length > 0 ? (
+                  <Text style={[styles.rowTag, { color: colors.textDim }]}>CONDITIONAL STEP</Text>
+                ) : null}
                 <TextInput
                   value={titleValue}
                   accessibilityLabel={`Step ${idx + 1} title`}
@@ -417,7 +405,11 @@ function StepsPanel({
                   placeholderTextColor={colors.textDim}
                   style={[
                     styles.inlineInput,
-                    { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textPri },
+                    {
+                      backgroundColor: colors.ink,
+                      borderColor: colors.ctlLine,
+                      color: colors.textPri,
+                    },
                   ]}
                 />
                 <TextInput
@@ -438,7 +430,11 @@ function StepsPanel({
                   style={[
                     styles.inlineInput,
                     styles.inlineInputSmall,
-                    { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textSec },
+                    {
+                      backgroundColor: colors.ink,
+                      borderColor: colors.ctlLine,
+                      color: colors.textSec,
+                    },
                   ]}
                 />
                 <View style={styles.actionRow}>
@@ -465,7 +461,9 @@ function StepsPanel({
                   <RequiredPill
                     required={step.required !== false}
                     disabled={rowBusy}
-                    onPress={() => update.mutate({ id: step.id, required: step.required === false })}
+                    onPress={() =>
+                      update.mutate({ id: step.id, required: step.required === false })
+                    }
                   />
                   <Pressable
                     accessibilityRole="button"
@@ -489,10 +487,6 @@ function StepsPanel({
       {rowError ? (
         <Text style={[styles.errorLine, { color: colors.warningBright }]}>{rowError}</Text>
       ) : null}
-      {forkError ? (
-        <Text style={[styles.errorLine, { color: colors.warningBright }]}>{forkError}</Text>
-      ) : null}
-
       <View style={styles.form}>
         <SectionLabel>Add a step</SectionLabel>
         <Field
@@ -549,39 +543,19 @@ function PartsPanel({
   const create = useCreateBomLine();
   const update = useUpdateBomLine();
   const del = useDeleteBomLine();
-  const fork = useForkBomBaseline();
   const [draftQty, setDraftQty] = useState<Record<string, string>>({});
-  // The gap report belongs to THIS panel instance, which is keyed by assembly
-  // id — switching jobs remounts the panel, so a stale report can't bleed
-  // across jobs (the web needs an effect for the same guarantee).
-  const [forkGaps, setForkGaps] = useState<ForkGapDisplay | null>(null);
   const [category, setCategory] = useState('');
   const [qtyStr, setQtyStr] = useState('1');
   const [description, setDescription] = useState('');
   const [required, setRequired] = useState(true);
   const [formError, setFormError] = useState<string | null>(null);
   const catalogueCategories = catalogueCategoriesByTrade[trade] ?? [];
-  const missingPriceCount = missingRequiredPriceCategories(
-    lines,
-    catalogueCategoriesByTrade,
-    trade,
-  ).length;
+  const effectiveLines = lines.length > 0 ? lines : baseline;
+  const readiness = assessRecipePriceReadiness(effectiveLines, catalogueCategoriesByTrade, trade);
+  const missingPriceCount = readiness.missingRequiredCategories.length;
+  const conditionalContextCount = readiness.conditionalContextCategories.length;
 
-  const busyId = update.isPending
-    ? update.variables.id
-    : del.isPending
-      ? del.variables.id
-      : null;
-
-  const onFork = () => {
-    // Client mirror of the server's 409 guard — never fork over an existing recipe.
-    if (forkWouldNoOp(lines) || fork.isPending) return;
-    setForkGaps(null);
-    fork.mutate(
-      { assembly_id: assembly.id },
-      { onSuccess: result => setForkGaps(mapForkGaps(result)) },
-    );
-  };
+  const busyId = update.isPending ? update.variables.id : del.isPending ? del.variables.id : null;
 
   const confirmDelete = (line: BomLine) => {
     Alert.alert(
@@ -633,16 +607,13 @@ function PartsPanel({
   };
 
   const rowError =
-    update.isError || del.isError ? apiErrorMessage(update.isError ? update.error : del.error) : null;
-  const forkError = fork.isError
-    ? isNoBaseline(fork.error)
-      ? "There's no standard baseline for this job yet — add the parts it always needs below."
-      : apiErrorMessage(fork.error)
-    : null;
-
-  const categoryOptions = materialCategoriesFor(trade).map(
-    (o): [string, string] => [o.value, o.label],
-  );
+    update.isError || del.isError
+      ? apiErrorMessage(update.isError ? update.error : del.error)
+      : null;
+  const categoryOptions = materialCategoriesFor(trade).map((o): [string, string] => [
+    o.value,
+    o.label,
+  ]);
 
   return (
     <Card>
@@ -652,11 +623,12 @@ function PartsPanel({
         category. Missing tenant catalogue prices route the estimate to inspection.
       </Text>
 
-      {(forkGaps?.detectionFailed || (forkGaps?.count ?? 0) > 0 || missingPriceCount > 0) ? (
+      {missingPriceCount > 0 || conditionalContextCount > 0 ? (
         <View style={{ marginBottom: spacing.md }}>
           <RecipePricingAuthority
-            count={Math.max(forkGaps?.count ?? 0, missingPriceCount)}
-            detectionFailed={forkGaps?.detectionFailed ?? false}
+            count={missingPriceCount}
+            conditionalCount={conditionalContextCount}
+            detectionFailed={false}
             onOpenCatalogue={onOpenCatalogue}
           />
         </View>
@@ -666,7 +638,9 @@ function PartsPanel({
         baseline.length > 0 ? (
           <View style={{ gap: spacing.md }}>
             <Text style={[styles.blurb, { color: colors.textSec }]}>
-              {"No saved recipe for this job yet — here's the standard baseline we'd use. Customise it to make it yours and start editing."}
+              {
+                "No saved recipe for this job yet — here's the standard baseline we'd use. It stays read-only until the shared fork API can preserve conditions and quantity ratios."
+              }
             </Text>
             {baseline.map((b, i) => (
               <View
@@ -681,20 +655,16 @@ function PartsPanel({
                     <Text style={[styles.rowMeta, { color: colors.textDim }]}>{b.description}</Text>
                   ) : null}
                   <Text style={[styles.rowTag, { color: colors.textDim }]}>
-                    {`SHARED BASELINE · QTY ${b.quantity} · ${b.required !== false ? 'REQUIRED' : 'OPTIONAL'}`}
+                    {`SHARED BASELINE · QTY ${b.quantity} · ${b.required !== false ? 'REQUIRED' : 'OPTIONAL'}${b.quantity_per != null ? ` · RATIO ÷${b.quantity_per}` : ''}${b.include_when && Object.keys(b.include_when).length > 0 ? ' · CONDITIONAL' : ''}`}
                   </Text>
                 </View>
               </View>
             ))}
-            <ActionButton
-              tone="accent"
-              label={fork.isPending ? 'Copying baseline…' : 'Customise this recipe'}
-              onPress={onFork}
-              disabled={fork.isPending}
+            <Notice
+              tone="warn"
+              label="Lossless copy is not available"
+              body="The current shared fork API omits part conditions and quantity ratios in every client. QuoteMax will not copy the baseline until those quoting rules can be preserved."
             />
-            <Text style={[styles.hint, { color: colors.textDim }]}>
-              {`Copies these ${baseline.length} line${baseline.length === 1 ? '' : 's'} into your recipe so you can edit quantities, switch required or optional, or add more parts.`}
-            </Text>
           </View>
         ) : (
           <Text style={[styles.blurb, { color: colors.textSec }]}>
@@ -703,16 +673,9 @@ function PartsPanel({
           </Text>
         )
       ) : (
-        lines.map((line, idx) => {
+        lines.map(line => {
           const qtyValue = draftQty[line.id] ?? String(line.quantity);
           const badge = resolveCatalogueBadge(line.material_category, catalogueCategories);
-          // The fork route reports gaps by 1-based line (sort) position;
-          // `lines` is already sorted by sort, so idx+1 matches. Category is
-          // the defensive fallback against a reorder between fork and render.
-          const gapHere =
-            forkGaps != null &&
-            (forkGaps.gapLines.has(idx + 1) ||
-              forkGaps.gapCategories.has(normaliseCategory(line.material_category)));
           const rowBusy = busyId === line.id;
           return (
             <View key={line.id} style={[styles.row, { borderBottomColor: colors.inkLine }]}>
@@ -725,6 +688,14 @@ function PartsPanel({
                     {line.description}
                   </Text>
                 ) : null}
+                {line.include_when && Object.keys(line.include_when).length > 0 ? (
+                  <Text style={[styles.rowTag, { color: colors.textDim }]}>CONDITIONAL PART</Text>
+                ) : null}
+                {line.quantity_per != null ? (
+                  <Text style={[styles.rowTag, { color: colors.textDim }]}>
+                    {`RATIO QUANTITY · CEIL(ITEM COUNT ÷ ${line.quantity_per})`}
+                  </Text>
+                ) : null}
                 <Text
                   style={[
                     styles.rowTag,
@@ -733,11 +704,6 @@ function PartsPanel({
                 >
                   {badge === 'catalogue' ? '✓ YOUR CATALOGUE' : '⚠ PRICE NEEDED'}
                 </Text>
-                {gapHere ? (
-                  <Text style={[styles.rowTag, { color: colors.warningBright }]}>
-                    ⚠ ADD A PRODUCT FOR THIS LINE
-                  </Text>
-                ) : null}
                 <View style={styles.actionRow}>
                   <Text style={[styles.qtyLabel, { color: colors.textDim }]}>QTY</Text>
                   <TextInput
@@ -757,13 +723,19 @@ function PartsPanel({
                     placeholderTextColor={colors.textDim}
                     style={[
                       styles.qtyInput,
-                      { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textPri },
+                      {
+                        backgroundColor: colors.ink,
+                        borderColor: colors.ctlLine,
+                        color: colors.textPri,
+                      },
                     ]}
                   />
                   <RequiredPill
                     required={line.required !== false}
                     disabled={rowBusy}
-                    onPress={() => update.mutate({ id: line.id, required: line.required === false })}
+                    onPress={() =>
+                      update.mutate({ id: line.id, required: line.required === false })
+                    }
                   />
                   <Pressable
                     accessibilityRole="button"
@@ -787,18 +759,14 @@ function PartsPanel({
       {rowError ? (
         <Text style={[styles.errorLine, { color: colors.warningBright }]}>{rowError}</Text>
       ) : null}
-      {forkError ? (
-        <Text style={[styles.errorLine, { color: colors.warningBright }]}>{forkError}</Text>
-      ) : null}
-
       <View style={styles.form}>
         <SectionLabel>Add a part</SectionLabel>
         <View>
           <Text style={[styles.fieldLabel, { color: colors.textPri }]}>MATERIAL CATEGORY</Text>
           <PillGroup options={categoryOptions} value={category} onChange={setCategory} />
           <Text style={[styles.hint, { color: colors.textDim, marginTop: spacing.sm }]}>
-            What part the job needs. Add a product in this category under Catalogue and the AI
-            uses your product and your price; otherwise the estimate routes to inspection.
+            What part the job needs. Add a product in this category under Catalogue and the AI uses
+            your product and your price; otherwise the estimate routes to inspection.
           </Text>
         </View>
         <Field
@@ -884,7 +852,7 @@ function SwitchRow({
   return (
     <View style={styles.switchRow}>
       <Text style={[styles.switchLabel, { color: colors.textPri }]}>{label}</Text>
-      <Switch
+      <ThemedSwitch
         accessibilityLabel={label}
         value={value}
         onValueChange={onValueChange}
@@ -911,19 +879,28 @@ function Field({
   maxLength?: number;
 }) {
   const { colors } = useTheme();
+  const [focused, setFocused] = useState(false);
   return (
     <View>
       <Text style={[styles.fieldLabel, { color: colors.textPri }]}>{label.toUpperCase()}</Text>
       <TextInput
+        accessibilityLabel={label}
         value={value}
         onChangeText={onChangeText}
         placeholder={placeholder}
         placeholderTextColor={colors.textDim}
         keyboardType={keyboardType}
         maxLength={maxLength}
+        selectionColor={colors.accentSoft}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
         style={[
           styles.input,
-          { backgroundColor: colors.ink, borderColor: colors.ctlLine, color: colors.textPri },
+          {
+            backgroundColor: colors.ink,
+            borderColor: focused ? colors.accentSoft : colors.ctlLine,
+            color: colors.textPri,
+          },
         ]}
       />
     </View>
@@ -954,6 +931,7 @@ function ActionButton({
         styles.actionBtn,
         {
           opacity: disabled ? 0.5 : 1,
+          minHeight: accent ? touch.primaryCta : touch.minimum,
           borderColor: accent ? colors.accent : colors.ctlLine,
           backgroundColor: accent
             ? pressed
@@ -965,10 +943,7 @@ function ActionButton({
         },
       ]}
     >
-      <Text
-        style={[styles.actionLabel, { color: accent ? colors.accentInk : colors.textPri }]}
-        numberOfLines={1}
-      >
+      <Text style={[styles.actionLabel, { color: accent ? colors.accentInk : colors.textPri }]}>
         {label.toUpperCase()}
       </Text>
     </Pressable>
@@ -980,8 +955,8 @@ const styles = StyleSheet.create({
     marginTop: spacing.sm,
     marginBottom: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
   kvRow: {
     flexDirection: 'row',
@@ -994,12 +969,14 @@ const styles = StyleSheet.create({
   kvLabel: {
     flex: 1,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8, // .08em @ 10
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   kvValue: {
     fontFamily: fonts.mono.bold,
-    fontSize: 13,
+    fontSize: 16,
+    lineHeight: 22,
     fontVariant: ['tabular-nums'],
   },
   row: {
@@ -1009,17 +986,19 @@ const styles = StyleSheet.create({
     paddingVertical: spacing.md,
     borderBottomWidth: 1,
   },
-  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 13.5, lineHeight: 18 },
-  rowMeta: { fontFamily: fonts.sans.regular, fontSize: 12, lineHeight: 17 },
+  rowName: { fontFamily: fonts.sans.semiBold, fontSize: 16, lineHeight: 22 },
+  rowMeta: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   rowTag: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   stepNum: {
     paddingTop: spacing.sm + 2,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
+    fontSize: 12,
+    lineHeight: 18,
     fontVariant: ['tabular-nums'],
   },
   inlineInput: {
@@ -1030,7 +1009,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.sans.regular,
     fontSize: 14,
   },
-  inlineInputSmall: { fontSize: 12.5 },
+  inlineInputSmall: { fontSize: 14 },
   actionRow: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -1038,18 +1017,25 @@ const styles = StyleSheet.create({
     gap: spacing.md,
     marginTop: spacing.xs,
   },
-  iconBtn: { minHeight: touch.minimum, justifyContent: 'center' },
+  iconBtn: {
+    minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   iconBtnLabel: { fontFamily: fonts.mono.bold, fontSize: 13 },
   dimmed: { opacity: 0.4 },
   textBtnLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   qtyLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   qtyInput: {
     minHeight: touch.minimum,
@@ -1065,57 +1051,68 @@ const styles = StyleSheet.create({
     minHeight: touch.minimum,
     justifyContent: 'center',
     borderWidth: 1,
-    borderRadius: radius.chip,
+    borderRadius: radius.control,
     paddingHorizontal: spacing.md,
   },
   togglePillLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  hint: { fontFamily: fonts.sans.regular, fontSize: 11.5, lineHeight: 16 },
+  hint: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   errorLine: {
     marginTop: spacing.sm,
     fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 0.4,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  form: { marginTop: spacing.lg, gap: spacing.md },
+  form: { marginTop: spacing.xl, gap: spacing.xl },
   fieldLabel: {
     marginBottom: spacing.sm,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   input: {
     minHeight: touch.minimum,
     borderWidth: 1,
     borderRadius: radius.control,
-    paddingHorizontal: 14,
+    paddingHorizontal: spacing.lg,
     fontFamily: fonts.sans.regular,
-    fontSize: 15,
+    fontSize: 16,
   },
   switchRow: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.md,
+    minHeight: touch.listRow,
   },
-  switchLabel: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
-  formActions: { flexDirection: 'row', justifyContent: 'flex-end', gap: spacing.sm },
+  switchLabel: { flex: 1, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  formActions: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-end',
+    gap: spacing.sm,
+  },
   actionBtn: {
     minHeight: touch.minimum,
+    maxWidth: '100%',
+    flexShrink: 1,
     alignSelf: 'flex-start',
     justifyContent: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.sm + 2,
+    paddingVertical: spacing.md,
   },
   actionLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
+    textAlign: 'center',
   },
 });

@@ -158,7 +158,7 @@ This system rejects the same things the website rejects (generic SaaS gradients,
 - ALL-CAPS Manrope display, left-aligned; JetBrains Mono for labels, prices, refs, timestamps, always `tabular-nums` on figures.
 - 48dp minimum touch targets, 56dp for list rows and the primary CTA. Gloves are the baseline, not the edge case.
 - Platform structure is stock: iOS tab bar / large titles / sheets, Android navigation bar / predictive back / edge-to-edge insets. Brand expresses through tint, type, surfaces, and motion, never through reinvented controls.
-- Dark is the primary brand. The warm-paper light theme is the sunlight workhorse: it follows the device setting by default and can be pinned in-app (Settings → Appearance: System / Charcoal / Paper, persisted), mirroring the website's manual `[data-theme]` pin. Both themes ship on every screen from day one.
+- Dark is the primary brand. The warm-paper light theme is the sunlight workhorse: it follows the device setting by default and can be pinned in-app (Menu → Appearance: System / Charcoal / Paper, persisted), mirroring the website's manual `[data-theme]` pin. Both themes ship on every screen from day one.
 
 ## 2. Colours
 

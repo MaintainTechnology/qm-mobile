@@ -6,11 +6,12 @@
  * screens) and the per-trade tool link-outs for trades whose tool has no
  * mobile port yet.
  */
-import { View } from 'react-native';
+import { Text } from 'react-native';
 
-import { spacing } from '@/lib/theme';
+import { spacing, type as typeScale } from '@/lib/theme';
+import { useTheme } from '@/lib/useTheme';
 
-import { Notice } from '../ui';
+import { Card } from '../ui';
 import { LinkOutButton } from './LinkOut';
 import { TRADE_LABELS, type HubTrade } from './sections';
 
@@ -27,11 +28,15 @@ export function WebOnlyCard({
   path?: string;
   cta?: string;
 }) {
+  const { colors } = useTheme();
   return (
-    <View style={{ gap: spacing.md }}>
-      <Notice tone="accent" label={label} body={body} />
-      {path ? <LinkOutButton label={cta} path={path} tone="accent" /> : null}
-    </View>
+    <Card style={{ gap: spacing.md }}>
+      <Text accessibilityRole="header" style={[typeScale.title, { color: colors.textPri }]}>
+        {label}
+      </Text>
+      <Text style={[typeScale.bodySm, { color: colors.textSec }]}>{body}</Text>
+      {path ? <LinkOutButton label={cta} path={path} /> : null}
+    </Card>
   );
 }
 

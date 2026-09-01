@@ -135,7 +135,7 @@ export function PricingSection({ trade }: { trade: HubTrade }) {
   const showsHourlyBook = !NO_BOOK_HUB_TRADES.includes(trade);
 
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View style={{ gap: spacing.xl }}>
       {showsHourlyBook ? (
         book ? (
           <LabourRatesCard trades={[trade]} pricingBooks={data.pricing_books} />
@@ -148,7 +148,12 @@ export function PricingSection({ trade }: { trade: HubTrade }) {
         )
       ) : null}
       {book && TIER_CAPABLE.includes(trade) ? (
-        <QuoteTierModeCard trade={trade} initialMode={asTierMode(book['quote_tier_mode'])} />
+        <QuoteTierModeCard
+          // Reset selected/error state whenever the authoritative trade book changes.
+          key={`${trade}:${asTierMode(book['quote_tier_mode'])}`}
+          trade={trade}
+          initialMode={asTierMode(book['quote_tier_mode'])}
+        />
       ) : null}
       {trade === 'roofing' ? <RoofRatesCard /> : null}
       {trade === 'painting' ? <PaintRatesCard /> : null}
@@ -173,15 +178,15 @@ export function PricingSection({ trade }: { trade: HubTrade }) {
 
 const styles = StyleSheet.create({
   tierHint: {
-    marginTop: 6,
+    marginTop: spacing.sm,
     fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
   },
   tierStatus: {
     marginTop: spacing.md,
     fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 18,
+    fontSize: 14,
+    lineHeight: 20,
   },
 });

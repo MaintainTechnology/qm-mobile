@@ -13,26 +13,29 @@
  * WebOnlyCard at the bottom links there.
  */
 import { useQueryClient } from '@tanstack/react-query';
-import * as DocumentPicker from 'expo-document-picker';
-import { useEffect, useReducer, useState } from 'react';
+import { useEffect, useReducer, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
-import { Field, PrimaryCta } from '@/features/auth/ui';
-import { sizeOk, type PickedFile } from '@/lib/media';
+import { Field, GhostButton, PrimaryCta } from '@/features/auth/ui';
+import {
+  pickDocumentForUpload,
+  uploadFailureNotice,
+  uploadSelectionNote,
+  type PickedFile,
+} from '@/lib/media';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 import {
-  ACCEPTED_DOC_MIME,
   buildCompleteBody,
   buildSignBody,
   canSavePaintQuote,
   classifyPaintPricingBlock,
+  COMMERCIAL_PAINT_DOCUMENT_POLICY,
   DOC_TYPES,
   initialPipeline,
   loadPersistedRunId,
-  MAX_DOC_BYTES,
   persistRunId,
   pipelineReducer,
   putSignedFile,
@@ -58,7 +61,13 @@ import {
 } from './api';
 import { WebOnlyCard } from '../hub/SectionsContent';
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../ui';
-import { repriceAndProveFreshBom } from './pricing-freshness';
+import {
+  isCurrentPaintPricingAttempt,
+  isPaintPricingProofUnavailable,
+  PAINT_PRICING_PROOF_MESSAGE,
+  repriceAndProveFreshBom,
+  type PaintPricingAttempt,
+} from './pricing-freshness';
 
 export { repriceAndProveFreshBom } from './pricing-freshness';
 
@@ -97,9 +106,16 @@ export function CommercialPaintingScreen() {
   const [jobName, setJobName] = useState('');
   const [siteAddress, setSiteAddress] = useState('');
   const [note, setNote] = useState<string | null>(null);
+  const [documentNote, setDocumentNote] = useState<string | null>(null);
   const [savedQuote, setSavedQuote] = useState<SavedQuote | null>(null);
   const [pricingBlock, setPricingBlock] = useState<PaintPricingBlock | null>(null);
-  const [pricingVerified, setPricingVerified] = useState(true);
+  // A stored BOM is a preview, not proof that today's tenant rates and this
+  // takeoff revision produced it. Every mount/run starts fail-closed.
+  const [pricingVerified, setPricingVerified] = useState(false);
+  const pricingSequenceRef = useRef(0);
+  const currentRunIdRef = useRef<string | null>(null);
+  const currentExtractionIdRef = useRef<string | null>(null);
+  const documentPickerOpenRef = useRef(false);
 
   const sign = useSignUploads();
   const complete = useCompleteUploads();
@@ -136,6 +152,8 @@ export function CommercialPaintingScreen() {
 
   const uploads = runQuery.data?.uploads ?? [];
   const extraction = runQuery.data?.extraction ?? null;
+  currentRunIdRef.current = runId;
+  currentExtractionIdRef.current = extraction?.id ?? null;
   const corrected = extraction?.corrected_items ?? [];
   const items: TakeoffItem[] = corrected.length > 0 ? corrected : (extraction?.items ?? []);
   const flags = extraction?.sheets_used?.flags ?? [];
@@ -147,70 +165,107 @@ export function CommercialPaintingScreen() {
   const extracting = pipeline.step === 'extracting' || serverStatus === 'extracting';
   const docBusy = setDocType.isPending || removeUpload.isPending;
 
+  function resetPricingProof() {
+    pricingSequenceRef.current += 1;
+    setPricingVerified(false);
+    setPricingBlock(null);
+  }
+
+  useEffect(() => {
+    // Covers persisted-run resume, remote extraction replacement and remount.
+    pricingSequenceRef.current += 1;
+    setPricingVerified(false);
+    setPricingBlock(null);
+  }, [runId, extraction?.id]);
+
   function refreshRun(id: string) {
     void queryClient.invalidateQueries({ queryKey: [...runKey(id)] });
     void queryClient.invalidateQueries({ queryKey: [...RUNS_KEY] });
   }
 
   async function pickDocs() {
-    const result = await DocumentPicker.getDocumentAsync({
-      type: [...ACCEPTED_DOC_MIME],
-      multiple: true,
-      copyToCacheDirectory: true,
-    });
-    if (result.canceled) return;
-    const files: PickedFile[] = [];
-    for (const asset of result.assets) {
-      const file: PickedFile = {
-        uri: asset.uri,
-        name: asset.name,
-        type: asset.mimeType ?? 'application/pdf',
-        size: asset.size ?? undefined,
-      };
-      if (!sizeOk(file, MAX_DOC_BYTES)) {
-        setNote(`${file.name} is over 32 MB — export a smaller file and try again.`);
-        continue;
-      }
-      files.push(file);
+    if (documentPickerOpenRef.current) return;
+    const remaining = COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles - picked.length;
+    if (remaining <= 0) {
+      setDocumentNote(null);
+      setNote(
+        `You can add up to ${COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles} documents to one upload. Remove one to choose another.`,
+      );
+      return;
     }
-    if (files.length > 0) setPicked(prev => [...prev, ...files]);
+    documentPickerOpenRef.current = true;
+    try {
+      const result = await pickDocumentForUpload({
+        ...COMMERCIAL_PAINT_DOCUMENT_POLICY,
+        maxFiles: remaining,
+      });
+      if (result.kind === 'cancelled') return;
+      if (result.kind === 'denied' || result.kind === 'failed') {
+        setDocumentNote(null);
+        setNote(result.message);
+        return;
+      }
+      if (result.kind === 'rejected') {
+        setDocumentNote(null);
+        setNote(result.problem.message);
+        return;
+      }
+      const next = [...picked, ...result.files];
+      if (next.length > COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles) {
+        setDocumentNote(null);
+        setNote(
+          `You can add up to ${COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles} documents to one upload. Remove one to choose another.`,
+        );
+        return;
+      }
+      setPicked(next);
+      setNote(null);
+      setDocumentNote(uploadSelectionNote(result));
+    } finally {
+      documentPickerOpenRef.current = false;
+    }
   }
 
   async function uploadAll() {
     if (picked.length === 0 || uploadBusy) return;
+    resetPricingProof();
     setNote(null);
+    setDocumentNote(null);
     dispatch({ type: 'SIGN_START', fileCount: picked.length });
+    let stage: 'sign' | 'transfer' | 'complete' = 'sign';
+    let attemptRunId = runId;
     try {
       const signed = await sign.mutateAsync(buildSignBody(picked, { jobName, siteAddress, runId }));
+      attemptRunId = signed.paintRunId;
       setRunId(signed.paintRunId);
       void persistRunId(signed.paintRunId);
       dispatch({ type: 'SIGNED', runId: signed.paintRunId });
 
+      stage = 'transfer';
       const pairs = zipUploads(picked, signed.uploads);
       for (const pair of pairs) {
         await putSignedFile(pair.target.signedUrl, pair.file);
         dispatch({ type: 'FILE_PUT_OK' });
       }
 
+      stage = 'complete';
       await complete.mutateAsync(buildCompleteBody(signed.paintRunId, pairs));
       dispatch({ type: 'COMPLETED' });
       setPicked([]);
       refreshRun(signed.paintRunId);
     } catch (error) {
-      // Files and fields are kept; a retry re-signs against the same run.
+      // Files and fields are kept. Retry requests fresh signed targets and
+      // restarts the transfer; this pipeline never claims byte-level resume.
       dispatch({ type: 'FAILED' });
-      // putSignedFile throws plain Errors with tradie-ready copy (which file,
-      // which HTTP status) — pass that through; ApiErrors map as usual.
-      const fallback =
-        error instanceof Error && error.message.startsWith('Uploading ')
-          ? error.message
-          : 'Upload failed. Your files are kept — try again.';
-      setNote(apiErrorMessage(error, fallback));
+      const canReconcile = stage === 'complete' && attemptRunId !== null;
+      if (canReconcile && attemptRunId) refreshRun(attemptRunId);
+      setNote(uploadFailureNotice(error, 'painting document', { canReconcile }).message);
     }
   }
 
   async function runTakeoff() {
     if (!runId || extracting || extract.isPending) return;
+    resetPricingProof();
     setNote(null);
     setSavedQuote(null);
     dispatch({ type: 'EXTRACT_START', runId });
@@ -237,27 +292,40 @@ export function CommercialPaintingScreen() {
     setNote(null);
     setPricingBlock(null);
     setPricingVerified(false);
+    const attempt: PaintPricingAttempt = {
+      sequence: ++pricingSequenceRef.current,
+      runId,
+      extractionId,
+    };
     const verification = await repriceAndProveFreshBom(
       () => price.mutateAsync({ paintRunId: runId, extractionId }),
       () => runQuery.refetch(),
       extractionId,
     );
-    if (verification.ok) {
-      dispatch({ type: 'PRICED' });
-      setPricingVerified(true);
-    } else {
-      const block = classifyPaintPricingBlock(verification.error);
-      setPricingBlock(block);
-      if (!block) {
-        setNote(
-          apiErrorMessage(
-            verification.error,
-            'Pricing failed. Re-price successfully before saving this takeoff.',
-          ),
-        );
-      }
-    }
     void queryClient.invalidateQueries({ queryKey: [...RUNS_KEY] });
+    if (
+      !isCurrentPaintPricingAttempt(attempt, {
+        sequence: pricingSequenceRef.current,
+        runId: currentRunIdRef.current,
+        extractionId: currentExtractionIdRef.current,
+      })
+    ) {
+      return;
+    }
+
+    if (verification.previewRefreshed) dispatch({ type: 'PRICED' });
+    const block = classifyPaintPricingBlock(verification.error);
+    setPricingBlock(block);
+    if (isPaintPricingProofUnavailable(verification.error)) {
+      setNote(PAINT_PRICING_PROOF_MESSAGE);
+    } else if (!block) {
+      setNote(
+        apiErrorMessage(
+          verification.error,
+          'Pricing failed. Re-price successfully before saving this takeoff.',
+        ),
+      );
+    }
   }
 
   async function saveAsQuote() {
@@ -268,7 +336,8 @@ export function CommercialPaintingScreen() {
       saveQuote.isPending ||
       !pricingVerified ||
       !canSavePaintQuote(bom, pricingBlock)
-    ) return;
+    )
+      return;
     setNote(null);
     try {
       const saved = await saveQuote.mutateAsync({ paintRunId: runId, extractionId });
@@ -284,6 +353,7 @@ export function CommercialPaintingScreen() {
 
   function changeDocType(id: string, docType: PaintDocType) {
     if (!runId) return;
+    resetPricingProof();
     setDocType.mutate(
       { id, doc_type: docType },
       {
@@ -296,6 +366,7 @@ export function CommercialPaintingScreen() {
 
   function removeDoc(id: string) {
     if (!runId) return;
+    resetPricingProof();
     removeUpload.mutate(
       { id },
       {
@@ -308,6 +379,7 @@ export function CommercialPaintingScreen() {
 
   function openRun(id: string) {
     if (id === runId) return;
+    resetPricingProof();
     dispatch({ type: 'RESET' });
     setRunId(id);
     void persistRunId(id);
@@ -317,10 +389,11 @@ export function CommercialPaintingScreen() {
     setNote(null);
     setSavedQuote(null);
     setPricingBlock(null);
-    setPricingVerified(true);
+    setPricingVerified(false);
   }
 
   function startNewRun() {
+    resetPricingProof();
     dispatch({ type: 'RESET' });
     setRunId(null);
     void persistRunId(null);
@@ -330,7 +403,7 @@ export function CommercialPaintingScreen() {
     setNote(null);
     setSavedQuote(null);
     setPricingBlock(null);
-    setPricingVerified(true);
+    setPricingVerified(false);
   }
 
   const uploadLabel =
@@ -341,9 +414,11 @@ export function CommercialPaintingScreen() {
         : pipeline.step === 'completing'
           ? 'Classifying documents…'
           : 'Upload & classify';
+  const TakeoffAction = items.length > 0 ? GhostButton : PrimaryCta;
+  const PricingAction = bom ? GhostButton : PrimaryCta;
 
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View style={{ gap: spacing.xl }}>
       {note ? <Notice tone="danger" label="Something needs attention" body={note} /> : null}
 
       {runQuery.isError && runId ? (
@@ -376,16 +451,11 @@ export function CommercialPaintingScreen() {
           it below if we guessed wrong.
         </Text>
         <Field label="Job name" value={jobName} onChangeText={setJobName} height={52} />
-        <Field
-          label="Site address"
-          value={siteAddress}
-          onChangeText={setSiteAddress}
-          height={52}
-        />
+        <Field label="Site address" value={siteAddress} onChangeText={setSiteAddress} height={52} />
 
         {picked.map((file, i) => (
           <View key={`${file.uri}-${i}`} style={styles.fileRow}>
-            <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={1}>
+            <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={2}>
               {file.name}
             </Text>
             {fileMb(file.size) ? (
@@ -395,7 +465,10 @@ export function CommercialPaintingScreen() {
               accessibilityRole="button"
               accessibilityLabel={`Remove ${file.name}`}
               disabled={uploadBusy}
-              onPress={() => setPicked(prev => prev.filter(f => f !== file))}
+              onPress={() => {
+                setPicked(prev => prev.filter(f => f !== file));
+                setDocumentNote(null);
+              }}
               style={styles.textBtn}
               hitSlop={8}
             >
@@ -415,8 +488,11 @@ export function CommercialPaintingScreen() {
           </Text>
         </Pressable>
         <Text style={[styles.hintLine, { color: colors.textDim }]}>
-          PDF · PNG · JPG · up to 32 MB each
+          PDF · PNG · JPG · up to 32 MB each · {COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles} files
         </Text>
+        {documentNote ? (
+          <Text style={[styles.hintLine, { color: colors.textDim }]}>{documentNote}</Text>
+        ) : null}
 
         {picked.length > 0 ? (
           <PrimaryCta label={uploadLabel} onPress={() => void uploadAll()} loading={uploadBusy} />
@@ -460,8 +536,10 @@ export function CommercialPaintingScreen() {
               reconciles against your measurements doc when you’ve added one.
             </Text>
           )}
-          <PrimaryCta
-            label={extracting ? 'Extracting…' : items.length > 0 ? 'Run takeoff again' : 'Run AI takeoff'}
+          <TakeoffAction
+            label={
+              extracting ? 'Extracting…' : items.length > 0 ? 'Run takeoff again' : 'Run AI takeoff'
+            }
             onPress={() => void runTakeoff()}
             loading={extracting || extract.isPending}
             disabled={!hasPlanSet || uploadBusy}
@@ -496,7 +574,7 @@ export function CommercialPaintingScreen() {
             Need to edit lines before pricing? Use the takeoff editor on the web — this screen
             prices the takeoff exactly as extracted.
           </Text>
-          <PrimaryCta
+          <PricingAction
             label={bom ? 'Re-price this takeoff' : 'Price this takeoff'}
             onPress={() => void priceTakeoff()}
             loading={price.isPending}
@@ -598,7 +676,7 @@ function DocRow({
   return (
     <View style={[styles.docRow, { borderColor: colors.inkLine }]}>
       <View style={styles.fileRow}>
-        <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={2}>
           {upload.filename}
         </Text>
         {mb ? <Text style={[styles.fileMeta, { color: colors.textDim }]}>{mb}</Text> : null}
@@ -701,7 +779,7 @@ export function PaintPricingGate({
   bom,
   block,
   busy,
-  pricingVerified = true,
+  pricingVerified = false,
   onSave,
 }: {
   bom: PricedBom | null;
@@ -730,8 +808,8 @@ export function PaintPricingGate({
       {!pricingVerified ? (
         <Notice
           tone="warn"
-          label="Re-price required"
-          body="Re-price must finish successfully before this quote can be saved."
+          label="Versioned pricing check required"
+          body="A successful re-price and server proof of the exact tenant rates and takeoff revision are required before Save can be enabled."
         />
       ) : null}
       {bom ? (
@@ -819,9 +897,11 @@ export function PricedSummary({ bom }: { bom: PricedBom }) {
           {bom.equipment.map((eq, i) => (
             <View key={`${eq.label}-${i}`} style={{ gap: 2 }}>
               <SumRow
-                label={eq.days != null && eq.dayRate != null
-                  ? `${eq.label} · ${eq.days} days × ${aud(eq.dayRate)}`
-                  : eq.label}
+                label={
+                  eq.days != null && eq.dayRate != null
+                    ? `${eq.label} · ${eq.days} days × ${aud(eq.dayRate)}`
+                    : eq.label
+                }
                 value={aud(eq.costExGst)}
               />
               {eq.reason ? (
@@ -835,7 +915,10 @@ export function PricedSummary({ bom }: { bom: PricedBom }) {
       {bom.unmatched.length > 0 ? (
         <View style={{ gap: spacing.xs }}>
           {bom.unmatched.map((row, i) => (
-            <Text key={`${row.surface}-${i}`} style={[styles.flagLine, { color: colors.warningBright }]}>
+            <Text
+              key={`${row.surface}-${i}`}
+              style={[styles.flagLine, { color: colors.warningBright }]}
+            >
               {`Not priced — no matching rate: ${row.surface}${row.room ? ` (${row.room})` : ''}`}
             </Text>
           ))}
@@ -854,10 +937,7 @@ export function PricedSummary({ bom }: { bom: PricedBom }) {
 
       <View style={[styles.block, { borderTopColor: colors.inkLine }]}>
         <SumRow label="Subtotal ex GST" value={aud(bom.subtotalExGst)} />
-        <SumRow
-          label={bom.gstRegistered ? 'GST' : 'No GST charged'}
-          value={aud(bom.gst)}
-        />
+        <SumRow label={bom.gstRegistered ? 'GST' : 'No GST charged'} value={aud(bom.gst)} />
         <View style={styles.sumRow}>
           <Text style={[styles.sumLabel, styles.boldLabel, { color: colors.textPri }]}>
             {bom.gstRegistered ? 'TOTAL INC GST' : 'TOTAL — NO GST CHARGED'}
@@ -935,10 +1015,10 @@ function RunRow({
       ]}
     >
       <View style={styles.lineHead}>
-        <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.fileName, { color: colors.textPri }]} numberOfLines={2}>
           {run.job_name ?? 'Untitled run'}
         </Text>
-        <Text style={[styles.itemMeta, { color: colors.textDim }]} numberOfLines={1}>
+        <Text style={[styles.itemMeta, { color: colors.textDim }]} numberOfLines={2}>
           {[run.site_address, when].filter((part): part is string => !!part).join(' · ')}
         </Text>
       </View>
@@ -950,41 +1030,53 @@ function RunRow({
 }
 
 const styles = StyleSheet.create({
-  body: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 20 },
-  hintLine: { fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.5, lineHeight: 15 },
+  body: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  hintLine: { fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.3, lineHeight: 18 },
   fileRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  fileName: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
+  fileName: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   fileMeta: {
     fontFamily: fonts.mono.medium,
-    fontSize: 10,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 0.5,
     fontVariant: ['tabular-nums'],
   },
-  textBtn: { minHeight: touch.minimum, alignSelf: 'flex-start', justifyContent: 'center' },
-  textBtnLabel: { fontFamily: fonts.mono.bold, fontSize: 11, letterSpacing: 0.88 },
-  borderedBtn: {
+  textBtn: {
     minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    maxWidth: '100%',
     alignSelf: 'flex-start',
     justifyContent: 'center',
+    paddingVertical: spacing.sm,
+  },
+  textBtnLabel: { fontFamily: fonts.sans.bold, fontSize: 14, lineHeight: 20, letterSpacing: 0.4 },
+  borderedBtn: {
+    minHeight: touch.minimum,
+    alignSelf: 'stretch',
+    justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   dimmed: { opacity: 0.5 },
   docRow: { borderTopWidth: 1, paddingTop: spacing.md, gap: spacing.sm },
   chip: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72,
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
-  itemRow: { borderTopWidth: 1, paddingTop: spacing.sm, gap: 6 },
+  itemRow: { borderTopWidth: 1, paddingTop: spacing.lg, gap: spacing.sm },
   itemHead: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     gap: spacing.md,
@@ -992,13 +1084,15 @@ const styles = StyleSheet.create({
   itemSurface: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 14 },
   itemQty: {
     fontFamily: fonts.mono.bold,
-    fontSize: 13,
+    fontSize: 14,
+    lineHeight: 20,
     fontVariant: ['tabular-nums'],
   },
-  itemMeta: { fontFamily: fonts.mono.medium, fontSize: 10, lineHeight: 15, letterSpacing: 0.5 },
-  flagLine: { fontFamily: fonts.sans.medium, fontSize: 12.5, lineHeight: 18 },
+  itemMeta: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18, letterSpacing: 0.3 },
+  flagLine: { fontFamily: fonts.sans.medium, fontSize: 14, lineHeight: 20 },
   sumRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     gap: spacing.md,
@@ -1006,34 +1100,38 @@ const styles = StyleSheet.create({
   sumLabel: {
     flexShrink: 1,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   sumValue: {
     fontFamily: fonts.mono.medium,
-    fontSize: 12.5,
+    fontSize: 16,
+    lineHeight: 24,
     fontVariant: ['tabular-nums'],
   },
   boldLabel: { fontFamily: fonts.mono.bold },
   boldValue: { fontFamily: fonts.mono.bold },
   totalValue: {
     fontFamily: fonts.mono.bold,
-    fontSize: 18,
+    fontSize: 24,
+    lineHeight: 32,
     fontVariant: ['tabular-nums'],
   },
-  block: { borderTopWidth: 1, paddingTop: spacing.sm, gap: spacing.xs },
-  blockLabel: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  lineHead: { flex: 1, minWidth: 0, gap: 2 },
-  lineSurface: { fontFamily: fonts.sans.regular, fontSize: 13 },
+  block: { borderTopWidth: 1, paddingTop: spacing.md, gap: spacing.sm },
+  blockLabel: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.4 },
+  lineHead: { flexGrow: 1, flexShrink: 1, flexBasis: 160, minWidth: 0, gap: spacing.xs },
+  lineSurface: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   runRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     gap: spacing.md,
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
-    minHeight: touch.minimum,
+    paddingVertical: spacing.md,
+    minHeight: touch.listRow,
   },
-  runStatus: { fontFamily: fonts.mono.bold, fontSize: 10, letterSpacing: 0.8 },
+  runStatus: { fontFamily: fonts.mono.bold, fontSize: 12, lineHeight: 18, letterSpacing: 0.4 },
 });

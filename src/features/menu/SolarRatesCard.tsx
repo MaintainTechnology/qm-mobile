@@ -287,7 +287,8 @@ const styles = StyleSheet.create({
   gstBlock: { gap: 8 },
   gstLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1.05,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.8,
   },
 });

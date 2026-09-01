@@ -6,10 +6,13 @@
  * /api/aircon/pdf is byte-for-byte what the engine returned.
  */
 import {
+  acceptsAirconRun,
+  airconRunFingerprint,
   buildRecommendRequest,
   buildAirconPdfRequest,
   DEFAULT_FORM,
   MAX_PLAN_BYTES,
+  newAirconRequestId,
   parseCount,
   parseOptionalPositive,
   pdfAddress,
@@ -130,6 +133,7 @@ describe('result helpers', () => {
 
 const responseFixture = {
   ok: true,
+  request_id: 'ac_request_1234',
   climate_zone: 'subtropical',
   climate_note: 'Postcode 2750 sits in the subtropical band.',
   location: {
@@ -140,6 +144,12 @@ const responseFixture = {
   },
   recommendation: {
     pricing_status: 'priced',
+    pricing_authority: {
+      source: 'tenant_pricing_book',
+      tenant_id: 'tenant-1',
+      pricing_book_id: 'book-1',
+      revision: 'a'.repeat(64),
+    },
     sizing: {
       rooms: [{ room_type: 'bedroom', area_m2: 12, volume_m3: 28.8, kw: 1.3 }],
       conditioned_zones: 1,
@@ -248,6 +258,55 @@ describe('RecommendResponseSchema', () => {
     expect(parsed.recommendation.pricing_status).toBe('priced');
     if (parsed.recommendation.pricing_status !== 'priced') return;
     expect(parsed.recommendation.options[0]!.pricing.gst_registered).toBe(gstRegistered);
+  });
+
+  it.each([
+    ['zero band', { path: ['recommendation', 'options', 0, 'price', 'low'], value: 0 }],
+    ['null estimate', { path: ['recommendation', 'options', 0, 'pricing', 'point_estimate_ex_gst'], value: null }],
+    ['non-finite estimate', { path: ['recommendation', 'options', 0, 'pricing', 'point_estimate_inc_gst'], value: Infinity }],
+  ])('rejects priced output with %s', (_label, change) => {
+    const candidate = structuredClone(responseFixture) as Record<string, unknown>;
+    let cursor = candidate as Record<string | number, unknown>;
+    const path = change.path as (string | number)[];
+    for (const key of path.slice(0, -1)) cursor = cursor[key] as Record<string | number, unknown>;
+    cursor[path[path.length - 1]!] = change.value;
+    expect(RecommendResponseSchema.safeParse(candidate).success).toBe(false);
+  });
+
+  it('rejects missing authority or a priced result that was not persisted', () => {
+    const noAuthority = structuredClone(responseFixture);
+    delete (noAuthority.recommendation as { pricing_authority?: unknown }).pricing_authority;
+    expect(RecommendResponseSchema.safeParse(noAuthority).success).toBe(false);
+    expect(RecommendResponseSchema.safeParse({ ...responseFixture, saved: null }).success).toBe(false);
+  });
+});
+
+describe('aircon run fencing and retry identity', () => {
+  it('reuses an explicit request id and creates deterministic test ids', () => {
+    const first = buildRecommendRequest(filledForm, 'ac_retry_1234');
+    const retry = buildRecommendRequest(filledForm, 'ac_retry_1234');
+    expect(first).toEqual(retry);
+    expect(newAirconRequestId(() => 1234, () => 0.5)).toBe('ac_ya_i');
+  });
+
+  it('accepts only the mounted current run and rejects late, switched, or remounted responses', () => {
+    const fingerprint = airconRunFingerprint(filledForm, null);
+    const current = {
+      mounted: true,
+      activeRequestId: 'ac_request_1234',
+      activeFingerprint: fingerprint,
+      responseRequestId: 'ac_request_1234',
+      currentFingerprint: fingerprint,
+    };
+    expect(acceptsAirconRun(current)).toBe(true);
+    expect(acceptsAirconRun({ ...current, responseRequestId: 'ac_late_9999' })).toBe(false);
+    expect(
+      acceptsAirconRun({
+        ...current,
+        currentFingerprint: airconRunFingerprint({ ...filledForm, postcode: '4000' }, null),
+      }),
+    ).toBe(false);
+    expect(acceptsAirconRun({ ...current, mounted: false })).toBe(false);
   });
 });
 

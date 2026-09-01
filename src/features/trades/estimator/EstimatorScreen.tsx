@@ -233,7 +233,7 @@ export function EstimatorScreen() {
   }
 
   return (
-    <View style={{ gap: spacing.lg }}>
+    <View style={{ gap: spacing.xl }}>
       {!inRun ? (
         <Card style={{ gap: spacing.md }}>
           <SectionLabel>Plan take-off</SectionLabel>
@@ -244,7 +244,7 @@ export function EstimatorScreen() {
           </Text>
           {file ? (
             <View style={styles.attachRow}>
-              <Text style={[styles.attachName, { color: colors.textPri }]} numberOfLines={1}>
+              <Text style={[styles.attachName, { color: colors.textPri }]} numberOfLines={2}>
                 {file.name}
               </Text>
               <Pressable
@@ -320,7 +320,7 @@ export function EstimatorScreen() {
             <Card style={{ gap: spacing.md }}>
               <SectionLabel>Take-off</SectionLabel>
               {planName ? (
-                <Text style={[styles.planName, { color: colors.textPri }]} numberOfLines={1}>
+                <Text style={[styles.planName, { color: colors.textPri }]} numberOfLines={2}>
                   {planName}
                 </Text>
               ) : null}
@@ -577,21 +577,15 @@ function PricedSummaryCard({
       ) : null}
       {bom.unmatched.length > 0 ? (
         <Text style={[styles.warnLine, { color: colors.warningBright }]}>
-          Unmatched items aren’t in your catalogue — add them on the web dashboard, then re-price
-          to include them.
+          Unmatched items aren’t in your catalogue — add them on the web dashboard, then re-price to
+          include them.
         </Text>
       ) : null}
     </Card>
   );
 }
 
-function HistoryRow({
-  upload,
-  onOpen,
-}: {
-  upload: HistoryUpload;
-  onOpen: (id: string) => void;
-}) {
+function HistoryRow({ upload, onOpen }: { upload: HistoryUpload; onOpen: (id: string) => void }) {
   const { colors } = useTheme();
   const ex = upload.plan_extractions[0];
   const when = new Date(upload.created_at).toLocaleString('en-AU');
@@ -599,7 +593,7 @@ function HistoryRow({
     return (
       <View style={[styles.historyRow, styles.dimmed]}>
         <View style={{ flex: 1, minWidth: 0 }}>
-          <Text style={[styles.itemType, { color: colors.textSec }]} numberOfLines={1}>
+          <Text style={[styles.itemType, { color: colors.textSec }]} numberOfLines={2}>
             {upload.filename}
           </Text>
           <Text style={[styles.itemMeta, { color: colors.textDim }]}>
@@ -620,7 +614,7 @@ function HistoryRow({
       style={({ pressed }) => [styles.historyRow, pressed && { backgroundColor: colors.ink }]}
     >
       <View style={{ flex: 1, minWidth: 0 }}>
-        <Text style={[styles.itemType, { color: colors.textPri }]} numberOfLines={1}>
+        <Text style={[styles.itemType, { color: colors.textPri }]} numberOfLines={2}>
           {upload.filename}
         </Text>
         <Text style={[styles.itemMeta, { color: colors.textDim }]}>
@@ -644,40 +638,56 @@ function HistoryRow({
 }
 
 const styles = StyleSheet.create({
-  body: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 20 },
-  dimLine: { fontFamily: fonts.mono.medium, fontSize: 10, lineHeight: 15, letterSpacing: 0.5 },
-  warnLine: { fontFamily: fonts.sans.bold, fontSize: 11, letterSpacing: 0.4, lineHeight: 15 },
-  planName: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 19 },
+  body: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
+  dimLine: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18, letterSpacing: 0.3 },
+  warnLine: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  planName: { fontFamily: fonts.sans.bold, fontSize: 18, lineHeight: 24 },
   attachRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  attachName: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
-  textBtn: { minHeight: touch.minimum, alignSelf: 'flex-start', justifyContent: 'center' },
+  attachName: {
+    flex: 1,
+    minWidth: 0,
+    fontFamily: fonts.sans.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
+  textBtn: {
+    minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    maxWidth: '100%',
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+  },
   textBtnLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   borderedBtn: {
     minHeight: touch.minimum,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   dimmed: { opacity: 0.5 },
-  rowsWrap: { borderTopWidth: 1, paddingTop: spacing.sm, gap: spacing.sm },
+  rowsWrap: { borderTopWidth: 1, paddingTop: spacing.md, gap: spacing.md },
   itemRow: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: spacing.md,
     minHeight: touch.minimum,
   },
-  itemType: { fontFamily: fonts.sans.regular, fontSize: 13, lineHeight: 18 },
+  itemType: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
   itemMeta: {
     fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    lineHeight: 15,
-    letterSpacing: 0.5,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.3,
   },
   countInput: {
     width: 72,
@@ -687,27 +697,49 @@ const styles = StyleSheet.create({
     paddingHorizontal: spacing.md,
     textAlign: 'right',
     fontFamily: fonts.mono.medium,
-    fontSize: 14,
+    fontSize: 16,
     fontVariant: ['tabular-nums'],
   },
   dot: { width: 10, height: 10, borderRadius: radius.pill },
-  priceRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  priceCell: { fontFamily: fonts.mono.medium, fontSize: 12.5, fontVariant: ['tabular-nums'] },
+  priceRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: spacing.md },
+  priceCell: {
+    fontFamily: fonts.mono.medium,
+    fontSize: 14,
+    lineHeight: 20,
+    fontVariant: ['tabular-nums'],
+  },
   priceCellBold: { fontFamily: fonts.mono.bold },
-  totalBig: { fontFamily: fonts.mono.bold, fontSize: 22, fontVariant: ['tabular-nums'] },
+  totalBig: {
+    fontFamily: fonts.mono.bold,
+    fontSize: 28,
+    lineHeight: 34,
+    fontVariant: ['tabular-nums'],
+  },
   totalRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     gap: spacing.md,
   },
-  totalLabel: { flexShrink: 1, fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
+  totalLabel: {
+    flexShrink: 1,
+    fontFamily: fonts.mono.semiBold,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.5,
+  },
   historyRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'stretch',
     gap: spacing.md,
-    paddingVertical: spacing.sm,
+    paddingVertical: spacing.md,
     minHeight: touch.listRow,
   },
-  historyRight: { alignItems: 'flex-end', gap: 4 },
+  historyRight: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
 });

@@ -20,6 +20,7 @@ import { fetch as expoFetch } from 'expo/fetch';
 import { useMemo } from 'react';
 
 import { apiUrl } from '@/lib/env';
+import { captureAppError } from '@/lib/monitoring';
 import { authHeader } from '@/lib/session';
 
 /** Backend endpoint that proxies to the model. Must return an AI SDK UI message stream. */
@@ -42,5 +43,13 @@ export function useQuoteAssistant() {
     [],
   );
 
-  return useChat({ transport });
+  return useChat({
+    transport,
+    onError: error =>
+      captureAppError(error, {
+        kind: 'stream',
+        operationId: 'assistant.stream.consume',
+        route: '/chats',
+      }),
+  });
 }

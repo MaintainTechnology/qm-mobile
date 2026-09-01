@@ -7,6 +7,7 @@
 import {
   BULK_ADD_MAX,
   BulkAddResponseSchema,
+  CATALOGUE_PHOTO_POLICY,
   CatalogueResponseSchema,
   compareCatalogueRows,
   filterCatalogueRows,
@@ -27,6 +28,19 @@ import {
   type CatalogueRow,
   type SupplierRow,
 } from './catalogue-api';
+
+describe('catalogue photo upload contract', () => {
+  it('pins the field, allowlist, byte cap and single-file multiplicity', () => {
+    expect(CATALOGUE_PHOTO_POLICY).toEqual({
+      purpose: 'product photo',
+      field: 'file',
+      allowedMimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      allowedTypeLabel: 'a PNG, JPEG or WebP photo',
+      maxBytes: 8 * 1024 * 1024,
+      maxFiles: 1,
+    });
+  });
+});
 
 // ── Selection (browse multi-select) ─────────────────────────────────────────
 
@@ -66,7 +80,11 @@ describe('summariseBulkAdd', () => {
       { supplier_catalogue_id: '1', status: 'added' },
       { supplier_catalogue_id: '2', status: 'already_stocked' },
       { supplier_catalogue_id: '3', status: 'trade_mismatch' },
-      { supplier_catalogue_id: '4', status: 'insert_failed', error: 'duplicate name in your catalogue' },
+      {
+        supplier_catalogue_id: '4',
+        status: 'insert_failed',
+        error: 'duplicate name in your catalogue',
+      },
       { supplier_catalogue_id: '5', status: 'added' },
     ]);
     expect(added).toBe(2);
@@ -120,18 +138,36 @@ function catRow(over: Partial<CatalogueRow>): CatalogueRow {
 describe('filterCatalogueRows', () => {
   const rows = [
     catRow({ id: '1' }),
-    catRow({ id: '2', name: 'HPM downlight', category: 'downlight', brand: 'HPM', range_series: null }),
-    catRow({ id: '3', name: 'Cable ties', category: 'sundries', brand: null, supplier: 'Bunnings' }),
+    catRow({
+      id: '2',
+      name: 'HPM downlight',
+      category: 'downlight',
+      brand: 'HPM',
+      range_series: null,
+    }),
+    catRow({
+      id: '3',
+      name: 'Cable ties',
+      category: 'sundries',
+      brand: null,
+      supplier: 'Bunnings',
+    }),
   ];
 
   it('narrows by category chip', () => {
-    expect(filterCatalogueRows(rows, { category: 'downlight', search: '' }).map(r => r.id)).toEqual(['2']);
+    expect(filterCatalogueRows(rows, { category: 'downlight', search: '' }).map(r => r.id)).toEqual(
+      ['2'],
+    );
     expect(filterCatalogueRows(rows, { category: 'all', search: '' })).toHaveLength(3);
   });
 
   it('searches name/brand/range/supplier, case-insensitive', () => {
-    expect(filterCatalogueRows(rows, { category: 'all', search: 'clipsal' }).map(r => r.id)).toEqual(['1']);
-    expect(filterCatalogueRows(rows, { category: 'all', search: 'BUNNINGS' }).map(r => r.id)).toEqual(['3']);
+    expect(
+      filterCatalogueRows(rows, { category: 'all', search: 'clipsal' }).map(r => r.id),
+    ).toEqual(['1']);
+    expect(
+      filterCatalogueRows(rows, { category: 'all', search: 'BUNNINGS' }).map(r => r.id),
+    ).toEqual(['3']);
     expect(filterCatalogueRows(rows, { category: 'all', search: 'nothing here' })).toHaveLength(0);
   });
 
@@ -184,8 +220,20 @@ function supRow(over: Partial<SupplierRow>): SupplierRow {
 describe('filterSupplierRows', () => {
   const rows = [
     supRow({ id: '1' }),
-    supRow({ id: '2', brand: 'Clipsal', range_series: 'Iconic', name: 'Iconic GPO', category: 'gpo' }),
-    supRow({ id: '3', brand: 'Clipsal', name: 'Clipsal 2000 GPO', category: 'gpo', tier_hint: 'better' }),
+    supRow({
+      id: '2',
+      brand: 'Clipsal',
+      range_series: 'Iconic',
+      name: 'Iconic GPO',
+      category: 'gpo',
+    }),
+    supRow({
+      id: '3',
+      brand: 'Clipsal',
+      name: 'Clipsal 2000 GPO',
+      category: 'gpo',
+      tier_hint: 'better',
+    }),
   ];
 
   it('ANDs category, brand and multi-term search', () => {
@@ -193,7 +241,9 @@ describe('filterSupplierRows', () => {
       filterSupplierRows(rows, { category: 'gpo', brand: 'all', search: '' }).map(r => r.id),
     ).toEqual(['2', '3']);
     expect(
-      filterSupplierRows(rows, { category: 'gpo', brand: 'Clipsal', search: 'iconic' }).map(r => r.id),
+      filterSupplierRows(rows, { category: 'gpo', brand: 'Clipsal', search: 'iconic' }).map(
+        r => r.id,
+      ),
     ).toEqual(['2']);
   });
 
@@ -237,7 +287,13 @@ describe('sortGapCategories', () => {
       { category: 'gpo', shared_count: 4, tenant_count: 2, missing_count: 2, covered: true },
       { category: 'zzz', shared_count: 0, tenant_count: 0, missing_count: 0, covered: false },
       { category: 'downlight', shared_count: 3, tenant_count: 0, missing_count: 3, covered: false },
-      { category: 'smoke_alarm', shared_count: 2, tenant_count: 0, missing_count: 2, covered: false },
+      {
+        category: 'smoke_alarm',
+        shared_count: 2,
+        tenant_count: 0,
+        missing_count: 2,
+        covered: false,
+      },
     ]);
     expect(sorted.map(c => c.category)).toEqual(['downlight', 'smoke_alarm', 'gpo']);
   });
@@ -320,8 +376,13 @@ describe('response schemas accept realistic payloads', () => {
 
   it('stock-essentials POST — including the no-supplier-rows early return', () => {
     expect(
-      StockEssentialsResponseSchema.parse({ ok: true, added: 5, skipped: 1, total: 6, failures: [] })
-        .skipped,
+      StockEssentialsResponseSchema.parse({
+        ok: true,
+        added: 5,
+        skipped: 1,
+        total: 6,
+        failures: [],
+      }).skipped,
     ).toBe(1);
     const early = StockEssentialsResponseSchema.parse({
       ok: true,

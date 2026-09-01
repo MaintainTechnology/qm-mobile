@@ -57,7 +57,7 @@ Runs typecheck, lint and tests together. Run it before every commit. Individuall
 ```
 src/
   app/            expo-router routes — file-based, typed
-  lib/            api client, money, query client, AI, session, env
+  lib/            API, money, query/session, routing, media and monitoring boundaries
   types/          ambient declarations
 assets/           icons and splash (Expo placeholders — replace with QuoteMax branding)
 ```
@@ -78,7 +78,8 @@ Money is always an integer number of cents. `src/lib/money.ts` is the only place
 and it is unit-tested. See `.claude/skills/au-conventions/SKILL.md` for the GST, phone, date and
 timezone rules — including the one where NSW observes daylight saving and Queensland does not.
 
-## Notes
+## Release boundaries
 
-- App icon and splash are still the Expo defaults. Replace them in `assets/` with QuoteMax branding.
-- `src/app/index.tsx` is a scaffold placeholder. Delete it when the design system lands.
+Local tests and exports do not prove provider configuration, cross-tenant authority, native deep
+links, push, purchases, accessibility or device lifecycle behaviour. Track those gates in
+`specs/web-mobile-completeness-spec.md`; publishing remains a separate authorised action.

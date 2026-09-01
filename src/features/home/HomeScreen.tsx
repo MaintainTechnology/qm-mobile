@@ -1,33 +1,23 @@
 /**
  * `home` — Today first (design kit screen 4).
  *
- * Every size, colour and string below is the kit's. Business identity, the AI
- * line, the overview stats, Recent quotes and Recent chats are all wired to
+ * Business identity, the AI line, the overview stats, Recent quotes and Recent chats are wired to
  * live data (spec web-parity C1–C4, E1). The kit's calendar ("Today · site
  * visits") has no backing API this round and calendar is a listed non-goal,
  * so that section is cut rather than faked.
  */
-import { useFocusEffect, useRouter } from 'expo-router';
-import { useCallback, useEffect, useMemo } from 'react';
+import { useRouter } from 'expo-router';
+import { useMemo } from 'react';
 import {
-  ActivityIndicator,
   Pressable,
   RefreshControl,
   ScrollView,
   Share,
   StyleSheet,
   Text,
+  useWindowDimensions,
   View,
 } from 'react-native';
-import Animated, {
-  Easing,
-  cancelAnimation,
-  useAnimatedStyle,
-  useSharedValue,
-  withRepeat,
-  withSequence,
-  withTiming,
-} from 'react-native-reanimated';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandMark } from '@/components/BrandMark';
@@ -44,7 +34,7 @@ import { CopyIcon, SunIcon } from '@/features/home/icons';
 import { apiErrorMessage } from '@/lib/api';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { isAccepted, isInReview, overviewStats, useTenantMe, type QuoteRow } from '@/lib/tenant';
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme, useThemeToggle } from '@/lib/useTheme';
 
 type Tone = 'ok' | 'warn' | 'dim';
@@ -87,25 +77,12 @@ function greetingWord(hour: number): string {
 
 // ── Small shared pieces ────────────────────────────────────────────────────
 
-/** qmPulse: opacity 1 → .4 → 1, 2.4s, ease-in-out, infinite. Runs only while the tab is focused. */
-function PulseDot({ color, size = 6 }: { color: string; size?: number }) {
-  const pulse = useSharedValue(1);
-  useFocusEffect(
-    useCallback(() => {
-      pulse.value = withRepeat(
-        withSequence(
-          withTiming(0.4, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-          withTiming(1, { duration: 1200, easing: Easing.inOut(Easing.ease) }),
-        ),
-        -1,
-      );
-      return () => cancelAnimation(pulse);
-    }, [pulse]),
-  );
-  const style = useAnimatedStyle(() => ({ opacity: pulse.value }));
+/** A steady status marker avoids motion competing with the next action. */
+function StatusDot({ color, size = 6 }: { color: string; size?: number }) {
   return (
-    <Animated.View
-      style={[{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }, style]}
+    <View
+      accessible={false}
+      style={{ width: size, height: size, borderRadius: size / 2, backgroundColor: color }}
     />
   );
 }
@@ -113,9 +90,11 @@ function PulseDot({ color, size = 6 }: { color: string; size?: number }) {
 // ── The screen ─────────────────────────────────────────────────────────────
 
 export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const toggleTheme = useThemeToggle();
   const insets = useSafeAreaInsets();
+  const { width, fontScale } = useWindowDimensions();
+  const stackMetrics = width < 360 || fontScale > 1.15;
   const router = useRouter();
   const { data: me, isPending, isError, error, refetch, isRefetching } = useTenantMe();
   const {
@@ -125,29 +104,17 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
     refetch: refetchChats,
   } = useChats();
 
-  const lift = isDark ? 'inset 0 1px 0 rgba(255,255,255,0.06)' : '0 1px 2px rgba(43,36,34,0.06)';
   const card = {
     borderWidth: 1,
     borderColor: colors.inkLine,
     borderRadius: 14,
     backgroundColor: colors.inkCard,
-    boxShadow: lift,
   } as const;
   const tone: Record<Tone, string> = {
     ok: colors.successBright,
     warn: colors.warningBright,
     dim: colors.textDim,
   };
-
-  // qmUp: greeting entrance, translateY 8 → 0 with fade, 0.32s.
-  const up = useSharedValue(0);
-  useEffect(() => {
-    up.value = withTiming(1, { duration: 320, easing: Easing.bezier(0.22, 1, 0.36, 1) });
-  }, [up]);
-  const upStyle = useAnimatedStyle(() => ({
-    opacity: up.value,
-    transform: [{ translateY: (1 - up.value) * 8 }],
-  }));
 
   const stats = useMemo(() => (me ? overviewStats(me.quotes) : null), [me]);
   const orderedQuotes = useMemo(() => (me ? newestFirst(me.quotes) : []), [me]);
@@ -181,7 +148,13 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
             accessibilityLabel="Back"
             onPress={onBack}
             hitSlop={8}
-            style={[styles.iconBtn, { borderColor: colors.inkLine }]}
+            style={({ pressed }) => [
+              styles.iconBtn,
+              {
+                borderColor: colors.ctlLine,
+                backgroundColor: pressed ? colors.ink : 'transparent',
+              },
+            ]}
           >
             <Text style={[styles.backGlyph, { color: colors.textSec }]}>‹</Text>
           </Pressable>
@@ -189,7 +162,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
         <BrandMark height={24} body={colors.logoBody} notch={colors.logoNotch} />
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={[styles.brandName, { color: colors.logoBody }]}>QUOTEMAX</Text>
-          <Text style={[styles.businessName, { color: colors.textDim }]}>
+          <Text style={[styles.businessName, { color: colors.textDim }]} numberOfLines={1}>
             {businessName.toUpperCase()}
           </Text>
         </View>
@@ -198,24 +171,22 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
           accessibilityLabel="Toggle theme"
           onPress={toggleTheme}
           hitSlop={3}
-          style={[styles.iconBtn, { borderColor: colors.inkLine }]}
+          style={({ pressed }) => [
+            styles.iconBtn,
+            { borderColor: colors.ctlLine, backgroundColor: pressed ? colors.ink : 'transparent' },
+          ]}
         >
           <SunIcon color={colors.textSec} />
         </Pressable>
-        <View style={[styles.avatar, { backgroundColor: colors.accent }]}>
-          <Text style={[styles.avatarText, { color: colors.accentInk }]}>
-            {ownerFirstName.charAt(0).toUpperCase()}
-          </Text>
-        </View>
       </View>
 
       {/* C4: loading skeleton, error + retry, pull-to-refresh — assume poor signal. */}
       {isPending ? (
-        <View style={styles.centerFill}>
-          <ActivityIndicator color={colors.accent} style={{ alignSelf: 'center' }} />
-          <Text style={[styles.centerText, { color: colors.textDim }]}>
-            LOADING YOUR DASHBOARD…
-          </Text>
+        <View accessible accessibilityLabel="Loading your dashboard" style={styles.loadingContent}>
+          <View style={[styles.skeletonHeading, { backgroundColor: colors.ink }]} />
+          <View style={[styles.skeletonText, { backgroundColor: colors.ink }]} />
+          <View style={[styles.skeletonCard, { backgroundColor: colors.ink }]} />
+          <View style={[styles.skeletonCard, { backgroundColor: colors.ink }]} />
         </View>
       ) : isError && !me ? (
         // Only when there is nothing cached to show — a failed refresh must never blank a
@@ -234,7 +205,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
       ) : me && stats ? (
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={{ paddingBottom: 24 }}
+          contentContainerStyle={{ paddingBottom: spacing.gap }}
           refreshControl={
             <RefreshControl
               refreshing={isRefetching}
@@ -247,40 +218,14 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
             />
           }
         >
-          {/* Live strip */}
-          <View
-            style={[
-              styles.liveStrip,
-              { borderBottomColor: colors.inkLine, backgroundColor: colors.ink },
-            ]}
-          >
-            <PulseDot color={aiLineLive ? colors.successBright : colors.warningBright} />
-            <Text
-              style={[
-                styles.liveText,
-                { color: aiLineLive ? colors.successBright : colors.warningBright },
-              ]}
-            >
-              {aiLineLive ? 'AI LINE LIVE · ANSWERING' : 'AI LINE · SETTING UP'}
-            </Text>
-            <Text style={[styles.liveNumber, { color: colors.textDim }]}>
-              {smsOrVoiceNumber ?? 'NOT PROVISIONED'}
-            </Text>
-          </View>
-
           {/* Greeting */}
-          <Animated.View style={[styles.greeting, upStyle]}>
-            <Text style={[styles.h1, { color: colors.textPri }]}>
-              {greetingWord(new Date().getHours())},{' '}
-              <Text
-                style={{
-                  color: colors.accentText,
-                  textDecorationLine: 'underline',
-                  textDecorationColor: colors.accentUnder,
-                }}
-              >
-                {ownerFirstName.toUpperCase()}
-              </Text>
+          <View style={styles.greeting}>
+            <Text
+              accessibilityRole="header"
+              maxFontSizeMultiplier={1.4}
+              style={[styles.h1, { color: colors.textPri }]}
+            >
+              {greetingWord(new Date().getHours())}, {ownerFirstName.toUpperCase()}
             </Text>
             <Text style={[styles.greetingSub, { color: colors.textSec }]}>
               {stats.inReviewCount === 0
@@ -289,19 +234,13 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                   ? 'One quote needs your review. The rest are drafted and waiting.'
                   : `${stats.inReviewCount} quotes need your review. The rest are drafted and waiting.`}
             </Text>
-          </Animated.View>
+          </View>
 
           {/* Needs your attention — the newest in-review quote, or nothing at all. */}
           {attentionQuote ? (
-            <View
-              style={[
-                styles.attentionCard,
-                card,
-                { borderColor: 'rgba(245,158,11,0.42)', marginTop: 20 },
-              ]}
-            >
+            <View style={[styles.attentionCard, card, { borderColor: colors.warningBright }]}>
               <View style={styles.attentionHeader}>
-                <PulseDot color={colors.warningBright} />
+                <StatusDot color={colors.warningBright} />
                 <Text style={[styles.attentionLabel, { color: colors.warningBright }]}>
                   NEEDS YOUR ATTENTION
                 </Text>
@@ -309,7 +248,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
               <View style={styles.attentionRow}>
                 <Text
                   style={[styles.attentionName, { color: colors.textPri, flexShrink: 1 }]}
-                  numberOfLines={1}
+                  numberOfLines={2}
                 >
                   {attentionQuote.customer_full_name ||
                     attentionQuote.customer_first_name ||
@@ -324,22 +263,16 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
               <Text style={[styles.attentionBody, { color: colors.textDim }]}>
                 QuoteMax drafted this one. It needs a couple of details before you can send.
               </Text>
-              <Pressable
-                accessibilityRole="button"
-                onPress={() => goToQuote(attentionQuote.id)}
-                style={[styles.reviewBtn, { backgroundColor: colors.accent }]}
-              >
-                <Text style={[styles.reviewBtnText, { color: colors.accentInk }]}>
-                  REVIEW QUOTE →
-                </Text>
-              </Pressable>
+              <View style={styles.reviewBtn}>
+                <PrimaryCta label="Review quote" onPress={() => goToQuote(attentionQuote.id)} />
+              </View>
             </View>
           ) : null}
 
           {/* Quoted */}
           <View style={[styles.quotedCard, card]}>
             <Text style={[styles.quotedLabel, { color: colors.textDim }]}>QUOTED · INC GST</Text>
-            <Text style={[styles.quotedValue, { color: colors.textPri }]}>
+            <Text selectable style={[styles.quotedValue, { color: colors.textPri }]}>
               {formatAud(stats.quotedCents)}
             </Text>
             <View style={styles.quotedStats}>
@@ -368,17 +301,30 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
           <View
             style={[
               styles.kpiStrip,
-              { borderColor: colors.inkLine, backgroundColor: colors.inkLine, boxShadow: lift },
+              stackMetrics && styles.kpiStripStacked,
+              { borderColor: colors.inkLine, backgroundColor: colors.inkLine },
             ]}
           >
-            <View style={[styles.kpiCell, { backgroundColor: colors.inkCard }]}>
+            <View
+              style={[
+                styles.kpiCell,
+                stackMetrics && styles.kpiCellStacked,
+                { backgroundColor: colors.inkCard },
+              ]}
+            >
               <Text style={[styles.kpiLabel, { color: colors.textDim }]}>AVG QUOTE</Text>
-              <Text style={[styles.kpiValue, { color: colors.accentText }]}>
+              <Text style={[styles.kpiValue, { color: colors.textPri }]}>
                 {formatAud(stats.avgQuoteCents)}
               </Text>
               <Text style={[styles.kpiSub, { color: colors.textSec }]}>Per draft · inc GST</Text>
             </View>
-            <View style={[styles.kpiCell, { backgroundColor: colors.inkCard }]}>
+            <View
+              style={[
+                styles.kpiCell,
+                stackMetrics && styles.kpiCellStacked,
+                { backgroundColor: colors.inkCard },
+              ]}
+            >
               <Text style={[styles.kpiLabel, { color: colors.textDim }]}>IN REVIEW</Text>
               <Text style={[styles.kpiValue, { color: colors.textPri }]}>
                 {stats.inReviewCount}
@@ -392,8 +338,19 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
             <Text style={[styles.numberLabel, { color: colors.textDim }]}>
               YOUR QUOTEMAX NUMBER
             </Text>
+            <View style={styles.numberStatus}>
+              <StatusDot color={aiLineLive ? colors.successBright : colors.warningBright} />
+              <Text
+                style={[
+                  styles.liveText,
+                  { color: aiLineLive ? colors.successBright : colors.warningBright },
+                ]}
+              >
+                {aiLineLive ? 'AI LINE LIVE' : 'AI LINE SETTING UP'}
+              </Text>
+            </View>
             <View style={styles.numberRow}>
-              <Text style={[styles.numberValue, { color: colors.textPri }]}>
+              <Text selectable style={[styles.numberValue, { color: colors.textPri }]}>
                 {smsOrVoiceNumber ?? 'Pending'}
               </Text>
               <Pressable
@@ -403,9 +360,13 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                 onPress={() => {
                   if (smsOrVoiceNumber) void Share.share({ message: smsOrVoiceNumber });
                 }}
-                style={[
+                style={({ pressed }) => [
                   styles.copyBtn,
-                  { borderColor: colors.inkLine, opacity: smsOrVoiceNumber ? 1 : 0.4 },
+                  {
+                    borderColor: colors.ctlLine,
+                    backgroundColor: pressed ? colors.ink : 'transparent',
+                    opacity: smsOrVoiceNumber ? 1 : 0.4,
+                  },
                 ]}
               >
                 <CopyIcon color={colors.textSec} />
@@ -413,13 +374,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
             </View>
             <View style={styles.channelChips}>
               {channelChips.map(c => (
-                <View
-                  key={c.label}
-                  style={[
-                    styles.channelChip,
-                    { borderColor: c.live ? 'rgba(52,210,123,0.45)' : colors.inkLine },
-                  ]}
-                >
+                <View key={c.label} style={[styles.channelChip, { borderColor: colors.inkLine }]}>
                   <View
                     style={[
                       styles.chipDot,
@@ -432,52 +387,61 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                       { color: c.live ? colors.successBright : colors.textDim },
                     ]}
                   >
-                    {c.label.toUpperCase()}
+                    {c.label.toUpperCase()} {c.live ? 'ON' : 'OFF'}
                   </Text>
                 </View>
               ))}
             </View>
           </View>
 
-          {/* 01 Recent quotes */}
+          {/* Recent quotes */}
           <View style={[styles.listCard, card]}>
             <View style={[styles.listHeader, { borderBottomColor: colors.inkLine }]}>
-              <View style={styles.sectionTitleGroup}>
-                <Text style={[styles.listNum, { color: colors.accentText }]}>01</Text>
-                <Text style={[styles.listTitle, { color: colors.textPri }]}>RECENT QUOTES</Text>
-              </View>
+              <Text
+                accessibilityRole="header"
+                style={[styles.listTitle, { color: colors.textPri }]}
+              >
+                Recent quotes
+              </Text>
               <Pressable
                 accessibilityRole="button"
                 onPress={goToQuotes}
                 hitSlop={8}
-                style={styles.sectionActionBtn}
+                style={({ pressed }) => [styles.sectionActionBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
-                <Text style={[styles.sectionAction, { color: colors.accentText }]}>
+                <Text style={[styles.sectionAction, { color: colors.textSec }]}>
                   ALL {stats.quoteCount} →
                 </Text>
               </Pressable>
             </View>
             {recentQuotes.length === 0 ? (
               <Text style={[styles.emptyRow, { color: colors.textDim }]}>
-                NO QUOTES YET · SMS OR CALLS WILL LAND HERE
+                No quotes yet. New requests will appear here.
               </Text>
             ) : (
-              recentQuotes.map(q => {
+              recentQuotes.map((q, index) => {
                 const chip = quoteStatusChip(q);
                 return (
                   <Pressable
                     key={q.id}
                     accessibilityRole="button"
                     onPress={() => goToQuote(q.id)}
-                    style={[styles.quoteRow, { borderBottomColor: colors.inkLine }]}
+                    style={({ pressed }) => [
+                      styles.quoteRow,
+                      {
+                        borderBottomColor: colors.inkLine,
+                        borderBottomWidth: index === recentQuotes.length - 1 ? 0 : 1,
+                        backgroundColor: pressed ? colors.ink : 'transparent',
+                      },
+                    ]}
                   >
-                    <View style={{ flex: 1, minWidth: 0 }}>
-                      <Text style={[styles.quoteName, { color: colors.textPri }]} numberOfLines={1}>
+                    <View style={styles.quoteDetails}>
+                      <Text style={[styles.quoteName, { color: colors.textPri }]} numberOfLines={2}>
                         {q.customer_full_name || q.customer_first_name || 'Customer'}
                       </Text>
                       <Text
                         style={[styles.quoteJob, { color: colors.textSec }]}
-                        numberOfLines={1}
+                        numberOfLines={2}
                         ellipsizeMode="tail"
                       >
                         {jobLabel(q)}
@@ -488,16 +452,18 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                       </Text>
                     </View>
                     <View style={styles.quoteRight}>
-                      <Text style={[styles.quoteValue, { color: colors.textPri }]}>
-                        {q.total_inc_gst != null
-                          ? formatAud(centsFromApiDollars(q.total_inc_gst))
-                          : '—'}
-                      </Text>
-                      {q.total_inc_gst != null ? (
-                        <Text style={[styles.quoteAmountMeta, { color: colors.textDim }]}>
-                          inc GST
+                      <View style={styles.quoteAmount}>
+                        <Text style={[styles.quoteValue, { color: colors.textPri }]}>
+                          {q.total_inc_gst != null
+                            ? formatAud(centsFromApiDollars(q.total_inc_gst))
+                            : '—'}
                         </Text>
-                      ) : null}
+                        {q.total_inc_gst != null ? (
+                          <Text style={[styles.quoteAmountMeta, { color: colors.textDim }]}>
+                            inc GST
+                          </Text>
+                        ) : null}
+                      </View>
                       <View style={[styles.statusChip, { borderColor: tone[chip.tone] }]}>
                         <View style={[styles.statusDot, { backgroundColor: tone[chip.tone] }]} />
                         <Text style={[styles.statusChipText, { color: tone[chip.tone] }]}>
@@ -511,22 +477,32 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
             )}
           </View>
 
-          {/* Recent chats (no section number in the kit) — spec E1, live /api/tenant/chats. */}
+          {/* Recent chats — spec E1, live /api/tenant/chats. */}
           <View style={[styles.listCard, card, { marginBottom: 0 }]}>
             <View style={[styles.listHeader, { borderBottomColor: colors.inkLine }]}>
-              <Text style={[styles.listTitle, { color: colors.textPri }]}>RECENT CHATS</Text>
+              <Text
+                accessibilityRole="header"
+                style={[styles.listTitle, { color: colors.textPri }]}
+              >
+                Recent chats
+              </Text>
               <Pressable
                 accessibilityRole="button"
                 onPress={() => router.push('/chats')}
                 hitSlop={8}
-                style={styles.sectionActionBtn}
+                style={({ pressed }) => [styles.sectionActionBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
-                <Text style={[styles.sectionAction, { color: colors.accentText }]}>OPEN →</Text>
+                <Text style={[styles.sectionAction, { color: colors.textSec }]}>OPEN →</Text>
               </Pressable>
             </View>
             {chatsLoading ? (
-              <View style={styles.chatsStateRow}>
-                <ActivityIndicator color={colors.accent} />
+              <View
+                accessible
+                accessibilityLabel="Loading recent chats"
+                style={styles.chatsStateRow}
+              >
+                <View style={[styles.skeletonText, { backgroundColor: colors.ink }]} />
+                <View style={[styles.skeletonText, { backgroundColor: colors.ink }]} />
               </View>
             ) : chatsError && recentChats.length === 0 ? (
               <Pressable
@@ -535,22 +511,29 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                 style={styles.chatsErrorRow}
               >
                 <Text style={[styles.emptyRow, { color: colors.textDim }]}>
-                  COULDN’T LOAD CHATS · TAP TO RETRY
+                  Couldn’t load chats. Tap to retry.
                 </Text>
               </Pressable>
             ) : recentChats.length === 0 ? (
               <Text style={[styles.emptyRow, { color: colors.textDim }]}>
-                NO CHATS YET · SMS OR CALLS WILL LAND HERE
+                No chats yet. Customer conversations will appear here.
               </Text>
             ) : (
-              recentChats.map(c => {
+              recentChats.map((c, index) => {
                 const who = chatDisplayName(c);
                 return (
                   <Pressable
                     key={c.id}
                     accessibilityRole="button"
                     onPress={() => router.push({ pathname: '/chats', params: { chatId: c.id } })}
-                    style={[styles.chatRow, { borderBottomColor: colors.inkLine }]}
+                    style={({ pressed }) => [
+                      styles.chatRow,
+                      {
+                        borderBottomColor: colors.inkLine,
+                        borderBottomWidth: index === recentChats.length - 1 ? 0 : 1,
+                        backgroundColor: pressed ? colors.ink : 'transparent',
+                      },
+                    ]}
                   >
                     <View style={[styles.chatAvatar, { backgroundColor: colors.inkLine }]}>
                       <Text style={[styles.chatInitial, { color: colors.textSec }]}>
@@ -571,7 +554,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                       </View>
                       <Text
                         style={[styles.chatMsg, { color: colors.textDim }]}
-                        numberOfLines={1}
+                        numberOfLines={2}
                         ellipsizeMode="tail"
                       >
                         {lastMessagePreview(c)}
@@ -593,306 +576,198 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
 
 const styles = StyleSheet.create({
   header: {
-    height: 54,
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
+    gap: spacing.md,
+    paddingHorizontal: spacing.xl,
+    paddingVertical: spacing.md,
     borderBottomWidth: 1,
   },
-  brandName: {
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 12.5,
-    letterSpacing: -0.125, // -.01em @ 12.5
-  },
-  businessName: {
-    marginTop: 3,
-    fontFamily: fonts.mono.medium,
-    fontSize: 8.5,
-    letterSpacing: 1.02, // .12em @ 8.5
-  },
+  brandName: { ...type.body, fontFamily: fonts.sans.extraBold, letterSpacing: -0.3 },
+  businessName: { ...type.label, marginTop: spacing.xs, letterSpacing: 0.6 },
   iconBtn: {
-    width: 38,
-    height: 38,
+    width: touch.minimum,
+    height: touch.minimum,
     borderWidth: 1,
-    borderRadius: 9,
+    borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  backGlyph: { fontFamily: fonts.sans.extraBold, fontSize: 22, lineHeight: 24, marginTop: -2 },
-  avatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  avatarText: { fontFamily: fonts.sans.extraBold, fontSize: 13.5 },
-  centerFill: { flex: 1, justifyContent: 'center', paddingHorizontal: 32, gap: 10 },
-  centerText: {
-    fontFamily: fonts.sans.regular,
-    fontSize: 13.5,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  errorTitle: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 15,
-    lineHeight: 20,
-    textAlign: 'center',
-  },
-  retryBtn: { marginTop: 8 },
-  emptyRow: {
-    paddingVertical: 24,
-    paddingHorizontal: 16,
-    textAlign: 'center',
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    letterSpacing: 1,
-  },
-  chatsStateRow: { paddingVertical: 24, alignItems: 'center' },
-  chatsErrorRow: { minHeight: touch.minimum, justifyContent: 'center' },
-  liveStrip: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 9,
-    paddingVertical: 9,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
-  },
-  liveText: {
+  backGlyph: { fontFamily: fonts.sans.extraBold, fontSize: 26, lineHeight: 28 },
+  centerFill: {
     flex: 1,
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 12,
-    letterSpacing: 1.68, // .14em @ 12
-  },
-  liveNumber: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 12,
-    letterSpacing: 1.44, // .12em @ 12
-  },
-  greeting: { paddingTop: 20, paddingHorizontal: 16 },
-  h1: {
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 28,
-    lineHeight: 30, // kit .95 clips in RN; DESIGN.md floors display leading at 1.05
-    letterSpacing: -1.12, // -.04em @ 28
-  },
-  greetingSub: {
-    marginTop: 9,
-    fontFamily: fonts.sans.regular,
-    fontSize: 13.5,
-    lineHeight: 20, // 1.5
-  },
-  sectionTitleGroup: { flexDirection: 'row', alignItems: 'baseline', gap: 9 },
-  sectionAction: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 10,
-    letterSpacing: 1, // .1em @ 10
-  },
-  sectionActionBtn: { minHeight: touch.minimum, justifyContent: 'center' },
-  attentionCard: { marginHorizontal: 16, padding: 18 },
-  attentionHeader: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  attentionLabel: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
-  attentionRow: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    gap: 10,
-  },
-  attentionName: { fontFamily: fonts.sans.bold, fontSize: 15, lineHeight: 18 },
-  attentionMeta: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 12,
-    letterSpacing: 1.2, // .1em @ 12
-  },
-  attentionBody: {
-    marginTop: 7,
-    fontFamily: fonts.sans.regular,
-    fontSize: 12.5,
-    lineHeight: 18, // 1.45
-  },
-  reviewBtn: {
-    marginTop: 14,
-    height: 52,
-    borderRadius: 9,
-    alignItems: 'center',
     justifyContent: 'center',
+    paddingHorizontal: spacing.gap,
+    gap: spacing.md,
   },
-  reviewBtnText: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 12.5,
-    letterSpacing: 0.75, // .06em @ 12.5
-  },
-  quotedCard: { marginTop: 16, marginHorizontal: 16, padding: 18 },
-  quotedLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1.05, // .1em @ 10.5
-  },
-  quotedValue: {
-    marginTop: 9,
-    fontFamily: fonts.mono.bold,
-    fontSize: 38,
-    lineHeight: 40,
-    letterSpacing: -1.14, // -.03em @ 38
-    fontVariant: ['tabular-nums'],
-  },
+  centerText: { ...type.bodySm, textAlign: 'center' },
+  errorTitle: { ...type.title, textAlign: 'center' },
+  retryBtn: { marginTop: spacing.sm },
+  loadingContent: { padding: spacing.xl, paddingTop: spacing.gap, gap: spacing.lg },
+  skeletonHeading: { width: '72%', height: 32, borderRadius: radius.chip },
+  skeletonText: { width: '88%', height: 20, borderRadius: radius.chip },
+  skeletonCard: { marginTop: spacing.sm, height: 144, borderRadius: radius.card },
+  emptyRow: { ...type.bodySm, paddingVertical: spacing.xxl, paddingHorizontal: spacing.xl },
+  chatsStateRow: { padding: spacing.xl, gap: spacing.md },
+  chatsErrorRow: { minHeight: touch.minimum, justifyContent: 'center' },
+  liveText: { ...type.label, flex: 1, letterSpacing: 0.6 },
+  greeting: { paddingTop: spacing.gap, paddingHorizontal: spacing.xl },
+  h1: { ...type.headline },
+  greetingSub: { ...type.body, marginTop: spacing.md },
+  sectionAction: { ...type.label, letterSpacing: 0.6 },
+  sectionActionBtn: { minHeight: touch.minimum, justifyContent: 'center', paddingLeft: spacing.sm },
+  attentionCard: { marginTop: spacing.xxl, marginHorizontal: spacing.xl, padding: spacing.xl },
+  attentionHeader: { flexDirection: 'row', alignItems: 'center', gap: spacing.sm },
+  attentionLabel: { ...type.label, flex: 1, letterSpacing: 0.8 },
+  attentionRow: { marginTop: spacing.lg, gap: spacing.sm },
+  attentionName: { ...type.title },
+  attentionMeta: { ...type.label, letterSpacing: 0.6 },
+  attentionBody: { ...type.bodySm, marginTop: spacing.md },
+  reviewBtn: { marginTop: spacing.xl },
+  quotedCard: { marginTop: spacing.xxl, marginHorizontal: spacing.xl, padding: spacing.xl },
+  quotedLabel: { ...type.label, letterSpacing: 1.2 },
+  quotedValue: { ...type.price, marginTop: spacing.md },
   quotedStats: {
-    marginTop: 12,
+    marginTop: spacing.lg,
     flexDirection: 'row',
     flexWrap: 'wrap',
-    columnGap: 18,
-    rowGap: 5,
+    columnGap: spacing.lg,
+    rowGap: spacing.sm,
   },
-  quotedStat: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 17.5 },
-  quotedStatNum: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 12.5,
-    fontVariant: ['tabular-nums'],
-  },
+  quotedStat: { ...type.bodySm },
+  quotedStatNum: { ...type.bodySm, fontFamily: fonts.mono.semiBold, fontVariant: ['tabular-nums'] },
   kpiStrip: {
-    marginTop: 12,
-    marginHorizontal: 16,
+    marginTop: spacing.md,
+    marginHorizontal: spacing.xl,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 1,
     borderWidth: 1,
-    borderRadius: 14,
+    borderRadius: radius.card,
     overflow: 'hidden',
   },
-  kpiCell: { flex: 1, paddingVertical: 14, paddingHorizontal: 12 },
-  kpiLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 9.5,
-    lineHeight: 12,
-    letterSpacing: 0.76, // .08em @ 9.5
-  },
+  kpiStripStacked: { flexDirection: 'column' },
+  kpiCell: { flex: 1, minWidth: 132, paddingVertical: spacing.lg, paddingHorizontal: spacing.md },
+  kpiCellStacked: { flex: 0 },
+  kpiLabel: { ...type.label, letterSpacing: 0.6 },
   kpiValue: {
-    marginTop: 7,
+    marginTop: spacing.md,
     fontFamily: fonts.mono.bold,
-    fontSize: 17,
+    fontSize: 18,
+    lineHeight: 24,
     fontVariant: ['tabular-nums'],
   },
-  kpiSub: { marginTop: 6, fontFamily: fonts.sans.medium, fontSize: 9.5, lineHeight: 12 },
-  numberCard: { marginTop: 16, marginHorizontal: 16, padding: 18 },
-  numberLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
-  numberRow: {
-    marginTop: 10,
+  kpiSub: { ...type.bodySm, marginTop: spacing.sm },
+  numberCard: { marginTop: spacing.xxl, marginHorizontal: spacing.xl, padding: spacing.xl },
+  numberLabel: { ...type.label, letterSpacing: 1.2 },
+  numberStatus: {
+    marginTop: spacing.md,
     flexDirection: 'row',
     alignItems: 'center',
+    gap: spacing.sm,
+  },
+  numberRow: {
+    marginTop: spacing.md,
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'center',
     justifyContent: 'space-between',
-    gap: 10,
+    gap: spacing.md,
   },
   numberValue: {
+    flexShrink: 1,
     fontFamily: fonts.mono.bold,
-    fontSize: 20,
-    letterSpacing: -0.2, // -.01em @ 20
+    fontSize: 22,
+    lineHeight: 30,
+    letterSpacing: -0.2,
+    fontVariant: ['tabular-nums'],
   },
   copyBtn: {
-    width: 44,
-    height: 44,
+    width: touch.minimum,
+    height: touch.minimum,
     borderWidth: 1,
-    borderRadius: 9,
+    borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  channelChips: { marginTop: 13, flexDirection: 'row', gap: 8 },
+  channelChips: { marginTop: spacing.lg, flexDirection: 'row', gap: spacing.sm },
   channelChip: {
     flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 6,
+    gap: spacing.xs,
     borderWidth: 1,
-    borderRadius: 6,
-    paddingVertical: 8,
+    borderRadius: radius.chip,
+    padding: spacing.sm,
   },
   chipDot: { width: 5, height: 5, borderRadius: 2.5 },
-  channelChipText: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
-  listCard: { marginTop: 16, marginHorizontal: 16, overflow: 'hidden' },
+  channelChipText: { ...type.label, flexShrink: 1, letterSpacing: 0, textAlign: 'center' },
+  listCard: { marginTop: spacing.xxl, marginHorizontal: spacing.xl, overflow: 'hidden' },
   listHeader: {
+    minHeight: 72,
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingVertical: 13,
-    paddingHorizontal: 16,
+    columnGap: spacing.md,
+    paddingVertical: spacing.sm,
+    paddingHorizontal: spacing.xl,
     borderBottomWidth: 1,
   },
-  listNum: { fontFamily: fonts.mono.bold, fontSize: 11.5 },
-  listTitle: {
-    fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 1.1, // .1em @ 11
-  },
-  quoteRow: {
+  listTitle: { ...type.title },
+  quoteRow: { minHeight: touch.listRow, padding: spacing.xl, gap: spacing.md },
+  quoteDetails: { minWidth: 0 },
+  quoteName: { ...type.body, fontFamily: fonts.sans.bold },
+  quoteJob: { ...type.bodySm, marginTop: spacing.xs },
+  quoteMeta: { ...type.label, marginTop: spacing.sm, letterSpacing: 0.4 },
+  quoteRight: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 13,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
+    justifyContent: 'space-between',
+    gap: spacing.sm,
   },
-  quoteName: { fontFamily: fonts.sans.bold, fontSize: 13.5, lineHeight: 16 },
-  quoteJob: { marginTop: 4, fontFamily: fonts.sans.regular, fontSize: 12, lineHeight: 16 },
-  quoteMeta: {
-    marginTop: 5,
-    fontFamily: fonts.mono.medium,
-    fontSize: 12,
-    letterSpacing: 1.44, // .12em @ 12
-  },
-  quoteRight: { alignItems: 'flex-end', gap: 7 },
-  quoteValue: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 14,
-    fontVariant: ['tabular-nums'],
-  },
-  quoteAmountMeta: { fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.6 },
+  quoteAmount: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'baseline', gap: spacing.sm },
+  quoteValue: { ...type.body, fontFamily: fonts.mono.bold, fontVariant: ['tabular-nums'] },
+  quoteAmountMeta: { ...type.label, letterSpacing: 0 },
   statusChip: {
+    minHeight: 24,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: spacing.xs,
     borderWidth: 1,
-    borderRadius: 6,
-    paddingVertical: 5,
-    paddingHorizontal: 9,
+    borderRadius: radius.chip,
+    paddingVertical: spacing.xs,
+    paddingHorizontal: spacing.sm,
   },
   statusDot: { width: 4, height: 4, borderRadius: 2 },
-  statusChipText: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 12,
-    letterSpacing: 1.2, // .1em @ 12
-  },
+  statusChipText: { ...type.label, letterSpacing: 0.3 },
   chatRow: {
+    minHeight: 88,
     flexDirection: 'row',
     alignItems: 'flex-start',
-    gap: 11,
-    paddingVertical: 13,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
+    gap: spacing.md,
+    padding: spacing.xl,
   },
   chatAvatar: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chatInitial: { fontFamily: fonts.sans.bold, fontSize: 12 },
-  chatNameRow: { flexDirection: 'row', justifyContent: 'space-between', gap: 8 },
-  chatName: { fontFamily: fonts.sans.bold, fontSize: 13 },
-  chatTime: { fontFamily: fonts.mono.medium, fontSize: 9.5 },
-  chatMsg: { marginTop: 5, fontFamily: fonts.sans.regular, fontSize: 12, lineHeight: 17 },
+  chatInitial: { ...type.bodySm, fontFamily: fonts.sans.bold },
+  chatNameRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    columnGap: spacing.sm,
+    rowGap: spacing.xs,
+  },
+  chatName: { ...type.body, fontFamily: fonts.sans.bold, flexShrink: 1 },
+  chatTime: { ...type.label, letterSpacing: 0 },
+  chatMsg: { ...type.bodySm, marginTop: spacing.sm },
 });

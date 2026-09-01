@@ -1,28 +1,68 @@
 /**
  * Active-theme resolution: the OS setting, overridable in-app.
  *
- * The kit's home header (and later the menu) carries a theme toggle; DESIGN.md
- * pins the override in Settings → Appearance. The override lives here so every
- * screen picks it up unchanged.
- * ponytail: override is session-only; persist it when the settings screen lands.
+ * Menu → Appearance offers System, Charcoal and Paper. This device preference
+ * is shared by every screen and survives an app restart.
  */
-import { createContext, useContext, useMemo, useState, type ReactNode } from 'react';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
 
 import { type ThemeColors, type ThemeName, themes } from '@/lib/theme';
 
-const ThemeControlContext = createContext<{ name: ThemeName; toggle: () => void }>({
+export type ThemePreference = ThemeName | 'system';
+const PREFERENCE_KEY = 'quotemax.appearance';
+
+const ThemeControlContext = createContext<{
+  name: ThemeName;
+  preference: ThemePreference;
+  setPreference: (preference: ThemePreference) => void;
+  toggle: () => void;
+}>({
   name: 'dark',
+  preference: 'system',
+  setPreference: () => {},
   toggle: () => {},
 });
 
 export function ThemeControlProvider({ children }: { children: ReactNode }) {
   const scheme = useColorScheme();
-  const [override, setOverride] = useState<ThemeName | null>(null);
-  const name: ThemeName = override ?? (scheme === 'light' ? 'light' : 'dark');
+  const [savedPreference, setPreference] = useState<ThemePreference | null>(null);
+  const preference = savedPreference ?? 'system';
+  const name: ThemeName =
+    preference === 'system' ? (scheme === 'light' ? 'light' : 'dark') : preference;
+
+  useEffect(() => {
+    let active = true;
+    AsyncStorage.getItem(PREFERENCE_KEY)
+      .then(saved => {
+        if (!active) return;
+        const restored = saved === 'dark' || saved === 'light' ? saved : 'system';
+        // A selection made while storage was loading takes precedence.
+        setPreference(current => current ?? restored);
+      })
+      .catch(() => {
+        if (active) setPreference(current => current ?? 'system');
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (savedPreference !== null) {
+      AsyncStorage.setItem(PREFERENCE_KEY, savedPreference).catch(() => {});
+    }
+  }, [savedPreference]);
+
   const value = useMemo(
-    () => ({ name, toggle: () => setOverride(name === 'dark' ? 'light' : 'dark') }),
-    [name],
+    () => ({
+      name,
+      preference,
+      setPreference,
+      toggle: () => setPreference(name === 'dark' ? 'light' : 'dark'),
+    }),
+    [name, preference],
   );
   return <ThemeControlContext.Provider value={value}>{children}</ThemeControlContext.Provider>;
 }
@@ -32,7 +72,12 @@ export function useTheme(): { colors: ThemeColors; isDark: boolean } {
   return { colors: themes[name], isDark: name === 'dark' };
 }
 
-/** The kit's sun-button behaviour: flip dark ↔ light for this session. */
+/** The overview's shortcut uses the same preference as Menu → Appearance. */
 export function useThemeToggle(): () => void {
   return useContext(ThemeControlContext).toggle;
+}
+
+export function useThemePreference() {
+  const { preference, setPreference } = useContext(ThemeControlContext);
+  return { preference, setPreference };
 }

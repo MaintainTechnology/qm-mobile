@@ -1,6 +1,6 @@
 {
   "name": "qm-mobile",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "private": true,
   "main": "expo-router/entry",
   "scripts": {
@@ -25,7 +25,9 @@
     "@expo-google-fonts/jetbrains-mono": "^0.4.1",
     "@expo-google-fonts/manrope": "^0.4.2",
     "@react-native-async-storage/async-storage": "2.2.0",
+    "@react-native-community/netinfo": "11.4.1",
     "@react-navigation/native": "^7.1.8",
+    "@sentry/react-native": "~7.2.0",
     "@shopify/flash-list": "2.0.2",
     "@stardazed/streams-text-encoding": "^1.0.2",
     "@supabase/supabase-js": "^2.112.4",
@@ -91,6 +93,9 @@
   },
   "jest": {
     "preset": "jest-expo",
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
+    ],
     "testPathIgnorePatterns": [
       "/node_modules/",
       "/.claude/",

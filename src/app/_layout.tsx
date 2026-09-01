@@ -1,6 +1,6 @@
 import '@/polyfills';
 
-import { ClerkProvider } from '@clerk/expo';
+import { ClerkProvider, useAuth } from '@clerk/expo';
 import { tokenCache } from '@clerk/expo/token-cache';
 import {
   JetBrainsMono_400Regular,
@@ -19,22 +19,34 @@ import {
 import { DarkTheme, DefaultTheme, ThemeProvider } from '@react-navigation/native';
 import { PersistQueryClientProvider } from '@tanstack/react-query-persist-client';
 import Constants from 'expo-constants';
-import { Stack } from 'expo-router';
+import { type ErrorBoundaryProps, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
-import { useEffect } from 'react';
+import * as Updates from 'expo-updates';
+import { useEffect, useState, type ReactNode } from 'react';
+import { DevSettings, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
+import { NetworkStatusBanner } from '@/components/NetworkStatusBanner';
 import { BiometricGate } from '@/features/auth/BiometricGate';
 import { clerkPublishableKey } from '@/lib/env';
+import { captureAppError, initialiseMonitoring, setMonitoringRoute } from '@/lib/monitoring';
 import { useNotificationObserver, usePushRegistration } from '@/lib/notifications';
 import { usePurchases } from '@/lib/purchases';
-import { asyncStoragePersister, queryClient } from '@/lib/query';
+import {
+  asyncStoragePersister,
+  queryClient,
+  queryScopeBuster,
+  subscribeQueryRuntime,
+} from '@/lib/query';
 import { themes } from '@/lib/theme';
 import { ThemeControlProvider, useTheme } from '@/lib/useTheme';
 
+initialiseMonitoring();
 SplashScreen.preventAutoHideAsync();
+
+const APP_VERSION = Constants.expoConfig?.version ?? 'dev';
 
 // Navigation's own theme only paints transition backgrounds and headers, but a
 // mismatched background flashes white between screens on the dark canvas.
@@ -68,6 +80,100 @@ function PushBridge() {
   return null;
 }
 
+function QueryRuntimeBridge() {
+  useEffect(() => subscribeQueryRuntime(), []);
+  return null;
+}
+
+function MonitoringRouteBridge() {
+  const pathname = usePathname();
+  useEffect(() => setMonitoringRoute(pathname), [pathname]);
+  return null;
+}
+
+function StartupFailure({ message, onRetry }: { message: string; onRetry?: () => void }) {
+  function restart() {
+    if (__DEV__) DevSettings.reload();
+    else void Updates.reloadAsync();
+  }
+
+  return (
+    <View style={startupStyles.screen}>
+      <Text accessibilityRole="header" style={startupStyles.title}>
+        QuoteMax could not finish starting
+      </Text>
+      <Text style={startupStyles.message}>{message}</Text>
+      <Pressable
+        accessibilityRole="button"
+        accessibilityLabel="Restart QuoteMax"
+        onPress={onRetry ?? restart}
+        style={({ pressed }) => [startupStyles.button, { opacity: pressed ? 0.7 : 1 }]}
+      >
+        <Text style={startupStyles.buttonLabel}>Restart QuoteMax</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+/**
+ * Wait for Clerk before touching persisted server state. This prevents a
+ * private cache from hydrating under a temporary signed-out scope during cold
+ * start, while the buster keeps account A and account B mutually exclusive.
+ */
+function ScopedServerStateProvider({ children }: { children: ReactNode }) {
+  const { isLoaded, userId } = useAuth();
+  const scope = userId ?? 'signed-out';
+  const [activeScope, setActiveScope] = useState<string | null>(null);
+  const [timedOut, setTimedOut] = useState(false);
+
+  useEffect(() => {
+    if (isLoaded) return;
+    const timer = setTimeout(() => setTimedOut(true), 12_000);
+    return () => clearTimeout(timer);
+  }, [isLoaded]);
+
+  useEffect(() => {
+    if (!isLoaded) return;
+    queryClient.clear();
+    setActiveScope(scope);
+  }, [isLoaded, scope]);
+
+  useEffect(() => {
+    if (isLoaded && activeScope === scope) void SplashScreen.hideAsync();
+  }, [activeScope, isLoaded, scope]);
+
+  useEffect(() => {
+    if (timedOut && !isLoaded) void SplashScreen.hideAsync();
+    if (timedOut && !isLoaded) {
+      captureAppError(new Error('Clerk startup timed out'), {
+        kind: 'startup',
+        operationId: 'startup.auth.load',
+        route: '/startup',
+      });
+    }
+  }, [isLoaded, timedOut]);
+
+  if (!isLoaded && !timedOut) return null;
+  if (!isLoaded) {
+    return <StartupFailure message="Your sign-in state did not load. No account data was opened." />;
+  }
+  if (activeScope !== scope) return null;
+
+  return (
+    <PersistQueryClientProvider
+      key={scope}
+      client={queryClient}
+      persistOptions={{
+        persister: asyncStoragePersister,
+        maxAge: 24 * 60 * 60 * 1000,
+        buster: queryScopeBuster(APP_VERSION, userId),
+      }}
+    >
+      {children}
+    </PersistQueryClientProvider>
+  );
+}
+
 /** Inside ThemeControlProvider so the in-app toggle restyles navigation too. */
 function ThemedApp() {
   const { isDark } = useTheme();
@@ -77,9 +183,12 @@ function ThemedApp() {
   return (
     <ThemeProvider value={isDark ? navDark : navLight}>
       <Stack screenOptions={{ headerShown: false }} />
+      <NetworkStatusBanner />
       {/* Overlay, not a route: deep links keep resolving underneath the lock. */}
       <BiometricGate />
       <PushBridge />
+      <QueryRuntimeBridge />
+      <MonitoringRouteBridge />
       <StatusBar style={isDark ? 'light' : 'dark'} />
     </ThemeProvider>
   );
@@ -87,7 +196,7 @@ function ThemedApp() {
 
 export default function RootLayout() {
   // Exactly the weights src/lib/theme.ts sanctions — anything else synthesises badly.
-  const [fontsLoaded] = useFonts({
+  const [fontsLoaded, fontError] = useFonts({
     Manrope_400Regular,
     Manrope_500Medium,
     Manrope_600SemiBold,
@@ -100,9 +209,19 @@ export default function RootLayout() {
   });
 
   useEffect(() => {
-    if (fontsLoaded) SplashScreen.hideAsync();
-  }, [fontsLoaded]);
+    if (fontError) {
+      void SplashScreen.hideAsync();
+      captureAppError(fontError, {
+        kind: 'startup',
+        operationId: 'startup.fonts.load',
+        route: '/startup',
+      });
+    }
+  }, [fontError]);
 
+  if (fontError) {
+    return <StartupFailure message="The app fonts could not be loaded. Restart to try the bundled assets again." />;
+  }
   if (!fontsLoaded) return null;
 
   return (
@@ -113,24 +232,51 @@ export default function RootLayout() {
             inlined inside node_modules in a production build, so Clerk cannot
             read it for itself any more. */}
         <ClerkProvider publishableKey={clerkPublishableKey()} tokenCache={tokenCache}>
-          {/* Same queryClient as before, now rehydrated from AsyncStorage on cold
-              start (src/lib/query.ts). maxAge mirrors the client's 24h gcTime, and
-              the app version busts the cache across OTA/store updates so a stale
-              shape never meets new screen code. */}
-          <PersistQueryClientProvider
-            client={queryClient}
-            persistOptions={{
-              persister: asyncStoragePersister,
-              maxAge: 24 * 60 * 60 * 1000,
-              buster: Constants.expoConfig?.version ?? 'dev',
-            }}
-          >
+          <ScopedServerStateProvider>
             <ThemeControlProvider>
               <ThemedApp />
             </ThemeControlProvider>
-          </PersistQueryClientProvider>
+          </ScopedServerStateProvider>
         </ClerkProvider>
       </SafeAreaProvider>
     </GestureHandlerRootView>
   );
 }
+
+export function ErrorBoundary({ error, retry }: ErrorBoundaryProps) {
+  useEffect(() => {
+    void SplashScreen.hideAsync();
+    captureAppError(error, { kind: 'route', operationId: 'route.render' });
+  }, [error]);
+  return (
+    <StartupFailure
+      message={
+        __DEV__
+          ? `A screen failed safely: ${error.message}`
+          : 'A screen failed safely. Your last server-confirmed work is unchanged.'
+      }
+      onRetry={retry}
+    />
+  );
+}
+
+const startupStyles = StyleSheet.create({
+  screen: {
+    flex: 1,
+    justifyContent: 'center',
+    gap: 16,
+    padding: 24,
+    backgroundColor: '#16120F',
+  },
+  title: { color: '#F6F1EA', fontSize: 24, lineHeight: 32, fontWeight: '800' },
+  message: { color: '#C3B8AC', fontSize: 16, lineHeight: 24 },
+  button: {
+    minHeight: 56,
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12,
+    backgroundColor: '#FFC400',
+    paddingHorizontal: 20,
+  },
+  buttonLabel: { color: '#1C1812', fontSize: 16, lineHeight: 24, fontWeight: '700' },
+});

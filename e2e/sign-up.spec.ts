@@ -49,7 +49,7 @@ test('a tradie can sign up end to end', async ({ page }) => {
   await tapCta(page, 'Activate my AI line');
 
   // Success — provisioned number from the (mocked) activation response.
-  await expect(page.getByText('WELCOME TO QUOTEMAX')).toBeVisible({ timeout: 60_000 });
+  await expect(page.getByText(/YOU.?RE SET UP/i)).toBeVisible({ timeout: 60_000 });
   await expect(page.getByText(QA_PHONE_NUMBER).first()).toBeVisible();
 
   await tapCta(page, 'Open my dashboard');

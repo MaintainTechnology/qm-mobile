@@ -3,8 +3,8 @@
  * wizard that mirrors the web funnel (account, trade & licence, pricing, review).
  *
  * Activation is the web app's own POST /api/onboard/activate (it inserts the tenants +
- * pricing_book rows and provisions the AI line), called with the Clerk user created here so the
- * tenant lands linked via tenants.clerk_user_id. The Clerk session only becomes active on the
+ * pricing_book rows and provisions the AI line), called with a token minted from the Clerk session
+ * created here so the server derives tenants.clerk_user_id itself. The Clerk session only becomes active on the
  * success screen (spec B6), so a failed activation never strands a signed-in-but-no-tenant
  * session — this screen never calls `setActive` itself.
  *
@@ -24,14 +24,13 @@ import { isClerkAPIResponseError, useAuth, useClerk, useUser } from '@clerk/expo
 import { useSignIn, useSignUp } from '@clerk/expo/legacy';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
   Pressable,
   ScrollView,
   StyleSheet,
-  Switch,
   Text,
   View,
 } from 'react-native';
@@ -39,14 +38,32 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { BrandMark } from '@/components/BrandMark';
-import { AuthHeader, BackButton, Field, PrimaryCta } from '@/features/auth/ui';
+import {
+  acquisitionEnvelopeFromParams,
+  activationAcquisitionFields,
+  applyIntentResolution,
+  bindAcquisitionAccount,
+  clearAcquisitionEnvelope,
+  completeAcquisitionEnvelope,
+  createAcquisitionPersistence,
+  invitationValidationChannel,
+  loadAcquisitionEnvelope,
+  mergeAcquisitionEnvelopes,
+  type AcquisitionEnvelope,
+  withAcquisitionProvisioningReceipt,
+  withAcquisitionInvitation,
+} from '@/features/auth/acquisition-envelope';
+import { activationBearerToken } from '@/features/auth/activation-session';
+import { AUTH_GUTTER, AuthHeader, BackButton, Field, PrimaryCta } from '@/features/auth/ui';
 import {
   API_TO_LOCAL_KEY,
   buildActivatePayload,
   EMPTY_ONBOARD_FORM,
   fieldLabel,
+  formatAuMobileDisplay,
   isCodeError,
   LICENCE_BODIES,
+  OnboardNumericValidationError,
   type OnboardForm,
   ROOFING_RATE_FIELDS,
   type RoofingMaterial,
@@ -60,7 +77,8 @@ import {
   usernameFromEmail,
 } from '@/features/auth/verify-state';
 import { apiErrorMessage, ApiError, apiRequest } from '@/lib/api';
-import { fonts, touch } from '@/lib/theme';
+import { fonts, radius, spacing, touch, type } from '@/lib/theme';
+import { ThemedSwitch } from '@/components/ThemedSwitch';
 import { useTheme } from '@/lib/useTheme';
 
 const TRADES = [
@@ -117,6 +135,15 @@ const ValidateCodeResponseSchema = z.looseObject({
   last_slot: z.boolean().optional(),
 });
 
+const IntentResponseSchema = z.object({
+  ok: z.literal(true),
+  intent: z.object({
+    owner_mobile: z.string().min(1).max(32),
+    expires_at: z.string().min(1).max(64),
+    provenance: z.literal('sms'),
+  }),
+});
+
 /** Placeholder shape — only the HTTP status of `GET /api/tenant/me` matters here (spec A3). */
 const TenantMeProbeSchema = z.looseObject({});
 
@@ -130,10 +157,21 @@ function clerkErrorMessage(err: unknown): string {
 }
 
 export function SignUpScreen() {
-  const { colors, isDark } = useTheme();
+  const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const router = useRouter();
-  const params = useLocalSearchParams<{ resume?: string; uid?: string }>();
+  const params = useLocalSearchParams<{
+    resume?: string;
+    uid?: string;
+    code?: string;
+    intent?: string;
+    source?: string;
+    referral?: string;
+    plan?: string;
+    interval?: string;
+    returnTo?: string;
+  }>();
+  const incomingAcquisition = useRef(acquisitionEnvelopeFromParams(params)).current;
 
   const { signUp, setActive: activateSignUpSession, isLoaded: signUpLoaded } = useSignUp();
   const { signIn, isLoaded: signInLoaded } = useSignIn();
@@ -147,7 +185,7 @@ export function SignUpScreen() {
 
   const [resumeEntry, setResumeEntry] = useState(params.resume === '1');
   const [identity, setIdentity] = useState<{ clerkUserId: string; sessionId: string | null }>(
-    () => ({ clerkUserId: params.uid || authUserId || '', sessionId: authSessionId ?? null }),
+    () => ({ clerkUserId: authUserId || params.uid || '', sessionId: authSessionId ?? null }),
   );
 
   const [codeAccepted, setCodeAccepted] = useState(false);
@@ -155,6 +193,13 @@ export function SignUpScreen() {
   const [codeChecking, setCodeChecking] = useState(false);
   const [codeError, setCodeError] = useState<string | null>(null);
   const [codeNote, setCodeNote] = useState<string | null>(null);
+  const [intentError, setIntentError] = useState<string | null>(
+    params.intent && !incomingAcquisition?.intent
+      ? 'That SMS signup link is not valid. Enter a current invitation code instead.'
+      : null,
+  );
+  const [intentResolving, setIntentResolving] = useState(false);
+  const [intentRetry, setIntentRetry] = useState(0);
   const [switchingAccount, setSwitchingAccount] = useState(false);
   const queryClient = useQueryClient();
 
@@ -170,6 +215,12 @@ export function SignUpScreen() {
   const [resending, setResending] = useState(false);
   const [resendError, setResendError] = useState<string | null>(null);
   const [resendSent, setResendSent] = useState(false);
+  const [continuityWarning, setContinuityWarning] = useState<string | null>(null);
+  const [acquisition, setAcquisition] = useState<AcquisitionEnvelope | null>(
+    incomingAcquisition,
+  );
+  const acquisitionRef = useRef<AcquisitionEnvelope | null>(incomingAcquisition);
+  const acquisitionPersistence = useRef(createAcquisitionPersistence()).current;
 
   // Resume entry (A2/A3) skips step 1, so business_name/owner_first_name/owner_email — all
   // required by OnboardActivateSchema — never get typed there. First name + email ARE on the
@@ -178,6 +229,139 @@ export function SignUpScreen() {
   // 2–4" — this lives structurally in step 2, not a re-shown step 1).
   const { user: clerkUser } = useUser();
   const identityBackfilled = useRef(false);
+
+  const commitAcquisition = useCallback((next: AcquisitionEnvelope | null) => {
+    acquisitionRef.current = next;
+    setAcquisition(next);
+    if (!next) return;
+    void acquisitionPersistence.save(next).catch(() => {
+      setContinuityWarning(
+        'We could not save this signup on the device. Keep QuoteMax open until activation finishes.',
+      );
+    });
+  }, [acquisitionPersistence]);
+
+  // Restore only an unbound envelope or one belonging to the live/pending
+  // account. Clerk retains its pending sign-up resource across a remount, so
+  // its email is the account-isolation key before a user id exists.
+  const pendingAccountEmail =
+    clerkUser?.primaryEmailAddress?.emailAddress ?? signUp?.emailAddress ?? undefined;
+  const pendingSignInSession = signIn?.createdSessionId
+    ? clerk.client.sessions.find(session => session.id === signIn.createdSessionId)
+    : undefined;
+  const pendingClerkUserId =
+    authUserId ??
+    signUp?.createdUserId ??
+    pendingSignInSession?.user?.id ??
+    pendingSignInSession?.publicUserData.userId ??
+    undefined;
+  useEffect(() => {
+    let cancelled = false;
+    void (async () => {
+      const stored = await loadAcquisitionEnvelope({
+        email: pendingAccountEmail,
+        clerkUserId: pendingClerkUserId,
+      });
+      if (cancelled) return;
+      const merged = mergeAcquisitionEnvelopes(stored, incomingAcquisition);
+      if (!merged) return;
+      const bound =
+        pendingAccountEmail || pendingClerkUserId
+          ? bindAcquisitionAccount(merged, {
+              email: pendingAccountEmail,
+              clerkUserId: pendingClerkUserId,
+            })
+          : merged;
+      if (!bound) return;
+      commitAcquisition(bound);
+      setInvitationCode(current => current || bound.invitation?.code || '');
+    })().catch(() => {
+      if (!cancelled) {
+        setContinuityWarning(
+          'We could not restore the previous signup. Recheck the acquisition details below.',
+        );
+      }
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [commitAcquisition, incomingAcquisition, pendingAccountEmail, pendingClerkUserId]);
+
+  const pendingIntentToken =
+    acquisition?.intent?.status === 'pending' ? acquisition.intent.token : null;
+  useEffect(() => {
+    if (!pendingIntentToken) return;
+    let cancelled = false;
+    setIntentResolving(true);
+    setIntentError(null);
+    void apiRequest(
+      `/api/onboard/intent/${encodeURIComponent(pendingIntentToken)}`,
+      IntentResponseSchema,
+      { diagnosticPath: '/api/onboard/intent/:token' },
+    )
+      .then(response => {
+        if (cancelled) return;
+        const current = acquisitionRef.current;
+        if (!current?.intent || !('token' in current.intent)) return;
+        const next = applyIntentResolution(current, {
+          status: 'verified',
+          displayPhone: response.intent.owner_mobile,
+          expiresAt: response.intent.expires_at,
+        });
+        commitAcquisition(next);
+      })
+      .catch(error => {
+        if (cancelled) return;
+        const code =
+          error instanceof ApiError && error.body && typeof error.body === 'object'
+            ? (error.body as { error?: unknown }).error
+            : undefined;
+        if (code === 'intent_expired' || code === 'intent_used' || code === 'intent_invalid') {
+          const status = code.slice('intent_'.length) as 'expired' | 'used' | 'invalid';
+          const current = acquisitionRef.current;
+          if (current) {
+            const next = applyIntentResolution(current, { status });
+            commitAcquisition(next);
+            if (current.invitation?.provenance === 'sms') setInvitationCode('');
+          }
+          setIntentError(
+            status === 'expired'
+              ? 'That SMS signup link has expired. Enter a current invitation code instead.'
+              : status === 'used'
+                ? 'That SMS signup link was already used. Sign in, or enter a different invitation code.'
+                : 'That SMS signup link is invalid. Enter a current invitation code instead.',
+          );
+          return;
+        }
+        setIntentError('Could not verify that SMS signup link. Check your signal and retry.');
+      })
+      .finally(() => {
+        if (!cancelled) setIntentResolving(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [commitAcquisition, intentRetry, pendingIntentToken]);
+
+  // A deep-link uid is display/resume context only. Once Clerk hydrates, the
+  // live authenticated identity always wins so a hand-crafted URL cannot steer
+  // even the post-activation hand-off metadata.
+  useEffect(() => {
+    if (!authUserId) return;
+    setIdentity(prev => ({
+      clerkUserId: authUserId,
+      sessionId: authSessionId ?? prev.sessionId,
+    }));
+    const current = acquisitionRef.current;
+    if (current) {
+      const bound = bindAcquisitionAccount(current, {
+        email: clerkUser?.primaryEmailAddress?.emailAddress,
+        clerkUserId: authUserId,
+      });
+      if (bound) commitAcquisition(bound);
+    }
+  }, [authSessionId, authUserId, clerkUser, commitAcquisition]);
+
   useEffect(() => {
     if (!resumeEntry || !clerkUser || identityBackfilled.current) return;
     identityBackfilled.current = true;
@@ -219,6 +403,12 @@ export function SignUpScreen() {
   const hasPainting = form.trades.includes('painting');
   const hasRoofing = form.trades.includes('roofing');
   const primaryTrade: TradeSlug | undefined = form.trades[0];
+  const verifiedIntent =
+    acquisition?.intent?.status === 'verified' ? acquisition.intent : null;
+  const lockedSmsInvitation =
+    verifiedIntent && acquisition?.invitation?.provenance === 'sms'
+      ? acquisition.invitation.code
+      : null;
 
   function validateStep(current: 1 | 2 | 3 | 4): boolean {
     const next: Partial<Record<string, string>> = {};
@@ -235,7 +425,7 @@ export function SignUpScreen() {
       if (resumeEntry && form.businessName.trim().length < 2)
         next.businessName = 'Business name required.';
       if (form.trades.length === 0) next.trades = 'Pick at least one trade.';
-      if (form.mobile.trim() && !AU_MOBILE.test(form.mobile.trim()))
+      if (!verifiedIntent && form.mobile.trim() && !AU_MOBILE.test(form.mobile.trim()))
         next.mobile = 'Enter a valid Australian mobile (04xx xxx xxx).';
       if (form.websiteUrl.trim() && !WEBSITE_RE.test(form.websiteUrl.trim()))
         next.websiteUrl = 'Enter a valid website (e.g. rooroofing.com.au).';
@@ -258,16 +448,25 @@ export function SignUpScreen() {
       setCodeError('Enter your invitation code to continue.');
       return;
     }
+    const channel = invitationValidationChannel(acquisitionRef.current);
+    if (!channel) {
+      setCodeError('Wait while we verify the SMS signup link, then continue.');
+      if (!intentResolving) setIntentRetry(value => value + 1);
+      return;
+    }
     setCodeChecking(true);
     setCodeError(null);
     setCodeNote(null);
     try {
       const res = await apiRequest('/api/onboard/validate-code', ValidateCodeResponseSchema, {
         method: 'POST',
-        body: { code: value, channel: 'web' },
+        body: { code: value, channel },
       });
       if (res.last_slot) setCodeNote('Heads up — this is the last sign-up slot for this code.');
       setInvitationCode(value);
+      const provenance = channel === 'sms' ? 'sms' : 'manual';
+      const next = withAcquisitionInvitation(acquisitionRef.current, value, provenance);
+      if (next) commitAcquisition(next);
       setCodeAccepted(true);
     } catch (err) {
       setCodeError(
@@ -281,13 +480,55 @@ export function SignUpScreen() {
   /** Spec B4/B5 — build the exact activation payload, submit it, and route on the result. */
   async function activateAndFinish(clerkUserId: string, sessionId: string | null) {
     try {
+      const acquisitionFields = activationAcquisitionFields(acquisitionRef.current);
+      const body = buildActivatePayload(form, {
+        invitationCode: acquisitionFields.invitationCode || invitationCode,
+        intentToken: acquisitionFields.intentToken,
+      });
+      // A completed Clerk sign-up owns a session before it becomes active. Mint
+      // the bearer from that exact pending session; resume flows may fall back
+      // to the already-active session. Never send activation without a token.
+      const token = await activationBearerToken({
+        sessionId,
+        activeSessionId: authSessionId,
+        sessions: clerk.client.sessions,
+        getActiveToken: getAuthToken,
+      });
+      if (!token) {
+        setSubmitError('Your secure session expired. Sign in again before activating.');
+        return;
+      }
       const res = await apiRequest('/api/onboard/activate', ActivateResponseSchema, {
         method: 'POST',
-        body: buildActivatePayload(form, { clerkUserId, invitationCode }),
+        body,
+        token,
         // Provisions a real phone number end-to-end — the server's own budget for that is well
         // past the generic 15s default, so match it rather than abort a slow success client-side.
         timeoutMs: 180000,
       });
+      const current = acquisitionRef.current;
+      if (current) {
+        const redacted = completeAcquisitionEnvelope(current, {
+          email: form.email,
+          clerkUserId,
+        });
+        if (redacted) {
+          const complete = withAcquisitionProvisioningReceipt(redacted, {
+            setupComplete: res.setupComplete === true,
+            phoneNumber: res.phoneNumber,
+            warning: res.warning,
+          });
+          acquisitionRef.current = complete;
+          setAcquisition(complete);
+          try {
+            await acquisitionPersistence.save(complete);
+          } catch {
+            setContinuityWarning(
+              'Activation succeeded, but the selected plan could not be saved on this device.',
+            );
+          }
+        }
+      }
       router.replace(
         successHref({
           firstName: form.firstName.trim(),
@@ -295,6 +536,7 @@ export function SignUpScreen() {
           warning: res.warning ?? null,
           sessionId,
           clerkUserId,
+          setupComplete: res.setupComplete === true,
         }),
       );
     } catch (err) {
@@ -302,29 +544,58 @@ export function SignUpScreen() {
     }
   }
 
+  function applyFieldFailures(fieldErrors: Record<string, string[]>) {
+    const fields = Object.keys(fieldErrors);
+    const localErrors: Partial<Record<string, string>> = {};
+    for (const f of fields) {
+      const localKey = API_TO_LOCAL_KEY[f];
+      const msg = fieldErrors[f]?.[0];
+      if (localKey && msg) localErrors[localKey] = msg;
+    }
+    setErrors(localErrors);
+    const summary = fields
+      .map(f => `${fieldLabel(f)}: ${fieldErrors[f]?.[0] ?? 'Please check this'}`)
+      .join(' · ');
+    setSubmitError(`Please fix: ${summary}`);
+    // Resume entry never renders step 1 (spec A2) — clamp the jump to the earliest step it
+    // DOES render, or validateStep(1)'s password/email checks dead-end the wizard.
+    const target = stepForFields(fields) ?? 4;
+    setStep((resumeEntry ? Math.max(2, target) : target) as 1 | 2 | 3 | 4);
+  }
+
   function applyActivateFailure(err: unknown) {
+    if (err instanceof OnboardNumericValidationError) {
+      applyFieldFailures(err.fieldErrors);
+      return;
+    }
     if (err instanceof ApiError && err.body && typeof err.body === 'object') {
       const body = err.body as {
         error?: string;
         fieldErrors?: Record<string, string[]>;
       };
       if (body.error === 'validation_failed' && body.fieldErrors) {
-        const fields = Object.keys(body.fieldErrors);
-        const localErrors: Partial<Record<string, string>> = {};
-        for (const f of fields) {
-          const localKey = API_TO_LOCAL_KEY[f];
-          const msg = body.fieldErrors[f]?.[0];
-          if (localKey && msg) localErrors[localKey] = msg;
-        }
-        setErrors(localErrors);
-        const summary = fields
-          .map(f => `${fieldLabel(f)}: ${body.fieldErrors?.[f]?.[0] ?? 'Please check this'}`)
-          .join(' · ');
-        setSubmitError(`Please fix: ${summary}`);
-        // Resume entry never renders step 1 (spec A2) — clamp the jump to the earliest step it
-        // DOES render, or validateStep(1)'s password/email checks dead-end the wizard.
-        const target = stepForFields(fields) ?? 4;
-        setStep((resumeEntry ? Math.max(2, target) : target) as 1 | 2 | 3 | 4);
+        applyFieldFailures(body.fieldErrors);
+        return;
+      }
+      if (
+        body.error === 'intent_expired' ||
+        body.error === 'intent_used' ||
+        body.error === 'intent_invalid'
+      ) {
+        const status = body.error.slice('intent_'.length) as 'expired' | 'used' | 'invalid';
+        const current = acquisitionRef.current;
+        if (current) commitAcquisition(applyIntentResolution(current, { status }));
+        setInvitationCode('');
+        setCodeAccepted(false);
+        setIntentError(
+          status === 'expired'
+            ? 'That SMS signup link expired before activation. Enter a current invitation code.'
+            : status === 'used'
+              ? 'That SMS signup link was already used. Sign in, or enter another invitation code.'
+              : 'That SMS signup link is invalid. Enter a current invitation code.',
+        );
+        setCodeError(null);
+        setSubmitError(null);
         return;
       }
       if (isCodeError(body.error)) {
@@ -383,6 +654,19 @@ export function SignUpScreen() {
 
     switch (decideDuplicateEmail({ signInFailed, tenantStatus })) {
       case 'resume':
+        if (acquisitionRef.current) {
+          const bound = bindAcquisitionAccount(acquisitionRef.current, {
+            email: form.email,
+            clerkUserId: newUserId,
+          });
+          if (!bound) {
+            setSubmitError(
+              'This signup link belongs to another account. Switch accounts and open your own link.',
+            );
+            return;
+          }
+          commitAcquisition(bound);
+        }
         setIdentity({ clerkUserId: newUserId, sessionId: newSessionId });
         setResumeEntry(true);
         setErrors({});
@@ -393,6 +677,14 @@ export function SignUpScreen() {
         if (newSessionId && signUpLoaded && activateSignUpSession) {
           await activateSignUpSession({ session: newSessionId });
         }
+        try {
+          await acquisitionPersistence.drain();
+          await clearAcquisitionEnvelope();
+        } catch {
+          // Global account cleanup will retry; do not block the proven account.
+        }
+        acquisitionRef.current = null;
+        setAcquisition(null);
         router.replace('/');
         return;
       case 'needs_signin':
@@ -404,7 +696,19 @@ export function SignUpScreen() {
     if (submitting) return;
     setSubmitError(null);
     if (step < 4) {
-      if (validateStep(step)) setStep((step + 1) as typeof step);
+      if (validateStep(step)) {
+        if (step === 1 && acquisitionRef.current) {
+          const bound = bindAcquisitionAccount(acquisitionRef.current, { email: form.email });
+          if (!bound) {
+            setSubmitError(
+              'Those acquisition details belong to a different account. Restart signup from your own link.',
+            );
+            return;
+          }
+          commitAcquisition(bound);
+        }
+        setStep((step + 1) as typeof step);
+      }
       return;
     }
     setSubmitting(true);
@@ -444,6 +748,14 @@ export function SignUpScreen() {
       }
       const userId = attempt.createdUserId;
       if (!userId) throw new Error('Clerk sign-up completed without a user id');
+      if (acquisitionRef.current) {
+        const bound = bindAcquisitionAccount(acquisitionRef.current, {
+          email: form.email,
+          clerkUserId: userId,
+        });
+        if (!bound) throw new Error('Acquisition account mismatch');
+        commitAcquisition(bound);
+      }
       setIdentity({ clerkUserId: userId, sessionId: attempt.createdSessionId });
       await activateAndFinish(userId, attempt.createdSessionId);
     } catch (err) {
@@ -487,6 +799,14 @@ export function SignUpScreen() {
         return;
       }
       if (!attempt.createdUserId) throw new Error('Clerk sign-up completed without a user id');
+      if (acquisitionRef.current) {
+        const bound = bindAcquisitionAccount(acquisitionRef.current, {
+          email: form.email,
+          clerkUserId: attempt.createdUserId,
+        });
+        if (!bound) throw new Error('Acquisition account mismatch');
+        commitAcquisition(bound);
+      }
       setIdentity({ clerkUserId: attempt.createdUserId, sessionId: attempt.createdSessionId });
       await activateAndFinish(attempt.createdUserId, attempt.createdSessionId);
     } catch (err) {
@@ -542,6 +862,14 @@ export function SignUpScreen() {
     setSwitchingAccount(true);
     try {
       await signOut();
+      try {
+        await acquisitionPersistence.drain();
+        await clearAcquisitionEnvelope();
+      } catch {
+        // The route still leaves this account; global sign-out cleanup retries.
+      }
+      acquisitionRef.current = null;
+      setAcquisition(null);
       queryClient.clear();
       router.replace('/welcome');
     } catch {
@@ -560,7 +888,7 @@ export function SignUpScreen() {
           .join(' · ') || '—',
     },
     { label: 'State', value: form.state || '—' },
-    { label: 'Mobile', value: form.mobile || '—' },
+    { label: 'Mobile', value: verifiedIntent?.displayPhone || form.mobile || '—' },
     {
       label: 'Licence',
       value: form.licenceNumber ? `${form.licenceType || ''} ${form.licenceNumber}`.trim() : '—',
@@ -584,11 +912,18 @@ export function SignUpScreen() {
         ]
       : []),
     ...(hasRoofing ? [{ label: 'Roofing', value: 'Measured per-m² rate card' }] : []),
+    ...(acquisition?.selection
+      ? [
+          {
+            label: 'Selected plan',
+            value: `${acquisition.selection.plan} · ${acquisition.selection.interval === 'year' ? 'annual' : 'monthly'}`,
+          },
+        ]
+      : []),
     { label: 'GST', value: form.gstRegistered ? 'Registered' : 'Not registered' },
     { label: 'AI line', value: 'Provisioning on activate' },
   ];
 
-  const lift = isDark ? 'inset 0 1px 0 rgba(255,255,255,0.06)' : '0 1px 2px rgba(43,36,34,0.06)';
   const stepNum = meta.num;
 
   return (
@@ -602,7 +937,7 @@ export function SignUpScreen() {
         </View>
         <View style={{ flex: 1 }} />
         <Text style={[styles.stepCounter, { color: colors.textDim }]}>
-          STEP {stepNum} <Text style={{ color: colors.inkLine }}>/</Text> 04
+          {codeAccepted ? `STEP ${stepNum} / 04` : 'GET STARTED'}
         </Text>
       </AuthHeader>
 
@@ -612,49 +947,132 @@ export function SignUpScreen() {
       >
         <ScrollView
           style={{ flex: 1 }}
-          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + 30 }]}
+          contentContainerStyle={[styles.body, { paddingBottom: insets.bottom + spacing.xxl }]}
           keyboardShouldPersistTaps="handled"
+          keyboardDismissMode="on-drag"
         >
-          <View style={styles.progress}>
-            {STEPS.map((s, i) => (
-              <View
-                key={s.num}
-                style={[
-                  styles.progressSeg,
-                  { backgroundColor: codeAccepted && i < step ? colors.accent : colors.inkLine },
-                ]}
-              />
-            ))}
-          </View>
+          {codeAccepted ? (
+            <View
+              accessible
+              accessibilityRole="progressbar"
+              accessibilityLabel="Account setup"
+              accessibilityValue={{
+                min: 1,
+                max: 4,
+                now: step,
+                text: `Step ${step} of 4: ${meta.label}`,
+              }}
+              style={styles.progress}
+            >
+              {STEPS.map((s, i) => (
+                <View
+                  key={s.num}
+                  style={[
+                    styles.progressSeg,
+                    { backgroundColor: i < step ? colors.textPri : colors.inkLine },
+                  ]}
+                />
+              ))}
+            </View>
+          ) : null}
 
           {!codeAccepted ? (
             <>
-              <View style={styles.stepMeta}>
-                <Text style={[styles.stepMetaRight, { color: colors.textPri }]}>
-                  One code to start
-                </Text>
-              </View>
               <Text style={[styles.h2, { color: colors.textPri }]}>INVITATION CODE</Text>
               <Text style={[styles.sub, { color: colors.textSec }]}>
-                Enter the invitation code whoever invited you sent. It unlocks tradie sign-up.
+                Enter the code from your invitation to set up your QuoteMax account.
               </Text>
+              {intentResolving ? (
+                <Text style={[styles.intentNote, { color: colors.textSec }]}>
+                  Checking your SMS signup link…
+                </Text>
+              ) : null}
+              {verifiedIntent ? (
+                <View
+                  style={[
+                    styles.verifiedIntent,
+                    { backgroundColor: colors.inkCard, borderColor: colors.inkLine },
+                  ]}
+                >
+                  <Text style={[styles.verifiedIntentLabel, { color: colors.textDim }]}>
+                    VERIFIED VIA SMS
+                  </Text>
+                  <Text selectable style={[styles.verifiedIntentPhone, { color: colors.textPri }]}>
+                    {formatAuMobileDisplay(verifiedIntent.displayPhone)}
+                  </Text>
+                  <Text style={[styles.intentNote, { color: colors.textSec }]}>
+                    We will confirm this number from the one-time link again when you activate.
+                  </Text>
+                </View>
+              ) : null}
+              {intentError ? (
+                <View style={styles.intentErrorBlock}>
+                  <Text style={[styles.intentNote, { color: colors.dangerBright }]}>
+                    {intentError}
+                  </Text>
+                  {acquisition?.intent?.status === 'pending' && !intentResolving ? (
+                    <Pressable
+                      accessibilityRole="button"
+                      onPress={() => setIntentRetry(value => value + 1)}
+                      style={styles.retryIntent}
+                    >
+                      <Text style={[styles.retryIntentLabel, { color: colors.textPri }]}>
+                        RETRY SMS LINK
+                      </Text>
+                    </Pressable>
+                  ) : null}
+                </View>
+              ) : null}
+              {acquisition?.selection ? (
+                <Text style={[styles.intentNote, { color: colors.textSec }]}>
+                  Selected plan: {acquisition.selection.plan.toUpperCase()} ·{' '}
+                  {acquisition.selection.interval === 'year' ? 'ANNUAL' : 'MONTHLY'}
+                </Text>
+              ) : null}
               <View style={styles.fields}>
-                <Field
-                  label="Invitation code"
-                  value={invitationCode}
-                  onChangeText={v => setInvitationCode(v.toUpperCase())}
-                  required
-                  hint="e.g. JON-JUNE-FLYERS-7K2P"
-                  height={54}
-                  autoCapitalize="none"
-                  autoComplete="off"
-                  error={codeError}
-                />
+                {lockedSmsInvitation ? (
+                  <View
+                    accessibilityLabel={`Invitation code from verified SMS ${lockedSmsInvitation}`}
+                    style={[
+                      styles.verifiedIntent,
+                      { backgroundColor: colors.inkCard, borderColor: colors.inkLine },
+                    ]}
+                  >
+                    <Text style={[styles.verifiedIntentLabel, { color: colors.textDim }]}>
+                      INVITATION CODE · FROM TEXT · READ-ONLY
+                    </Text>
+                    <Text selectable style={[styles.verifiedIntentPhone, { color: colors.textPri }]}>
+                      {lockedSmsInvitation}
+                    </Text>
+                    {codeError ? (
+                      <Text style={[styles.intentNote, { color: colors.dangerBright }]}>
+                        {codeError}
+                      </Text>
+                    ) : null}
+                  </View>
+                ) : (
+                  <Field
+                    label="Invitation code"
+                    value={invitationCode}
+                    onChangeText={v => setInvitationCode(v.toUpperCase())}
+                    required
+                    hint="e.g. JON-JUNE-FLYERS-7K2P"
+                    height={54}
+                    autoCapitalize="none"
+                    autoComplete="off"
+                    error={codeError}
+                  />
+                )}
               </View>
               {codeNote ? (
                 <Text style={[styles.codeNote, { color: colors.warningBright }]}>{codeNote}</Text>
               ) : null}
-              <View style={{ marginTop: 26 }}>
+              {continuityWarning ? (
+                <Text style={[styles.codeNote, { color: colors.warningBright }]}>
+                  {continuityWarning}
+                </Text>
+              ) : null}
+              <View style={styles.primaryAction}>
                 <PrimaryCta
                   label={codeChecking ? 'Checking…' : 'Continue'}
                   onPress={submitCode}
@@ -668,7 +1086,7 @@ export function SignUpScreen() {
                   disabled={switchingAccount}
                   style={styles.switchAccount}
                 >
-                  <Text style={[styles.switchAccountText, { color: colors.accentText }]}>
+                  <Text style={[styles.switchAccountText, { color: colors.textSec }]}>
                     {switchingAccount ? 'Signing out…' : 'Sign in with a different account'}
                   </Text>
                 </Pressable>
@@ -676,13 +1094,6 @@ export function SignUpScreen() {
             </>
           ) : (
             <>
-              <View style={styles.stepMeta}>
-                <Text style={[styles.stepMetaLeft, { color: colors.textDim }]}>
-                  STEP {stepNum} / 04
-                </Text>
-                <Text style={[styles.stepMetaRight, { color: colors.textPri }]}>{meta.label}</Text>
-              </View>
-
               {phase === 'verify' ? (
                 <>
                   {/* ponytail: no verification screen exists in the kit; this pane reuses the
@@ -701,6 +1112,7 @@ export function SignUpScreen() {
                       hint="From your email"
                       height={54}
                       keyboardType="number-pad"
+                      autoComplete="one-time-code"
                       error={errors.code}
                     />
                   </View>
@@ -710,11 +1122,11 @@ export function SignUpScreen() {
                     disabled={resending}
                     style={styles.resendRow}
                   >
-                    <Text style={[styles.resendLabel, { color: colors.accentText }]}>
+                    <Text style={[styles.resendLabel, { color: colors.textSec }]}>
                       {resending
                         ? 'RESENDING…'
                         : resendSent
-                          ? 'CODE RESENT — CHECK YOUR EMAIL'
+                          ? 'CODE RESENT · CHECK YOUR EMAIL'
                           : 'RESEND CODE'}
                     </Text>
                   </Pressable>
@@ -728,7 +1140,7 @@ export function SignUpScreen() {
                       {submitError}
                     </Text>
                   ) : null}
-                  <View style={{ marginTop: 26 }}>
+                  <View style={styles.primaryAction}>
                     <PrimaryCta label="Activate my AI line" onPress={verify} loading={submitting} />
                   </View>
                 </>
@@ -803,7 +1215,7 @@ export function SignUpScreen() {
                         <View>
                           <View style={styles.labelRow}>
                             <Text style={[styles.fieldLabel, { color: colors.textPri }]}>
-                              YOUR TRADE<Text style={{ color: '#F43F5E' }}> *</Text>
+                              YOUR TRADE<Text style={{ color: colors.textDim }}> *</Text>
                             </Text>
                             <Text style={[styles.fieldHint, { color: colors.textDim }]}>
                               PICK ONE OR MORE
@@ -828,8 +1240,8 @@ export function SignUpScreen() {
                                   style={[
                                     styles.gridOption,
                                     {
-                                      backgroundColor: on ? 'rgba(255,196,0,0.10)' : colors.ink,
-                                      borderColor: on ? colors.accent : colors.inkLine,
+                                      backgroundColor: on ? colors.inkCard : colors.ink,
+                                      borderColor: on ? colors.accentSoft : colors.ctlLine,
                                     },
                                   ]}
                                 >
@@ -837,13 +1249,13 @@ export function SignUpScreen() {
                                     style={[
                                       styles.tick,
                                       {
-                                        borderColor: on ? colors.accent : colors.inkLine,
-                                        backgroundColor: on ? colors.accent : 'transparent',
+                                        borderColor: on ? colors.accentSoft : colors.ctlLine,
+                                        backgroundColor: on ? colors.accentSoft : 'transparent',
                                       },
                                     ]}
                                   >
                                     {on ? (
-                                      <Text style={[styles.tickMark, { color: colors.accentInk }]}>
+                                      <Text style={[styles.tickMark, { color: colors.inkDeep }]}>
                                         ✓
                                       </Text>
                                     ) : null}
@@ -883,17 +1295,12 @@ export function SignUpScreen() {
                                   style={[
                                     styles.chip,
                                     {
-                                      backgroundColor: on ? 'rgba(255,196,0,0.12)' : colors.ink,
-                                      borderColor: on ? colors.accent : colors.inkLine,
+                                      backgroundColor: on ? colors.inkCard : colors.ink,
+                                      borderColor: on ? colors.accentSoft : colors.ctlLine,
                                     },
                                   ]}
                                 >
-                                  <Text
-                                    style={[
-                                      styles.chipLabel,
-                                      { color: on ? colors.accentText : colors.textSec },
-                                    ]}
-                                  >
+                                  <Text style={[styles.chipLabel, { color: colors.textPri }]}>
                                     {code_}
                                   </Text>
                                 </Pressable>
@@ -902,17 +1309,42 @@ export function SignUpScreen() {
                           </View>
                         </View>
 
-                        <Field
-                          label="Mobile"
-                          value={form.mobile}
-                          onChangeText={v => set('mobile', v)}
-                          hint="Optional · for your welcome text"
-                          height={54}
-                          suffix="AU"
-                          keyboardType="phone-pad"
-                          autoComplete="tel"
-                          error={errors.mobile}
-                        />
+                        {verifiedIntent ? (
+                          <View
+                            accessibilityLabel={`Mobile verified via SMS ${formatAuMobileDisplay(verifiedIntent.displayPhone)}`}
+                            style={[
+                              styles.verifiedIntent,
+                              { backgroundColor: colors.inkCard, borderColor: colors.inkLine },
+                            ]}
+                          >
+                            <Text
+                              style={[styles.verifiedIntentLabel, { color: colors.textDim }]}
+                            >
+                              MOBILE · VERIFIED VIA SMS
+                            </Text>
+                            <Text
+                              selectable
+                              style={[styles.verifiedIntentPhone, { color: colors.textPri }]}
+                            >
+                              {formatAuMobileDisplay(verifiedIntent.displayPhone)}
+                            </Text>
+                            <Text style={[styles.intentNote, { color: colors.textSec }]}>
+                              Read-only · the server will derive this from your one-time intent.
+                            </Text>
+                          </View>
+                        ) : (
+                          <Field
+                            label="Mobile"
+                            value={form.mobile}
+                            onChangeText={v => set('mobile', v)}
+                            hint="Optional · for your welcome text"
+                            height={54}
+                            suffix="AU"
+                            keyboardType="phone-pad"
+                            autoComplete="tel"
+                            error={errors.mobile}
+                          />
+                        )}
                         <Field
                           label="Contact name"
                           value={form.contactName}
@@ -1002,7 +1434,7 @@ export function SignUpScreen() {
                       <>
                         {hasLabourTrade && (
                           <>
-                            <Text style={[styles.sectionHeading, { color: colors.accentText }]}>
+                            <Text style={[styles.sectionHeading, { color: colors.textPri }]}>
                               LABOUR RATES
                             </Text>
                             <Field
@@ -1041,12 +1473,11 @@ export function SignUpScreen() {
                             />
                             <Pressable
                               accessibilityRole="button"
+                              accessibilityState={{ expanded: showAdvanced }}
                               onPress={() => setShowAdvanced(v => !v)}
                               style={styles.collapseToggle}
                             >
-                              <Text
-                                style={[styles.collapseToggleLabel, { color: colors.accentText }]}
-                              >
+                              <Text style={[styles.collapseToggleLabel, { color: colors.textSec }]}>
                                 {showAdvanced
                                   ? 'HIDE ADVANCED PRICING'
                                   : '+ SHOW ADVANCED PRICING (5 OPTIONAL)'}
@@ -1105,7 +1536,7 @@ export function SignUpScreen() {
 
                         {hasPainting && (
                           <>
-                            <Text style={[styles.sectionHeading, { color: colors.accentText }]}>
+                            <Text style={[styles.sectionHeading, { color: colors.textPri }]}>
                               PAINTING PRICING
                             </Text>
                             <View style={styles.modelRow}>
@@ -1125,10 +1556,8 @@ export function SignUpScreen() {
                                     style={[
                                       styles.modelBtn,
                                       {
-                                        backgroundColor: active
-                                          ? 'rgba(255,196,0,0.10)'
-                                          : colors.ink,
-                                        borderColor: active ? colors.accent : colors.inkLine,
+                                        backgroundColor: active ? colors.inkCard : colors.ink,
+                                        borderColor: active ? colors.accentSoft : colors.ctlLine,
                                       },
                                     ]}
                                   >
@@ -1207,7 +1636,7 @@ export function SignUpScreen() {
 
                         {hasRoofing && (
                           <>
-                            <Text style={[styles.sectionHeading, { color: colors.accentText }]}>
+                            <Text style={[styles.sectionHeading, { color: colors.textPri }]}>
                               ROOFING PRICING
                             </Text>
                             <Text style={[styles.sectionHint, { color: colors.textSec }]}>
@@ -1235,11 +1664,12 @@ export function SignUpScreen() {
                           </>
                         )}
 
-                        <View style={styles.switchRow}>
+                        <View style={[styles.switchRow, { borderColor: colors.inkLine }]}>
                           <Text style={[styles.switchLabel, { color: colors.textPri }]}>
                             GST registered
                           </Text>
-                          <Switch
+                          <ThemedSwitch
+                            accessibilityLabel="GST registered"
                             value={form.gstRegistered}
                             onValueChange={v => set('gstRegistered', v)}
                             trackColor={{ false: colors.inkLine, true: colors.accent }}
@@ -1265,14 +1695,19 @@ export function SignUpScreen() {
                             {
                               backgroundColor: colors.inkCard,
                               borderColor: colors.inkLine,
-                              boxShadow: lift,
                             },
                           ]}
                         >
-                          {reviewRows.map(row => (
+                          {reviewRows.map((row, index) => (
                             <View
                               key={row.label}
-                              style={[styles.reviewRow, { borderBottomColor: colors.inkLine }]}
+                              style={[
+                                styles.reviewRow,
+                                {
+                                  borderBottomColor: colors.inkLine,
+                                  borderBottomWidth: index === reviewRows.length - 1 ? 0 : 1,
+                                },
+                              ]}
                             >
                               <Text style={[styles.reviewLabel, { color: colors.textDim }]}>
                                 {row.label.toUpperCase()}
@@ -1293,7 +1728,7 @@ export function SignUpScreen() {
                     </Text>
                   ) : null}
 
-                  <View style={{ marginTop: 26 }}>
+                  <View style={styles.primaryAction}>
                     <PrimaryCta label={meta.cta} onPress={next} loading={submitting} />
                   </View>
                   <Text style={[styles.reassure, { color: colors.textDim }]}>
@@ -1311,217 +1746,140 @@ export function SignUpScreen() {
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: 10 },
-  stepCounter: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 10.5,
-    letterSpacing: 1.68, // .16em @ 10.5
-  },
-  body: { paddingTop: 22, paddingHorizontal: 26 },
-  progress: { flexDirection: 'row', gap: 7 },
+  headerLeft: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
+  stepCounter: { ...type.label, letterSpacing: 1.2 },
+  body: { flexGrow: 1, paddingTop: spacing.xxl, paddingHorizontal: AUTH_GUTTER },
+  progress: { flexDirection: 'row', gap: spacing.sm },
   progressSeg: { height: 4, flex: 1, borderRadius: 2 },
-  stepMeta: {
-    marginTop: 12,
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: 12,
-  },
-  stepMetaLeft: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    letterSpacing: 1.6, // .16em @ 10
-  },
-  stepMetaRight: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 13.5,
-  },
-  h2: {
-    marginTop: 28,
-    fontFamily: fonts.sans.extraBold,
-    fontSize: 27,
-    lineHeight: 29, // kit 1.03; floored at 1.05 so RN cannot clip the caps
-    letterSpacing: -0.81, // -.03em @ 27
-  },
-  sub: {
-    marginTop: 10,
-    fontFamily: fonts.sans.regular,
-    fontSize: 14.5,
-    lineHeight: 22, // 1.55
-  },
-  fields: { marginTop: 22, gap: 20 },
+  h2: { ...type.headline, marginTop: spacing.xxl },
+  sub: { ...type.body, marginTop: spacing.md },
+  fields: { marginTop: spacing.xxl, gap: spacing.xxl },
+  primaryAction: { marginTop: spacing.gap },
   labelRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
-    gap: 12,
-    marginBottom: 8,
+    columnGap: spacing.md,
+    rowGap: spacing.xs,
+    marginBottom: spacing.sm,
   },
-  fieldLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
-    letterSpacing: 1.47, // .14em @ 10.5
-  },
-  fieldHint: {
-    fontFamily: fonts.mono.regular,
-    fontSize: 9.5,
-    letterSpacing: 0.95, // .1em @ 9.5
-  },
-  fieldError: {
-    marginTop: 6,
-    fontFamily: fonts.sans.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: 10 },
+  fieldLabel: { ...type.label, letterSpacing: 1.2 },
+  fieldHint: { ...type.label, fontFamily: fonts.mono.regular, letterSpacing: 0.3 },
+  fieldError: { ...type.bodySm, marginTop: spacing.sm },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   gridOption: {
     flexBasis: '47%',
     flexGrow: 1,
-    minHeight: 56,
-    paddingHorizontal: 14,
+    minWidth: 132,
+    minHeight: touch.listRow,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.md,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 10,
+    gap: spacing.md,
   },
   tick: {
-    width: 18,
-    height: 18,
-    borderRadius: 5,
+    width: 20,
+    height: 20,
+    borderRadius: radius.chip,
     borderWidth: 1,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  tickMark: { fontSize: 11, lineHeight: 13, fontFamily: fonts.sans.bold },
-  gridLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 14,
-    lineHeight: 17, // 1.2
-  },
-  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8 },
+  tickMark: { ...type.bodySm, fontFamily: fonts.sans.bold },
+  gridLabel: { ...type.bodySm, fontFamily: fonts.sans.semiBold, flex: 1 },
+  chips: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   chip: {
     minHeight: touch.minimum,
-    paddingHorizontal: 15,
+    minWidth: 64,
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
     borderWidth: 1,
-    borderRadius: 8,
+    borderRadius: radius.control,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  chipLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 12.5,
-    letterSpacing: 1, // .08em @ 12.5
+  chipLabel: { ...type.label, letterSpacing: 0.8 },
+  collapseToggle: {
+    minHeight: touch.minimum,
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
   },
-  collapseToggle: { minHeight: touch.minimum, justifyContent: 'center' },
-  collapseToggleLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.8,
-  },
+  collapseToggleLabel: { ...type.label, letterSpacing: 0.6 },
   resendRow: {
-    marginTop: 4,
+    marginTop: spacing.sm,
     minHeight: touch.minimum,
     justifyContent: 'center',
     alignSelf: 'flex-start',
   },
-  resendLabel: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11,
-    letterSpacing: 0.8,
-  },
-  sectionHeading: {
-    fontFamily: fonts.mono.semiBold,
-    fontSize: 11.5,
-    letterSpacing: 1.5,
-  },
-  sectionHint: {
-    marginTop: -12,
-    fontFamily: fonts.sans.regular,
-    fontSize: 13.5,
-    lineHeight: 20,
-  },
-  modelRow: { flexDirection: 'row', gap: 10 },
+  resendLabel: { ...type.label, letterSpacing: 0.6 },
+  sectionHeading: { ...type.title, textTransform: 'none' },
+  sectionHint: { ...type.bodySm, marginTop: -spacing.md },
+  modelRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
   modelBtn: {
     flex: 1,
+    minWidth: 132,
+    minHeight: 72,
     borderWidth: 1,
-    borderRadius: 8,
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    gap: 3,
+    borderRadius: radius.control,
+    paddingVertical: spacing.md,
+    paddingHorizontal: spacing.lg,
+    gap: spacing.xs,
   },
-  modelLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 13.5,
-  },
-  modelSub: {
-    fontFamily: fonts.mono.regular,
-    fontSize: 9.5,
-    letterSpacing: 0.6,
-    textTransform: 'uppercase',
-  },
+  modelLabel: { ...type.body, fontFamily: fonts.sans.semiBold },
+  modelSub: { ...type.label, fontFamily: fonts.mono.regular, letterSpacing: 0.3 },
   switchRow: {
+    minHeight: 72,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    borderWidth: 1,
+    borderRadius: radius.card,
+    paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
+    gap: spacing.lg,
   },
-  switchLabel: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 14.5,
+  switchLabel: { ...type.body, fontFamily: fonts.sans.semiBold, flex: 1 },
+  codeNote: { ...type.bodySm, marginTop: spacing.md },
+  intentNote: { ...type.bodySm },
+  verifiedIntent: {
+    marginTop: spacing.lg,
+    borderWidth: 1,
+    borderRadius: radius.card,
+    padding: spacing.lg,
+    gap: spacing.sm,
   },
-  codeNote: {
-    marginTop: 12,
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 13.5,
-    lineHeight: 19,
+  verifiedIntentLabel: { ...type.label, letterSpacing: 0.8 },
+  verifiedIntentPhone: {
+    ...type.title,
+    fontFamily: fonts.mono.semiBold,
+    fontVariant: ['tabular-nums'],
   },
+  intentErrorBlock: { marginTop: spacing.lg, gap: spacing.sm },
+  retryIntent: { minHeight: touch.minimum, justifyContent: 'center', alignSelf: 'flex-start' },
+  retryIntentLabel: { ...type.label, letterSpacing: 0.6 },
   switchAccount: {
-    marginTop: 18,
+    marginTop: spacing.lg,
     minHeight: touch.minimum,
     justifyContent: 'center',
   },
-  switchAccountText: {
-    fontFamily: fonts.sans.semiBold,
-    fontSize: 13.5,
-  },
-  reviewCard: {
-    borderWidth: 1,
-    borderRadius: 14,
-    overflow: 'hidden',
-  },
+  switchAccountText: { ...type.bodySm, fontFamily: fonts.sans.semiBold },
+  reviewCard: { borderWidth: 1, borderRadius: radius.card, overflow: 'hidden' },
   reviewRow: {
-    flexDirection: 'row',
-    alignItems: 'baseline',
-    justifyContent: 'space-between',
-    gap: 14,
-    paddingVertical: 13,
-    paddingHorizontal: 16,
-    borderBottomWidth: 1,
+    alignItems: 'flex-start',
+    gap: spacing.sm,
+    paddingVertical: spacing.lg,
+    paddingHorizontal: spacing.xl,
   },
-  reviewLabel: {
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    lineHeight: 13, // 1.3
-    letterSpacing: 1.2, // .12em @ 10
-  },
+  reviewLabel: { ...type.label, letterSpacing: 0.8 },
   reviewValue: {
-    flexShrink: 1,
-    textAlign: 'right',
-    fontFamily: fonts.sans.bold,
-    fontSize: 13.5,
-    lineHeight: 18, // 1.3
+    ...type.bodySm,
+    fontFamily: fonts.mono.semiBold,
+    fontVariant: ['tabular-nums'],
   },
-  submitError: {
-    marginTop: 16,
-    fontFamily: fonts.sans.regular,
-    fontSize: 14,
-    lineHeight: 20,
-  },
-  reassure: {
-    marginTop: 16,
-    fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    lineHeight: 15, // 1.5
-    letterSpacing: 1.4, // .14em @ 10
-  },
+  submitError: { ...type.bodySm, marginTop: spacing.lg },
+  reassure: { ...type.label, marginTop: spacing.lg, letterSpacing: 0.6 },
 });

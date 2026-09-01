@@ -6,10 +6,12 @@
  * here instead of a `chats/[id]` route.
  */
 import { useState } from 'react';
-import { ActivityIndicator, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
+import { ListSkeleton, ListState } from '@/components/ListState';
+import { ScreenHeader } from '@/components/ScreenHeader';
 import { GhostButton } from '@/features/auth/ui';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
@@ -58,47 +60,37 @@ export function ChatsScreen({
 
   return (
     <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
-      <Text style={[styles.title, { color: colors.textPri }]}>CHATS</Text>
+      <ScreenHeader title="Chats" subtitle="Customer texts and calls, in one place." />
 
       {isLoading ? (
-        <View style={styles.centerFill}>
-          <ActivityIndicator color={colors.accent} />
-          <Text style={[styles.centerLabel, { color: colors.textDim }]}>
-            LOADING CONVERSATIONS…
-          </Text>
-        </View>
+        <ListSkeleton label="Loading conversations" />
       ) : isError && chats.length === 0 ? (
-        <View style={styles.centerFill}>
-          <Text style={[styles.errorText, { color: colors.textSec }]}>
-            Couldn&rsquo;t load your conversations.
-          </Text>
-          <GhostButton label="Retry" onPress={() => void refetch()} height={touch.minimum} />
-        </View>
+        <ListState
+          title="Conversations couldn’t load"
+          description="Check your connection and try again."
+          action={<GhostButton label="Retry" onPress={() => void refetch()} />}
+        />
       ) : chats.length === 0 ? (
-        <View style={styles.centerFill}>
-          <Text style={[styles.emptyTitle, { color: colors.textPri }]}>NO CONVERSATIONS YET</Text>
-          <Text style={[styles.emptyBody, { color: colors.textSec }]}>
-            Your AI line answers here. When a customer texts or calls your QuoteMax number, the
-            conversation shows up in this list.
-          </Text>
-        </View>
+        <ListState
+          title="No conversations yet"
+          description="Texts and calls to your QuoteMax number will appear here. Open a conversation to read the history or reply by SMS."
+        />
       ) : (
         <>
           {isError ? (
             <View
               style={[
                 styles.refreshBanner,
-                { borderColor: colors.danger, backgroundColor: colors.ink },
+                { borderColor: colors.inkLine, backgroundColor: colors.ink },
               ]}
             >
-              <Text style={[styles.refreshBannerText, { color: colors.textPri }]}>
-                Couldn&rsquo;t refresh — showing the last loaded list.
+              <Text
+                accessibilityLiveRegion="polite"
+                style={[styles.refreshBannerText, { color: colors.textSec }]}
+              >
+                Couldn’t refresh. Showing your last loaded conversations.
               </Text>
-              <Pressable accessibilityRole="button" onPress={() => void refetch()} hitSlop={8}>
-                <Text style={[styles.refreshBannerAction, { color: colors.accentText }]}>
-                  RETRY
-                </Text>
-              </Pressable>
+              <GhostButton label="Retry" onPress={() => void refetch()} />
             </View>
           ) : null}
           <FlashList
@@ -108,7 +100,7 @@ export function ChatsScreen({
             onRefresh={() => void refetch()}
             contentContainerStyle={styles.listContent}
             ItemSeparatorComponent={() => (
-              <View style={{ height: 1, backgroundColor: colors.inkLine }} />
+              <View style={{ height: 1, marginLeft: 52, backgroundColor: colors.inkLine }} />
             )}
             renderItem={({ item }) => <ChatListRow chat={item} onPress={() => onSelect(item.id)} />}
           />
@@ -128,14 +120,18 @@ function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) 
   ]
     .filter(Boolean)
     .join(' · ');
+  const when = relativeTime(chat.last_message_at ?? chat.created_at);
+  const preview = lastMessagePreview(chat);
 
   return (
     <Pressable
       accessibilityRole="button"
+      accessibilityLabel={`${who}. ${meta}. ${preview}. ${when}`}
+      accessibilityHint="Opens the conversation"
       onPress={onPress}
       style={({ pressed }) => [styles.row, pressed && { backgroundColor: colors.ink }]}
     >
-      <View style={[styles.avatar, { backgroundColor: colors.inkLine }]}>
+      <View style={[styles.avatar, { backgroundColor: colors.ink, borderColor: colors.inkLine }]}>
         <Text style={[styles.avatarText, { color: colors.textSec }]}>{chatInitial(who)}</Text>
       </View>
       <View style={{ flex: 1, minWidth: 0 }}>
@@ -143,21 +139,19 @@ function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) 
           <Text style={[styles.rowName, { color: colors.textPri }]} numberOfLines={1}>
             {who}
           </Text>
-          <Text style={[styles.rowTime, { color: colors.textDim }]}>
-            {relativeTime(chat.last_message_at ?? chat.created_at)}
-          </Text>
+          <Text style={[styles.rowTime, { color: colors.textDim }]}>{when}</Text>
         </View>
         {meta ? (
           <Text style={[styles.rowMeta, { color: colors.textDim }]} numberOfLines={1}>
-            {meta.toUpperCase()}
+            {meta}
           </Text>
         ) : null}
         <Text
           style={[styles.rowPreview, { color: colors.textSec }]}
-          numberOfLines={1}
+          numberOfLines={2}
           ellipsizeMode="tail"
         >
-          {lastMessagePreview(chat)}
+          {preview}
         </Text>
       </View>
     </Pressable>
@@ -166,31 +160,13 @@ function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) 
 
 const styles = StyleSheet.create({
   screen: { flex: 1 },
-  title: {
-    paddingHorizontal: spacing.lg,
-    paddingTop: spacing.lg,
-    paddingBottom: spacing.md,
-    ...type.headline,
-    fontSize: 22,
-    lineHeight: 24,
-  },
-  centerFill: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: spacing.xxl,
-    gap: spacing.lg,
-  },
-  centerLabel: { ...type.label },
-  errorText: { ...type.body, textAlign: 'center' },
-  emptyTitle: { ...type.title, textAlign: 'center' },
-  emptyBody: { ...type.body, textAlign: 'center' },
   refreshBanner: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     gap: spacing.sm,
-    marginHorizontal: spacing.lg,
+    marginHorizontal: spacing.xl,
+    marginTop: spacing.lg,
     marginBottom: spacing.sm,
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
@@ -198,27 +174,35 @@ const styles = StyleSheet.create({
     borderRadius: radius.control,
   },
   refreshBannerText: { ...type.bodySm, flex: 1 },
-  refreshBannerAction: { fontFamily: fonts.sans.bold, fontSize: 11, letterSpacing: 1 },
-  listContent: { paddingBottom: spacing.xxl },
+  listContent: {
+    paddingHorizontal: spacing.xl,
+    paddingBottom: spacing.xxl,
+    paddingTop: spacing.xs,
+  },
   row: {
     flexDirection: 'row',
     alignItems: 'flex-start',
     gap: spacing.md,
-    paddingHorizontal: spacing.lg,
-    paddingVertical: spacing.md,
+    paddingVertical: spacing.lg,
     minHeight: touch.listRow,
   },
   avatar: {
-    width: 34,
-    height: 34,
+    width: 40,
+    height: 40,
+    borderWidth: 1,
     borderRadius: radius.pill,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  avatarText: { fontFamily: fonts.sans.bold, fontSize: 13 },
-  rowTop: { flexDirection: 'row', justifyContent: 'space-between', gap: spacing.sm },
-  rowName: { ...type.title, fontSize: 15, lineHeight: 18, flexShrink: 1 },
-  rowTime: { fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.5 },
-  rowMeta: { marginTop: 3, fontFamily: fonts.mono.medium, fontSize: 12, letterSpacing: 0.9 },
-  rowPreview: { marginTop: 4, ...type.bodySm, lineHeight: 18 },
+  avatarText: { fontFamily: fonts.sans.bold, fontSize: 16 },
+  rowTop: {
+    flexDirection: 'row',
+    alignItems: 'baseline',
+    justifyContent: 'space-between',
+    gap: spacing.sm,
+  },
+  rowName: { ...type.title, fontSize: 16, flexShrink: 1 },
+  rowTime: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 16 },
+  rowMeta: { marginTop: spacing.xs, ...type.bodySm },
+  rowPreview: { marginTop: spacing.xs, ...type.bodySm },
 });

@@ -5,47 +5,55 @@ import {
   fieldLabel,
   formatAuMobileDisplay,
   isCodeError,
-  optionalNumber,
+  OnboardNumericValidationError,
+  parseOptionalNumber,
   ROOFING_RATE_FIELDS,
   stepForFields,
 } from './onboard-fields';
 
-describe('optionalNumber (web optionalNumber parity)', () => {
+describe('parseOptionalNumber (zero-safe web schema parity)', () => {
   it('parses a plain amount', () => {
-    expect(optionalNumber('110')).toBe(110);
+    expect(parseOptionalNumber('110')).toEqual({ kind: 'value', value: 110 });
   });
 
-  it('blank never becomes 0 — it drops the field', () => {
-    expect(optionalNumber('')).toBeUndefined();
-    expect(optionalNumber('   ')).toBeUndefined();
+  it('distinguishes blank from a literal zero', () => {
+    expect(parseOptionalNumber('')).toEqual({ kind: 'blank' });
+    expect(parseOptionalNumber('   ')).toEqual({ kind: 'blank' });
+    expect(parseOptionalNumber('0', { min: 0 })).toEqual({ kind: 'value', value: 0 });
   });
 
   it('strips currency formatting', () => {
-    expect(optionalNumber('$ 1,234.50'.replace(',', ''))).toBe(1234.5);
+    expect(parseOptionalNumber('$ 1,234.50')).toEqual({ kind: 'value', value: 1234.5 });
   });
 
-  it('non-numeric garbage drops the field rather than becoming 0', () => {
-    expect(optionalNumber('TBC')).toBeUndefined();
-    expect(optionalNumber('n/a')).toBeUndefined();
-    expect(optionalNumber('$')).toBeUndefined();
+  it('reports non-numeric input as invalid instead of dropping it', () => {
+    expect(parseOptionalNumber('TBC')).toEqual({ kind: 'invalid', raw: 'TBC' });
+    expect(parseOptionalNumber('n/a')).toEqual({ kind: 'invalid', raw: 'n/a' });
+    expect(parseOptionalNumber('$')).toEqual({ kind: 'invalid', raw: '$' });
   });
 
-  it('a literal 0 drops the field — 0 is not an accepted override', () => {
-    expect(optionalNumber('0')).toBeUndefined();
-    expect(optionalNumber('0.00')).toBeUndefined();
-    expect(optionalNumber('$0')).toBeUndefined();
+  it('reports zero as out-of-range only for a strictly-positive field', () => {
+    expect(parseOptionalNumber('0', { min: 0, exclusiveMin: true })).toMatchObject({
+      kind: 'out_of_range',
+      value: 0,
+    });
   });
 
-  it('a stray minus is rejected, never silently stripped into a positive number', () => {
-    expect(optionalNumber('-5')).toBeUndefined();
-    expect(optionalNumber('-45.50')).toBeUndefined();
+  it('distinguishes a syntactically valid but out-of-range value', () => {
+    expect(parseOptionalNumber('-5', { min: 0 })).toMatchObject({
+      kind: 'out_of_range',
+      value: -5,
+    });
+    expect(parseOptionalNumber('101', { min: 0, max: 100 })).toMatchObject({
+      kind: 'out_of_range',
+      value: 101,
+    });
   });
 });
 
 describe('buildActivatePayload (spec B4)', () => {
   it('omits every blank optional numeric field rather than sending 0', () => {
     const payload = buildActivatePayload(EMPTY_ONBOARD_FORM, {
-      clerkUserId: 'user_123',
       invitationCode: 'JON-JUNE-FLYERS-7K2P',
     });
     expect(payload.hourly_rate).toBeUndefined();
@@ -58,20 +66,75 @@ describe('buildActivatePayload (spec B4)', () => {
 
   it('carries the pre-filled painting/roofing defaults as numbers, not strings', () => {
     const payload = buildActivatePayload(EMPTY_ONBOARD_FORM, {
-      clerkUserId: 'user_123',
       invitationCode: 'CODE',
     });
     expect(payload.painting_walls_rate).toBe(28);
     expect(payload.roofing_corrugated_rate).toBe(90);
   });
 
-  it('trims and carries the invitation code + clerk user id', () => {
+  it('trims the invitation code and omits all client-controlled ownership ids', () => {
     const payload = buildActivatePayload(EMPTY_ONBOARD_FORM, {
-      clerkUserId: 'user_123',
       invitationCode: '  CODE  ',
     });
     expect(payload.invitation_code).toBe('CODE');
-    expect(payload.clerk_user_id).toBe('user_123');
+    expect(payload).not.toHaveProperty('clerk_user_id');
+    expect(payload).not.toHaveProperty('owner_user_id');
+  });
+
+  it('carries only the verified intent token and lets the server derive its phone', () => {
+    const payload = buildActivatePayload(
+      { ...EMPTY_ONBOARD_FORM, mobile: '0412 345 678' },
+      { invitationCode: 'SMS-CODE', intentToken: 'abc123' },
+    );
+
+    expect(payload.intent_token).toBe('abc123');
+    expect(payload.owner_mobile).toBeUndefined();
+  });
+
+  it('preserves every field whose server bound permits zero', () => {
+    const payload = buildActivatePayload(
+      {
+        ...EMPTY_ONBOARD_FORM,
+        markupPct: '0',
+        apprenticeRate: '0.00',
+        seniorRate: '$0',
+        minLabourHours: '0',
+        riskBufferPct: '0',
+        paintingCallOutMin: '0',
+      },
+      { invitationCode: 'CODE' },
+    );
+
+    expect(payload.default_markup_pct).toBe(0);
+    expect(payload.apprentice_rate).toBe(0);
+    expect(payload.senior_rate).toBe(0);
+    expect(payload.min_labour_hours).toBe(0);
+    expect(payload.risk_buffer_pct).toBe(0);
+    expect(payload.painting_call_out_minimum).toBe(0);
+  });
+
+  it('surfaces invalid and out-of-range fields under their API keys', () => {
+    try {
+      buildActivatePayload(
+        {
+          ...EMPTY_ONBOARD_FORM,
+          markupPct: 'TBC',
+          afterHoursMultiplier: '0',
+          paintingWallsRate: '201',
+          roofing: { ...EMPTY_ONBOARD_FORM.roofing, colorbond_corrugated: '0' },
+        },
+        { invitationCode: 'CODE' },
+      );
+      throw new Error('Expected numeric validation to fail');
+    } catch (error) {
+      expect(error).toBeInstanceOf(OnboardNumericValidationError);
+      expect((error as OnboardNumericValidationError).fieldErrors).toMatchObject({
+        default_markup_pct: ['Enter a valid number.'],
+        after_hours_multiplier: [expect.stringContaining('1')],
+        painting_walls_rate: [expect.stringContaining('200')],
+        roofing_corrugated_rate: [expect.stringContaining('above 0')],
+      });
+    }
   });
 });
 

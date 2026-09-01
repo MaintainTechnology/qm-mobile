@@ -116,21 +116,88 @@ export const EMPTY_ROOFING_RATES: RoofingRates = ROOFING_RATE_FIELDS.reduce((acc
   return acc;
 }, {} as RoofingRates);
 
+export type OptionalNumberBounds = {
+  min?: number;
+  max?: number;
+  exclusiveMin?: boolean;
+};
+
+export type OptionalNumberResult =
+  | { kind: 'blank' }
+  | { kind: 'invalid'; raw: string }
+  | { kind: 'out_of_range'; value: number; bounds: OptionalNumberBounds }
+  | { kind: 'value'; value: number };
+
 /**
- * "110.00" | "$ 110.00" → 110; blank, "0"/"0.00", or garbage like "TBC"/"n/a"/"$"/"-5" that
- * doesn't reduce to a positive number → undefined so the field is OMITTED from the activation
- * payload rather than sent as 0 (spec B4 — mirrors the web's `optionalNumber`). A blank,
- * unparseable, or zero numeric field must never become a free job or a $0 rate the pricing book
- * didn't set — and a stray minus is rejected outright rather than stripped, which would otherwise
- * silently flip a negative typo into a positive rate.
+ * Parse one optional onboarding number without conflating four materially
+ * different inputs: blank, invalid, out-of-range, and a valid value. In
+ * particular, literal zero is a real value. Field-specific bounds decide
+ * whether it is allowed; it is never silently converted to "not provided".
  */
-export function optionalNumber(raw: string): number | undefined {
+export function parseOptionalNumber(
+  raw: string,
+  bounds: OptionalNumberBounds = {},
+): OptionalNumberResult {
   const trimmed = raw.trim();
-  if (!trimmed || trimmed.includes('-')) return undefined;
-  const cleaned = trimmed.replace(/[^0-9.]/g, '');
-  if (!/^\d+(\.\d+)?$/.test(cleaned)) return undefined;
+  if (!trimmed) return { kind: 'blank' };
+
+  // Accept the modest formatting the old parser supported, but require the
+  // entire remaining string to be numeric. "TBC 100" must not become 100.
+  const cleaned = trimmed.replace(/^\$\s*/, '').replace(/,/g, '');
+  if (!/^-?(?:\d+(?:\.\d*)?|\.\d+)$/.test(cleaned)) {
+    return { kind: 'invalid', raw: trimmed };
+  }
   const value = Number(cleaned);
-  return value === 0 ? undefined : value;
+  if (!Number.isFinite(value)) return { kind: 'invalid', raw: trimmed };
+
+  const belowMinimum =
+    bounds.min !== undefined &&
+    (bounds.exclusiveMin ? value <= bounds.min : value < bounds.min);
+  const aboveMaximum = bounds.max !== undefined && value > bounds.max;
+  if (belowMinimum || aboveMaximum) return { kind: 'out_of_range', value, bounds };
+  return { kind: 'value', value };
+}
+
+export class OnboardNumericValidationError extends Error {
+  constructor(readonly fieldErrors: Record<string, string[]>) {
+    super('Onboarding numeric fields failed validation.');
+    this.name = 'OnboardNumericValidationError';
+  }
+}
+
+function rangeMessage(bounds: OptionalNumberBounds): string {
+  if (bounds.min !== undefined && bounds.max !== undefined) {
+    return bounds.exclusiveMin
+      ? `Enter a number above ${bounds.min} and no more than ${bounds.max}.`
+      : `Enter a number from ${bounds.min} to ${bounds.max}.`;
+  }
+  if (bounds.min !== undefined) {
+    return bounds.exclusiveMin
+      ? `Enter a number above ${bounds.min}.`
+      : `Enter a number of ${bounds.min} or more.`;
+  }
+  return bounds.max !== undefined
+    ? `Enter a number no more than ${bounds.max}.`
+    : 'Enter a valid number.';
+}
+
+function numericValue(
+  field: string,
+  raw: string,
+  bounds: OptionalNumberBounds,
+  fieldErrors: Record<string, string[]>,
+): number | undefined {
+  const parsed = parseOptionalNumber(raw, bounds);
+  if (parsed.kind === 'blank') return undefined;
+  if (parsed.kind === 'invalid') {
+    fieldErrors[field] = ['Enter a valid number.'];
+    return undefined;
+  }
+  if (parsed.kind === 'out_of_range') {
+    fieldErrors[field] = [rangeMessage(bounds)];
+    return undefined;
+  }
+  return parsed.value;
 }
 
 export type OnboardForm = {
@@ -201,17 +268,132 @@ export const EMPTY_ONBOARD_FORM: OnboardForm = {
   gstRegistered: true,
 };
 
-/** The exact `OnboardActivateSchema` payload shape (spec B4) — blanks omitted, never `0`. */
+/**
+ * The exact `OnboardActivateSchema` payload shape (spec B4). Blank optional
+ * numbers are omitted; valid zero values survive; malformed or out-of-range
+ * numbers fail locally with the same API field keys used by the server.
+ * Ownership ids are deliberately absent — the server derives them from the
+ * verified Clerk bearer.
+ */
 export function buildActivatePayload(
   form: OnboardForm,
-  opts: { clerkUserId: string; invitationCode: string },
+  opts: { invitationCode: string; intentToken?: string },
 ) {
+  const fieldErrors: Record<string, string[]> = {};
+  const positive = { min: 0, exclusiveMin: true } as const;
+  const pct = { min: 0, max: 100 } as const;
+  const paintingRate = { min: 0, max: 200, exclusiveMin: true } as const;
+  const roofingRate = { min: 0, max: 500, exclusiveMin: true } as const;
+  const numeric = {
+    hourly_rate: numericValue('hourly_rate', form.hourlyRate, positive, fieldErrors),
+    call_out_minimum: numericValue('call_out_minimum', form.callOutMin, positive, fieldErrors),
+    default_markup_pct: numericValue('default_markup_pct', form.markupPct, pct, fieldErrors),
+    apprentice_rate: numericValue('apprentice_rate', form.apprenticeRate, { min: 0 }, fieldErrors),
+    senior_rate: numericValue('senior_rate', form.seniorRate, { min: 0 }, fieldErrors),
+    after_hours_multiplier: numericValue(
+      'after_hours_multiplier',
+      form.afterHoursMultiplier,
+      { min: 1, max: 3 },
+      fieldErrors,
+    ),
+    min_labour_hours: numericValue(
+      'min_labour_hours',
+      form.minLabourHours,
+      { min: 0, max: 8 },
+      fieldErrors,
+    ),
+    risk_buffer_pct: numericValue('risk_buffer_pct', form.riskBufferPct, pct, fieldErrors),
+    painting_walls_rate: numericValue(
+      'painting_walls_rate',
+      form.paintingWallsRate,
+      paintingRate,
+      fieldErrors,
+    ),
+    painting_ceilings_rate: numericValue(
+      'painting_ceilings_rate',
+      form.paintingCeilingsRate,
+      paintingRate,
+      fieldErrors,
+    ),
+    painting_trim_rate: numericValue(
+      'painting_trim_rate',
+      form.paintingTrimRate,
+      paintingRate,
+      fieldErrors,
+    ),
+    painting_exterior_rate: numericValue(
+      'painting_exterior_rate',
+      form.paintingExteriorRate,
+      paintingRate,
+      fieldErrors,
+    ),
+    painting_call_out_minimum: numericValue(
+      'painting_call_out_minimum',
+      form.paintingCallOutMin,
+      { min: 0, max: 5000 },
+      fieldErrors,
+    ),
+    painting_hourly_rate: numericValue(
+      'painting_hourly_rate',
+      form.paintingHourlyRate,
+      { min: 0, max: 2000, exclusiveMin: true },
+      fieldErrors,
+    ),
+    roofing_corrugated_rate: numericValue(
+      'roofing_corrugated_rate',
+      form.roofing.colorbond_corrugated,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_trimdek_rate: numericValue(
+      'roofing_trimdek_rate',
+      form.roofing.colorbond_trimdek,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_spandek_rate: numericValue(
+      'roofing_spandek_rate',
+      form.roofing.colorbond_spandek,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_kliplok_rate: numericValue(
+      'roofing_kliplok_rate',
+      form.roofing.colorbond_kliplok,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_concrete_tile_rate: numericValue(
+      'roofing_concrete_tile_rate',
+      form.roofing.concrete_tile,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_terracotta_tile_rate: numericValue(
+      'roofing_terracotta_tile_rate',
+      form.roofing.terracotta_tile,
+      roofingRate,
+      fieldErrors,
+    ),
+    roofing_cement_sheet_rate: numericValue(
+      'roofing_cement_sheet_rate',
+      form.roofing.cement_sheet,
+      roofingRate,
+      fieldErrors,
+    ),
+  };
+
+  if (Object.keys(fieldErrors).length > 0) {
+    throw new OnboardNumericValidationError(fieldErrors);
+  }
+
   return {
     business_name: form.businessName.trim(),
     owner_first_name: form.firstName.trim(),
     owner_email: form.email.trim(),
-    owner_mobile: form.mobile.trim() || undefined,
-    clerk_user_id: opts.clerkUserId,
+    // A verified SMS intent is resolved again by the activation route. The
+    // server-derived phone is deliberately not replaced by a client field.
+    owner_mobile: opts.intentToken ? undefined : form.mobile.trim() || undefined,
     trades: form.trades,
     state: form.state || undefined,
     abn: form.abn.trim() || undefined,
@@ -221,29 +403,30 @@ export function buildActivatePayload(
     contact_name: form.contactName.trim() || undefined,
     website_url: form.websiteUrl.trim() || undefined,
     business_address: form.businessAddress.trim() || undefined,
-    hourly_rate: optionalNumber(form.hourlyRate),
-    call_out_minimum: optionalNumber(form.callOutMin),
-    default_markup_pct: optionalNumber(form.markupPct),
-    apprentice_rate: optionalNumber(form.apprenticeRate),
-    senior_rate: optionalNumber(form.seniorRate),
-    after_hours_multiplier: optionalNumber(form.afterHoursMultiplier),
-    min_labour_hours: optionalNumber(form.minLabourHours),
-    risk_buffer_pct: optionalNumber(form.riskBufferPct),
+    hourly_rate: numeric.hourly_rate,
+    call_out_minimum: numeric.call_out_minimum,
+    default_markup_pct: numeric.default_markup_pct,
+    apprentice_rate: numeric.apprentice_rate,
+    senior_rate: numeric.senior_rate,
+    after_hours_multiplier: numeric.after_hours_multiplier,
+    min_labour_hours: numeric.min_labour_hours,
+    risk_buffer_pct: numeric.risk_buffer_pct,
     painting_pricing_model: form.paintingPricingModel,
-    painting_walls_rate: optionalNumber(form.paintingWallsRate),
-    painting_ceilings_rate: optionalNumber(form.paintingCeilingsRate),
-    painting_trim_rate: optionalNumber(form.paintingTrimRate),
-    painting_exterior_rate: optionalNumber(form.paintingExteriorRate),
-    painting_call_out_minimum: optionalNumber(form.paintingCallOutMin),
-    painting_hourly_rate: optionalNumber(form.paintingHourlyRate),
-    roofing_corrugated_rate: optionalNumber(form.roofing.colorbond_corrugated),
-    roofing_trimdek_rate: optionalNumber(form.roofing.colorbond_trimdek),
-    roofing_spandek_rate: optionalNumber(form.roofing.colorbond_spandek),
-    roofing_kliplok_rate: optionalNumber(form.roofing.colorbond_kliplok),
-    roofing_concrete_tile_rate: optionalNumber(form.roofing.concrete_tile),
-    roofing_terracotta_tile_rate: optionalNumber(form.roofing.terracotta_tile),
-    roofing_cement_sheet_rate: optionalNumber(form.roofing.cement_sheet),
+    painting_walls_rate: numeric.painting_walls_rate,
+    painting_ceilings_rate: numeric.painting_ceilings_rate,
+    painting_trim_rate: numeric.painting_trim_rate,
+    painting_exterior_rate: numeric.painting_exterior_rate,
+    painting_call_out_minimum: numeric.painting_call_out_minimum,
+    painting_hourly_rate: numeric.painting_hourly_rate,
+    roofing_corrugated_rate: numeric.roofing_corrugated_rate,
+    roofing_trimdek_rate: numeric.roofing_trimdek_rate,
+    roofing_spandek_rate: numeric.roofing_spandek_rate,
+    roofing_kliplok_rate: numeric.roofing_kliplok_rate,
+    roofing_concrete_tile_rate: numeric.roofing_concrete_tile_rate,
+    roofing_terracotta_tile_rate: numeric.roofing_terracotta_tile_rate,
+    roofing_cement_sheet_rate: numeric.roofing_cement_sheet_rate,
     gst_registered: form.gstRegistered,
+    intent_token: opts.intentToken?.trim() || undefined,
     invitation_code: opts.invitationCode.trim(),
   };
 }

@@ -11,7 +11,7 @@
  */
 import { useAuth } from '@clerk/expo';
 import * as DocumentPicker from 'expo-document-picker';
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Field, PrimaryCta } from '@/features/auth/ui';
@@ -23,12 +23,15 @@ import { useTheme } from '@/lib/useTheme';
 import { buildPlanForm, downloadAirconPdf, useAirconPlan, useAirconRecommend } from './api';
 import {
   AREA_SOURCE_LABEL,
+  acceptsAirconRun,
+  airconRunFingerprint,
   AUS_STATES,
   buildRecommendRequest,
   CEILINGS,
   DEFAULT_FORM,
   FLOOR_AREA_SOURCE_LABEL,
   INSULATIONS,
+  newAirconRequestId,
   PLAN_MEDIA_TYPES,
   planFileProblem,
   roomLabels,
@@ -62,13 +65,38 @@ export function AirconToolScreen() {
   const [result, setResult] = useState<AirconResult | null>(null);
   const [pdfBusy, setPdfBusy] = useState(false);
   const [pdfError, setPdfError] = useState<string | null>(null);
+  const mountedRef = useRef(true);
+  const requestIdRef = useRef<string | null>(null);
+  const activeRequestIdRef = useRef<string | null>(null);
+  const activeFingerprintRef = useRef<string | null>(null);
+  const currentFingerprintRef = useRef('');
+
+  currentFingerprintRef.current = airconRunFingerprint(form, planFile);
+
+  useEffect(
+    () => () => {
+      mountedRef.current = false;
+      activeRequestIdRef.current = null;
+      activeFingerprintRef.current = null;
+    },
+    [],
+  );
 
   const recommend = useAirconRecommend();
   const plan = useAirconPlan();
   const busy = recommend.isPending || plan.isPending;
   const runError = recommend.isError ? recommend.error : plan.isError ? plan.error : null;
 
+  function invalidateRun() {
+    requestIdRef.current = null;
+    activeRequestIdRef.current = null;
+    activeFingerprintRef.current = null;
+    setResult(null);
+    setPdfError(null);
+  }
+
   function update<K extends keyof AirconForm>(key: K, value: AirconForm[K]) {
+    invalidateRun();
     setForm(f => ({ ...f, [key]: value }));
   }
 
@@ -92,13 +120,22 @@ export function AirconToolScreen() {
       return;
     }
     setPlanNote(null);
+    invalidateRun();
     setPlanFile(file);
   }
 
+  function removePlan() {
+    invalidateRun();
+    setPlanFile(null);
+    setPlanNote(null);
+  }
+
   function onSubmit() {
-    if (busy) return;
+    if (busy || result) return;
     setPdfError(null);
-    const built = buildRecommendRequest(form);
+    const requestId = requestIdRef.current ?? newAirconRequestId();
+    requestIdRef.current = requestId;
+    const built = buildRecommendRequest(form, requestId);
     if (!built.ok) {
       setFormError(built.error);
       return;
@@ -106,15 +143,35 @@ export function AirconToolScreen() {
     setFormError(null);
     recommend.reset();
     plan.reset();
+    const fingerprint = airconRunFingerprint(form, planFile);
+    activeRequestIdRef.current = requestId;
+    activeFingerprintRef.current = fingerprint;
+    const accept = (data: AirconResult) => {
+      if (
+        acceptsAirconRun({
+          mounted: mountedRef.current,
+          activeRequestId: activeRequestIdRef.current,
+          activeFingerprint: activeFingerprintRef.current,
+          responseRequestId: data.request_id,
+          currentFingerprint: currentFingerprintRef.current,
+        })
+      ) {
+        setResult(data);
+      }
+    };
     // Web parity: one button — an attached plan routes to the vision pipeline.
-    if (planFile) plan.mutate(buildPlanForm(built.body, planFile), { onSuccess: setResult });
-    else recommend.mutate(built.body, { onSuccess: setResult });
+    if (planFile) plan.mutate(buildPlanForm(built.body, planFile), { onSuccess: accept });
+    else recommend.mutate(built.body, { onSuccess: accept });
   }
 
   async function savePdf() {
-    if (!result || result.recommendation.pricing_status !== 'priced' || !result.saved || pdfBusy) return;
+    if (!result || result.recommendation.pricing_status !== 'priced' || !result.saved || pdfBusy)
+      return;
     setPdfBusy(true);
     setPdfError(null);
+    requestIdRef.current = null;
+    activeRequestIdRef.current = null;
+    activeFingerprintRef.current = null;
     try {
       await downloadAirconPdf({
         recommendationId: result.saved.id,
@@ -249,21 +306,18 @@ export function AirconToolScreen() {
 
       <Card style={{ gap: spacing.md }}>
         <SectionLabel>Floor plan (optional)</SectionLabel>
-        <Text style={[styles.hint, { color: colors.textSec, borderLeftColor: colors.accent }]}>
+        <Text style={[styles.hint, { color: colors.textSec }]}>
           Real rooms beat estimates — attach a PDF or photo of any plan and the rooms and areas are
           read off the drawing. Reading a full plan can take a minute or two.
         </Text>
         {planFile ? (
           <View style={styles.attachRow}>
-            <Text
-              style={[styles.attachName, { color: colors.textPri }]}
-              numberOfLines={1}
-            >
+            <Text style={[styles.attachName, { color: colors.textPri }]} numberOfLines={2}>
               {planFile.name}
             </Text>
             <Pressable
               accessibilityRole="button"
-              onPress={() => setPlanFile(null)}
+              onPress={removePlan}
               style={styles.textBtn}
               hitSlop={8}
             >
@@ -290,6 +344,7 @@ export function AirconToolScreen() {
         label={busy ? (planFile ? 'Reading the plan…' : 'Calculating…') : 'Get recommendation'}
         onPress={onSubmit}
         loading={busy}
+        disabled={result !== null}
       />
 
       {runError != null ? (
@@ -335,7 +390,11 @@ export function AirconToolScreen() {
                 accessibilityRole="button"
                 onPress={() => void savePdf()}
                 disabled={pdfBusy}
-                style={[styles.borderedBtn, { borderColor: colors.ctlLine }, pdfBusy && styles.dimmed]}
+                style={[
+                  styles.borderedBtn,
+                  { borderColor: colors.ctlLine },
+                  pdfBusy && styles.dimmed,
+                ]}
               >
                 <Text style={[styles.textBtnLabel, { color: colors.textPri }]}>
                   {pdfBusy ? 'PREPARING PDF…' : 'SAVE PDF'}
@@ -493,34 +552,22 @@ function SizingCard({ result }: { result: AirconResult }) {
       <Text style={[styles.body, { color: colors.textSec }]}>{result.climate_note}</Text>
 
       <View style={[styles.tableWrap, { borderTopColor: colors.inkLine }]}>
-        <View style={styles.tableRow}>
-          <Text style={[styles.thName, { color: colors.textDim }]}>ROOM</Text>
-          <Text style={[styles.thNum, { color: colors.textDim }]}>M²</Text>
-          <Text style={[styles.thNum, { color: colors.textDim }]}>M³</Text>
-          <Text style={[styles.thNum, { color: colors.textDim }]}>KW</Text>
-        </View>
         {sizing.rooms.map((room: RoomLoad, i: number) => (
-          <View key={`${labels[i] ?? i}`} style={styles.tableRow}>
-            <Text style={[styles.tdName, { color: colors.textPri }]} numberOfLines={1}>
-              {labels[i]}
-            </Text>
-            <Text style={[styles.tdNum, { color: colors.textSec }]}>{room.area_m2}</Text>
-            <Text style={[styles.tdNum, { color: colors.textSec }]}>{room.volume_m3}</Text>
-            <Text style={[styles.tdNum, { color: colors.textSec }]}>{room.kw}</Text>
-          </View>
+          <RoomMetrics
+            key={`${labels[i] ?? i}`}
+            label={labels[i] ?? `Room ${i + 1}`}
+            area={room.area_m2}
+            volume={room.volume_m3}
+            load={room.kw}
+          />
         ))}
-        <View style={styles.tableRow}>
-          <Text style={[styles.tdName, styles.bold, { color: colors.textPri }]}>TOTAL</Text>
-          <Text style={[styles.tdNum, styles.boldNum, { color: colors.textPri }]}>
-            {sizing.total_floor_area_m2}
-          </Text>
-          <Text style={[styles.tdNum, styles.boldNum, { color: colors.textPri }]}>
-            {sizing.total_volume_m3}
-          </Text>
-          <Text style={[styles.tdNum, styles.boldNum, { color: colors.accentText }]}>
-            {sizing.connected_kw}
-          </Text>
-        </View>
+        <RoomMetrics
+          label="Total"
+          isTotal
+          area={sizing.total_floor_area_m2}
+          volume={sizing.total_volume_m3}
+          load={sizing.connected_kw}
+        />
       </View>
 
       <Bullets lines={sizing.notes} />
@@ -529,12 +576,70 @@ function SizingCard({ result }: { result: AirconResult }) {
   );
 }
 
+function RoomMetrics({
+  label,
+  area,
+  volume,
+  load,
+  isTotal = false,
+}: {
+  label: string;
+  area: number;
+  volume: number;
+  load: number;
+  isTotal?: boolean;
+}) {
+  const { colors } = useTheme();
+  return (
+    <View
+      style={[
+        styles.roomRow,
+        isTotal && { borderTopWidth: 1, borderTopColor: colors.inkLine, paddingTop: spacing.lg },
+      ]}
+    >
+      <Text style={[styles.roomName, isTotal && styles.bold, { color: colors.textPri }]}>
+        {label}
+      </Text>
+      <View style={styles.roomMetrics}>
+        <View style={styles.roomMetric}>
+          <Text style={[styles.roomMetricLabel, { color: colors.textDim }]}>AREA</Text>
+          <Text
+            style={[styles.roomMetricValue, isTotal && styles.boldNum, { color: colors.textPri }]}
+          >
+            {area} m²
+          </Text>
+        </View>
+        <View style={styles.roomMetric}>
+          <Text style={[styles.roomMetricLabel, { color: colors.textDim }]}>VOLUME</Text>
+          <Text
+            style={[styles.roomMetricValue, isTotal && styles.boldNum, { color: colors.textPri }]}
+          >
+            {volume} m³
+          </Text>
+        </View>
+        <View style={styles.roomMetric}>
+          <Text style={[styles.roomMetricLabel, { color: colors.textDim }]}>LOAD</Text>
+          <Text
+            style={[
+              styles.roomMetricValue,
+              isTotal && styles.boldNum,
+              { color: isTotal ? colors.accentText : colors.textPri },
+            ]}
+          >
+            {load} kW
+          </Text>
+        </View>
+      </View>
+    </View>
+  );
+}
+
 function PlanCard({ plan }: { plan: NonNullable<AirconResult['plan']> }) {
   const { colors } = useTheme();
   return (
     <Card style={{ gap: spacing.md }}>
       <SectionLabel>{`Plan read · page ${plan.page}`}</SectionLabel>
-      <Text style={[styles.addressLine, { color: colors.textPri }]} numberOfLines={1}>
+      <Text style={[styles.addressLine, { color: colors.textPri }]} numberOfLines={2}>
         {plan.filename}
       </Text>
       <View style={styles.chipRow}>
@@ -547,7 +652,7 @@ function PlanCard({ plan }: { plan: NonNullable<AirconResult['plan']> }) {
       <View style={{ gap: spacing.sm }}>
         {plan.rooms.map(room => (
           <View key={room.name}>
-            <Text style={[styles.tdName, { color: colors.textPri }]}>{room.name}</Text>
+            <Text style={[styles.roomName, { color: colors.textPri }]}>{room.name}</Text>
             <Text style={[styles.roomMeta, { color: colors.textDim }]}>
               {[
                 room.room_type,
@@ -576,11 +681,7 @@ export function AirconPricingRequiredCard({
 }) {
   return (
     <Card style={{ gap: spacing.md }}>
-      <Notice
-        tone="warn"
-        label="Price needed"
-        body={`${setupReason} ${routingReason}`}
-      />
+      <Notice tone="warn" label="Price needed" body={`${setupReason} ${routingReason}`} />
       <WebOnlyCard
         label="Set up air-conditioning pricing"
         body="Complete your tenant rate card before presenting or saving a customer price. Book the site visit to confirm sizing and access."
@@ -596,9 +697,7 @@ export function OptionCardView({ option, rooms }: { option: AcOption; rooms: Roo
   const [showBreakdown, setShowBreakdown] = useState(false);
   const p = option.pricing;
   return (
-    <Card
-      style={[{ gap: spacing.md }, option.best_fit ? { borderColor: colors.accent } : null]}
-    >
+    <Card style={[{ gap: spacing.md }, option.best_fit ? { borderColor: colors.accent } : null]}>
       <View style={styles.optionHead}>
         <View style={{ flex: 1, minWidth: 0 }}>
           <Text style={[styles.optionKw, { color: colors.textDim }]}>
@@ -611,15 +710,23 @@ export function OptionCardView({ option, rooms }: { option: AcOption; rooms: Roo
         {option.best_fit ? <Chip label="Best fit" accent /> : null}
       </View>
 
-      <Text style={[styles.priceBig, { color: colors.textPri }]}>
-        {`${aud(option.price.low)} – ${aud(option.price.high)}`}
-      </Text>
+      <View style={styles.priceRange}>
+        <View style={styles.priceBound}>
+          <Text style={[styles.priceSub, { color: colors.textDim }]}>FROM</Text>
+          <Text style={[styles.priceBig, { color: colors.textPri }]}>{aud(option.price.low)}</Text>
+        </View>
+        <View style={styles.priceBound}>
+          <Text style={[styles.priceSub, { color: colors.textDim }]}>TO</Text>
+          <Text style={[styles.priceBig, { color: colors.textPri }]}>{aud(option.price.high)}</Text>
+        </View>
+      </View>
       <Text style={[styles.priceSub, { color: colors.textDim }]}>
         {`${p.gst_registered ? 'INC GST' : 'NO GST CHARGED'} · INDICATIVE · POINT ${aud(p.point_estimate_inc_gst)} ±${p.confidence_band_pct}%`}
       </Text>
 
       <Pressable
         accessibilityRole="button"
+        accessibilityState={{ expanded: showBreakdown }}
         onPress={() => setShowBreakdown(v => !v)}
         style={styles.textBtn}
         hitSlop={8}
@@ -700,52 +807,68 @@ const styles = StyleSheet.create({
   label: {
     marginBottom: 8,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10.5,
+    fontSize: 12,
+    lineHeight: 18,
     letterSpacing: 1.2,
   },
   hint: {
-    borderLeftWidth: 2,
-    paddingLeft: 10,
     fontFamily: fonts.sans.regular,
-    fontSize: 13,
-    lineHeight: 19,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  body: { fontFamily: fonts.sans.regular, fontSize: 13.5, lineHeight: 20 },
+  body: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   attachRow: { flexDirection: 'row', alignItems: 'center', gap: spacing.md },
-  attachName: { flex: 1, minWidth: 0, fontFamily: fonts.sans.semiBold, fontSize: 13.5 },
+  attachName: {
+    flex: 1,
+    minWidth: 0,
+    fontFamily: fonts.sans.semiBold,
+    fontSize: 14,
+    lineHeight: 20,
+  },
   warnLine: {
     fontFamily: fonts.sans.bold,
-    fontSize: 11,
-    letterSpacing: 0.4,
-    lineHeight: 15,
+    fontSize: 14,
+    lineHeight: 20,
   },
-  textBtn: { minHeight: touch.minimum, alignSelf: 'flex-start', justifyContent: 'center' },
+  textBtn: {
+    minHeight: touch.minimum,
+    minWidth: touch.minimum,
+    maxWidth: '100%',
+    alignSelf: 'flex-start',
+    justifyContent: 'center',
+    paddingVertical: spacing.sm,
+  },
   textBtnLabel: {
-    fontFamily: fonts.mono.bold,
-    fontSize: 11,
-    letterSpacing: 0.88, // .08em @ 11
+    fontFamily: fonts.sans.bold,
+    fontSize: 14,
+    lineHeight: 20,
+    letterSpacing: 0.4,
   },
   borderedBtn: {
     minHeight: touch.minimum,
-    alignSelf: 'flex-start',
+    alignSelf: 'stretch',
     justifyContent: 'center',
+    alignItems: 'center',
     borderWidth: 1,
     borderRadius: radius.control,
     paddingHorizontal: spacing.lg,
+    paddingVertical: spacing.md,
   },
   dimmed: { opacity: 0.5 },
   chip: {
     borderWidth: 1,
     borderRadius: radius.chip,
-    paddingHorizontal: 7,
-    paddingVertical: 3,
+    paddingHorizontal: spacing.sm,
+    paddingVertical: spacing.xs,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 9,
-    letterSpacing: 0.72, // .08em @ 9
+    fontSize: 12,
+    lineHeight: 16,
+    letterSpacing: 0.4,
   },
   chipRow: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm },
   statRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     alignItems: 'baseline',
     justifyContent: 'space-between',
     gap: spacing.md,
@@ -753,44 +876,45 @@ const styles = StyleSheet.create({
   statLabel: {
     flexShrink: 1,
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
   statValue: {
     fontFamily: fonts.mono.bold,
-    fontSize: 13,
+    fontSize: 16,
+    lineHeight: 22,
     fontVariant: ['tabular-nums'],
   },
-  noteLine: { fontFamily: fonts.sans.regular, fontSize: 12.5, lineHeight: 18 },
+  noteLine: { fontFamily: fonts.sans.regular, fontSize: 14, lineHeight: 20 },
   addressLine: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 19 },
-  tableWrap: { borderTopWidth: 1, paddingTop: spacing.sm, gap: spacing.xs },
-  tableRow: { flexDirection: 'row', alignItems: 'baseline', gap: spacing.sm },
-  thName: { flex: 1, fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
-  thNum: {
-    width: 56,
-    textAlign: 'right',
+  tableWrap: { borderTopWidth: 1, paddingTop: spacing.md, gap: spacing.md },
+  roomRow: { gap: spacing.sm, paddingVertical: spacing.sm },
+  roomName: { fontFamily: fonts.sans.semiBold, fontSize: 14, lineHeight: 20 },
+  roomMetrics: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.md },
+  roomMetric: { flexGrow: 1, flexBasis: 72, minWidth: 0, gap: spacing.xs },
+  roomMetricLabel: {
     fontFamily: fonts.mono.semiBold,
-    fontSize: 10,
-    letterSpacing: 0.8,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.4,
   },
-  tdName: { flex: 1, fontFamily: fonts.sans.regular, fontSize: 13 },
-  tdNum: {
-    width: 56,
-    textAlign: 'right',
+  roomMetricValue: {
     fontFamily: fonts.mono.medium,
-    fontSize: 12.5,
+    fontSize: 14,
+    lineHeight: 20,
     fontVariant: ['tabular-nums'],
   },
   bold: { fontFamily: fonts.sans.bold },
   boldNum: { fontFamily: fonts.mono.bold },
   roomMeta: {
     fontFamily: fonts.mono.medium,
-    fontSize: 10,
-    lineHeight: 15,
-    letterSpacing: 0.5,
+    fontSize: 12,
+    lineHeight: 18,
+    letterSpacing: 0.3,
   },
-  optionHead: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
-  optionKw: { fontFamily: fonts.mono.semiBold, fontSize: 10, letterSpacing: 0.8 },
+  optionHead: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: spacing.md },
+  optionKw: { fontFamily: fonts.mono.semiBold, fontSize: 12, lineHeight: 18, letterSpacing: 0.4 },
   optionTitle: {
     marginTop: 2,
     fontFamily: fonts.sans.extraBold,
@@ -799,15 +923,19 @@ const styles = StyleSheet.create({
   },
   priceBig: {
     fontFamily: fonts.mono.bold,
-    fontSize: 22,
+    fontSize: 20,
+    lineHeight: 28,
     fontVariant: ['tabular-nums'],
   },
-  priceSub: { fontFamily: fonts.mono.medium, fontSize: 10, letterSpacing: 0.8 },
+  priceRange: { flexDirection: 'row', flexWrap: 'wrap', gap: spacing.lg },
+  priceBound: { flexGrow: 1, flexBasis: 132, gap: spacing.xs },
+  priceSub: { fontFamily: fonts.mono.medium, fontSize: 12, lineHeight: 18, letterSpacing: 0.4 },
   breakdown: { borderTopWidth: 1, paddingTop: spacing.md, gap: spacing.sm },
-  compRow: { flexDirection: 'row', alignItems: 'flex-start', gap: spacing.md },
+  compRow: { flexDirection: 'row', flexWrap: 'wrap', alignItems: 'flex-start', gap: spacing.md },
   compTotal: {
     fontFamily: fonts.mono.medium,
-    fontSize: 12.5,
+    fontSize: 14,
+    lineHeight: 20,
     fontVariant: ['tabular-nums'],
   },
   nextTitle: {

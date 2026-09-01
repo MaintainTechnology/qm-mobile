@@ -16,19 +16,19 @@ Secondary: extra seats on Pro/Crew plans (an office partner or second licensed t
 
 ## Product Purpose
 
-The tradie-facing companion app to quotemax.com.au. QuoteMax answers the tradie's calls and texts, applies _their own_ pricing book, and drafts a clean quote in under a minute; this app is where the tradie reviews and approves that draft, watches leads arrive in real time, edits the pricing book, and tracks deposits and booked jobs. Success is a quote approved from a job site in under a minute with total confidence in the number.
+The primary experience is the tradie's QuoteMax command centre: review and approve drafts, watch leads arrive, maintain the pricing book, and track booked and paid work from the job site.
 
-It is not the customer-facing quote page; that stays on web. The customer never installs this.
+The current completeness scope also includes audience-correct installed-app counterparts for public/customer capability links and a separately server-authorised administrator workspace. Public/customer journeys must continue to work in a normal browser without an install. A signed-in owner preview never grants customer consent, and a tradie account never gains administrator authority from client navigation.
 
 ## Positioning
 
-QuoteMax quotes from the tradie's own pricing book, never from a model's guess. Complex jobs are never auto-quoted; they route to a paid A$99 site visit that is credited back to the final invoice, a product guarantee. QuoteMax never takes a cut of a job; only voice minutes are metered. The app's claim on the phone: the quote is already drafted, the price is already yours, you just say yes.
+QuoteMax quotes from the tradie's own pricing book, never from a model's guess. Pricing, fees, GST, deposits, site visits and remaining balances must come from the current authoritative server contract for that tenant and trade; old marketing claims are not client constants. The app's claim on the phone: the quote is already drafted, the price is already yours, you just say yes.
 
 ## Operating Context
 
 - The app is a client only. The QuoteMax backend owns the pricing book, the quote lifecycle, and every LLM provider credential.
 - Channels: each tradie gets a dedicated AU number; SMS/WhatsApp on all plans, voice on Pro/Crew.
-- Plans: Starter from A$49/mo (~40 quotes) → Pro (+voice, estimator module) → Crew A$249/mo. All AUD, ex-GST. Marketing-site facts as of Aug 2026; re-check before treating as current.
+- Plans and limits are rendered from current store/server entitlement contracts. Historical marketing values must be re-checked before display.
 - Estimator modules: solar, roof, paint.
 - Quote lifecycle vocabulary: Lead → Draft → (approve) → Sent → Deposit paid / booked, with the A$99 Site visit as the complex-job branch.
 - Usage scene: outdoors, one-handed, gloves, sunlight, dropped connections mid-task.
@@ -39,7 +39,7 @@ QuoteMax quotes from the tradie's own pricing book, never from a model's guess. 
 - The pricing book is the only source of a price. Nothing in the app may invent, estimate, or interpolate a price the tradie did not set.
 - Every API response is zod-parsed before use; shape mismatches throw rather than render a wrong number.
 - Offline tolerance is mandatory: any on-site screen must survive a dropped connection (react-query offline-tolerant defaults in `src/lib/query.ts`).
-- Stack is decided and recorded in CLAUDE.md (Expo SDK 54, RN 0.81.5, React 19.1.2, TypeScript strict, expo-router, FlashList for anything longer than a screen).
+- Stack is decided and recorded in CLAUDE.md (Expo SDK 54, RN 0.81.5, React 19.1.0, TypeScript strict, expo-router, FlashList for anything longer than a screen).
 - en-AU spelling in all user-facing copy (organise, licence, colour).
 
 ## Brand Commitments

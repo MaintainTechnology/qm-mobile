@@ -54,6 +54,7 @@ export function buildPlanForm(body: RecommendRequest, file: PickedFile): FormDat
   appendFile(form, 'plan', file);
   form.append('address', JSON.stringify(body.address));
   form.append('inputs', JSON.stringify(body.inputs));
+  if (body.request_id) form.append('request_id', body.request_id);
   return form;
 }
 
