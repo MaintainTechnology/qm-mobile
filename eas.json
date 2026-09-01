@@ -10,7 +10,8 @@
       "distribution": "internal",
       "channel": "development",
       "env": {
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cGlja2VkLWFsaWVuLTMwLmNsZXJrLmFjY291bnRzLmRldiQ"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_test_cGlja2VkLWFsaWVuLTMwLmNsZXJrLmFjY291bnRzLmRldiQ",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "ios-simulator": {
@@ -25,7 +26,8 @@
       "channel": "preview",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://quotemax.com.au",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsucXVvdGVtYXguY29tLmF1JA"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsucXVvdGVtYXguY29tLmF1JA",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     },
     "production": {
@@ -34,7 +36,8 @@
       "channel": "production",
       "env": {
         "EXPO_PUBLIC_API_URL": "https://quotemax.com.au",
-        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsucXVvdGVtYXguY29tLmF1JA"
+        "EXPO_PUBLIC_CLERK_PUBLISHABLE_KEY": "pk_live_Y2xlcmsucXVvdGVtYXguY29tLmF1JA",
+        "SENTRY_DISABLE_AUTO_UPLOAD": "true"
       }
     }
   },
