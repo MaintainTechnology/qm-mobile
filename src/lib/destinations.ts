@@ -5,6 +5,8 @@
  * pass through this registry. A valid-looking relative string is not enough:
  * the route, audience and query shape must be known here first.
  */
+import { UNSUBSCRIBE_TOKEN_PATTERN } from '@/features/support/unsubscribe-contract';
+
 export type DestinationAudience = 'public' | 'authenticated' | 'staff';
 
 type DestinationDefinition = {
@@ -23,6 +25,7 @@ export const DESTINATION_REGISTRY = {
   '/': { audience: 'authenticated' },
   '/welcome': { audience: 'public' },
   '/support': { audience: 'public' },
+  '/unsubscribe': { audience: 'public', query: { token: UNSUBSCRIBE_TOKEN_PATTERN } },
   '/sign-in': { audience: 'public', query: { intent: SAFE_INTENT } },
   '/sign-up': {
     audience: 'public',
@@ -60,7 +63,7 @@ export const DESTINATION_REGISTRY = {
   '/sections/files': { audience: 'authenticated' },
   '/sections/followups': { audience: 'authenticated' },
   '/sections/history': { audience: 'authenticated' },
-  '/sections/help': { audience: 'authenticated' },
+  '/sections/help': { audience: 'public' },
   '/sections/invites': { audience: 'authenticated' },
   '/sections/overview': { audience: 'authenticated' },
   '/sections/payouts': {
@@ -87,6 +90,7 @@ function routeUrl(value: string): URL | null {
     if (value.startsWith('/')) return new URL(value, 'quotemax://app');
     const parsed = new URL(value);
     const protocol = parsed.protocol.toLowerCase();
+    if (parsed.hash || parsed.username || parsed.password || parsed.port) return null;
 
     if (protocol === 'quotemax:') {
       const routePath =
@@ -99,7 +103,10 @@ function routeUrl(value: string): URL | null {
     if (protocol !== 'https:' || !APPROVED_LINK_HOSTS.has(parsed.hostname.toLowerCase())) {
       return null;
     }
-    // Only links deliberately published under /app are claimed by the native
+    // The existing signed unsubscribe URL now has a public native reader.
+    // No other /api or customer namespace is claimed by this exception.
+    if (parsed.pathname.startsWith('/api/email/unsubscribe/')) return parsed;
+    // Only links deliberately published under /app are otherwise claimed by the native
     // binary today. Customer/browser routes remain installation-optional until
     // their native counterparts are implemented and added to this registry.
     if (parsed.pathname !== '/app' && !parsed.pathname.startsWith('/app/')) return null;
@@ -111,16 +118,24 @@ function routeUrl(value: string): URL | null {
 }
 
 export function safeDestination(value: string): SafeDestination | null {
-  const parsed = routeUrl(value);
+  let parsed = routeUrl(value);
   if (!parsed || parsed.hash || parsed.username || parsed.password) return null;
+  if (parsed.pathname === '/app/unsubscribe') parsed = new URL(`/unsubscribe${parsed.search}`, 'quotemax://app');
+
+  if (parsed.pathname.startsWith('/api/email/unsubscribe/')) {
+    const raw = parsed.pathname.slice('/api/email/unsubscribe/'.length);
+    if (parsed.search || !UNSUBSCRIBE_TOKEN_PATTERN.test(raw)) return null;
+    parsed = new URL(`/unsubscribe?token=${raw}`, 'quotemax://app');
+  }
 
   const path = parsed.pathname.replace(/\/{2,}/g, '/') as RegisteredDestinationPath;
   const definition = (DESTINATION_REGISTRY as Record<string, DestinationDefinition>)[path];
   if (!definition) return null;
+  if (path === '/unsubscribe' && parsed.searchParams.getAll('token').length !== 1) return null;
 
   const allowedQuery = definition.query ?? {};
   for (const [key, rawValue] of parsed.searchParams.entries()) {
-    const matcher = allowedQuery[key];
+    const matcher = Object.prototype.hasOwnProperty.call(allowedQuery, key) ? allowedQuery[key] : undefined;
     if (!matcher || !matcher.test(rawValue)) return null;
   }
 
@@ -137,6 +152,12 @@ export function safeDestination(value: string): SafeDestination | null {
  * QuoteMax custom/universal links are routed through an auth-aware resolver.
  */
 export function rewriteIncomingSystemPath(value: string): string {
+  // Relative paths from the OS need the same capability validation as full
+  // links; never leave a raw /api token in an unmatched native route.
+  if (/^\/(?:api\/email\/unsubscribe|(?:app\/)?unsubscribe)(?:[/?#]|$)/.test(value)) {
+    const destination = safeDestination(value);
+    return destination ? `/resolve-link?target=${encodeURIComponent(destination.href)}` : '/invalid-link';
+  }
   if (
     value.startsWith('/') ||
     value.startsWith('exp://') ||

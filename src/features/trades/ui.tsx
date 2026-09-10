@@ -46,24 +46,27 @@ export function PillOption({
   label,
   selected,
   onPress,
+  disabled = false,
 }: {
   label: string;
   selected: boolean;
   onPress: () => void;
+  disabled?: boolean;
 }) {
   const { colors } = useTheme();
   return (
     <Pressable
       accessibilityRole="radio"
-      accessibilityState={{ checked: selected, selected }}
+      accessibilityState={{ checked: selected, selected, disabled }}
       aria-checked={selected}
       onPress={onPress}
+      disabled={disabled}
       style={({ pressed }) => [
         styles.pill,
         {
           backgroundColor: selected || pressed ? colors.inkCard : colors.ink,
           borderColor: selected ? colors.accentSoft : colors.ctlLine,
-          opacity: pressed ? 0.75 : 1,
+          opacity: disabled ? 0.45 : pressed ? 0.75 : 1,
         },
       ]}
     >
@@ -80,15 +83,17 @@ export function PillGroup({
   options,
   value,
   onChange,
+  disabled = false,
 }: {
   options: readonly (readonly [string, string])[];
   value: string;
   onChange: (next: string) => void;
+  disabled?: boolean;
 }) {
   return (
     <View accessibilityRole="radiogroup" style={styles.pillRow}>
       {options.map(([v, label]) => (
-        <PillOption key={v} label={label} selected={value === v} onPress={() => onChange(v)} />
+        <PillOption key={v} label={label} selected={value === v} disabled={disabled} onPress={() => onChange(v)} />
       ))}
     </View>
   );

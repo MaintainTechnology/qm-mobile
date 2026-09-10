@@ -11,10 +11,13 @@
  * contacted list. Each row expands into the same lazy messages thread
  * (FollowupThread, GET followups/messages).
  *
- * Money on this wire is DOLLARS inc GST (web parity) → cents only at render.
+ * Amounts arrive in dollars. Tax wording requires proven quote-specific authority.
  */
-import { useMemo, useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAuth } from '@clerk/expo';
+import { usePreventRemove } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import { Alert, Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
 import { z } from 'zod';
 
 import { apiErrorMessage } from '@/lib/api';
@@ -22,54 +25,34 @@ import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useApiMutation, useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
+import { useTenantMe } from '@/lib/tenant';
 
 import { Notice, PillGroup } from '../trades/ui';
 import { FollowupThread } from './FollowupThread';
+import { FollowupHistory } from './FollowupHistory';
+import { CalendarSchema } from './CalendarScreen';
+import { QuoteWorkspace } from '../quotes/QuoteWorkspace';
+import {
+  FOLLOWUPS_KEY,
+  NOTE_OUTCOMES,
+  FollowupsSchema,
+  chaseableFollowups,
+  filterFollowups,
+  followupCategories,
+  followupEventsKey,
+  followupKey,
+  followupTarget,
+  suggestedFollowupText,
+  type FollowupDraft,
+  type FollowupItem,
+} from './followups';
+import { useFollowupDrafts } from './use-followup-drafts';
+import { useFollowupActions } from './use-followup-actions';
+import { followupOperationFinished, followupOperationMatches, type FollowupOperationInput } from './followup-operation';
 import { SectionEmpty, SectionGroup, SectionLoading, SectionScreen } from './SectionScreen';
-
-const FOLLOWUPS_KEY = ['tenant', 'followups'] as const;
 
 /** Web parity: lib/dashboard/pagination PAGE_SIZE — pages of 10, sliced client-side. */
 const PAGE_SIZE = 10;
-
-/** The web's log-touch outcome radios (page.tsx NOTE_OUTCOMES), values verbatim. */
-const NOTE_OUTCOMES = [
-  ['spoke', 'Spoke with customer'],
-  ['left_voicemail', 'Left voicemail'],
-  ['no_answer', 'No answer'],
-  ['wants_callback', 'Wants callback'],
-  ['not_interested', 'Not interested'],
-  ['other', 'Other'],
-] as const;
-
-const FollowupItemSchema = z.looseObject({
-  kind: z.enum(['quote', 'lead']),
-  quote_id: z.string().nullish(),
-  conversation_id: z.string().nullish(),
-  share_token: z.string().nullish(),
-  followup_reason: z.string().nullish(),
-  last_activity: z.string().nullish(),
-  age_hours: z.number().nullish(),
-  total_inc_gst: z.number().nullish(),
-  selected_tier: z.string().nullish(),
-  job_type: z.string().nullish(),
-  needs_inspection: z.boolean().nullish(),
-  followed_up_at: z.string().nullish(),
-  followup_note: z.string().nullish(),
-  customer: z
-    .looseObject({
-      first_name: z.string().nullish(),
-      full_name: z.string().nullish(),
-      phone: z.string().nullish(),
-      suburb: z.string().nullish(),
-    })
-    .nullish(),
-});
-type FollowupItem = z.infer<typeof FollowupItemSchema>;
-
-const FollowupsSchema = z.looseObject({
-  followups: z.array(FollowupItemSchema).default([]),
-});
 
 const ActionOkSchema = z.looseObject({ ok: z.literal(true) });
 
@@ -88,57 +71,133 @@ function ageLabel(hours: number | null | undefined): string {
   return `${Math.floor(hours / 24)}d ago`;
 }
 
-function FollowupRow({ item }: { item: FollowupItem }) {
+function FollowupRow({
+  item,
+  draft,
+  updateDraft,
+  prepareDraft,
+  draftReady,
+  actionsReady,
+  tenantId,
+  onOpenQuote,
+}: {
+  item: FollowupItem;
+  draft: FollowupDraft;
+  updateDraft: (patch: Partial<FollowupDraft>) => void;
+  prepareDraft: () => void;
+  draftReady: boolean;
+  actionsReady: boolean;
+  tenantId: string;
+  onOpenQuote: (id: string) => void;
+}) {
+  useEffect(() => { prepareDraft(); }, [prepareDraft]);
   const { colors } = useTheme();
   const [note, setNote] = useState<string | null>(null);
-  const [text, setText] = useState('');
+  const text = draft.text ?? '';
   const [composing, setComposing] = useState(false);
   // Log-touch form (the web's mark-contacted path): outcome radio + optional note.
   const [logging, setLogging] = useState(false);
-  const [outcome, setOutcome] = useState('spoke');
-  const [logNote, setLogNote] = useState('');
+  const { outcome, logNote } = draft;
   const [threadOpen, setThreadOpen] = useState(false);
+  const [historyOpen, setHistoryOpen] = useState(false);
+  const [completionSeen, setCompletionSeen] = useState<Partial<Record<'text' | 'call' | 'note', string>>>({});
 
-  const idBody = item.quote_id
-    ? { quoteId: item.quote_id }
-    : { conversationId: item.conversation_id ?? '' };
-
-  const call = useApiMutation('/api/tenant/followups/call', ActionOkSchema, {
-    timeoutMs: 30000,
-    onSuccess: () => setNote('Calling — answer your phone and we bridge the customer in.'),
-    onError: err => setNote(apiErrorMessage(err)),
-  });
-  const send = useApiMutation('/api/tenant/followups/text', ActionOkSchema, {
-    timeoutMs: 30000,
-    invalidates: [FOLLOWUPS_KEY],
-    onSuccess: () => {
-      setNote('Text sent ✓');
-      setComposing(false);
-      setText('');
-    },
-    onError: err => setNote(apiErrorMessage(err)),
+  const idBody = followupTarget(item);
+  const quoteId = item.kind === 'quote' ? item.quote_id : null;
+  const invalidates = [FOLLOWUPS_KEY, ...(quoteId ? [followupEventsKey(quoteId)] : [])];
+  const operations = useFollowupActions(tenantId, {
+    kind: item.kind === 'quote' ? 'quote' : 'conversation',
+    id: (item.kind === 'quote' ? item.quote_id : item.conversation_id)!,
   });
   const reopen = useApiMutation('/api/tenant/followups', ActionOkSchema, {
-    invalidates: [FOLLOWUPS_KEY],
+    invalidates,
     onError: err => setNote(apiErrorMessage(err)),
   });
-  // POST followups/events {quoteId, kind:'note', outcome, note?} — the server
-  // also sets followed_up_at, so the row moves to Contacted on the refetch.
-  const logTouch = useApiMutation('/api/tenant/followups/events', ActionOkSchema, {
-    invalidates: [FOLLOWUPS_KEY],
-    onSuccess: () => {
-      setNote('Touch logged ✓');
-      setLogging(false);
-      setLogNote('');
-    },
-    onError: err => setNote(apiErrorMessage(err)),
-  });
-
   const contacted = item.followed_up_at != null;
+  const inputFor = (action: 'text' | 'call' | 'note'): FollowupOperationInput =>
+    action === 'note'
+      ? { action, kind: 'note', outcome, note: logNote.trim() || undefined, preserveChase: contacted }
+      : action === 'text'
+        ? { action, text: text.trim(), expectedRecipient: item.customer?.phone ?? '' }
+        : { action, expectedRecipient: item.customer?.phone ?? '' };
+  const latestInput = useRef(inputFor);
+  latestInput.current = inputFor;
+  const completionContext = useRef({ updateDraft, item, quoteId });
+  completionContext.current = { updateDraft, item, quoteId };
+  const receipts = useMemo(() => ({ text: operations.text.receipt, call: operations.call.receipt, note: operations.note.receipt }),
+    [operations.text.receipt, operations.call.receipt, operations.note.receipt]);
+  const completionPending = (action: 'text' | 'call' | 'note') => {
+    const receipt = receipts[action];
+    return !!receipt && followupOperationFinished(receipt) && completionSeen[action] !== receipt.requestId;
+  };
+  useEffect(() => {
+    if (!draftReady) return;
+    let cancelled = false;
+    for (const action of ['text', 'call', 'note'] as const) {
+      const receipt = receipts[action];
+      if (!receipt || !followupOperationFinished(receipt) || completionSeen[action] === receipt.requestId) continue;
+      void (async () => {
+        const captured = latestInput.current(action);
+        const context = completionContext.current;
+        const target = { kind: context.item.kind === 'quote' ? 'quote' as const : 'conversation' as const,
+          id: (context.quoteId ?? context.item.conversation_id)! };
+        let matches = false;
+        // No recoverable working copy is also a valid state. Never invent its
+        // original text, or discard a newer draft because an older send completed.
+        try { matches = await followupOperationMatches(target, captured, receipt); } catch { /* Empty or newer input stays intact. */ }
+        if (cancelled) return;
+        if (receipt.status !== 'failed' && matches && JSON.stringify(latestInput.current(action)) === JSON.stringify(captured)) {
+          if (action === 'text' && receipt.accepted) { completionContext.current.updateDraft({ text: null }); setComposing(false); }
+          if (action === 'note' && receipt.status === 'complete') { completionContext.current.updateDraft({ logNote: '' }); setLogging(false); setHistoryOpen(true); }
+        }
+        setNote(receipt.status === 'failed' ? `The previous ${action} request failed. Its working copy has been kept.`
+          : action === 'note' ? 'The previous touch is already logged.' : `The provider accepted the previous ${action} request.`);
+        setCompletionSeen(previous => ({ ...previous, [action]: receipt.requestId }));
+      })();
+    }
+    return () => { cancelled = true; };
+  }, [draftReady, receipts, completionSeen]);
+  const unresolved = (action: 'text' | 'call' | 'note') => {
+    const receipt = operations[action].receipt;
+    return !!receipt && !followupOperationFinished(receipt);
+  };
+  const perform = async (action: 'text' | 'call' | 'note', retry = false) => {
+    setNote(null);
+    try {
+      const receipt = await operations.run(inputFor(action), retry ? 'retry' : 'start');
+      if (!followupOperationFinished(receipt)) {
+        setNote(receipt.accepted ? 'The provider accepted this request. Contact history still needs confirmation.' : 'The outcome is not confirmed. Check status before another request.');
+        return;
+      }
+      if (receipt.status === 'failed') { setNote('This request failed. Review the details before trying again.'); return; }
+      if (action === 'text' && receipt.accepted) {
+        setNote('Text accepted by the provider.'); setComposing(false); updateDraft({ text: null });
+      } else if (action === 'call' && receipt.accepted) {
+        setNote('Call requested — answer your phone to connect with the customer.');
+      } else if (action === 'note' && receipt.status === 'complete') {
+        setNote('Touch logged.'); setLogging(false); updateDraft({ logNote: '' }); setHistoryOpen(true);
+      }
+    } catch (error) { setNote(apiErrorMessage(error)); }
+  };
+  const checkStatus = async (action: 'text' | 'call' | 'note') => {
+    const captured = inputFor(action);
+    const receipt = await operations.refresh(action);
+    if (!receipt || !followupOperationFinished(receipt)) return;
+    if (receipt.status === 'failed') { setNote('The previous request failed. Its draft has been kept.'); return; }
+    setNote(action === 'note' ? 'The previous touch is already logged.' : `The provider accepted the previous ${action} request.`);
+    const target = { kind: item.kind === 'quote' ? 'quote' as const : 'conversation' as const, id: (quoteId ?? item.conversation_id)! };
+    // A successful readback clears only the exact working input used by that
+    // operation. Newer text or notes stay intact.
+    if (await followupOperationMatches(target, captured, receipt) && JSON.stringify(latestInput.current(action)) === JSON.stringify(captured)) {
+      if (action === 'text' && receipt.accepted) { updateDraft({ text: null }); setComposing(false); }
+      if (action === 'note' && receipt.status === 'complete') { updateDraft({ logNote: '' }); setLogging(false); setHistoryOpen(true); }
+    }
+  };
   const amount =
     item.total_inc_gst == null ? null : formatAud(centsFromApiDollars(item.total_inc_gst));
-  const phoneOk = hasPhone(item);
-  const busy = call.isPending || send.isPending || reopen.isPending || logTouch.isPending;
+  const phoneOk = hasPhone(item) && !!idBody;
+  const busy = operations.busy || reopen.isPending;
+  const mutationBlocked = busy || !actionsReady;
 
   return (
     <View style={[styles.row, { borderColor: colors.inkLine, backgroundColor: colors.inkCard }]}>
@@ -160,26 +219,31 @@ function FollowupRow({ item }: { item: FollowupItem }) {
         {item.needs_inspection ? ' · Inspection' : ''}
       </Text>
       {item.kind === 'quote' && amount ? (
-        <Text style={[styles.amount, { color: colors.textPri }]}>{amount} inc GST</Text>
+        <Text style={[styles.amount, { color: colors.textPri }]}>Quote total: {amount}</Text>
+      ) : null}
+      {item.kind === 'quote' && item.share_token ? (
+        <Text style={[styles.meta, { color: colors.textSec }]}>Quote code: {item.share_token}</Text>
       ) : null}
 
       <View style={[styles.actions, { borderTopColor: colors.inkLine }]}>
         <View style={styles.actionPair}>
           <ActionBtn
-            label={call.isPending ? 'Calling…' : 'Call'}
-            disabled={!phoneOk || busy}
+            label={operations.call.busy ? 'Calling…' : 'Call'}
+            disabled={!phoneOk || mutationBlocked || operations.call.loading || !!operations.call.error || unresolved('call') || completionPending('call')}
             inline
             onPress={() => {
               setNote(null);
-              call.mutate(idBody);
+              if (idBody) void perform('call');
             }}
           />
           <ActionBtn
             label="Text"
             inline
-            disabled={!phoneOk || busy}
+            disabled={!phoneOk || busy || !draftReady}
             onPress={() => {
               setNote(null);
+              if (!composing && draft.text === null)
+                updateDraft({ text: suggestedFollowupText(item) });
               setComposing(v => !v);
             }}
           />
@@ -190,41 +254,63 @@ function FollowupRow({ item }: { item: FollowupItem }) {
             inline
             onPress={() => setThreadOpen(v => !v)}
           />
-          {item.quote_id ? (
-            contacted ? (
-              <ActionBtn
-                label={reopen.isPending ? 'Saving…' : 'Reopen'}
-                inline
-                disabled={busy}
-                onPress={() => {
-                  setNote(null);
-                  reopen.mutate({ quoteId: item.quote_id, action: 'reopen' });
-                }}
-              />
-            ) : (
-              <ActionBtn
-                label={logging ? 'Cancel' : 'Mark contacted'}
-                inline
-                disabled={busy}
-                onPress={() => {
-                  setNote(null);
-                  setLogging(v => !v);
-                }}
-              />
-            )
+          {quoteId && contacted ? (
+            <ActionBtn
+              label={reopen.isPending ? 'Saving…' : 'Reopen'}
+              inline
+              disabled={mutationBlocked}
+              onPress={() => {
+                setNote(null);
+                reopen.mutate({ quoteId, action: 'reopen' });
+              }}
+            />
+          ) : null}
+          {quoteId ? (
+            <ActionBtn
+              label={logging ? 'Cancel log' : contacted ? 'Log another touch' : 'Log touch'}
+              inline
+              disabled={busy || !draftReady}
+              onPress={() => {
+                setNote(null);
+                setLogging(v => !v);
+              }}
+            />
           ) : null}
         </View>
+        {quoteId ? (
+          <View style={styles.actionPair}>
+            <ActionBtn
+              label="Open quote"
+              inline
+              disabled={mutationBlocked}
+              onPress={() => onOpenQuote(quoteId)}
+            />
+            <ActionBtn
+              label={historyOpen ? 'Hide history' : 'Contact history'}
+              inline
+              onPress={() => setHistoryOpen(v => !v)}
+            />
+          </View>
+        ) : null}
       </View>
 
-      {logging && item.quote_id ? (
+      {logging && quoteId ? (
         <View style={[styles.inlineForm, { borderTopColor: colors.inkLine }]}>
           <Text style={[styles.formLabel, { color: colors.textDim }]}>
             LOG TOUCH · WHAT HAPPENED?
           </Text>
-          <PillGroup options={NOTE_OUTCOMES} value={outcome} onChange={setOutcome} />
+          <PillGroup
+            options={NOTE_OUTCOMES}
+            value={outcome}
+            onChange={outcome => {
+              const selected = NOTE_OUTCOMES.find(([key]) => key === outcome);
+              if (selected && !busy) updateDraft({ outcome: selected[0] });
+            }}
+          />
           <TextInput
             value={logNote}
-            onChangeText={v => setLogNote(v.slice(0, 500))}
+            onChangeText={v => updateDraft({ logNote: v.slice(0, 500) })}
+            editable={!busy}
             placeholder="Optional note, e.g. call back after 3pm"
             placeholderTextColor={colors.textDim}
             multiline
@@ -235,31 +321,29 @@ function FollowupRow({ item }: { item: FollowupItem }) {
             ]}
           />
           <ActionBtn
-            label={logTouch.isPending ? 'Saving…' : 'Save touch'}
-            disabled={logTouch.isPending}
+            label={operations.note.busy ? 'Saving…' : 'Save touch'}
+            disabled={mutationBlocked || operations.note.loading || !!operations.note.error || unresolved('note') || completionPending('note')}
             primary
-            onPress={() =>
-              logTouch.mutate({
-                quoteId: item.quote_id,
-                kind: 'note',
-                outcome,
-                note: logNote.trim() || undefined,
-              })
-            }
+            onPress={() => void perform('note')}
           />
         </View>
       ) : null}
 
       {threadOpen ? (
-        <FollowupThread quoteId={item.quote_id} conversationId={item.conversation_id} />
+        <FollowupThread
+          quoteId={quoteId}
+          conversationId={item.kind === 'lead' ? item.conversation_id : null}
+        />
       ) : null}
+      {historyOpen && quoteId ? <FollowupHistory quoteId={quoteId} /> : null}
 
       {composing ? (
         <View style={[styles.inlineForm, { borderTopColor: colors.inkLine }]}>
           <Text style={[styles.formLabel, { color: colors.textDim }]}>MESSAGE</Text>
           <TextInput
             value={text}
-            onChangeText={v => setText(v.slice(0, 640))}
+            onChangeText={v => updateDraft({ text: v.slice(0, 640) })}
+            editable={!busy}
             placeholder="Message the customer…"
             placeholderTextColor={colors.textDim}
             multiline
@@ -270,12 +354,29 @@ function FollowupRow({ item }: { item: FollowupItem }) {
             ]}
           />
           <ActionBtn
-            label={send.isPending ? 'Sending…' : `Send (${text.length}/640)`}
-            disabled={text.trim().length === 0 || send.isPending}
+            label={operations.text.busy ? 'Sending…' : `Send (${text.length}/640)`}
+            disabled={text.trim().length === 0 || mutationBlocked || !idBody || operations.text.loading || !!operations.text.error || unresolved('text') || completionPending('text')}
             primary
-            onPress={() => send.mutate({ ...idBody, text: text.trim() })}
+            onPress={() => { if (idBody) void perform('text'); }}
           />
         </View>
+      ) : null}
+
+      {(['text', 'call', ...(quoteId ? ['note'] : [])] as ('text' | 'call' | 'note')[]).map(action => {
+        const state = operations[action];
+        if (!state.error && !unresolved(action)) return null;
+        return <View key={action} style={styles.inlineForm}>
+          <Text style={[styles.note, { color: colors.textSec }]}>{state.error ? apiErrorMessage(state.error) : `The previous ${action} outcome needs confirmation. Restore the original text or note to retry the same request; a new request remains blocked.`}</Text>
+          <ActionBtn label={`Check ${action} status`} disabled={busy || state.loading} onPress={() => void checkStatus(action).catch(error => setNote(apiErrorMessage(error)))} />
+          {state.receipt && unresolved(action) ? <ActionBtn label={`Retry same ${action} request`} disabled={mutationBlocked || !draftReady || state.loading} onPress={() => void perform(action, true)} /> : null}
+        </View>;
+      })}
+      {draftReady && (draft.text !== null || draft.logNote || draft.outcome !== 'spoke') ? (
+        <ActionBtn label="Discard local follow-up edits" disabled={busy || unresolved('text') || unresolved('note')}
+          onPress={() => Alert.alert('Discard local edits?', 'This removes the unsent message, touch note and selected outcome from this device. It does not remove sent messages or logged history.', [
+            { text: 'Keep editing', style: 'cancel' },
+            { text: 'Discard local edits', style: 'destructive', onPress: () => updateDraft({ text: null, logNote: '', outcome: 'spoke' }) },
+          ])} />
       ) : null}
 
       {note ? <Text style={[styles.note, { color: colors.textSec }]}>{note}</Text> : null}
@@ -328,8 +429,30 @@ function ActionBtn({
 }
 
 export function FollowupsScreen() {
+  const { userId, sessionId } = useAuth();
+  const tenant = useTenantMe();
+  if (!userId || !tenant.data?.tenant.id || tenant.isError) return (
+    <SectionScreen title="Follow-ups">
+      {tenant.isError ? <Notice tone="danger" label="Account unavailable" body={apiErrorMessage(tenant.error)} onRetry={() => void tenant.refetch()} />
+        : <SectionLoading label="Loading account" />}
+    </SectionScreen>
+  );
+  return <FollowupsBody key={`${userId}:${sessionId}:${tenant.data.tenant.id}`} userId={userId} tenantId={tenant.data.tenant.id} />;
+}
+
+function FollowupsBody({ userId, tenantId }: { userId: string; tenantId: string }) {
   const { colors } = useTheme();
+  const router = useRouter();
   const [search, setSearch] = useState('');
+  const [category, setCategory] = useState('all');
+  const drafts = useFollowupDrafts({ userId, tenantId });
+  usePreventRemove(drafts.unsaved, () => {
+    Alert.alert('Keep your follow-up edits', 'Your latest edits are not yet saved on this device. Stay here until saving finishes, or retry if storage failed.', [
+      { text: 'Stay here', style: 'cancel' },
+      { text: 'Retry saving', onPress: drafts.retry },
+    ]);
+  });
+  const [openQuote, setOpenQuote] = useState<string | null>(null);
   // Load-more window over the ordered list (the GET has no paging params —
   // web slices the same fetched array into pages of 10).
   const [visible, setVisible] = useState(PAGE_SIZE);
@@ -339,25 +462,30 @@ export function FollowupsScreen() {
     FollowupsSchema,
   );
 
-  const items = useMemo(() => {
-    const all = query.data?.followups ?? [];
-    const terms = search.toLowerCase().split(/\s+/).filter(Boolean);
-    if (terms.length === 0) return all;
-    return all.filter(item => {
-      const hay = [
-        item.customer?.full_name,
-        item.customer?.first_name,
-        item.customer?.suburb,
-        item.customer?.phone,
-        item.job_type,
-        item.share_token,
-      ]
-        .filter((v): v is string => typeof v === 'string')
-        .join(' ')
-        .toLowerCase();
-      return terms.every(t => hay.includes(t));
-    });
-  }, [query.data, search]);
+  const calendar = useApiQuery(['tenant', 'calendar'], '/api/tenant/calendar', CalendarSchema);
+  const all = useMemo(() => chaseableFollowups(query.data?.followups ?? []), [query.data]);
+  const categories = useMemo(() => followupCategories(all), [all]);
+  const effectiveCategory = categories.some(([key]) => key === category) ? category : 'all';
+  const items = useMemo(
+    () => filterFollowups(all, effectiveCategory, search),
+    [all, effectiveCategory, search],
+  );
+  const row = (item: FollowupItem) => {
+    const key = followupKey(item);
+    return (
+      <FollowupRow
+        key={key}
+        item={item}
+        draft={drafts.state(item).value}
+        draftReady={drafts.state(item).ready}
+        prepareDraft={() => drafts.ensure(item)}
+        updateDraft={patch => drafts.update(item, patch)}
+        actionsReady={!query.isError && !drafts.unsaved && !drafts.error}
+        tenantId={tenantId}
+        onOpenQuote={setOpenQuote}
+      />
+    );
+  };
 
   const toChase = items.filter(i => i.followed_up_at == null);
   const contacted = items.filter(i => i.followed_up_at != null);
@@ -377,8 +505,27 @@ export function FollowupsScreen() {
       onRefresh={() => {
         setVisible(PAGE_SIZE);
         void query.refetch();
+        void calendar.refetch();
       }}
     >
+      {drafts.error ? <Notice tone="danger" label="Working copy needs attention" body={drafts.error} onRetry={drafts.retry} /> : null}
+      {drafts.pending ? <Text style={{ color: colors.textSec }}>Saving working copy on this device…</Text> : null}
+      <Text style={{ color: colors.textDim }}>Unsent messages and notes stay encrypted on this device for seven days after your last edit. They are cleared when you sign out.</Text>
+      {calendar.data && !calendar.isError && calendar.data.toSchedule.length ? (
+        <ActionBtn
+          disabled={drafts.unsaved}
+          label={`${calendar.data.toSchedule.length} paid ${calendar.data.toSchedule.length === 1 ? 'quote needs' : 'quotes need'} a time · Open Calendar`}
+          onPress={() => router.push('/sections/calendar')}
+        />
+      ) : null}
+      {calendar.isError ? (
+        <Notice
+          tone="warn"
+          label="Calendar status unavailable"
+          body="Paid quotes leave the follow-up queue. Open Calendar to review bookings."
+          onRetry={() => void calendar.refetch()}
+        />
+      ) : null}
       {query.isPending ? (
         <SectionLoading label="Loading follow-ups" />
       ) : query.isError && !query.data ? (
@@ -390,6 +537,22 @@ export function FollowupsScreen() {
         />
       ) : (
         <>
+          {query.isError ? (
+            <Notice
+              tone="warn"
+              label="Showing saved follow-ups"
+              body="The latest queue could not be loaded. Refresh before contacting a customer."
+              onRetry={() => void query.refetch()}
+            />
+          ) : null}
+          <PillGroup
+            options={categories}
+            value={effectiveCategory}
+            onChange={value => {
+              setCategory(value);
+              setVisible(PAGE_SIZE);
+            }}
+          />
           <TextInput
             value={search}
             onChangeText={v => {
@@ -410,33 +573,37 @@ export function FollowupsScreen() {
               },
             ]}
           />
+          {search.trim() || effectiveCategory !== 'all' ? (
+            <ActionBtn
+              label={`Clear filters (${items.length} of ${all.length})`}
+              onPress={() => {
+                setSearch('');
+                setCategory('all');
+                setVisible(PAGE_SIZE);
+              }}
+            />
+          ) : null}
           <SectionGroup title="To chase" count={toChase.length}>
             {toChase.length === 0 ? (
               <SectionEmpty
-                title={search.trim() ? 'No matching follow-ups' : 'You’re up to date'}
+                title={
+                  search.trim() || effectiveCategory !== 'all'
+                    ? 'No matching follow-ups'
+                    : 'You’re up to date'
+                }
                 body={
-                  search.trim()
+                  search.trim() || effectiveCategory !== 'all'
                     ? 'Try a different name, suburb or phone number.'
                     : 'Every live quote has been followed up.'
                 }
               />
             ) : (
-              shownChase.map(item => (
-                <FollowupRow
-                  key={item.quote_id ?? item.conversation_id ?? itemName(item)}
-                  item={item}
-                />
-              ))
+              shownChase.map(row)
             )}
           </SectionGroup>
           {shownDone.length > 0 ? (
             <SectionGroup title="Contacted · awaiting payment" count={contacted.length}>
-              {shownDone.map(item => (
-                <FollowupRow
-                  key={item.quote_id ?? item.conversation_id ?? itemName(item)}
-                  item={item}
-                />
-              ))}
+              {shownDone.map(row)}
             </SectionGroup>
           ) : null}
           {ordered.length > shown.length ? (
@@ -447,6 +614,19 @@ export function FollowupsScreen() {
           ) : null}
         </>
       )}
+      {openQuote ? (
+        <QuoteWorkspace
+          quoteId={openQuote}
+          onClose={() => {
+            setOpenQuote(null);
+            void query.refetch();
+          }}
+          onDeleted={() => {
+            setOpenQuote(null);
+            void query.refetch();
+          }}
+        />
+      ) : null}
     </SectionScreen>
   );
 }

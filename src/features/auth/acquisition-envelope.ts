@@ -10,6 +10,7 @@ import * as SecureStore from 'expo-secure-store';
 import { z } from 'zod';
 
 import { safeDestination } from '@/lib/destinations';
+import { PhoneReadinessSchema } from './provisioning';
 
 export const ACQUISITION_ENVELOPE_KEY = 'quotemax.auth.acquisition.v1';
 
@@ -37,6 +38,7 @@ export type AcquisitionIntent =
   | { provenance: 'sms'; status: 'expired' | 'used' | 'invalid' | 'consumed' };
 
 export type AcquisitionProvisioningReceipt = {
+  phoneReadiness?: import('./provisioning').PhoneReadiness;
   /** Copied only from a validated activation/retry response, never a route query. */
   setupComplete: boolean;
   phoneNumber?: string;
@@ -147,6 +149,7 @@ const EnvelopeSchema = z.object({
   provisioning: z
     .object({
       setupComplete: z.boolean(),
+      phoneReadiness: PhoneReadinessSchema.optional(),
       phoneNumber: z.string().min(1).max(32).optional(),
       warning: z.string().min(1).max(512).optional(),
       recordedAt: z.number().int().nonnegative(),
@@ -209,8 +212,7 @@ export function acquisitionEnvelopeFromParams(
       ? { plan: rawPlan, interval: rawInterval }
       : undefined;
   const requestedReturn = clean(params.returnTo);
-  const returnTarget =
-    validatedReturnTarget(requestedReturn) ?? defaultReturnTarget(selection);
+  const returnTarget = validatedReturnTarget(requestedReturn) ?? defaultReturnTarget(selection);
 
   if (!code && !intentToken && !source && !referral && !selection && !requestedReturn) return null;
 
@@ -220,9 +222,7 @@ export function acquisitionEnvelopeFromParams(
     updatedAt: now,
     activation: 'pending',
     subject: {},
-    invitation: code
-      ? { code, provenance: intentToken ? 'sms' : 'link' }
-      : undefined,
+    invitation: code ? { code, provenance: intentToken ? 'sms' : 'link' } : undefined,
     intent: intentToken ? { provenance: 'sms', status: 'pending', token: intentToken } : undefined,
     attribution: source || referral ? { source, referral } : undefined,
     selection,
@@ -248,7 +248,8 @@ export function mergeAcquisitionEnvelopes(
     incoming.intent &&
     'token' in incoming.intent &&
     stored.intent.token === incoming.intent.token;
-  const intent = sameToken && stored.intent?.status === 'verified' ? stored.intent : incoming.intent;
+  const intent =
+    sameToken && stored.intent?.status === 'verified' ? stored.intent : incoming.intent;
 
   return {
     ...stored,
@@ -274,21 +275,12 @@ export function bindAcquisitionAccount(
   const clerkUserId = account.clerkUserId?.trim() || undefined;
   if (clerkUserId && !CLERK_USER_RE.test(clerkUserId)) return null;
   if (envelope.subject.email && email && envelope.subject.email !== email) return null;
-  if (
-    envelope.subject.email &&
-    !envelope.subject.clerkUserId &&
-    clerkUserId &&
-    !email
-  ) {
+  if (envelope.subject.email && !envelope.subject.clerkUserId && clerkUserId && !email) {
     // An unrelated Clerk id is not enough to claim an email-bound envelope.
     // The caller must supply the matching email while adding the first id.
     return null;
   }
-  if (
-    envelope.subject.clerkUserId &&
-    clerkUserId &&
-    envelope.subject.clerkUserId !== clerkUserId
-  ) {
+  if (envelope.subject.clerkUserId && clerkUserId && envelope.subject.clerkUserId !== clerkUserId) {
     return null;
   }
 
@@ -370,8 +362,7 @@ export function applyIntentResolution(
   return {
     ...envelope,
     updatedAt: now,
-    invitation:
-      envelope.invitation?.provenance === 'sms' ? undefined : envelope.invitation,
+    invitation: envelope.invitation?.provenance === 'sms' ? undefined : envelope.invitation,
     intent: { provenance: 'sms', status: failedStatus },
   };
 }
@@ -391,8 +382,7 @@ export function activationAcquisitionFields(envelope: AcquisitionEnvelope | null
 } {
   return {
     invitationCode: envelope?.invitation?.code ?? '',
-    intentToken:
-      envelope?.intent?.status === 'verified' ? envelope.intent.token : undefined,
+    intentToken: envelope?.intent?.status === 'verified' ? envelope.intent.token : undefined,
   };
 }
 
@@ -420,6 +410,7 @@ export function withAcquisitionProvisioningReceipt(
   envelope: AcquisitionEnvelope,
   receipt: {
     setupComplete: boolean;
+    phoneReadiness?: import('./provisioning').PhoneReadiness;
     phoneNumber?: string | null;
     warning?: string | null;
   },
@@ -432,6 +423,7 @@ export function withAcquisitionProvisioningReceipt(
     ...envelope,
     updatedAt: now,
     provisioning: {
+      phoneReadiness: receipt.phoneReadiness,
       setupComplete: receipt.setupComplete === true,
       phoneNumber,
       warning,
@@ -494,10 +486,7 @@ export async function loadAcquisitionEnvelope(
   if (!acquisitionBelongsToAccount(parsed.data, account)) return null;
 
   const envelope = parsed.data;
-  if (
-    envelope.intent?.status === 'verified' &&
-    Date.parse(envelope.intent.expiresAt) <= now
-  ) {
+  if (envelope.intent?.status === 'verified' && Date.parse(envelope.intent.expiresAt) <= now) {
     const expired = applyIntentResolution(envelope, { status: 'expired' }, now);
     await saveAcquisitionEnvelope(expired, storage);
     return expired;

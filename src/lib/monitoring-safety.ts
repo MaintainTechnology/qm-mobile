@@ -13,13 +13,7 @@ const SAFE_TAG_VALUE = /^[A-Za-z0-9_./:@-]{1,128}$/;
 const SAFE_OPERATION_ID = /^[a-z][a-z0-9._-]{2,79}$/;
 
 export type MonitoringErrorKind =
-  | 'background_return'
-  | 'provider'
-  | 'route'
-  | 'schema'
-  | 'startup'
-  | 'stream'
-  | 'upload';
+  'background_return' | 'provider' | 'route' | 'schema' | 'startup' | 'stream' | 'upload';
 
 /**
  * Keep monitoring route tags useful without ever sending IDs, invitation
@@ -43,6 +37,8 @@ export function privacySafeRoute(rawRoute: string): string {
       'sign-in',
       'sign-up',
       'success',
+      'support',
+      'unsubscribe',
       'tools',
       'welcome',
     ]);
@@ -60,15 +56,11 @@ export function privacySafeRoute(rawRoute: string): string {
   if (!group || !/^[a-z-]{1,40}$/.test(group)) return '/api/unknown';
   if (group === 'tenant') {
     const resource = segments[2];
-    return resource && /^[a-z-]{1,40}$/.test(resource)
-      ? `/api/tenant/${resource}`
-      : '/api/tenant';
+    return resource && /^[a-z-]{1,40}$/.test(resource) ? `/api/tenant/${resource}` : '/api/tenant';
   }
   if (group === 'quote') return '/api/quote/:id';
   const action = segments[2];
-  return action && /^[a-z-]{1,40}$/.test(action)
-    ? `/api/${group}/${action}`
-    : `/api/${group}`;
+  return action && /^[a-z-]{1,40}$/.test(action) ? `/api/${group}/${action}` : `/api/${group}`;
 }
 
 export function validOperationId(value: string): boolean {

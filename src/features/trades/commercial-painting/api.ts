@@ -11,19 +11,21 @@
  * centsFromApiDollars + formatAud at the screen — nothing here computes,
  * sums, or derives a price.
  *
- * The PURE section at the bottom is the upload/extract state machine plus the
- * AsyncStorage run-id persistence that lets a killed app resume the run from
- * server state (paint_runs is the source of truth at every step).
+ * The pure section models uploads/extraction. Account-scoped encrypted resume
+ * and durable Save receipts live in their own adapters.
  */
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMutation, useQuery } from '@tanstack/react-query';
 import * as FileSystem from 'expo-file-system/legacy';
 import { z } from 'zod';
 
 import { ApiError } from '@/lib/api';
+import { MissingClerkTokenError } from '@/lib/auth-token';
 import { UploadTransferError, type PickedFile, type UploadPolicy } from '@/lib/media';
 import { captureAppError } from '@/lib/monitoring';
-import { TENANT_ME_KEY } from '@/lib/tenant';
-import { useApiMutation, useApiQuery } from '@/lib/useApi';
+import { useApiMutation } from '@/lib/useApi';
+import { PaintLabourBasisSchema, PaintReviewSchema, type PaintScope } from './pricing-contract';
+import { PaintScopeChangedError, usePaintTransport } from './use-paint-transport';
+import { PaintEditReadSchema, PaintEditSnapshotSchema, paintEditMatchesDisplay } from './edit-review';
 
 const BASE = '/api/tenant/commercial-painting';
 
@@ -67,7 +69,6 @@ const COMPLETE_TIMEOUT_MS = 120000;
 const EXTRACT_TIMEOUT_MS = 300000;
 const PRICE_TIMEOUT_MS = 60000;
 const PREVIEW_TIMEOUT_MS = 120000;
-const SAVE_TIMEOUT_MS = 90000;
 /** Poll cadence while the server owns the run (status 'extracting'). */
 const EXTRACT_POLL_MS = 6000;
 
@@ -120,7 +121,7 @@ const PricedLineSchema = z.looseObject({
 });
 export type PricedLine = z.infer<typeof PricedLineSchema>;
 
-const PricedBomSchema = z.looseObject({
+export const PricedBomSchema = z.looseObject({
   lines: z.array(PricedLineSchema).default([]),
   unmatched: z
     .array(
@@ -236,11 +237,15 @@ const OkSchema = z.looseObject({ ok: z.literal(true) });
  *  resume source of truth, so only the id is contract here. */
 const ExtractSchema = z.looseObject({ ok: z.literal(true), extractionId: z.string() });
 
-const PriceSchema = z.looseObject({
+export const PriceSchema = z.looseObject({
   ok: z.literal(true),
   bom: PricedBomSchema,
   gst_registered: z.boolean(),
   usesSeedDefaults: z.boolean().nullish(),
+  pricingProof: PaintReviewSchema.shape.pricingProof.optional(),
+  pricedAt: PaintReviewSchema.shape.pricedAt.optional(),
+  labourBasis: PaintLabourBasisSchema.optional(),
+  rateRows: z.number().int().nonnegative().optional(),
 });
 
 const PreviewSchema = z.looseObject({
@@ -248,24 +253,6 @@ const PreviewSchema = z.looseObject({
   before: z.string().nullish(),
   after: z.string(),
 });
-
-const SaveQuoteSchema = z.looseObject({
-  ok: z.literal(true),
-  quoteId: z.string(),
-  shareToken: z.string(),
-  quoteViewUrl: z.string(),
-  pdfUrl: z.string().nullish(),
-  alreadySaved: z.boolean().nullish(),
-  delivery: z
-    .looseObject({
-      attempted: z.boolean(),
-      sent: z.boolean().nullish(),
-      mms: z.boolean().nullish(),
-      reason: z.string().nullish(),
-    })
-    .nullish(),
-});
-export type SavedQuote = z.infer<typeof SaveQuoteSchema>;
 
 const RunSchema = z.looseObject({
   id: z.string(),
@@ -301,6 +288,7 @@ const ExtractionRowSchema = z.looseObject({
   runtime_seconds: z.number().nullish(),
   priced_bom: PricedBomSchema.nullish(),
   priced_at: z.string().nullish(),
+  pricing_review: PaintReviewSchema.nullish(),
 });
 
 const RunDetailSchema = z.looseObject({
@@ -308,6 +296,8 @@ const RunDetailSchema = z.looseObject({
   run: RunSchema,
   uploads: z.array(UploadRowSchema).default([]),
   extraction: ExtractionRowSchema.nullish(),
+  edit_snapshot: PaintEditSnapshotSchema.nullish(),
+  edit_review_state: z.enum(['matched', 'changed', 'unavailable']).optional(),
 });
 export type RunDetail = z.infer<typeof RunDetailSchema>;
 
@@ -352,15 +342,19 @@ export function runKey(id: string): readonly unknown[] {
   return ['tenant', 'cpaint', 'run', id];
 }
 
-export function useSignUploads() {
-  return useApiMutation<SignBody, SignResult>(`${BASE}/upload/sign`, SignSchema, {
+function usePaintMutation<TBody, TResult>(scope: PaintScope, path: string | ((body: TBody) => string), schema: z.ZodType<TResult>, options: { method?: 'POST' | 'PATCH' | 'DELETE'; timeoutMs?: number } = {}) {
+  const request = usePaintTransport(scope);
+  return useMutation({ mutationFn: (body: TBody) => request(typeof path === 'function' ? path(body) : path, schema, body, options) });
+}
+export function useSignUploads(scope: PaintScope) {
+  return usePaintMutation<SignBody, SignResult>(scope, `${BASE}/upload/sign`, SignSchema, {
     timeoutMs: SIGN_TIMEOUT_MS,
   });
 }
 
-export function useCompleteUploads() {
-  return useApiMutation<CompleteBody, z.infer<typeof CompleteSchema>>(
-    `${BASE}/upload/complete`,
+export function useCompleteUploads(scope: PaintScope) {
+  return usePaintMutation<CompleteBody, z.infer<typeof CompleteSchema>>(
+    scope, `${BASE}/upload/complete`,
     CompleteSchema,
     { timeoutMs: COMPLETE_TIMEOUT_MS },
   );
@@ -368,9 +362,9 @@ export function useCompleteUploads() {
 
 /** Correct a document's auto-classification. The server reads only doc_type;
  *  the id rides in the body solely to address the path. */
-export function useSetDocType() {
-  return useApiMutation<{ id: string; doc_type: PaintDocType }, z.infer<typeof DocPatchSchema>>(
-    body => `${BASE}/upload/${body.id}`,
+export function useSetDocType(scope: PaintScope) {
+  return usePaintMutation<{ id: string; doc_type: PaintDocType }, z.infer<typeof DocPatchSchema>>(
+    scope, body => `${BASE}/upload/${body.id}`,
     DocPatchSchema,
     { method: 'PATCH' },
   );
@@ -378,27 +372,27 @@ export function useSetDocType() {
 
 /** Remove a document. 409 'has_extraction' means it anchors the takeoff —
  *  apiErrorMessage surfaces the server's own explanation. */
-export function useRemoveUpload() {
-  return useApiMutation<{ id: string }, z.infer<typeof OkSchema>>(
-    body => `${BASE}/upload/${body.id}`,
+export function useRemoveUpload(scope: PaintScope) {
+  return usePaintMutation<{ id: string }, z.infer<typeof OkSchema>>(
+    scope, body => `${BASE}/upload/${body.id}`,
     OkSchema,
     { method: 'DELETE' },
   );
 }
 
-export function useExtract() {
-  return useApiMutation<{ paintRunId: string }, z.infer<typeof ExtractSchema>>(
-    `${BASE}/extract`,
+export function useExtract(scope: PaintScope) {
+  return usePaintMutation<{ paintRunId: string }, z.infer<typeof ExtractSchema>>(
+    scope, `${BASE}/extract`,
     ExtractSchema,
     { timeoutMs: EXTRACT_TIMEOUT_MS },
   );
 }
 
-export function usePrice() {
-  return useApiMutation<
-    { paintRunId: string; extractionId: string; labourRatePerHr?: number },
+export function usePrice(scope: PaintScope) {
+  return usePaintMutation<
+    { paintRunId: string; extractionId: string; expectedRevision: string; labourRatePerHr?: number },
     z.infer<typeof PriceSchema>
-  >(`${BASE}/price`, PriceSchema, { timeoutMs: PRICE_TIMEOUT_MS });
+  >(scope, `${BASE}/price`, PriceSchema, { timeoutMs: PRICE_TIMEOUT_MS });
 }
 
 /** AI "after repaint" render from the run's site photo. Data-URL strings in
@@ -411,31 +405,45 @@ export function usePreview() {
   );
 }
 
-/** Saving invalidates the tenant snapshot so the new quote appears in the hub
- *  queue, and the runs rail so the run shows 'priced'. */
-export function useSaveQuote() {
-  return useApiMutation<
-    { paintRunId: string; extractionId: string; customerPhone?: string; customerName?: string },
-    SavedQuote
-  >(`${BASE}/save-quote`, SaveQuoteSchema, {
-    timeoutMs: SAVE_TIMEOUT_MS,
-    invalidates: [TENANT_ME_KEY, RUNS_KEY],
-  });
-}
-
 /** Full run detail — the resume/refresh source of truth. Polls every 6 s
  *  while the server reports 'extracting', so a takeoff finishes into the UI
  *  even after an app kill or dropped connection. */
-export function useRun(runId: string | null) {
-  return useApiQuery(runKey(runId ?? ''), `${BASE}/run/${runId ?? ''}`, RunDetailSchema, {
+export function useRun(runId: string | null, scope: PaintScope) {
+  const request = usePaintTransport(scope);
+  return useQuery({
+    queryKey: [...runKey(runId ?? ''), scope.userId, scope.tenantId],
+    queryFn: async ({ signal }) => {
+      const result = await request(`${BASE}/run/${runId ?? ''}`, RunDetailSchema, undefined, { method: 'GET', signal });
+      if (result.run.id !== runId) throw new Error('The server returned a different painting run. Refresh before continuing.');
+      let snapshot: z.infer<typeof PaintEditSnapshotSchema> | null = null;
+      try {
+        const read = await request(`${BASE}/run/${runId}/corrections`, PaintEditReadSchema, undefined, { method: 'GET', signal });
+        snapshot = read.snapshot;
+        if (snapshot.runId !== runId) throw new PaintScopeChangedError();
+      } catch (error) {
+        if (signal.aborted || error instanceof MissingClerkTokenError || error instanceof PaintScopeChangedError ||
+          (error instanceof ApiError && [401, 403].includes(error.status))) throw error;
+        // An older or unavailable correction contract can still show the owned
+        // takeoff, but no BOM or observed revision becomes price authority.
+      }
+      const matched = !!snapshot && paintEditMatchesDisplay(snapshot, result.run, result.extraction);
+      return { ...result, edit_snapshot: matched ? snapshot : null,
+        edit_review_state: matched ? 'matched' as const : snapshot ? 'changed' as const : 'unavailable' as const,
+        extraction: matched || !result.extraction ? result.extraction : {
+          ...result.extraction, priced_bom: null, priced_at: null, pricing_review: null,
+        },
+      };
+    },
     enabled: runId != null,
     refetchInterval: query =>
       query.state.data?.run.status === 'extracting' ? EXTRACT_POLL_MS : false,
   });
 }
 
-export function useRuns() {
-  return useApiQuery(RUNS_KEY, `${BASE}/runs`, RunsSchema);
+export function useRuns(scope: PaintScope) {
+  const request = usePaintTransport(scope);
+  return useQuery({ queryKey: [...RUNS_KEY, scope.userId, scope.tenantId],
+    queryFn: ({ signal }) => request(`${BASE}/runs`, RunsSchema, undefined, { method: 'GET', signal }) });
 }
 
 /**
@@ -701,27 +709,5 @@ export function pipelineReducer(state: PipelineState, event: PipelineEvent): Pip
     }
     case 'RESET':
       return initialPipeline;
-  }
-}
-
-// ── Run-id persistence (resume across app restarts) ─────────────────────────
-
-export const RUN_ID_STORAGE_KEY = 'quotemax.cpaint.run-id';
-
-/** Best-effort: a storage failure must never break the pipeline itself. */
-export async function persistRunId(id: string | null): Promise<void> {
-  try {
-    if (id) await AsyncStorage.setItem(RUN_ID_STORAGE_KEY, id);
-    else await AsyncStorage.removeItem(RUN_ID_STORAGE_KEY);
-  } catch {
-    // The run still resumes from the history rail.
-  }
-}
-
-export async function loadPersistedRunId(): Promise<string | null> {
-  try {
-    return await AsyncStorage.getItem(RUN_ID_STORAGE_KEY);
-  } catch {
-    return null;
   }
 }

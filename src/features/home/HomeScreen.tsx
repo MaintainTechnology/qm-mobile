@@ -7,7 +7,9 @@
  * so that section is cut rather than faked.
  */
 import { useRouter } from 'expo-router';
-import { useMemo } from 'react';
+import { useAuth } from '@clerk/expo';
+import { usePhoneReadiness } from '@/features/auth/use-phone-readiness';
+import { useMemo, useState } from 'react';
 import {
   Pressable,
   RefreshControl,
@@ -21,7 +23,7 @@ import {
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import { BrandMark } from '@/components/BrandMark';
-import { PrimaryCta } from '@/features/auth/ui';
+import { GhostButton, PrimaryCta } from '@/features/auth/ui';
 import { useChats } from '@/features/chats/chats-api';
 import {
   chatDisplayName,
@@ -30,10 +32,19 @@ import {
   relativeTime,
 } from '@/features/chats/format';
 import { ActivityAnalytics } from '@/features/home/ActivityAnalytics';
+import {
+  REPORTING_PERIODS,
+  reportingPeriodWindow,
+  type ReportingPeriod,
+} from '@/features/home/reporting-period';
+import { queueTimeZone } from '@/features/trades/hub/quote-queue';
+import { recentWorkEntries } from '@/features/home/recent-work';
+import { SavedJobQueueRow, useQuoteQueueSources } from '@/features/quotes/UnifiedQuoteQueue';
+import { Notice, PillOption } from '@/features/trades/ui';
 import { CopyIcon, SunIcon } from '@/features/home/icons';
 import { apiErrorMessage } from '@/lib/api';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
-import { isAccepted, isInReview, overviewStats, useTenantMe, type QuoteRow } from '@/lib/tenant';
+import { isAccepted, isInReview, overviewStats, type QuoteRow } from '@/lib/tenant';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme, useThemeToggle } from '@/lib/useTheme';
 
@@ -96,11 +107,20 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
   const { width, fontScale } = useWindowDimensions();
   const stackMetrics = width < 360 || fontScale > 1.15;
   const router = useRouter();
-  const { data: me, isPending, isError, error, refetch, isRefetching } = useTenantMe();
+  const queue = useQuoteQueueSources();
+  const { data: me, isPending, isError, error, refetch, isRefetching } = queue.me;
+  const auth = useAuth();
+  const phone = usePhoneReadiness({
+    ownerKey:
+      auth.userId && auth.sessionId && me?.tenant.id ? `${auth.userId}:${auth.sessionId}` : null,
+    tenantId: me?.tenant.id,
+    getToken: auth.getToken,
+  });
   const {
     data: chatsData,
     isLoading: chatsLoading,
     isError: chatsError,
+    isFetching: chatsFetching,
     refetch: refetchChats,
   } = useChats();
 
@@ -116,19 +136,23 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
     dim: colors.textDim,
   };
 
-  const stats = useMemo(() => (me ? overviewStats(me.quotes) : null), [me]);
+  const [period, setPeriod] = useState<ReportingPeriod>('all');
+  const businessZone = queueTimeZone(undefined, me?.tenant.state);
+  const window = reportingPeriodWindow(period, new Date(), businessZone);
+  const stats = me ? overviewStats(me.quotes, window) : null;
+  const periodLabel = REPORTING_PERIODS.find(option => option.key === period)?.label ?? 'All time';
   const orderedQuotes = useMemo(() => (me ? newestFirst(me.quotes) : []), [me]);
-  const recentQuotes = orderedQuotes.slice(0, 3);
+  const recentWork = recentWorkEntries(queue.entries, window);
   const recentChats = (chatsData?.chats ?? []).slice(0, 3);
   const attentionQuote = useMemo(() => orderedQuotes.find(isInReview) ?? null, [orderedQuotes]);
 
   const ownerFirstName = me?.tenant.owner_first_name?.trim() || 'Tradie';
   const businessName = me?.tenant.business_name?.trim() ?? '';
-  const smsOrVoiceNumber = me?.tenant.twilio_sms_number || me?.tenant.twilio_voice_number || null;
-  const aiLineLive = me?.tenant.status === 'active';
+  const smsOrVoiceNumber = phone.data?.phoneNumber ?? null;
+  const aiLineLive = phone.data?.state === 'ready';
   const channelChips: { label: string; live: boolean }[] = [
-    { label: 'SMS', live: !!me?.tenant.twilio_sms_number },
-    { label: 'Voice', live: !!me?.tenant.twilio_voice_number },
+    { label: 'SMS', live: phone.data?.smsReady === true },
+    { label: 'Voice', live: phone.data?.voiceReady === true },
     { label: 'AI', live: aiLineLive },
   ];
 
@@ -208,10 +232,11 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
           contentContainerStyle={{ paddingBottom: spacing.gap }}
           refreshControl={
             <RefreshControl
-              refreshing={isRefetching}
+              refreshing={isRefetching || chatsFetching || queue.jobs.isRefetching}
               onRefresh={() => {
                 void refetch();
                 void refetchChats();
+                void queue.jobs.refetch();
               }}
               tintColor={colors.accent}
               colors={[colors.accent]}
@@ -270,8 +295,24 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
           ) : null}
 
           {/* Quoted */}
+          <View
+            accessibilityRole="radiogroup"
+            accessibilityLabel="Reporting period"
+            style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}
+          >
+            {REPORTING_PERIODS.map(option => (
+              <PillOption
+                key={option.key}
+                label={option.label}
+                selected={period === option.key}
+                onPress={() => setPeriod(option.key)}
+              />
+            ))}
+          </View>
           <View style={[styles.quotedCard, card]}>
-            <Text style={[styles.quotedLabel, { color: colors.textDim }]}>QUOTED · INC GST</Text>
+            <Text style={[styles.quotedLabel, { color: colors.textDim }]}>
+              QUOTED · INC GST · {periodLabel.toUpperCase()}
+            </Text>
             <Text selectable style={[styles.quotedValue, { color: colors.textPri }]}>
               {formatAud(stats.quotedCents)}
             </Text>
@@ -346,7 +387,13 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                   { color: aiLineLive ? colors.successBright : colors.warningBright },
                 ]}
               >
-                {aiLineLive ? 'AI LINE LIVE' : 'AI LINE SETTING UP'}
+                {aiLineLive
+                  ? 'PHONE SETUP READY'
+                  : phone.data?.state === 'stub'
+                    ? 'TEST PHONE SETUP'
+                    : phone.data?.state === 'processing'
+                      ? 'PHONE SETUP IN PROGRESS'
+                      : 'PHONE SETUP UNCONFIRMED'}
               </Text>
             </View>
             <View style={styles.numberRow}>
@@ -356,16 +403,18 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
               <Pressable
                 accessibilityRole="button"
                 accessibilityLabel="Share number"
-                disabled={!smsOrVoiceNumber}
+                disabled={!smsOrVoiceNumber || !aiLineLive}
+                accessibilityState={{ disabled: !smsOrVoiceNumber || !aiLineLive }}
                 onPress={() => {
-                  if (smsOrVoiceNumber) void Share.share({ message: smsOrVoiceNumber });
+                  if (smsOrVoiceNumber && aiLineLive)
+                    void Share.share({ message: smsOrVoiceNumber });
                 }}
                 style={({ pressed }) => [
                   styles.copyBtn,
                   {
                     borderColor: colors.ctlLine,
                     backgroundColor: pressed ? colors.ink : 'transparent',
-                    opacity: smsOrVoiceNumber ? 1 : 0.4,
+                    opacity: smsOrVoiceNumber && aiLineLive ? 1 : 0.4,
                   },
                 ]}
               >
@@ -392,16 +441,47 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                 </View>
               ))}
             </View>
+            <Text style={[type.bodySm, { color: colors.textSec }]}>
+              {phone.error ?? phone.data?.message ?? 'Checking phone setup for this account…'}
+            </Text>
+            <GhostButton
+              label={phone.busy ? 'Checking…' : 'Check phone setup'}
+              disabled={phone.busy}
+              onPress={() => {
+                void phone.refresh();
+              }}
+            />
+            {phone.data?.retryable && (
+              <GhostButton
+                label="Start phone setup"
+                disabled={phone.busy}
+                onPress={() => {
+                  void phone.start();
+                }}
+              />
+            )}
           </View>
 
-          {/* Recent quotes */}
+          <View style={[styles.listCard, card, { padding: spacing.md, gap: spacing.sm }]}>
+            <Text style={[type.bodySm, { color: colors.textSec }]}>
+              Services enabled:{' '}
+              {me.services?.filter(service => service.enabled === true).length ?? 0} /{' '}
+              {me.services?.length ?? 0}
+            </Text>
+            <GhostButton
+              label="Account and photo"
+              onPress={() => router.push('/sections/account')}
+            />
+          </View>
+
+          {/* Recent quotes and saved jobs share the queue's tagged source and ordering. */}
           <View style={[styles.listCard, card]}>
             <View style={[styles.listHeader, { borderBottomColor: colors.inkLine }]}>
               <Text
                 accessibilityRole="header"
                 style={[styles.listTitle, { color: colors.textPri }]}
               >
-                Recent quotes
+                Recent work
               </Text>
               <Pressable
                 accessibilityRole="button"
@@ -410,16 +490,30 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                 style={({ pressed }) => [styles.sectionActionBtn, { opacity: pressed ? 0.6 : 1 }]}
               >
                 <Text style={[styles.sectionAction, { color: colors.textSec }]}>
-                  ALL {stats.quoteCount} →
+                  ALL {queue.entries.length} →
                 </Text>
               </Pressable>
             </View>
-            {recentQuotes.length === 0 ? (
+            {queue.jobs.isPending ? (
+              <Notice tone="accent" label="Loading recent saved jobs…" />
+            ) : null}
+            {queue.jobs.isError ? (
+              <Notice
+                tone="warn"
+                label="Recent work is incomplete"
+                body="Saved jobs could not refresh. Your loaded quotes remain available."
+                onRetry={() => void queue.jobs.refetch()}
+              />
+            ) : null}
+            {recentWork.length === 0 ? (
               <Text style={[styles.emptyRow, { color: colors.textDim }]}>
-                No quotes yet. New requests will appear here.
+                No recent work in this period. Choose another period to see earlier work.
               </Text>
             ) : (
-              recentQuotes.map((q, index) => {
+              recentWork.map((entry, index) => {
+                if (entry.kind === 'job')
+                  return <SavedJobQueueRow key={entry.key} job={entry.job} />;
+                const q = entry.quote;
                 const chip = quoteStatusChip(q);
                 return (
                   <Pressable
@@ -430,7 +524,7 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
                       styles.quoteRow,
                       {
                         borderBottomColor: colors.inkLine,
-                        borderBottomWidth: index === recentQuotes.length - 1 ? 0 : 1,
+                        borderBottomWidth: index === recentWork.length - 1 ? 0 : 1,
                         backgroundColor: pressed ? colors.ink : 'transparent',
                       },
                     ]}
@@ -567,7 +661,11 @@ export function HomeScreen({ onBack }: { onBack?: () => void } = {}) {
           </View>
 
           {/* Your activity — the web Overview's analytics block, ported natively. */}
-          <ActivityAnalytics />
+          <ActivityAnalytics
+            window={window}
+            periodLabel={periodLabel}
+            liveReviewCount={stats.inReviewCount}
+          />
         </ScrollView>
       ) : null}
     </View>

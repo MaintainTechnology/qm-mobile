@@ -1,0 +1,14 @@
+PASS src/features/support/SupportScreen.test.tsx
+PASS src/features/support/contact-receipt.test.ts
+PASS src/lib/account-identity-storage.test.ts
+PASS src/lib/account-storage.test.ts
+PASS src/features/support/contact-draft.test.ts
+PASS src/lib/working-draft-storage.test.ts
+PASS src/lib/account-identity-boundary.test.ts
+PASS src/features/support/contact-contract.test.ts
+
+Test Suites: 8 passed, 8 total
+Tests:       60 passed, 60 total
+Snapshots:   0 total
+Time:        6.574 s
+Ran all test suites matching /src\\features\\support|src\\lib\\working-draft-storage.test.ts|src\\lib\\account-storage.test.ts|src\\lib\\account-identity-boundary.test.ts|src\\lib\\account-identity-storage.test.ts/i.

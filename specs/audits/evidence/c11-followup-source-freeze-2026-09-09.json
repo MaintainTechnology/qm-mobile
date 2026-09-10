@@ -1,0 +1,112 @@
+{
+  "capturedAt": "2026-09-09T05:22:30.109Z",
+  "webRoot": "C:\\Users\\dalig\\Downloads\\QuoteMate\\quoteMate\\quotemate-automation",
+  "files": [
+    {
+      "path": "app/api/tenant/followups/text/route.ts",
+      "sha256": "2d9fe1560d05caa965dc7bed0c7223a6444fbfe10b4361bda261899bcb60f935"
+    },
+    {
+      "path": "app/api/tenant/followups/call/route.ts",
+      "sha256": "ea2b0e3bcb506d1071410cc5e583ef5ed9d8b841a586fad8efeb1b6f05789448"
+    },
+    {
+      "path": "app/api/tenant/followups/events/route.ts",
+      "sha256": "f6a7059e20bc1ed32ccef7008a86a8bdfc14dcfc3a5c191f068c38ff1ba691be"
+    },
+    {
+      "path": "app/api/tenant/followups/messages/route.ts",
+      "sha256": "6f11df6047b1bd68d5777a9b7980c829a01d439a7587123545c0b763698ec41d"
+    },
+    {
+      "path": "app/dashboard/page.tsx",
+      "sha256": "11ba16bb0dc7d4018a0f28c6e392f63ac1285435b6bc26fd2844f821b21975bc"
+    },
+    {
+      "path": "lib/quote/followup-contact.ts",
+      "sha256": "f44b4af6970e61e64ce896a1d3cfa7b7389f38f0cdaab23b93904d4a4af53cd8"
+    },
+    {
+      "path": "lib/quote/followup-operation-contract.ts",
+      "sha256": "e96e814dec15455876546fb7127054eab2a8c05641c0f292b1c5c19b0e646d4a"
+    },
+    {
+      "path": "lib/quote/followup-operations.ts",
+      "sha256": "6024465055f40d8596d77b24fa8d1b6b8900e2e9c65d5e0ac98dee85ead9f818"
+    },
+    {
+      "path": "lib/quote/followup-browser-operation.ts",
+      "sha256": "5a95e9c6578c8e2cab35cbba62e390f1d103bd71ae01ac8f4337977314376f3b"
+    },
+    {
+      "path": "lib/quote/use-followup-browser-operations.ts",
+      "sha256": "4a7b553885e78af4faf195c858fa08a7a6e9a5c50bbe8e51b118998a46e00bc4"
+    },
+    {
+      "path": "lib/quote/followup-browser-operation.test.ts",
+      "sha256": "76126d2a59bf0a1aee0038ccc26132c69b68e7d30a6dd0bccb2a5fe7b4326c99"
+    },
+    {
+      "path": "tests/followup-operations.test.ts",
+      "sha256": "cc1c95ed2d8f2eb0ef6b4ccbb6deadb3e9b5b1f999ec58e4c0cf47872474fa8a"
+    },
+    {
+      "path": "sql/migrations/220_followup_operations.sql",
+      "sha256": "2f0a875a26626666e6daea7c0842de2370814b623cdc34e62aada5327fc1a8ee"
+    },
+    {
+      "path": "docs/followup-operations-rollback.md",
+      "sha256": "945d49440be0431ce3b2de856a68daf7fdacf4aea7d113fc57f5e6fdf316289a"
+    }
+  ],
+  "functions": [
+    {
+      "name": "followup_outbox_matches",
+      "sourceSha256": "46b6b2cff3ded4249b0e5aad4e2366a7734a74d903f7754a94b63bed99392fc2",
+      "sourceDefinition": "create or replace function public.followup_outbox_matches(op public.followup_operations,box public.sms_outbox)\nreturns boolean language sql immutable set search_path=public,pg_temp as $$\n  select coalesce(op.action='text' and op.tenant_id=box.tenant_id\n    and box.delivery_key='followup:'||op.tenant_id::text||':'||op.request_id::text\n    and box.to_number=op.payload->>'to' and box.body=op.payload->>'text'\n    and box.payload->>'to'=op.payload->>'to' and box.payload->>'from'=op.payload->>'from'\n    and box.payload->>'text'=op.payload->>'text' and box.payload->>'tenantId'=op.tenant_id::text\n    and box.audience='customer' and box.payload->>'audience'='customer',false)\n$$;"
+    },
+    {
+      "name": "followup_outbox_accepted",
+      "sourceSha256": "9492b4713153cbb91982ac7e802dee711f1bcb7d7752f4d07fb18ca755015837",
+      "sourceDefinition": "create or replace function public.followup_outbox_accepted(box public.sms_outbox)\nreturns boolean language sql immutable set search_path=public,pg_temp as $$\n  -- A mere SID on a failed/unknown row is insufficient. Either the durable\n  -- transport result proves acceptance, or a verified attempt-bound callback\n  -- proves Twilio created the message (even if its eventual delivery failed).\n  select coalesce(box.provider_sid ~ '^(SM|MM)[0-9a-fA-F]{32}$' and (\n    (box.result->>'ok'='true' and box.result->>'sid'=box.provider_sid)\n    or box.provider_status in ('accepted','scheduled','queued','sending','sent','delivered','read','failed','undelivered','canceled')\n  ),false)\n$$;"
+    },
+    {
+      "name": "followup_operation_claim",
+      "sourceSha256": "5406109eb99080373ab6e0fbd6f2668dea536c6ffa89301872455dbd77670c14",
+      "sourceDefinition": "create or replace function public.followup_operation_claim(\n  p_tenant uuid,p_request uuid,p_action text,p_target_kind text,p_target uuid,p_hash text,p_payload jsonb\n) returns jsonb language plpgsql security definer set search_path=public,pg_temp as $$\ndeclare op followup_operations; claimed boolean := false;\nbegin\n  if p_target_kind='quote' then\n    perform 1 from quotes where id=p_target and tenant_id=p_tenant for key share;\n  elsif p_target_kind='conversation' and p_action in ('text','call') then\n    perform 1 from sms_conversations where id=p_target and tenant_id=p_tenant for key share;\n  else raise exception 'invalid_target' using errcode='22023'; end if;\n  if not found then raise exception 'not_found' using errcode='P0002'; end if;\n  insert into followup_operations(tenant_id,request_id,action,target_kind,target_id,payload_hash,payload)\n    values(p_tenant,p_request,p_action,p_target_kind,p_target,p_hash,p_payload)\n    on conflict(tenant_id,request_id) do nothing returning * into op;\n  claimed := found;\n  if not claimed then\n    select * into op from followup_operations where tenant_id=p_tenant and request_id=p_request for update;\n    if op.action<>p_action or op.target_kind<>p_target_kind or op.target_id<>p_target or op.payload_hash<>p_hash then\n      raise exception 'operation_conflict' using errcode='23505';\n    end if;\n  end if;\n  return jsonb_build_object('claimed',claimed,'operation',to_jsonb(op));\nend $$;"
+    },
+    {
+      "name": "followup_operation_repair",
+      "sourceSha256": "f85b7a56315c00cc8cce9b4a3cfaee01ca530d0aaaa80e88cf1d2e0fe1202e5b",
+      "sourceDefinition": "create or replace function public.followup_operation_repair(p_tenant uuid,p_request uuid)\nreturns jsonb language plpgsql security definer set search_path=public,pg_temp as $$\ndeclare op followup_operations; convo uuid; box sms_outbox; event uuid; pin jsonb; preserve_context boolean;\nbegin\n  select * into op from followup_operations where tenant_id=p_tenant and request_id=p_request for update;\n  if not found then raise exception 'not_found' using errcode='P0002'; end if;\n  if op.status not in ('accepted','complete') or op.history='complete' then return to_jsonb(op); end if;\n  if op.target_kind='quote' then\n    perform 1 from quotes where id=op.target_id and tenant_id=p_tenant for key share;\n  else\n    perform 1 from sms_conversations where id=op.target_id and tenant_id=p_tenant for key share;\n  end if;\n  if not found then raise exception 'not_found' using errcode='P0002'; end if;\n  if op.action='text' then\n    select * into box from sms_outbox where id=op.outbox_id and tenant_id=p_tenant;\n    if not found or not followup_outbox_matches(op,box) or not followup_outbox_accepted(box) or box.provider_sid<>op.provider_sid then\n      raise exception 'acceptance_unconfirmed' using errcode='22023';\n    end if;\n    if op.target_kind='conversation' then convo:=op.target_id;\n    else\n      -- Serialize only this tenant/customer thread selection; concurrent different\n      -- follow-up intents must not create two new threads for the same customer.\n      perform pg_advisory_xact_lock(hashtextextended(p_tenant::text||':'||(op.payload->>'to'),0));\n      select id into convo from sms_conversations where tenant_id=p_tenant and from_number=op.payload->>'to'\n        and conversation_type='customer_quote'\n        order by last_message_at desc nulls last,id desc limit 1 for update;\n    end if;\n    pin:=op.payload->'pin';\n    if pin is not null and pin<>'null'::jsonb then\n      pin:=pin||jsonb_build_object('sent_at',op.accepted_at,'expires_at',op.accepted_at+interval '14 days');\n    end if;\n    if convo is null then\n      insert into sms_conversations(tenant_id,from_number,to_number,conversation_type,status,last_message_at,followup_quote)\n        values(p_tenant,op.payload->>'to',op.payload->>'from','customer_quote','open',op.accepted_at,pin) returning id into convo;\n    else\n      -- Repair appends historical evidence, never resumes an old receptionist\n      -- flow over newer inbound activity. Equal pin times preserve the pin that\n      -- already won, so a repair cannot flip between two same-time operations.\n      select coalesce((followup_quote->>'sent_at')::timestamptz>=op.accepted_at,false)\n        or coalesce(last_message_at>op.accepted_at,false) into preserve_context\n        from sms_conversations where id=convo and tenant_id=p_tenant for update;\n      update sms_conversations set status=case when not preserve_context and (last_message_at is null or last_message_at<=op.accepted_at) then 'open' else status end,\n        last_message_at=greatest(last_message_at,op.accepted_at),updated_at=now(),\n        followup_quote=case when op.target_kind='quote' and not preserve_context then pin else followup_quote end,\n        roofing_state=case when op.target_kind='quote' and not preserve_context then null else roofing_state end,\n        painting_state=case when op.target_kind='quote' and not preserve_context then null else painting_state end\n        where id=convo and tenant_id=p_tenant;\n    end if;\n    insert into sms_messages(conversation_id,direction,body,twilio_message_sid,audience,to_number,tenant_id,outbox_id,delivery_status,created_at)\n      values(convo,'outbound',box.body,box.provider_sid,'customer',box.to_number,p_tenant,box.id,box.status,op.accepted_at)\n      on conflict(outbox_id) where outbox_id is not null do update set delivery_status=excluded.delivery_status;\n  end if;\n  if op.target_kind='quote' then\n    event:=coalesce(op.event_id,gen_random_uuid());\n    insert into quote_followup_events(id,tenant_id,quote_id,kind,outcome,summary,created_at)\n      values(event,p_tenant,op.target_id,case when op.action='text' then 'sms' else 'call' end,\n        case when op.action='text' then 'text_sent' else 'call_dialed' end,\n        case when op.action='text' then 'SMS: '||left(op.payload->>'text',120)||case when length(op.payload->>'text')>120 then '…' else '' end else 'Outbound call placed' end,op.accepted_at)\n      on conflict(id) do nothing;\n  end if;\n  update followup_operations set history='complete',status='complete',event_id=event,conversation_id=convo,updated_at=now()\n    where id=op.id returning * into op;\n  return to_jsonb(op);\nend $$;"
+    },
+    {
+      "name": "followup_operation_try_repair",
+      "sourceSha256": "1f728fbaa6bc203eab4ec76dc15b180c6b4be4742572479cc0c289249107692f",
+      "sourceDefinition": "create or replace function public.followup_operation_try_repair(p_tenant uuid,p_request uuid)\nreturns void language plpgsql security definer set search_path=public,pg_temp as $$\nbegin\n  begin perform followup_operation_repair(p_tenant,p_request);\n  exception when others then null; end;\nend $$;"
+    },
+    {
+      "name": "followup_outbox_evidence",
+      "sourceSha256": "11e9720836761539e55be4b5ac6e38762adaac7c2f39518fa6b39e7263786c62",
+      "sourceDefinition": "create or replace function public.followup_outbox_evidence()\nreturns trigger language plpgsql security definer set search_path=public,pg_temp as $$\ndeclare op followup_operations; accepted boolean;\nbegin\n  if new.delivery_key not like 'followup:%' then return new; end if;\n  select * into op from followup_operations where tenant_id=new.tenant_id and action='text'\n    and new.delivery_key='followup:'||tenant_id::text||':'||request_id::text for update;\n  if not found or not followup_outbox_matches(op,new) then return new; end if;\n  accepted:=followup_outbox_accepted(new);\n  update followup_operations set outbox_id=new.id,provider_sid=case when accepted then coalesce(provider_sid,new.provider_sid) else provider_sid end,\n    accepted_at=case when accepted then coalesce(accepted_at,now()) else accepted_at end,\n    status=case when history='complete' then 'complete' when accepted or provider_sid is not null then 'accepted'\n      when new.status in ('unknown','sending') then 'unknown' when new.status in ('failed','undelivered') then 'failed' else 'pending' end,\n    updated_at=now()\n    where id=op.id\n    returning * into op;\n  if found and op.provider_sid is not null then perform followup_operation_try_repair(op.tenant_id,op.request_id); end if;\n  return new;\nend $$;"
+    },
+    {
+      "name": "followup_call_finish",
+      "sourceSha256": "f7b76cfe2069329142c723503de1d03a31f0eea8939c5810164f02c9a8993ac1",
+      "sourceDefinition": "create or replace function public.followup_call_finish(p_tenant uuid,p_request uuid,p_status text,p_sid text)\nreturns jsonb language plpgsql security definer set search_path=public,pg_temp as $$\ndeclare op followup_operations;\nbegin\n  if p_status not in ('accepted','failed','unknown') or (p_status='accepted' and coalesce(p_sid,'') !~ '^CA[0-9a-fA-F]{32}$') then\n    raise exception 'invalid_call_evidence' using errcode='22023';\n  end if;\n  update followup_operations set status=p_status,provider_sid=p_sid,\n    accepted_at=case when p_status='accepted' then now() else null end,updated_at=now()\n    where tenant_id=p_tenant and request_id=p_request and action='call' and status in ('pending','unknown') returning * into op;\n  if not found then select * into op from followup_operations where tenant_id=p_tenant and request_id=p_request and action='call'; end if;\n  if op.id is null then raise exception 'not_found' using errcode='P0002'; end if;\n  perform followup_operation_try_repair(p_tenant,p_request);\n  select * into op from followup_operations where id=op.id;\n  return to_jsonb(op);\nend $$;"
+    },
+    {
+      "name": "followup_note_commit",
+      "sourceSha256": "848aa78ce903b78c6757e8f9868380aa9b47d473ccdf8fdee31827f1bf9bd7f2",
+      "sourceDefinition": "create or replace function public.followup_note_commit(p_tenant uuid,p_request uuid,p_quote uuid,p_hash text,p_payload jsonb)\nreturns jsonb language plpgsql security definer set search_path=public,pg_temp as $$\ndeclare result jsonb; op followup_operations; event uuid; note_text text;\nbegin\n  if p_payload->>'outcome' not in ('left_voicemail','spoke','no_answer','wants_callback','not_interested','other')\n    or length(coalesce(p_payload->>'note',''))>500 then raise exception 'invalid_note' using errcode='22023'; end if;\n  result:=followup_operation_claim(p_tenant,p_request,'note','quote',p_quote,p_hash,p_payload);\n  select * into op from followup_operations where tenant_id=p_tenant and request_id=p_request for update;\n  if op.status='complete' then return to_jsonb(op); end if;\n  event:=gen_random_uuid(); note_text:=nullif(btrim(p_payload->>'note'),'');\n  insert into quote_followup_events(id,tenant_id,quote_id,actor_user_id,kind,outcome,summary,note)\n    values(event,p_tenant,p_quote,(p_payload->>'actor')::uuid,'note',p_payload->>'outcome',p_payload->>'summary',note_text);\n  if not coalesce((p_payload->>'preserveChase')::boolean,false) then\n    update quotes set followed_up_at=now(),followup_note=coalesce(note_text,followup_note) where id=p_quote and tenant_id=p_tenant;\n    if not found then raise exception 'not_found' using errcode='P0002'; end if;\n  end if;\n  update followup_operations set status='complete',history='complete',event_id=event,updated_at=now() where id=op.id returning * into op;\n  return to_jsonb(op);\nend $$;"
+    }
+  ],
+  "verification": {
+    "focusedTests": 54,
+    "sqlHandlerTests": 35,
+    "browserReceiptTests": 19,
+    "liveMigrationApplied": false,
+    "providerSends": false,
+    "notes": "SQL definitions are exact source bodies, not deployed database evidence. Postgres fixture is single-connection PGlite. Current independent review completion is reported separately."
+  }
+}

@@ -22,7 +22,7 @@ describe('AUTH-008 success adapters', () => {
     });
   });
 
-  it('uses the receipt only for a completed account-bound envelope', () => {
+  it('keeps the activation receipt but does not trust its legacy readiness boolean', () => {
     const envelope = {
       version: 1,
       createdAt: 1,
@@ -38,13 +38,11 @@ describe('AUTH-008 success adapters', () => {
       },
     } satisfies AcquisitionEnvelope;
 
-    expect(
-      trustedSuccessState(envelope, { ready: '0', phone: '+61499999999' }),
-    ).toEqual({
+    expect(trustedSuccessState(envelope, { ready: '0', phone: '+61499999999' })).toEqual({
       hasReceipt: true,
       phoneNumber: '+61412345678',
       warning: 'Server warning',
-      setupComplete: true,
+      setupComplete: false,
     });
   });
 

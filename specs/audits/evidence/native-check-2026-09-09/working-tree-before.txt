@@ -1,0 +1,230 @@
+ M app.json
+ M eslint.config.js
+ M package-lock.json
+ M package.json
+ M src/app/(tabs)/chats.tsx
+ M src/app/(tabs)/quotes.tsx
+ M src/app/_layout.tsx
+ M src/app/resolve-link.tsx
+ M src/features/auth/BiometricGate.tsx
+ M src/features/auth/SignInScreen.tsx
+ M src/features/auth/SignUpScreen.tsx
+ M src/features/auth/SuccessScreen.tsx
+ M src/features/auth/WelcomeScreen.tsx
+ M src/features/auth/acquisition-envelope.test.ts
+ M src/features/auth/acquisition-envelope.ts
+ M src/features/auth/success-adapter.test.ts
+ M src/features/auth/success-adapter.ts
+ M src/features/auth/ui.tsx
+ M src/features/chats/ChatThread.tsx
+ M src/features/chats/ChatsScreen.tsx
+ M src/features/help/HelpScreen.tsx
+ M src/features/home/ActivityAnalytics.tsx
+ M src/features/home/HomeScreen.tsx
+ M src/features/home/analytics.test.ts
+ M src/features/home/analytics.ts
+ M src/features/quotes/QuoteDetailModal.tsx
+ M src/features/quotes/QuoteRow.tsx
+ M src/features/quotes/api.test.ts
+ M src/features/quotes/api.ts
+ M src/features/quotes/status.test.ts
+ M src/features/quotes/status.ts
+ M src/features/sections/AccountScreen.tsx
+ M src/features/sections/FollowupsScreen.tsx
+ M src/features/sections/registry.ts
+ M src/features/support/SupportScreen.tsx
+ M src/features/support/contact-draft.test.ts
+ M src/features/support/contact-draft.ts
+ M src/features/trades/commercial-painting/CommercialPaintingScreen.tsx
+ M src/features/trades/commercial-painting/api.test.ts
+ M src/features/trades/commercial-painting/api.ts
+ M src/features/trades/commercial-painting/pricing-freshness.ts
+ M src/features/trades/hub/QuoteQueueSection.tsx
+ M src/features/trades/hub/quote-queue.test.ts
+ M src/features/trades/hub/quote-queue.ts
+ M src/features/trades/jobquote/JobQuoteScreen.tsx
+ M src/features/trades/jobquote/api.ts
+ M src/features/trades/jobquote/job-fields.test.ts
+ M src/features/trades/jobquote/job-fields.ts
+ M src/features/trades/jobquote/schema.test.ts
+ M src/features/trades/jobquote/schema.ts
+ M src/features/trades/roofing/RoofMeasureScreen.tsx
+ M src/features/trades/roofing/api.ts
+ M src/features/trades/roofing/schema.test.ts
+ M src/features/trades/roofing/schema.ts
+ M src/features/trades/tools/RoofingSavedJobs.tsx
+ M src/features/trades/ui.tsx
+ M src/lib/account-storage.test.ts
+ M src/lib/account-storage.ts
+ M src/lib/api.test.ts
+ M src/lib/api.ts
+ M src/lib/destinations.test.ts
+ M src/lib/destinations.ts
+ M src/lib/download.test.ts
+ M src/lib/download.ts
+ M src/lib/lock.test.ts
+ M src/lib/lock.ts
+ M src/lib/monitoring-safety.test.ts
+ M src/lib/monitoring-safety.ts
+ M src/lib/query.ts
+ M src/lib/tenant.test.ts
+ M src/lib/tenant.ts
+?? specs/audits/
+?? specs/mobile-parity-build-progress.md
+?? specs/mobile-parity-package-evidence.md
+?? specs/mobile-parity-release-build-spec.md
+?? src/app/(auth)/forgot-password.tsx
+?? src/app/roofing/
+?? src/app/sections/studio.tsx
+?? src/app/unsubscribe.tsx
+?? src/features/auth/BiometricGate.test.tsx
+?? src/features/auth/BusinessAddressField.test.tsx
+?? src/features/auth/BusinessAddressField.tsx
+?? src/features/auth/ForgotPasswordScreen.tsx
+?? src/features/auth/SuccessScreen.test.tsx
+?? src/features/auth/password-recovery.test.tsx
+?? src/features/auth/provisioning.test.ts
+?? src/features/auth/provisioning.ts
+?? src/features/auth/use-password-recovery.ts
+?? src/features/auth/use-phone-readiness.test.tsx
+?? src/features/auth/use-phone-readiness.ts
+?? src/features/chats/chat-state.test.ts
+?? src/features/chats/chat-state.ts
+?? src/features/home/ActivityAnalytics.test.tsx
+?? src/features/home/HomeScreen.phone.test.tsx
+?? src/features/home/recent-work.test.ts
+?? src/features/home/recent-work.ts
+?? src/features/home/reporting-period.test.ts
+?? src/features/home/reporting-period.ts
+?? src/features/quotes/QuoteBalanceActions.test.tsx
+?? src/features/quotes/QuoteBalanceActions.tsx
+?? src/features/quotes/QuoteChainSummary.test.tsx
+?? src/features/quotes/QuoteChainSummary.tsx
+?? src/features/quotes/QuoteDetailModal.delivery.test.tsx
+?? src/features/quotes/QuoteDocumentPreview.test.tsx
+?? src/features/quotes/QuoteDocumentPreview.tsx
+?? src/features/quotes/QuoteFinalActions.test.tsx
+?? src/features/quotes/QuoteFinalActions.tsx
+?? src/features/quotes/QuoteNarrativeEditor.tsx
+?? src/features/quotes/QuoteWorkspace.test.tsx
+?? src/features/quotes/QuoteWorkspace.tsx
+?? src/features/quotes/UnifiedQuoteQueue.test.tsx
+?? src/features/quotes/UnifiedQuoteQueue.tsx
+?? src/features/quotes/delivery-receipt.test.ts
+?? src/features/quotes/delivery-receipt.ts
+?? src/features/quotes/delivery-schema.ts
+?? src/features/quotes/final-quote-attempt.test.ts
+?? src/features/quotes/final-quote-attempt.ts
+?? src/features/quotes/owned-quote.ts
+?? src/features/quotes/quote-activity.test.ts
+?? src/features/quotes/quote-activity.ts
+?? src/features/quotes/quote-document.test.ts
+?? src/features/quotes/quote-document.ts
+?? src/features/quotes/quote-draft-storage.test.ts
+?? src/features/quotes/quote-draft-storage.ts
+?? src/features/quotes/quote-editor.test.ts
+?? src/features/quotes/quote-editor.ts
+?? src/features/quotes/report-editor.test.ts
+?? src/features/quotes/report-editor.ts
+?? src/features/quotes/use-quote-delivery.test.tsx
+?? src/features/quotes/use-quote-delivery.ts
+?? src/features/quotes/use-quote-draft.test.tsx
+?? src/features/quotes/use-quote-draft.ts
+?? src/features/sections/BusinessMediaEditor.test.tsx
+?? src/features/sections/BusinessMediaEditor.tsx
+?? src/features/sections/BusinessProfileEditor.test.tsx
+?? src/features/sections/BusinessProfileEditor.tsx
+?? src/features/sections/FollowupHistory.tsx
+?? src/features/sections/FollowupsScreen.test.tsx
+?? src/features/sections/SecurityCard.test.tsx
+?? src/features/sections/SecurityCard.tsx
+?? src/features/sections/business-media-contract.ts
+?? src/features/sections/business-media-file.test.ts
+?? src/features/sections/business-media-file.ts
+?? src/features/sections/business-media-image-info.test.ts
+?? src/features/sections/business-media-image-info.ts
+?? src/features/sections/business-media-policy.ts
+?? src/features/sections/business-media-test-fixture.ts
+?? src/features/sections/business-media-test-harness.ts
+?? src/features/sections/business-media-write.test.ts
+?? src/features/sections/business-media-write.ts
+?? src/features/sections/business-profile-contract.test.ts
+?? src/features/sections/business-profile-contract.ts
+?? src/features/sections/business-profile-hash.fixture.json
+?? src/features/sections/business-profile-review.test.tsx
+?? src/features/sections/business-profile-test-fixture.ts
+?? src/features/sections/business-profile-test-harness.tsx
+?? src/features/sections/business-profile-write.test.ts
+?? src/features/sections/business-profile-write.ts
+?? src/features/sections/business-profile.test.ts
+?? src/features/sections/business-profile.ts
+?? src/features/sections/followup-operation.test.ts
+?? src/features/sections/followup-operation.ts
+?? src/features/sections/followups.test.ts
+?? src/features/sections/followups.ts
+?? src/features/sections/use-business-media.test.tsx
+?? src/features/sections/use-business-media.ts
+?? src/features/sections/use-business-profile.test.tsx
+?? src/features/sections/use-business-profile.ts
+?? src/features/sections/use-followup-actions.test.tsx
+?? src/features/sections/use-followup-actions.ts
+?? src/features/sections/use-followup-drafts.test.tsx
+?? src/features/sections/use-followup-drafts.ts
+?? src/features/studio/
+?? src/features/support/SupportScreen.test.tsx
+?? src/features/support/UnsubscribeScreen.test.tsx
+?? src/features/support/UnsubscribeScreen.tsx
+?? src/features/support/contact-receipt.test.ts
+?? src/features/support/contact-receipt.ts
+?? src/features/support/unsubscribe-contract.ts
+?? src/features/support/unsubscribe-resolver.test.tsx
+?? src/features/support/use-contact-support.ts
+?? src/features/support/use-unsubscribe.ts
+?? src/features/trades/commercial-painting/CommercialPaintingWorkspace.test.tsx
+?? src/features/trades/commercial-painting/edit-review.test.ts
+?? src/features/trades/commercial-painting/edit-review.ts
+?? src/features/trades/commercial-painting/paint-hooks.test.tsx
+?? src/features/trades/commercial-painting/paint-query.test.tsx
+?? src/features/trades/commercial-painting/pricing-contract.ts
+?? src/features/trades/commercial-painting/pricing-freshness.test.ts
+?? src/features/trades/commercial-painting/run-resume.ts
+?? src/features/trades/commercial-painting/save-receipt.test.ts
+?? src/features/trades/commercial-painting/save-receipt.ts
+?? src/features/trades/commercial-painting/use-paint-inputs.ts
+?? src/features/trades/commercial-painting/use-paint-save.ts
+?? src/features/trades/commercial-painting/use-paint-transport.ts
+?? src/features/trades/jobquote/JobAddressField.tsx
+?? src/features/trades/jobquote/JobPhotos.test.tsx
+?? src/features/trades/jobquote/JobPhotos.tsx
+?? src/features/trades/jobquote/JobQuoteScreen.test.tsx
+?? src/features/trades/jobquote/address.test.ts
+?? src/features/trades/jobquote/address.ts
+?? src/features/trades/jobquote/api.test.tsx
+?? src/features/trades/jobquote/draft-attempt.test.ts
+?? src/features/trades/jobquote/draft-attempt.ts
+?? src/features/trades/jobquote/photos.test.ts
+?? src/features/trades/jobquote/photos.ts
+?? src/features/trades/roofing/OwnedRoofScreen.test.tsx
+?? src/features/trades/roofing/OwnedRoofScreen.tsx
+?? src/features/trades/roofing/RoofAddressField.tsx
+?? src/features/trades/roofing/RoofGeometry.tsx
+?? src/features/trades/roofing/RoofMeasureScreen.test.tsx
+?? src/features/trades/roofing/RoofSolarSummary.tsx
+?? src/features/trades/roofing/owned-roof.test.ts
+?? src/features/trades/roofing/owned-roof.ts
+?? src/features/trades/roofing/roof-attempt.test.ts
+?? src/features/trades/roofing/roof-attempt.ts
+?? src/features/trades/roofing/roof-input-draft.ts
+?? src/features/trades/roofing/roof-test-fixture.ts
+?? src/features/trades/roofing/roof-working-draft.ts
+?? src/lib/account-identity-boundary.test.ts
+?? src/lib/account-identity-boundary.ts
+?? src/lib/account-identity-storage.test.ts
+?? src/lib/api-error-message.test.ts
+?? src/lib/scoped-query-storage.test.ts
+?? src/lib/scoped-query-storage.ts
+?? src/lib/unsubscribe-links.test.ts
+?? src/lib/use-account-identity-boundary.test.tsx
+?? src/lib/use-account-identity-boundary.ts
+?? src/lib/working-draft-storage.test.ts
+?? src/lib/working-draft-storage.ts

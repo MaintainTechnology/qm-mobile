@@ -109,6 +109,7 @@ export async function downloadAndShare({
   timeoutMs?: number;
   onProgress?: (fraction: number | null) => void;
 }): Promise<void> {
+  if (signal?.aborted) throw new DownloadCancelledError('cancelled');
   const dir = FileSystem.cacheDirectory;
   if (!dir) throw new Error('No writable cache directory on this device.');
   const safeName = sanitizeFilename(filename);
@@ -124,8 +125,13 @@ export async function downloadAndShare({
   );
 
   let cancellation: 'cancelled' | 'timeout' | null = null;
+  let rejectCancelled: (reason: Error) => void = () => {};
+  const cancelled = new Promise<never>((_, reject) => {
+    rejectCancelled = reject;
+  });
   const cancel = (reason: 'cancelled' | 'timeout') => {
     cancellation ??= reason;
+    rejectCancelled(new DownloadCancelledError(cancellation));
     void task.cancelAsync().catch(() => undefined);
   };
   const onAbort = () => cancel('cancelled');
@@ -134,7 +140,20 @@ export async function downloadAndShare({
   const timer = setTimeout(() => cancel('timeout'), timeoutMs);
 
   try {
-    const result = await task.downloadAsync();
+    const download = task.downloadAsync();
+    // Some native transports settle after cancelAsync, or never settle at all.
+    // Stop awaiting immediately and delete any late partial/completed cache write again.
+    void download.then(
+      () => {
+        if (cancellation)
+          void FileSystem.deleteAsync(uri, { idempotent: true }).catch(() => undefined);
+      },
+      () => {
+        if (cancellation)
+          void FileSystem.deleteAsync(uri, { idempotent: true }).catch(() => undefined);
+      },
+    );
+    const result = await Promise.race([download, cancelled]);
     if (cancellation || !result) throw new DownloadCancelledError(cancellation ?? 'cancelled');
     if (result.status < 200 || result.status >= 300) {
       throw new ApiError(`GET ${path} failed`, result.status, path);
@@ -145,9 +164,12 @@ export async function downloadAndShare({
         `QuoteMax returned ${actualMime ?? 'an unknown file type'} instead of ${mimeType}.`,
       );
     }
-    if (!(await Sharing.isAvailableAsync())) {
+    if (!(await Promise.race([Sharing.isAvailableAsync(), cancelled]))) {
       throw new DownloadUnavailableError('No native share or save destination is available.');
     }
+    if (cancellation) throw new DownloadCancelledError(cancellation);
+    // The system share sheet is user-controlled; the network deadline stops here.
+    clearTimeout(timer);
     await Sharing.shareAsync(result.uri, { mimeType, dialogTitle: safeName });
   } catch (error) {
     if (cancellation && !(error instanceof DownloadCancelledError)) {

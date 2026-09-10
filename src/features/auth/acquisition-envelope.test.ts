@@ -78,10 +78,7 @@ describe('AUTH-006 acquisition envelope', () => {
       { source: 'campaign', plan: 'enterprise', interval: 'year' },
       NOW,
     );
-    const missingInterval = acquisitionEnvelopeFromParams(
-      { source: 'campaign', plan: 'pro' },
-      NOW,
-    );
+    const missingInterval = acquisitionEnvelopeFromParams({ source: 'campaign', plan: 'pro' }, NOW);
 
     expect(external?.returnTarget).toBe('/');
     expect(protocolRelative?.returnTarget).toBe('/');
@@ -148,13 +145,15 @@ describe('AUTH-006 acquisition envelope', () => {
   });
 
   it('is account-isolated across duplicate-account resume', () => {
-    const emailBound = bindAcquisitionAccount(smsEnvelope(), {
-      email: 'owner@example.com',
-    }, NOW + 1);
+    const emailBound = bindAcquisitionAccount(
+      smsEnvelope(),
+      {
+        email: 'owner@example.com',
+      },
+      NOW + 1,
+    );
     expect(emailBound).not.toBeNull();
-    expect(
-      bindAcquisitionAccount(emailBound!, { clerkUserId: 'user_attacker' }),
-    ).toBeNull();
+    expect(bindAcquisitionAccount(emailBound!, { clerkUserId: 'user_attacker' })).toBeNull();
 
     expect(
       bindAcquisitionAccount(emailBound!, {
@@ -261,6 +260,43 @@ describe('AUTH-006 acquisition envelope', () => {
 
     await clearAcquisitionEnvelope(storage);
     expect(values.has(ACQUISITION_ENVELOPE_KEY)).toBe(false);
+  });
+
+  it('round trips the durable phone proof only for its activated account', async () => {
+    const { storage } = memoryStorage();
+    const complete = completeAcquisitionEnvelope(
+      smsEnvelope(),
+      { clerkUserId: 'user_owner', email: 'owner@example.com' },
+      NOW + 1,
+    )!;
+    const phoneReadiness = {
+      version: 1 as const,
+      tenantId: 'aaaaaaaa-1111-4111-8111-aaaaaaaaaaaa',
+      operationId: 'bbbbbbbb-1111-4111-8111-bbbbbbbbbbbb',
+      state: 'unknown' as const,
+      setupComplete: false,
+      retryable: false,
+      phoneNumber: null,
+      smsReady: false,
+      voiceReady: false,
+      provisioningMode: { twilio: 'real' as const, vapi: 'real' as const },
+      message: 'Check status before retrying.',
+    };
+    await saveAcquisitionEnvelope(
+      withAcquisitionProvisioningReceipt(
+        complete,
+        { setupComplete: false, phoneReadiness },
+        NOW + 2,
+      ),
+      storage,
+    );
+    expect(
+      (await loadAcquisitionEnvelope({ clerkUserId: 'user_owner' }, storage, NOW + 3))?.provisioning
+        ?.phoneReadiness,
+    ).toEqual(phoneReadiness);
+    expect(
+      await loadAcquisitionEnvelope({ clerkUserId: 'user_other' }, storage, NOW + 3),
+    ).toBeNull();
   });
 
   it('records provisioning UI provenance only after activation is complete', () => {

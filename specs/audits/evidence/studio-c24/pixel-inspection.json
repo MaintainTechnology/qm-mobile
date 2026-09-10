@@ -1,0 +1,87 @@
+{
+  "decoder": "pypdf 6.10.0 and PDFium via pypdfium2 5.13.0",
+  "pageCount": 5,
+  "orderedPages": [
+    {
+      "page": 1,
+      "kind": "stat",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "embeddedPixelsEqualSource": true,
+      "pdfRasterPixelsEqualSource": true,
+      "rasterRmsDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rgbSha256": "a28b57734d27e6ae7413d55d32c0d448ef548a2e45f08182481a958423bf8803"
+    },
+    {
+      "page": 2,
+      "kind": "list",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "embeddedPixelsEqualSource": true,
+      "pdfRasterPixelsEqualSource": true,
+      "rasterRmsDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rgbSha256": "0a707c0868d99f79a8b69fd7909086aa4f506cde713a3bd4e1dcfe3fd0cb7236"
+    },
+    {
+      "page": 3,
+      "kind": "steps",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "embeddedPixelsEqualSource": true,
+      "pdfRasterPixelsEqualSource": true,
+      "rasterRmsDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rgbSha256": "953af190e55a169c30411296fc67928c2fdc7d22ceaa292a8b7ae90e7444af47"
+    },
+    {
+      "page": 4,
+      "kind": "quote",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "embeddedPixelsEqualSource": true,
+      "pdfRasterPixelsEqualSource": true,
+      "rasterRmsDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rgbSha256": "85d3d6869cc295a4e44f409cd141c7e4fc5e1f65335577711f6ae10aea53f99e"
+    },
+    {
+      "page": 5,
+      "kind": "cta",
+      "dimensions": [
+        1080,
+        1350
+      ],
+      "embeddedPixelsEqualSource": true,
+      "pdfRasterPixelsEqualSource": true,
+      "rasterRmsDifference": [
+        0.0,
+        0.0,
+        0.0
+      ],
+      "rgbSha256": "63edb0cf06f936ec161237d4be4b3b413a9900e57842d4fdaee7fab436d25e13"
+    }
+  ],
+  "signedDeviceProof": false
+}

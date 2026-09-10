@@ -40,12 +40,6 @@ type RequestOptions = {
   body?: unknown;
   method?: 'GET' | 'POST' | 'PATCH' | 'PUT' | 'DELETE';
   /**
-   * Bearer token for this request. Clerk session tokens are short-lived, so
-   * callers fetch one per request via useAuth().getToken() rather than storing
-   * it; when omitted, the legacy SecureStore session header applies.
-   */
-  token?: string;
-  /**
    * Per-call budget. Reads keep the 15s default; SLOW NON-IDEMPOTENT mutations
    * (activation provisions a phone number, job-quote/measure-all run an LLM)
    * must pass a budget matched to the server, or a slow success gets aborted
@@ -57,7 +51,13 @@ type RequestOptions = {
    * capability token. Fetch still uses `path`; errors and monitoring use this.
    */
   diagnosticPath?: string;
-};
+} & (
+  // Public capability requests never read a saved session or send credentials.
+  { anonymous: true; token?: never }
+  // Authenticated callers fetch a fresh Clerk token per request. Existing
+  // callers without one retain the legacy SecureStore header by default.
+  | { anonymous?: false; token?: string }
+);
 
 /**
  * A stalled request on a two-bar connection must fail into the retry UIs, not spin forever —
@@ -73,20 +73,40 @@ export async function apiRequest<T>(
     body,
     method = 'GET',
     token,
+    anonymous = false,
     timeoutMs = REQUEST_TIMEOUT_MS,
     diagnosticPath = path,
   }: RequestOptions = {},
 ): Promise<T> {
+  if (anonymous && token !== undefined) throw new Error('Anonymous requests cannot include a session token.');
   const controller = new AbortController();
-  const timer = setTimeout(() => controller.abort(), timeoutMs);
-  if (signal) {
-    if (signal.aborted) controller.abort();
-    else signal.addEventListener('abort', () => controller.abort(), { once: true });
-  }
-  try {
+  const abortError = () =>
+    Object.assign(new Error('The request was interrupted; its outcome is not confirmed.'), {
+      name: 'AbortError',
+    });
+  const checkAborted = () => {
+    if (controller.signal.aborted) throw abortError();
+  };
+  let rejectAborted: (error: Error) => void = () => {};
+  const aborted = new Promise<never>((_, reject) => {
+    rejectAborted = reject;
+  });
+  const rejectOnAbort = () => rejectAborted(abortError());
+  const forwardAbort = () => controller.abort();
+  controller.signal.addEventListener('abort', rejectOnAbort, { once: true });
+  const timer = setTimeout(forwardAbort, timeoutMs);
+  if (signal?.aborted) forwardAbort();
+  else signal?.addEventListener('abort', forwardAbort, { once: true });
+
+  async function performRequest(): Promise<T> {
+    checkAborted();
+    const authorization = anonymous ? {} : token ? { Authorization: `Bearer ${token}` } : await authHeader();
+    // Secure storage may settle after cancellation. Never begin a write after that boundary.
+    checkAborted();
     const response = await fetch(apiUrl(path), {
       method,
       signal: controller.signal,
+      ...(anonymous ? { credentials: 'omit' as const } : {}),
       headers: {
         Accept: 'application/json',
         // FormData sets its own multipart boundary — forcing a Content-Type here
@@ -94,7 +114,7 @@ export async function apiRequest<T>(
         ...(body === undefined || body instanceof FormData
           ? {}
           : { 'Content-Type': 'application/json' }),
-        ...(token ? { Authorization: `Bearer ${token}` } : await authHeader()),
+        ...authorization,
       },
       body: body === undefined ? undefined : body instanceof FormData ? body : JSON.stringify(body),
     });
@@ -109,11 +129,27 @@ export async function apiRequest<T>(
       );
     }
 
-    const parsed = schema.safeParse(await response.json());
+    let json: unknown;
+    try {
+      json = await response.json();
+    } catch {
+      checkAborted();
+      throw new ApiSchemaError(diagnosticPath, [
+        { code: 'custom', path: [], message: 'Response was not valid JSON.' },
+      ]);
+    }
+    checkAborted();
+    const parsed = schema.safeParse(json);
     if (!parsed.success) {
       throw new ApiSchemaError(diagnosticPath, parsed.error.issues);
     }
     return parsed.data;
+  }
+
+  try {
+    // Some native transports ignore abort after headers, leaving response.json() pending.
+    // Race the entire operation, including auth storage and body parsing, against cancellation.
+    return await Promise.race([performRequest(), aborted]);
   } catch (error) {
     if (error instanceof ApiSchemaError) {
       captureAppError(error, {
@@ -131,6 +167,8 @@ export async function apiRequest<T>(
     throw error;
   } finally {
     clearTimeout(timer);
+    signal?.removeEventListener('abort', forwardAbort);
+    controller.signal.removeEventListener('abort', rejectOnAbort);
   }
 }
 
@@ -169,8 +207,16 @@ export function apiErrorMessage(
   // dev server that moved port — the exact trap this project has already lost a day to.
   // Append, never replace: the tradie-facing sentence is the same in every build, and dev just
   // gets the detail bolted on. Swapping the copy out would make the shipped wording untested.
-  if (__DEV__) {
-    const target = apiUrl('');
+  if (
+    __DEV__ &&
+    (error instanceof TypeError || (error instanceof Error && error.name === 'AbortError'))
+  ) {
+    let target: string;
+    try {
+      target = apiUrl('');
+    } catch {
+      return `${fallback} [dev: the QuoteMax API URL is not configured.]`;
+    }
     if (error instanceof Error && error.name === 'AbortError') {
       return `${fallback} [dev: no response from ${target} — is the QuoteMax server running?]`;
     }

@@ -104,6 +104,15 @@ describe('analyticsWindow', () => {
 });
 
 describe('analyticsPath', () => {
+  it('keeps all-time unbounded and sends the exact selected business window', () => {
+    const now = new Date('2026-09-08T00:00:00Z');
+    expect(analyticsPath(8, now, null)).toBe('/api/tenant/analytics?weeks=8');
+    const from = new Date('2026-09-06T14:00:00Z');
+    const to = new Date('2026-09-08T13:59:59.999Z');
+    expect(analyticsPath(8, now, { from, to })).toBe(
+      `/api/tenant/analytics?weeks=8&from=${encodeURIComponent(from.toISOString())}&to=${encodeURIComponent(to.toISOString())}`,
+    );
+  });
   it('sends clamped weeks and URL-safe absolute ISO instants', () => {
     const path = analyticsPath(99, new Date(2026, 7, 27, 9, 0));
     expect(path.startsWith('/api/tenant/analytics?weeks=26&from=')).toBe(true);

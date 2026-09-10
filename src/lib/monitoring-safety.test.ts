@@ -11,6 +11,7 @@ describe('privacySafeRoute', () => {
     expect(privacySafeRoute('/sections/billing?stripe=return')).toBe('/sections/billing');
     expect(privacySafeRoute('/api/quote/customer-quote-id/complete')).toBe('/api/quote/:id');
     expect(privacySafeRoute('/ai/quote-assistant?prompt=private')).toBe('/ai/:operation');
+    expect(privacySafeRoute('/support/private-customer?email=private#secret')).toBe('/support');
   });
 
   it('does not report unregistered app routes', () => {

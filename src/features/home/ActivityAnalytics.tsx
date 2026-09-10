@@ -25,14 +25,20 @@ import { apiErrorMessage } from '@/lib/api';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
+import type { ReportingWindow } from './reporting-period';
 
-export function ActivityAnalytics() {
+export function ActivityAnalytics({
+  window,
+  periodLabel,
+  liveReviewCount,
+}: {
+  window?: ReportingWindow | null;
+  periodLabel?: string;
+  liveReviewCount?: number;
+} = {}) {
   const { colors } = useTheme();
-  const query = useApiQuery(
-    ['tenant', 'analytics', DEFAULT_WEEKS],
-    analyticsPath(DEFAULT_WEEKS, new Date()),
-    AnalyticsResponseSchema,
-  );
+  const path = analyticsPath(DEFAULT_WEEKS, new Date(), window);
+  const query = useApiQuery(['tenant', 'analytics', path], path, AnalyticsResponseSchema);
   const analytics = query.data?.analytics;
 
   return (
@@ -42,7 +48,7 @@ export function ActivityAnalytics() {
           Your activity
         </Text>
         <Text style={[styles.sectionRange, { color: colors.textDim }]}>
-          LAST {DEFAULT_WEEKS} WEEKS
+          {periodLabel?.toUpperCase() ?? `LAST ${DEFAULT_WEEKS} WEEKS`}
         </Text>
       </View>
       {query.isPending ? (
@@ -57,7 +63,29 @@ export function ActivityAnalytics() {
           onRetry={() => void query.refetch()}
         />
       ) : analytics ? (
-        <AnalyticsBody data={analytics} />
+        <>
+          {query.isError ? (
+            <Notice
+              tone="warn"
+              label="Showing previously loaded activity"
+              body={apiErrorMessage(query.error)}
+              onRetry={() => void query.refetch()}
+            />
+          ) : null}
+          <AnalyticsBody
+            data={
+              liveReviewCount == null
+                ? analytics
+                : {
+                    ...analytics,
+                    needsAttention: {
+                      ...analytics.needsAttention,
+                      awaitingReview: liveReviewCount,
+                    },
+                  }
+            }
+          />
+        </>
       ) : null}
     </View>
   );
@@ -75,13 +103,17 @@ function AnalyticsBody({ data }: { data: TradieAnalytics }) {
 
   if (isEmpty) {
     return (
-      <Card style={styles.emptyCard}>
-        <Text style={[styles.emptyTitle, { color: colors.textPri }]}>No activity yet</Text>
-        <Text style={[styles.emptyBody, { color: colors.textDim }]}>
-          Share your QuoteMax number to get started. Your messages, calls and quotes will appear
-          here as they come in.
-        </Text>
-      </Card>
+      <View style={styles.stack}>
+        <NeedsAttention data={data} />
+        <Card style={styles.emptyCard}>
+          <Text style={[styles.emptyTitle, { color: colors.textPri }]}>
+            No activity in this period
+          </Text>
+          <Text style={[styles.emptyBody, { color: colors.textDim }]}>
+            Choose another period to see earlier messages, calls and quotes.
+          </Text>
+        </Card>
+      </View>
     );
   }
 
@@ -132,12 +164,12 @@ function AnalyticsBody({ data }: { data: TradieAnalytics }) {
       <SplitBars title="Lead funnel" slices={data.funnel} barColor={colors.textSec} />
 
       <TrendBars
-        title="Requests / week"
+        title={`Requests / week · last ${data.weeks} weeks`}
         points={data.weeklyTrend.map(w => ({ label: w.label, value: w.intakes }))}
         barColor={colors.textSec}
       />
       <TrendBars
-        title="Quotes / week"
+        title={`Quotes / week · last ${data.weeks} weeks`}
         points={data.weeklyTrend.map(w => ({ label: w.label, value: w.quotes }))}
         barColor={colors.textSec}
       />
@@ -163,8 +195,7 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
   const { colors } = useTheme();
   const router = useRouter();
   const n = data.needsAttention;
-  // Same counts, labels and CTAs as the web. "Follow up" opens Chats
-  // unfiltered — the web's cold-filtered open is a web-only affordance.
+  // Attention links select the matching native queue or conversation filter.
   const actions: { count: number; label: string; cta: string; onPress: () => void }[] = [
     ...(n.awaitingReview > 0
       ? [
@@ -172,7 +203,7 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
             count: n.awaitingReview,
             label: n.awaitingReview === 1 ? 'quote to review' : 'quotes to review',
             cta: 'REVIEW',
-            onPress: () => router.push('/quotes'),
+            onPress: () => router.push({ pathname: '/quotes', params: { filter: 'review' } }),
           },
         ]
       : []),
@@ -182,7 +213,7 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
             count: n.coldChats,
             label: n.coldChats === 1 ? 'chat went cold' : 'chats went cold',
             cta: 'FOLLOW UP',
-            onPress: () => router.push('/chats'),
+            onPress: () => router.push({ pathname: '/chats', params: { filter: 'cold' } }),
           },
         ]
       : []),
@@ -192,7 +223,7 @@ function NeedsAttention({ data }: { data: TradieAnalytics }) {
             count: n.inspectionsToBook,
             label: n.inspectionsToBook === 1 ? 'job needs a visit' : 'jobs need a visit',
             cta: 'VIEW',
-            onPress: () => router.push('/quotes'),
+            onPress: () => router.push({ pathname: '/quotes', params: { filter: 'inspect' } }),
           },
         ]
       : []),

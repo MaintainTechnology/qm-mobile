@@ -1,0 +1,409 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Estimate EST-SAMPLE — Sample Electrical</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Caterpillar light "warm paper" tokens (app/globals.css light theme) ── */
+  :root{
+    --paper:#FAF8F4; --card:#FFFFFF; --line:#E9E3DC;
+    --accent:#FFC400; --accent-ink:#2B2422;
+    --pri:#241E1B; --sec:#5E544E; --dim:#837870;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ background:var(--paper); }
+  body{
+    margin:0 auto; color:var(--pri);
+    font-family:'Manrope','Segoe UI',-apple-system,system-ui,Arial,sans-serif;
+    font-size:12px; line-height:1.55;
+    /* Pin the layout width to the printable width. Gotenberg renders this
+       document as ONE continuous page, and it derives that page's height by
+       measuring the document at the browser viewport width — so the width
+       must not depend on the viewport, or the tail gets clipped. See the
+       SINGLE-PAGE / WIDTH CONTRACT in lib/pdf/gotenberg.ts. */
+    width:7.27in;
+    /* reserve room for the repeating fixed footer so content never overlaps */
+    padding-bottom:64px;
+  }
+  .mono{ font-family:'JetBrains Mono','Courier New',monospace; }
+
+  /* ── Header (white-label) ── */
+  header{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .logo{ max-height:60px; max-width:230px; object-fit:contain; display:block; }
+  .brand .monogram{
+    display:inline-flex; align-items:center; justify-content:center; flex:none;
+    width:46px; height:46px; background:var(--accent); color:var(--accent-ink);
+    font-weight:800; font-size:19px; letter-spacing:-0.02em;
+  }
+  .brand .wordmark{
+    font-weight:800; font-size:26px; line-height:1.05; text-transform:uppercase;
+    letter-spacing:-0.02em; color:var(--pri); max-width:300px;
+  }
+  .head-meta{ text-align:right; }
+  .head-meta .tagline{ font-style:italic; font-weight:700; color:var(--pri); font-size:13px; margin-bottom:4px; }
+  .head-meta .legal{ font-size:11px; color:var(--pri); }
+  .head-meta .contact{ font-size:11px; color:var(--sec); }
+  .rule{ height:3px; margin:12px 0 16px;
+    background:linear-gradient(90deg,var(--accent) 0 96px, var(--line) 96px 100%); }
+
+  /* ── Intro / thank-you ── */
+  .eyebrow{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--dim); }
+  .quote-title{ font-size:22px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.02em; margin:4px 0 2px; }
+  .quote-sub{ color:var(--sec); font-size:11px; }
+  .quote-sub strong{ color:var(--pri); }
+  .intro{ margin:12px 0 4px; color:var(--sec); }
+
+  /* ── Headings & shared body vocabulary ── */
+  h2{ font-size:14px; text-transform:uppercase; letter-spacing:-0.01em; margin:22px 0 8px; }
+  .part{ border:1px solid var(--line); background:var(--card); padding:14px 16px;
+    margin-top:14px; page-break-inside:avoid; }
+  .part-head{ display:flex; align-items:center; gap:12px; }
+  .marker{ font-family:'JetBrains Mono','Courier New',monospace; font-weight:600;
+    font-size:18px; line-height:1; color:var(--accent-ink); background:var(--accent);
+    padding:8px 12px; min-width:40px; text-align:center; }
+  .part-title{ font-size:14px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.01em; margin:0; }
+  .part-note-row{ margin:8px 0 0; }
+  .part-note{ color:var(--sec); font-size:11px; }
+  .chip{ font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    font-weight:600; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--accent-ink); background:var(--accent); padding:1px 6px; vertical-align:middle; }
+  ul.bullets{ margin:8px 0 0; padding-left:18px; }
+  ul.bullets li{ margin-bottom:3px; }
+  ol.prices{ margin:10px 0 0; padding-left:18px; }
+  ol.prices li{ margin-bottom:4px; }
+  .price{ font-weight:800; }
+  .caveat{ color:var(--sec); font-weight:400; }
+
+  /* generic cards/tables used by tier-based trades */
+  .scope{ border-left:3px solid var(--accent); background:#fff; padding:8px 12px; }
+  .statgrid{ display:flex; gap:12px; margin:12px 0 4px; }
+  .stat{ flex:1; border:1px solid var(--line); background:var(--card); padding:10px 12px; }
+  .stat .v{ font-size:19px; font-weight:800; }
+  .stat .v small{ font-size:10px; font-weight:400; color:var(--dim); }
+  .stat .l{ font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); }
+  .stat-selected{ border:2px solid var(--accent); }
+  table{ width:100%; border-collapse:collapse; margin-top:8px; }
+  th{ text-align:left; font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--dim);
+    border-bottom:2px solid var(--pri); padding:5px 6px; }
+  td{ border-bottom:1px solid var(--line); padding:5px 6px; vertical-align:top; }
+  .num{ text-align:right; white-space:nowrap; } th.num{ text-align:right; }
+  .flag{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    text-transform:uppercase; color:#B45309; border:1px solid #B45309; padding:1px 6px; }
+  .note{ color:var(--sec); font-size:11px; }
+
+  /* ── Tradie identity block (customer-view section 03 parity) ── */
+  .tradie{ display:flex; align-items:center; gap:14px; border:1px solid var(--line);
+    background:var(--card); padding:12px 14px; margin-top:8px; page-break-inside:avoid; }
+  .tradie-photo{ width:72px; height:72px; flex:none; object-fit:cover;
+    border:1px solid var(--line); background:#fff; }
+  .tradie-name{ font-weight:800; font-size:13px; text-transform:uppercase;
+    letter-spacing:-0.01em; color:var(--pri); }
+  .tradie-copy .note{ margin:4px 0 0; }
+
+  /* ── Figure ── */
+  .figure{ margin:14px 0; page-break-inside:avoid; }
+  .figure img{ width:100%; max-height:420px; object-fit:contain; border:1px solid var(--line); }
+  .figure figcaption{ text-align:center; color:var(--sec); font-style:italic; font-size:11px; margin-top:6px; }
+  /* two-image figure: hero outline tracing + small aerial reference thumbnail */
+  .figure-pair .hero{ width:100%; max-height:420px; object-fit:contain; border:1px solid var(--line); background:#fff; }
+  .figure-pair .thumb{ width:42%; max-width:280px; margin:10px auto 0; }
+  .figure-pair .thumb img{ display:block; width:100%; max-height:170px; object-fit:contain; border:1px solid var(--line); }
+  .figure-pair .thumb figcaption{ text-align:center; color:var(--dim); font-style:italic; font-size:9.5px; margin-top:4px; }
+
+  /* ── Please Note ── */
+  .please{ margin-top:24px; border:1px solid var(--line); background:var(--card); padding:14px 16px; page-break-inside:avoid; }
+  .please h3{ font-family:'JetBrains Mono','Courier New',monospace; font-size:10px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--pri); margin:0 0 8px; }
+  .please ul{ margin:0; padding-left:18px; } .please li{ margin-bottom:4px; color:var(--sec); }
+
+  .closing{ margin-top:16px; color:var(--sec); font-size:11px; }
+
+  /* ── Repeating footer (fixed → Chromium prints it on every page) ── */
+  .accentbar{ position:fixed; left:0; right:0; bottom:30px; background:var(--accent);
+    color:var(--accent-ink); text-align:center; padding:6px 10px;
+    font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.14em; text-transform:uppercase; }
+  .footline{ position:fixed; left:0; right:0; bottom:8px; text-align:center;
+    font-family:'JetBrains Mono','Courier New',monospace; font-size:8px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); }
+
+  /* Saved quote appearance */
+  body{font-family:Georgia,'Times New Roman',serif;}
+  :root{--accent:#0F1722;--accent-ink:#FFFFFF;}
+  .ev-total-panel .ev-total-panel-label,.ev-grand .ev-grand-label{color:var(--paper);}
+  h2{border:0;background:var(--accent);color:var(--accent-ink);padding:8px 12px;}
+  .ev-body .ev-secthead h2{color:var(--accent-ink);}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="monogram">SE</span><div class="wordmark">Sample Electrical</div></div>
+    <div class="head-meta"></div>
+  </header>
+  
+  <div class="ev-band">
+    <div class="ev-band-row">
+      <div>
+        <div class="ev-eyebrow">EST-SAMPLE</div>
+        <div class="ev-title">ESTIMATE</div>
+        <div class="ev-band-meta">
+        <div>
+          <div class="ev-meta-label">Prepared For:</div>
+          <div class="ev-meta-name">Sample Customer</div>
+          
+        </div></div>
+      </div>
+      <div class="ev-band-right">
+        
+        <div class="ev-total-panel">
+          <div class="ev-total-panel-label">Total:</div>
+          <div class="ev-total-panel-fig">$650.01</div>
+        </div>
+        <div class="ev-details">
+          <div class="ev-meta-label">Proposal Details:</div>
+          <div class="ev-details-list">
+            <div><strong>Date:</strong> 9 Sept 2026</div>
+            <div><strong>Valid Until:</strong> 9 Oct 2026</div>
+            
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  
+
+<style>
+  /* Header — logo cap tightened from the chrome's 60px so the four contact
+     lines stop out-weighing it; the ABN line becomes a mono micro-label. */
+  .brand .logo{ max-height:52px; max-width:205px; }
+  .head-meta{ font-size:10.5px; color:var(--sec); line-height:1.5; }
+  /* The chrome's body carries no horizontal padding, so its header sits flush
+     at x=0. Give the header the same 30px inset .ev-body uses, or the logo
+     hangs 30px to the left of every heading beneath it. */
+  header{ padding:0 30px; }
+
+  /* ── Full-bleed white summary band (replaces the chrome's intro block) ── */
+  .ev-band{ margin-top:20px; background:var(--card); border-top:3px solid var(--accent);
+    border-bottom:1px solid var(--line); padding:18px 30px 20px; }
+  .ev-band-row{ display:flex; justify-content:space-between; align-items:flex-start; gap:28px; }
+  .ev-eyebrow{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.2em; text-transform:uppercase; color:var(--dim); }
+  .ev-title{ font-size:34px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.035em; line-height:1; margin:3px 0 0; color:var(--pri); }
+  .ev-band-meta{ display:flex; gap:24px; margin-top:16px; }
+  .ev-band-right{ flex:none; text-align:right; }
+  .ev-meta-label{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--pri); font-weight:600; }
+  .ev-meta-name{ font-weight:800; font-size:12px; margin-top:3px; color:var(--pri); }
+  .ev-meta-line{ font-size:11px; color:var(--sec); }
+  .ev-meta-line-sub{ margin-top:3px; }
+
+  /* Hero total — the same figure the totals block prints, never a second sum. */
+  .ev-total-panel{ background:var(--pri); color:var(--paper); padding:12px 16px 14px; }
+  .ev-total-panel-label{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--accent); }
+  .ev-total-panel-fig{ font-family:'JetBrains Mono','Courier New',monospace;
+    font-variant-numeric:tabular-nums; font-size:30px; font-weight:600;
+    letter-spacing:-0.03em; line-height:1.1; margin-top:3px; }
+  .ev-details{ margin-top:10px; }
+  .ev-details-list{ display:grid; gap:1px; margin-top:3px; font-size:11px; color:var(--sec); }
+  .ev-details-list strong{ color:var(--pri); }
+
+  /* ── The 30px document body every non-bleeding block sits in ── */
+  .ev-body{ padding:0 30px; }
+
+  /* Numbered section heads (01-04) */
+  .ev-secthead{ display:flex; align-items:center; gap:12px; margin:26px 0 10px; }
+  .ev-marker{ font-family:'JetBrains Mono','Courier New',monospace; font-weight:600;
+    font-size:16px; line-height:1; color:var(--accent-ink); background:var(--accent);
+    padding:7px 10px; min-width:38px; text-align:center; }
+  .ev-secthead h2{ font-size:14px; font-weight:800; text-transform:uppercase;
+    letter-spacing:0.01em; margin:0; color:var(--pri); }
+
+  .ev-scope{ color:var(--sec); font-size:12px; margin:0; }
+  .ev-sub{ font-size:11.5px; font-weight:800; text-transform:uppercase;
+    letter-spacing:0.02em; color:var(--pri); margin:20px 0 8px; }
+
+  /* NB: these comments ship inside the document, so none of them may repeat a
+     section heading verbatim — the spec tests assert an omitted section's
+     heading is absent from the whole HTML, and a comment would satisfy the
+     search and hide a genuinely missing section.
+
+     The works list — the 1px grid gap over --line IS the divider. */
+  .ev-hairlist{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
+  .ev-hairlist > div{ background:var(--card); padding:8px 13px; font-size:11.5px; color:var(--sec); }
+
+  /* What we assume — 5x5 accent squares, optically aligned to the first line. */
+  ul.ev-assume{ list-style:none; margin:0; padding:0; display:grid; gap:6px; }
+  ul.ev-assume li{ display:flex; gap:9px; font-size:11.5px; color:var(--sec); }
+  ul.ev-assume li .mark{ flex:none; width:5px; height:5px; background:var(--accent); margin-top:7px; }
+
+  /* What's in / what's out, as facing cards; what is OUT reads as clearly as
+     what is IN. Only the card top border and heading carry the flag colour. */
+  .ev-cards{ display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:20px; }
+  /* Only one of the two present (an estimate with no exclusions is common) —
+     it takes the full width rather than sitting beside an empty column. */
+  .ev-cards-one{ grid-template-columns:1fr; }
+  .ev-card{ border:1px solid var(--line); background:var(--card); padding:12px 14px; }
+  .ev-card-inc{ border-top:3px solid var(--accent); }
+  .ev-card-exc{ border-top:3px solid #B45309; }
+  .ev-card h3{ font-size:11.5px; font-weight:800; text-transform:uppercase;
+    letter-spacing:0.02em; margin:0 0 9px; color:var(--pri); }
+  .ev-card-exc h3{ color:#B45309; }
+  .ev-card ul{ list-style:none; margin:0; padding:0; display:grid; gap:7px; }
+  .ev-card li{ font-size:11px; color:var(--sec); padding-left:14px; border-left:2px solid var(--line); }
+  .ev-card-inc li{ border-left-color:var(--accent); }
+
+  /* Optional upgrades — advisory notes left, notes + priced rows right. */
+  .ev-upgrades{ display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+  .ev-upgrades-right{ display:grid; gap:12px; align-content:start; }
+  .ev-note{ border:1px solid var(--line); background:var(--card); padding:12px 14px; }
+  .ev-upgrade-title{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--pri); font-weight:600;
+    margin-bottom:5px; }
+  .ev-note p{ color:var(--sec); font-size:11px; margin:0; }
+  .ev-upsells{ display:grid; gap:1px; background:var(--line); border:1px solid var(--line); }
+  .ev-upsell{ display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+    background:var(--card); padding:9px 13px; }
+  .ev-upsell-name{ font-size:11px; font-weight:700; color:var(--pri); }
+  .ev-upsell-price{ font-family:'JetBrains Mono','Courier New',monospace;
+    font-variant-numeric:tabular-nums; font-size:11px; font-weight:600; white-space:nowrap; }
+
+  /* Phase card — the tables AND the totals live in one white card. */
+  .ev-phase{ border:1px solid var(--line); background:var(--card); padding:14px 16px;
+    margin-top:22px; page-break-inside:avoid; }
+  .ev-phase-title{ font-size:12px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.01em; margin:0 0 10px; color:var(--pri); }
+  .ev-phase table + .ev-phase-title{ margin-top:20px; }
+  .ev-phase table{ width:100%; border-collapse:collapse; }
+  .ev-phase th{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    font-weight:600; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim);
+    border-bottom:2px solid var(--pri); text-align:left; padding:0 8px 6px 0; }
+  .ev-phase th.num{ text-align:right; padding:0 8px 6px; white-space:nowrap; }
+  .ev-phase th.num-last{ text-align:right; padding:0 0 6px 8px; white-space:nowrap; }
+  .ev-phase td{ border-bottom:1px solid var(--line); padding:9px 8px 9px 0;
+    vertical-align:top; font-size:11px; color:var(--pri); }
+  .ev-phase td.num{ padding:9px 8px; text-align:right; white-space:nowrap;
+    font-family:'JetBrains Mono','Courier New',monospace; font-variant-numeric:tabular-nums;
+    color:var(--sec); }
+  .ev-phase td.num-last{ padding:9px 0 9px 8px; text-align:right; white-space:nowrap;
+    font-family:'JetBrains Mono','Courier New',monospace; font-variant-numeric:tabular-nums;
+    font-weight:600; color:var(--pri); }
+  .ev-group-total td{ border-bottom:none; border-top:2px solid var(--pri);
+    font-family:'JetBrains Mono','Courier New',monospace; font-size:10px; letter-spacing:0.1em;
+    text-transform:uppercase; font-weight:600; text-align:right; padding:9px 8px 0 0;
+    color:var(--pri); }
+  .ev-group-total td.num-last{ font-size:13px; letter-spacing:normal; text-transform:none;
+    padding:9px 0 0 8px; }
+
+  /* Totals nested in the same card, right-aligned. */
+  .ev-totals-wrap{ display:flex; justify-content:flex-end; margin-top:16px; }
+  .ev-totals{ min-width:290px; }
+  .ev-total-row{ display:flex; justify-content:space-between; gap:16px; padding:6px 0;
+    border-bottom:1px solid var(--line); font-size:11.5px; }
+  .ev-total-row .ev-total-label{ color:var(--sec); }
+  .ev-total-row .num{ font-family:'JetBrains Mono','Courier New',monospace;
+    font-variant-numeric:tabular-nums; color:var(--pri); }
+  .ev-grand{ display:flex; justify-content:space-between; align-items:baseline; gap:16px;
+    margin-top:8px; padding:11px 13px; background:var(--pri); color:var(--paper); }
+  .ev-grand-label{ font-family:'JetBrains Mono','Courier New',monospace; font-size:10px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--accent); font-weight:600; }
+  .ev-grand .num{ font-family:'JetBrains Mono','Courier New',monospace;
+    font-variant-numeric:tabular-nums; font-size:20px; font-weight:600; letter-spacing:-0.02em; }
+
+  .ev-tier-heading{ margin-top:22px; }
+
+  /* Images span the text column (full-bleed images are direction 1C). */
+  .ev-image{ width:100%; height:320px; object-fit:cover; object-position:50% 60%;
+    display:block; border:1px solid var(--line); }
+
+  /* Terms — two columns, the GST/currency line spanning both. */
+  .ev-terms{ border:1px solid var(--line); background:var(--card); padding:14px 16px; }
+  .ev-terms-grid{ display:grid; grid-template-columns:1fr 1fr; gap:8px 20px; }
+  .ev-terms-grid > div{ font-size:11px; color:var(--sec); }
+  .ev-terms-span{ grid-column:1 / -1; }
+
+  /* Full-bleed accept band. The chrome's global link colour must not leak. */
+  .ev-accept{ margin-top:22px; background:var(--accent); color:var(--accent-ink);
+    padding:14px 30px; display:flex; align-items:center; justify-content:space-between; gap:16px; }
+  .ev-accept-line{ font-size:13px; font-weight:800; text-transform:uppercase; letter-spacing:0.02em; }
+  .ev-accept-url{ font-family:'JetBrains Mono','Courier New',monospace; font-size:10.5px;
+    margin-top:3px; word-break:break-all; color:var(--accent-ink); }
+  .ev-accept a{ color:var(--accent-ink); text-decoration:none; }
+  .ev-accept-total{ font-family:'JetBrains Mono','Courier New',monospace;
+    font-variant-numeric:tabular-nums; font-size:18px; font-weight:600; white-space:nowrap; }
+
+</style>
+  <div class="ev-body">
+  <div class="ev-secthead"><span class="ev-marker">01</span><h2>Scope of Work</h2></div>
+  
+  
+  
+  <div class="ev-cards ev-cards-one">
+    <div class="ev-card ev-card-inc"><h3>Inclusions</h3><ul><li>Sample installation work</li></ul></div>
+    
+  </div>
+  
+  <div class="ev-secthead"><span class="ev-marker">02</span><h2>Optional Upgrades &amp; Recommendations</h2></div>
+  <div class="ev-upgrades">
+    <div>
+      <div class="ev-note">
+        <div class="ev-upgrade-title">Surge protection option</div>
+        <p>We highly recommend installing a Surge Protection Device (SPD) to safeguard your new electric vehicle, EV charger, and valuable household electronics against sudden voltage spikes. Power surges can occur from lightning strikes or grid fluctuations and can cause thousands of dollars in damage to sensitive electronics. Pricing depends on there being sufficient physical room in your existing switchboard to fit the device, and is confirmed at your site visit.</p>
+      </div></div>
+    <div class="ev-upgrades-right">
+      <div class="ev-note">
+        <div class="ev-upgrade-title">Switchboard capacity note</div>
+        <p>If your switchboard does not have a spare circuit position available, additional work is needed to create space or upgrade the board. This is confirmed at your site visit.</p>
+      </div></div>
+  </div>
+  
+  <section class="part ev-phase">
+    <h3 class="ev-phase-title">Phase 1 - Switchboard and rough-in</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Description</th>
+          <th class="num">Qty</th>
+          <th class="num">Rate</th>
+          <th class="num-last">Amount</th>
+        </tr>
+      </thead>
+      <tbody>
+      <tr>
+        <td>Sample installation work</td>
+        <td class="num">1 JOB</td>
+        <td class="num">$650.01</td>
+        <td class="num-last">$650.01</td>
+      </tr></tbody>
+      <tfoot>
+        <tr class="ev-group-total">
+          <td colspan="3">Group Total:</td>
+          <td class="num-last">$650.01</td>
+        </tr>
+      </tfoot>
+    </table>
+    <div class="ev-totals-wrap"><div class="ev-totals"><div class="ev-total-row"><span class="ev-total-label">Subtotal (ex GST):</span><span class="num">$650.01</span></div><div class="ev-grand"><span class="ev-grand-label">Total:</span><span class="num">$650.01</span></div></div></div>
+  </section>
+  
+  <div class="ev-secthead"><span class="ev-marker">04</span><h2>Terms &amp; Conditions</h2></div>
+  <div class="ev-terms"><div class="ev-terms-grid"><div>This is an estimate, not a contract.</div><div>Prices are valid for 30 days from the date of this estimate.</div><div>Final price may vary based on actual work performed.</div><div>A $99 refundable site visit fee confirms your booking and is credited toward your final quote.</div><div class="ev-terms-span">All prices are in Australian dollars and are not subject to GST.</div></div></div>
+  </div>
+
+  
+
+  
+
+  <div class="accentbar">Sample Electrical</div>
+  <div class="footline">Sample Electrical · Prices are not subject to GST</div>
+</body>
+</html>

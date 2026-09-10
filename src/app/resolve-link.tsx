@@ -7,8 +7,8 @@ import { safeDestination } from '@/lib/destinations';
 import { spacing, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-function firstParam(value: string | string[] | undefined): string | null {
-  return Array.isArray(value) ? (value[0] ?? null) : (value ?? null);
+function singleParam(value: string | string[] | undefined): string | null {
+  return typeof value === 'string' ? value : null;
 }
 
 export default function ResolveLinkScreen() {
@@ -18,14 +18,15 @@ export default function ResolveLinkScreen() {
   const { isLoaded, isSignedIn } = useAuth();
 
   useEffect(() => {
-    if (!isLoaded) return;
-    const rawTarget = firstParam(target);
+    const rawTarget = singleParam(target);
     const destination = rawTarget ? safeDestination(rawTarget) : null;
     if (!destination || destination.audience === 'staff') {
       router.replace('/invalid-link' as Href);
       return;
     }
-    if (destination.audience === 'authenticated' && !isSignedIn) {
+    if (destination.audience === 'public') { router.replace(destination.href as Href); return; }
+    if (!isLoaded) return;
+    if (!isSignedIn) {
       router.replace({ pathname: '/sign-in', params: { intent: destination.href } });
       return;
     }

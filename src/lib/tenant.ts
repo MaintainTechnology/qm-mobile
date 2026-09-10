@@ -35,6 +35,16 @@ export const QuoteRowSchema = z.looseObject({
   job_type: z.string().nullish(),
   trade: z.string().nullish(),
   deposit_paid: z.boolean().nullish(),
+  paid_at: z.string().nullish(),
+  paid_tier: z.string().nullish(),
+  sent_at: z.string().nullish(),
+  /** Owner release precedes provider acceptance; it is not proof of delivery. */
+  customer_released_at: z.string().nullish(),
+  /** Null/absent is the legacy initial row; unfamiliar kinds stay non-actionable. */
+  quote_kind: z.string().nullish(),
+  parent_quote_id: z.string().nullish(),
+  inspection_cause: z.string().nullish(),
+  estimate_number: z.string().nullish(),
   channel: z.enum(['sms', 'voice']).nullish(),
   scope_of_works: z.string().nullish(),
   /** Legacy twin of needs_inspection — the web treats either flag as "inspection". */
@@ -180,28 +190,44 @@ export type OverviewStats = {
 };
 
 /** Same definitions as the web dashboard's OverviewTab (spec C2). */
-export function overviewStats(quotes: readonly QuoteRow[]): OverviewStats {
+export function overviewStats(
+  quotes: readonly QuoteRow[],
+  window?: { from: Date; to: Date } | null,
+): OverviewStats {
+  // Child acceptance belongs to its root even when the child is outside the selected period.
+  const acceptedRoots = new Set(
+    quotes
+      .filter(q => q.quote_kind === 'final' && ['deposit', 'credit'].includes(q.paid_tier ?? ''))
+      .map(q => q.parent_quote_id)
+      .filter((id): id is string => !!id),
+  );
+  const roots = quotes.filter(q => {
+    if (q.quote_kind != null && q.quote_kind !== 'initial') return false;
+    if (!window) return true;
+    const created = Date.parse(q.created_at);
+    return created >= window.from.getTime() && created <= window.to.getTime();
+  });
   let quotedCents = 0;
   let acceptedCents = 0;
   let acceptedCount = 0;
-  let inReviewCount = 0;
-  for (const quote of quotes) {
+  // Live review backlog is intentionally unbounded, and includes reviewable final quotes.
+  const inReviewCount = quotes.filter(isInReview).length;
+  for (const quote of roots) {
     const cents = quote.total_inc_gst == null ? null : centsFromApiDollars(quote.total_inc_gst);
     if (cents != null) quotedCents += cents;
-    if (isAccepted(quote)) {
+    if (isAccepted(quote) || acceptedRoots.has(quote.id)) {
       acceptedCount += 1;
       if (cents != null) acceptedCents += cents;
     }
-    if (isInReview(quote)) inReviewCount += 1;
   }
   return {
     quotedCents,
     acceptedCents,
     // A percentage, not money — plain rounding is fine here.
-    conversionPct: quotes.length === 0 ? 0 : Math.round((acceptedCount / quotes.length) * 100),
+    conversionPct: roots.length === 0 ? 0 : Math.round((acceptedCount / roots.length) * 100),
     // Web OverviewTab divides by ALL scoped quotes — unpriced ones count as $0.
-    avgQuoteCents: averageCents(quotedCents, quotes.length),
+    avgQuoteCents: averageCents(quotedCents, roots.length),
     inReviewCount,
-    quoteCount: quotes.length,
+    quoteCount: roots.length,
   };
 }

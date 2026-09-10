@@ -204,6 +204,8 @@ export type FieldProps = {
   keyboardType?: KeyboardTypeOptions;
   autoComplete?: TextInputProps['autoComplete'];
   autoCapitalize?: 'none' | 'words' | 'sentences';
+  editable?: boolean;
+  maxLength?: number;
   /** Error line below the field (DESIGN.md pattern; the kit ships no error state). */
   error?: string | null;
 };
@@ -221,6 +223,8 @@ export function Field({
   keyboardType,
   autoComplete,
   autoCapitalize = 'none',
+  editable = true,
+  maxLength,
   error,
 }: FieldProps) {
   const { colors } = useTheme();
@@ -259,6 +263,9 @@ export function Field({
           accessibilityLabel={label}
           accessibilityHint={error ?? hint}
           value={value}
+          editable={editable}
+          accessibilityState={{ disabled: !editable }}
+          maxLength={maxLength}
           onChangeText={onChangeText}
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}

@@ -1,0 +1,246 @@
+{
+  "capturedAt": "2026-09-09T11:19:57.8662512Z",
+  "status": "unintegrated_unrun",
+  "inputs": [
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-contract.ts",
+      "sha256": "048b34bdbc31cf58b439121badabbd98f62fcc60d1397095cdc310fb3a3fc00e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-edit.test.ts",
+      "sha256": "874817d1f90046e2781ec6c060f0db0b6727890e7b4be645a560bd7ac49fa01f"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-edit.ts",
+      "sha256": "687661a3b254cc061adba526cf0e425ab1889e6e3b2c907c3f75adb01cfe8c24"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-operation.test.ts",
+      "sha256": "25ddef8275d33899c268253c424684b6301d2774445b08dcc2c31448fd319bfb"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-operation.ts",
+      "sha256": "ee5cbfe7bbe99395caa168e93a818c0dd57f30589d892b2f168e13cc42f736e9"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-test-fixture.ts",
+      "sha256": "708479d5a2617e5993287fef96c8930d3fc9360c0aa55a6240e1f6180492d294"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/availability-test-harness.tsx",
+      "sha256": "2125ae42349cac4d4eb1a22ee3bf287df511ab0e2858d78996951ec104c54f9e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/BusinessAvailabilityEditor.test.tsx",
+      "sha256": "45712dd080c76b2cd219e794982ea28006d803c96c60ffb1415d547ed0ed4d5e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/BusinessAvailabilityEditor.tsx",
+      "sha256": "2cc8d15001cda0e1443958ab5835c97366f86ac5eeaef6eea263f189f173df8e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/README.md",
+      "sha256": "0e80711943a78c177b0806e8c231b246ff85012070c90e1812fac0193dd937fd"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/use-business-availability.test.tsx",
+      "sha256": "20d2667ca4d5c5f7f499b52a80709848044485bc5c621a00283d6776a196abef"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-business-availability-prototype/use-business-availability.ts",
+      "sha256": "38302ee2b6e3a624c8a0b79030efc7f4799a148f714d7261801236378482fba3"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-contract.ts",
+      "sha256": "49aa0e9d041994adc8bd47a3995a7972539e88437851eb9c3c2ee101f9647044"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-editor-model.test.ts",
+      "sha256": "203d6f475f77f0f0de128e4717422818a5eb215f1870ab54e4a9947592ee7b0b"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-editor-model.ts",
+      "sha256": "2c418719802b4b12b26354a8306f5f7995cdc021ff4e31a9975f338e86943454"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-observed-draft.test.ts",
+      "sha256": "9d3c400ce2eae50e28b42d8faf7673357259d7a10b9d1ed5d73ad414a1c80879"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-observed-draft.ts",
+      "sha256": "38069d5b8d54988c963a4c7a8aaf4f3d7451f0a1a50ddb1ea21cd9c6e0000eda"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-operation.test.ts",
+      "sha256": "5afedf55a4d34a3139ff43d094c726de5ee27afabc4c246387cb567fed103f4e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-operation.ts",
+      "sha256": "1ec0424efd4667d9b4229882a9e2df55910ab76586fd11878ecf89760dbb2e67"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/correction-workspace-review.ts",
+      "sha256": "e916e435767f599b05dc5d7fe41caad575ab6b3b6bf44aa8ea7f12d19ab06e20"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/integration-proposal.md",
+      "sha256": "7554f8ad54d965c806487f2a390dcb466e89b996bb8cdbfa6622133c8202512e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/owned-paint-document.test.ts",
+      "sha256": "e13d60a7660be8c796b371fa2cf1f7626075df66980bc6b1ad11b444d07902d2"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/owned-paint-document.ts",
+      "sha256": "97285d97423a3e7efc89ae01d0444b9a00ffe8a84ebb8f27a056aef5411ca365"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/OwnedPaintPlanViewer.test.tsx",
+      "sha256": "ddd4a37acf8a120cf8c2dab2ea6515b13f001d6b229772e007e4120ee58f2c0b"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/OwnedPaintPlanViewer.tsx",
+      "sha256": "d849c4db1e5ed39e94497cc68c9ca61fb154480530dc40ca6ecec4dde15a1510"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/PaintCorrectionEditor.test.tsx",
+      "sha256": "a284dd5c175bbaecd356e43c498aa01ba783b05d3397b23fe3700b3ebd680744"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/PaintCorrectionEditor.tsx",
+      "sha256": "006699700edd4e415e4792812579602be6367de9cc8b21fe3214ae7b267f17f1"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/PaintCorrectionWorkspace.tsx",
+      "sha256": "31f4d28f3c468117e809006f49b20e8a5c242897c3f6e9f46b30ae7cd2bb2a2f"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/README.md",
+      "sha256": "fdd2576910779fb94045594d73e35dbff255214e2d11d7607048465c2a646b78"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/use-paint-correction-draft.test.tsx",
+      "sha256": "bb869d45cd07f4982ec1e9ff850f012d2d9dba5db0242e5b65156a5fe8853e8b"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/use-paint-correction-draft.ts",
+      "sha256": "8256b7dcdac5a1d3a87dc60bef1d4f54c880b4092f9fa4b05bffd329aa462bcf"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/use-paint-correction-operation.test.tsx",
+      "sha256": "2a414bfe1987a8ac948e846be67d7c041e342aa87ddf8126c5357699419bc195"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-paint-corrections-prototype/use-paint-correction-operation.ts",
+      "sha256": "1551111064f34a7f468d030face7b1541f86e5d5cf11b97a9228541f286f4cf3"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/INTEGRATION.md",
+      "sha256": "74ae4275ed7f76c9289ca5c3463c95e1c3f628c76176449b7da825c4ba6077a3"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/private-startup-authority.test.ts",
+      "sha256": "9ba29a2df8564ee395008b69b55ad516988fecb9cd8d0cc9c272bbd18d878c45"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/private-startup-authority.ts",
+      "sha256": "1a6da25d7d5bd4a637476b3d3d9a2681cf0cde3e67525e807c03dfa524963499"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/PrivateStartupFailureBoundary.tsx",
+      "sha256": "afb2c30c84e73a2e5db16b001a35d5f3fee87843378bee0152bdc2c020197ec3"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/public-recovery-guard.ts",
+      "sha256": "26dd0c3f576cebac08ab0e0e1093eec074b5a7588cb83d34314d4c65738cc3ec"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/public-recovery-launch.test.ts",
+      "sha256": "dcbcf20bad73e4998ebfc65db1b87d061b538662c74f6c92e1da6450c1a66cd2"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/public-recovery-launch.ts",
+      "sha256": "e4a10489932648d3af0d5c08ace7234e0e00fed797a54ff68c9400017cf5989c"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/PublicHelpCore.tsx",
+      "sha256": "9d03b99ae57ed3a00db1a7840794817d9158344feb5e894731b905352830aceb"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/PublicRecoveryFrame.tsx",
+      "sha256": "bd058e44506e21c2a94deb148a38c022fa499ef220ea7ae734ab783707325f1c"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/PublicRecoveryHost.test.tsx",
+      "sha256": "5c6500ce91e9f5b8888a7cbfccd3279d24a32994f99c4ee745d11229b8c0ee04"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/PublicRecoveryHost.tsx",
+      "sha256": "810b132188cedd259631e5654d921f6226167297c3af890ac49c455ff0c832bf"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/SupportFormCore.tsx",
+      "sha256": "e027f58c7bfa3d2e44ccd9baaa02efdf7516805e2914284f3700e69f1a9b3242"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/unsubscribe-api.test.ts",
+      "sha256": "52d38dbf3288c377826e0d2b611a866ad34d129438b13d7951f89ac5c5c453ac"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/unsubscribe-api.ts",
+      "sha256": "4908a580def5560c65145cc251c5919be2647f78efee96a5e78a277953e0edf6"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/UnsubscribeContentCore.tsx",
+      "sha256": "0dbeb956bda42f7eac286e9a7ee704962be0f9e170ae2f88b16daacf71baadfc"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-public-recovery-prototype/use-unsubscribe.ts",
+      "sha256": "3b8fddbf039e02486b0e4fd036f9fb914ab99e6d98806dd02638e2149d3d44f3"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-api.test.ts",
+      "sha256": "e1b53cf3ee3308c96fd0ae116a3c78986257045a349921022ab01363ee985854"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-api.ts",
+      "sha256": "3182768d76d99b65a6045fa062531ad3f932f1d3fa5255573d86a2fbf47891a9"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-contract.test.ts",
+      "sha256": "946640f4c9d82202f4dc41ce7d8422e9eb34b9ac42fd582329b803917dc4c02a"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-contract.ts",
+      "sha256": "31eb398016ea2db783b9b662bb197108f0a20984737dc7aba56bcdd6e25e5a4a"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-store.test.ts",
+      "sha256": "2daae4bcbbb21370d7b9161fcca360df1a89c5f1c6b651ccb999aa6fc78b6b0e"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/contact-operation-store.ts",
+      "sha256": "2d9b86ac2e9995f2a5cb231ae5d5e2e63cbcd123849ba8275e2880430607459a"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/README.md",
+      "sha256": "cc14c4e9e0e45bf8687f044e4402c31586328ea5caf1c41549729f1d98ddf89c"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/SupportOperationsScreen.test.tsx",
+      "sha256": "888b0ee01150fe89d5e74bce52b5134b467911d74f7cba4df3135de377f22a10"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/SupportOperationsScreen.tsx",
+      "sha256": "04f0ecbe72ab83b37fcbc3aa793cc1bf964ff7670f118844599c66c06f860704"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/use-contact-operations.test.tsx",
+      "sha256": "056781ad1d09ce8ac5568148ff8d567be1dfe626442b7a74dc929aa9a5d3cf27"
+    },
+    {
+      "path": "C:/Users/dalig/.codex/worktrees/qm-parity-server-20260909/native-support-operations-prototype/use-contact-operations.ts",
+      "sha256": "02bfa126f68fcac083dd452f58e7b5779cb1eb30ba45ffe1300e0bfaec1b4a9c"
+    }
+  ]
+}

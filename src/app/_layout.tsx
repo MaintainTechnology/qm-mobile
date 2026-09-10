@@ -23,25 +23,27 @@ import { type ErrorBoundaryProps, Stack, usePathname } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import * as Updates from 'expo-updates';
-import { useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, useSyncExternalStore, type ReactNode } from 'react';
 import { DevSettings, Pressable, StyleSheet, Text, View } from 'react-native';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import { NetworkStatusBanner } from '@/components/NetworkStatusBanner';
 import { BiometricGate } from '@/features/auth/BiometricGate';
+import { clearAccountScopedState } from '@/lib/account-storage';
 import { clerkPublishableKey } from '@/lib/env';
 import { captureAppError, initialiseMonitoring, setMonitoringRoute } from '@/lib/monitoring';
 import { useNotificationObserver, usePushRegistration } from '@/lib/notifications';
 import { usePurchases } from '@/lib/purchases';
 import {
-  asyncStoragePersister,
+  createQueryPersister,
   queryClient,
   queryScopeBuster,
   subscribeQueryRuntime,
 } from '@/lib/query';
 import { themes } from '@/lib/theme';
 import { ThemeControlProvider, useTheme } from '@/lib/useTheme';
+import { useAccountIdentityBoundary } from '@/lib/use-account-identity-boundary';
 
 initialiseMonitoring();
 SplashScreen.preventAutoHideAsync();
@@ -115,15 +117,34 @@ function StartupFailure({ message, onRetry }: { message: string; onRetry?: () =>
   );
 }
 
+function clearServerIdentityCache() {
+  queryClient.clear();
+}
+
+function readTenantIdentity(): string | null {
+  const value = queryClient.getQueryData<{ tenant?: { id?: unknown } }>(['tenant', 'me']);
+  return typeof value?.tenant?.id === 'string' && value.tenant.id ? value.tenant.id : null;
+}
+
+function subscribeTenantIdentity(listener: () => void) {
+  return queryClient.getQueryCache().subscribe(event => {
+    if (event.query.queryKey[0] === 'tenant' && event.query.queryKey[1] === 'me') listener();
+  });
+}
+
 /**
  * Wait for Clerk before touching persisted server state. This prevents a
  * private cache from hydrating under a temporary signed-out scope during cold
  * start, while the buster keeps account A and account B mutually exclusive.
  */
 function ScopedServerStateProvider({ children }: { children: ReactNode }) {
-  const { isLoaded, userId } = useAuth();
+  const { isLoaded, userId, sessionId } = useAuth();
   const scope = userId ?? 'signed-out';
-  const [activeScope, setActiveScope] = useState<string | null>(null);
+  const tenantId = useSyncExternalStore(subscribeTenantIdentity, readTenantIdentity, () => null);
+  const identity = useAccountIdentityBoundary(
+    { isLoaded, userId: userId ?? null, sessionId: sessionId ?? null, tenantId },
+    { initialiseServerCache: clearServerIdentityCache, clearLocalState: clearAccountScopedState },
+  );
   const [timedOut, setTimedOut] = useState(false);
 
   useEffect(() => {
@@ -133,14 +154,8 @@ function ScopedServerStateProvider({ children }: { children: ReactNode }) {
   }, [isLoaded]);
 
   useEffect(() => {
-    if (!isLoaded) return;
-    queryClient.clear();
-    setActiveScope(scope);
-  }, [isLoaded, scope]);
-
-  useEffect(() => {
-    if (isLoaded && activeScope === scope) void SplashScreen.hideAsync();
-  }, [activeScope, isLoaded, scope]);
+    if (isLoaded && (identity.ready || identity.failed)) void SplashScreen.hideAsync();
+  }, [identity.ready, identity.failed, isLoaded]);
 
   useEffect(() => {
     if (timedOut && !isLoaded) void SplashScreen.hideAsync();
@@ -155,16 +170,24 @@ function ScopedServerStateProvider({ children }: { children: ReactNode }) {
 
   if (!isLoaded && !timedOut) return null;
   if (!isLoaded) {
-    return <StartupFailure message="Your sign-in state did not load. No account data was opened." />;
+    return (
+      <StartupFailure message="Your sign-in state did not load. No account data was opened." />
+    );
   }
-  if (activeScope !== scope) return null;
+  if (identity.failed) return <StartupFailure message="Local account cleanup could not finish. Retry before opening this account." onRetry={identity.retry} />;
+  if (!identity.ready) return <View style={startupStyles.screen}><Text accessibilityRole="header" style={startupStyles.title}>Preparing your account…</Text></View>;
 
+  return <ScopedQueryPersistence key={`${scope}:${identity.key}`} userId={userId ?? null}>{children}</ScopedQueryPersistence>;
+}
+
+/** Created only after identity cleanup succeeds. Old provider handles remain revoked. */
+function ScopedQueryPersistence({ userId, children }: { userId: string | null; children: ReactNode }) {
+  const [persister] = useState(createQueryPersister);
   return (
     <PersistQueryClientProvider
-      key={scope}
       client={queryClient}
       persistOptions={{
-        persister: asyncStoragePersister,
+        persister,
         maxAge: 24 * 60 * 60 * 1000,
         buster: queryScopeBuster(APP_VERSION, userId),
       }}
@@ -182,11 +205,11 @@ function ThemedApp() {
   usePurchases();
   return (
     <ThemeProvider value={isDark ? navDark : navLight}>
-      <Stack screenOptions={{ headerShown: false }} />
-      <NetworkStatusBanner />
-      {/* Overlay, not a route: deep links keep resolving underneath the lock. */}
-      <BiometricGate />
-      <PushBridge />
+      <BiometricGate>
+        <Stack screenOptions={{ headerShown: false }} />
+        <NetworkStatusBanner />
+        <PushBridge />
+      </BiometricGate>
       <QueryRuntimeBridge />
       <MonitoringRouteBridge />
       <StatusBar style={isDark ? 'light' : 'dark'} />
@@ -220,7 +243,9 @@ export default function RootLayout() {
   }, [fontError]);
 
   if (fontError) {
-    return <StartupFailure message="The app fonts could not be loaded. Restart to try the bundled assets again." />;
+    return (
+      <StartupFailure message="The app fonts could not be loaded. Restart to try the bundled assets again." />
+    );
   }
   if (!fontsLoaded) return null;
 

@@ -3,8 +3,9 @@
  * lock-state machine BiometricGate drives.
  *
  * This is a PRIVACY SCREEN, not a security boundary: the Clerk session is the
- * real gate on data. Everything here therefore fails OPEN — a tradie with a
- * broken sensor or no enrolment must never be locked out of their quotes.
+ * real gate on data. Known unavailable hardware or no enrolment leaves the
+ * optional lock off. An unreadable preference remains unknown in the UI,
+ * which offers retry/sign-out instead of briefly exposing customer content.
  * The flag lives in the keychain like the session token (see session.ts);
  * web degrades to "off" rather than crashing the bundler.
  */
@@ -78,7 +79,9 @@ export function lockReducer(state: LockState, event: LockEvent): LockState {
       return initialLockState;
     case 'backgrounded':
       // Only an unlocked session earns the grace window; locked stays locked.
-      return state.status === 'unlocked' ? { ...state, backgroundedAt: event.at } : state;
+      return state.status === 'unlocked' && state.backgroundedAt === null
+        ? { ...state, backgroundedAt: event.at }
+        : state;
     case 'foregrounded': {
       if (state.status !== 'unlocked' || state.backgroundedAt === null) return state;
       const away = event.at - state.backgroundedAt;

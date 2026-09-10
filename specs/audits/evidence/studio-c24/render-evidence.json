@@ -1,0 +1,56 @@
+{
+  "networkCalls": 0,
+  "ownerAuth": "isolated fixture",
+  "renderer": "actual Next ImageResponse plus bundled fonts and approved gallery",
+  "composer": "actual mobile createStudioPdf with pdf-lib 1.17.1",
+  "deviceProof": false,
+  "pages": [
+    {
+      "index": 1,
+      "kind": "stat",
+      "file": "slide-1-stat.png",
+      "width": 1080,
+      "height": 1350,
+      "photo": "/studio/photos/hero-main.png",
+      "sha256": "7caa04a3b37ff7fe60e7cbd4dcffe1b2f8433ee4bcf7a5dae9c399ded4212bb6"
+    },
+    {
+      "index": 2,
+      "kind": "list",
+      "file": "slide-2-list.png",
+      "width": 1080,
+      "height": 1350,
+      "photo": "/studio/photos/tools-flatlay.png",
+      "sha256": "e364a900583fd30cb9cc356b1ac962886e34e3a0dc629443deb8298ace67e074"
+    },
+    {
+      "index": 3,
+      "kind": "steps",
+      "file": "slide-3-steps.png",
+      "width": 1080,
+      "height": 1350,
+      "photo": null,
+      "sha256": "7a9a48a2d195569b2a8be2cfe05944dfc224d31a760218e79da1e894ccb0ade9"
+    },
+    {
+      "index": 4,
+      "kind": "quote",
+      "file": "slide-4-quote.png",
+      "width": 1080,
+      "height": 1350,
+      "photo": "/studio/photos/sparky-yellow.png",
+      "sha256": "4ddf9d9b0bc8e235358ec99118b36117f0b49dc5264698d690efbd74783ddfbe"
+    },
+    {
+      "index": 5,
+      "kind": "cta",
+      "file": "slide-5-cta.png",
+      "width": 1080,
+      "height": 1350,
+      "photo": "/studio/photos/team-crew.png",
+      "sha256": "d2c9c526cfd487de1d50ead99da794ec4681920238d3c148ae50e16eb0e6f731"
+    }
+  ],
+  "pdfBytes": 2103301,
+  "pdfSha256": "42b07b3fe3b7dedab93d4f3586b0425936df40bf35f7cb4c7e50eea122c79713"
+}

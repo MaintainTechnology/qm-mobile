@@ -2,8 +2,8 @@
  * Roofing measure — request/response shapes + pure helpers (spec web-parity F1).
  *
  * Ported from the web tool at quotemate-automation/app/dashboard/roofing/measure/page.tsx
- * and lib/roofing/{request-schema,types,selection}.ts. No maps/3D/street-view/solar-detach
- * here (non-goals) — just the measure → include/exclude → save flow's data shapes.
+ * and lib/roofing/{request-schema,types,selection}.ts. These shapes support native
+ * measurement, building selection, saved imagery and owned correction workflows.
  *
  * Response schemas are loose (H2): the web payload carries far more (polygon geometry,
  * Geoscape attributes, PropRadar context...) than this screen renders.
@@ -189,6 +189,7 @@ export type RoofAddress = { address: string; postcode: string; state: AuState };
 export type MeasureAllRequest = {
   address: RoofAddress;
   inputs: { material: string; pitch: string; intent: string; building_year_built: number | null };
+  perBuilding?: Record<string, Partial<MeasureAllRequest['inputs']>>;
 };
 
 export type SaveRoofRequest = {
@@ -197,6 +198,8 @@ export type SaveRoofRequest = {
   provider: string;
   quote: unknown;
   included_indices: number[];
+  customer_name?: string | null;
+  customer_phone?: string | null;
 };
 
 export type SaveAsQuoteRequest = {
@@ -222,7 +225,14 @@ export function sameRoofPricingAuthority(
 }
 
 export function roofMeasureFingerprint(request: MeasureAllRequest): string {
-  return JSON.stringify(request);
+  // Schema hydration may reorder keys. The same retained run must remain current
+  // after reopening its encrypted working copy.
+  return JSON.stringify(request, (_key, value: unknown) => {
+    if (value && typeof value === 'object' && !Array.isArray(value)) {
+      return Object.fromEntries(Object.entries(value).sort(([left], [right]) => left.localeCompare(right)));
+    }
+    return value;
+  });
 }
 
 export function acceptsRoofMeasureRun(args: {

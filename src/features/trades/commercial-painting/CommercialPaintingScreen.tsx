@@ -13,8 +13,11 @@
  * WebOnlyCard at the bottom links there.
  */
 import { useQueryClient } from '@tanstack/react-query';
-import { useEffect, useReducer, useRef, useState } from 'react';
-import { Pressable, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '@clerk/expo';
+import { usePreventRemove } from '@react-navigation/native';
+import { useRouter } from 'expo-router';
+import { useEffect, useMemo, useReducer, useRef, useState } from 'react';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Field, GhostButton, PrimaryCta } from '@/features/auth/ui';
 import {
@@ -26,6 +29,7 @@ import {
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
+import { useTenantMe } from '@/lib/tenant';
 
 import {
   buildCompleteBody,
@@ -35,8 +39,6 @@ import {
   COMMERCIAL_PAINT_DOCUMENT_POLICY,
   DOC_TYPES,
   initialPipeline,
-  loadPersistedRunId,
-  persistRunId,
   pipelineReducer,
   putSignedFile,
   runKey,
@@ -47,7 +49,6 @@ import {
   useRemoveUpload,
   useRun,
   useRuns,
-  useSaveQuote,
   useSetDocType,
   useSignUploads,
   zipUploads,
@@ -55,13 +56,19 @@ import {
   type PaintPricingBlock,
   type PricedBom,
   type RunListItem,
-  type SavedQuote,
   type TakeoffItem,
   type UploadRow,
 } from './api';
 import { WebOnlyCard } from '../hub/SectionsContent';
+import { PaintScopeSchema, paintInputKey, type PaintPass, type PaintScope } from './pricing-contract';
+import { createPaintRunResume } from './run-resume';
+import { usePaintInputs } from './use-paint-inputs';
+import { usePaintSave } from './use-paint-save';
+import { PaintRetryInputError, preparePaintSaveRetryInput } from './save-receipt';
+import { paintEditMatchesDisplay } from './edit-review';
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../ui';
 import {
+  canonicalPaintTimestamp,
   isCurrentPaintPricingAttempt,
   isPaintPricingProofUnavailable,
   PAINT_PRICING_PROOF_MESSAGE,
@@ -97,17 +104,37 @@ function fileMb(bytes: number | null | undefined): string | null {
 }
 
 export function CommercialPaintingScreen() {
+  const { userId, sessionId } = useAuth();
+  const tenant = useTenantMe();
+  const parsed = PaintScopeSchema.safeParse({ userId, tenantId: tenant.data?.tenant.id });
+  if (tenant.isError) return <Notice tone="danger" label="Could not load your painting account" body={apiErrorMessage(tenant.error)} onRetry={() => void tenant.refetch()} />;
+  if (!parsed.success) return <Notice tone="accent" label="Loading your painting account…" />;
+  return <CommercialPaintingWorkspace key={`${userId}:${sessionId}:${parsed.data.tenantId}`} scope={parsed.data} />;
+}
+
+// Full correction/concurrency and device acceptance remain release dependencies.
+const NATIVE_PAINT_SAVE_RELEASE_READY = false;
+export function CommercialPaintingWorkspace({ scope }: { scope: PaintScope }) {
   const { colors } = useTheme();
+  const router = useRouter();
   const queryClient = useQueryClient();
 
   const [runId, setRunId] = useState<string | null>(null);
   const [pipeline, dispatch] = useReducer(pipelineReducer, initialPipeline);
   const [picked, setPicked] = useState<PickedFile[]>([]);
-  const [jobName, setJobName] = useState('');
-  const [siteAddress, setSiteAddress] = useState('');
   const [note, setNote] = useState<string | null>(null);
   const [documentNote, setDocumentNote] = useState<string | null>(null);
-  const [savedQuote, setSavedQuote] = useState<SavedQuote | null>(null);
+  const saving = usePaintSave(scope);
+  const inputs = usePaintInputs(scope, runId);
+  const resume = useMemo(() => createPaintRunResume(scope), [scope.userId, scope.tenantId]); // eslint-disable-line react-hooks/exhaustive-deps
+  const [resumeLoaded, setResumeLoaded] = useState(false);
+  const [resumeError, setResumeError] = useState<unknown>(null);
+  const [resumeRetry, setResumeRetry] = useState(0);
+  const [switching, setSwitching] = useState(false);
+  const [retryPreparing, setRetryPreparing] = useState(false);
+  const active = useRef(0);
+  const mutationLock = useRef(false);
+  const [review, setReview] = useState<{ pass: PaintPass; revision: string; bom: PricedBom; labour: string; basis: 'tenant' | 'override' } | null>(null);
   const [pricingBlock, setPricingBlock] = useState<PaintPricingBlock | null>(null);
   // A stored BOM is a preview, not proof that today's tenant rates and this
   // takeoff revision produced it. Every mount/run starts fail-closed.
@@ -117,23 +144,29 @@ export function CommercialPaintingScreen() {
   const currentExtractionIdRef = useRef<string | null>(null);
   const documentPickerOpenRef = useRef(false);
 
-  const sign = useSignUploads();
-  const complete = useCompleteUploads();
-  const setDocType = useSetDocType();
-  const removeUpload = useRemoveUpload();
-  const extract = useExtract();
-  const price = usePrice();
-  const saveQuote = useSaveQuote();
-  const runQuery = useRun(runId);
-  const runsQuery = useRuns();
+  const sign = useSignUploads(scope);
+  const complete = useCompleteUploads(scope);
+  const setDocType = useSetDocType(scope);
+  const removeUpload = useRemoveUpload(scope);
+  const extract = useExtract(scope);
+  const price = usePrice(scope);
+  const runQuery = useRun(runId, scope);
+  const runsQuery = useRuns(scope);
+  useEffect(() => { active.current += 1; return () => { active.current += 1; }; }, []);
+  usePreventRemove(inputs.loaded && !inputs.stored, () => Alert.alert('Keep this working copy open', 'Your latest painting details have not been stored yet. Retry storage before leaving.'));
 
   // Resume: the persisted run id survives an app kill; the run query then
   // brings back the server's state and RESUME lands the machine on it.
   useEffect(() => {
-    void loadPersistedRunId().then(id => {
-      if (id) setRunId(id);
-    });
-  }, []);
+    if (!saving.loaded || resumeLoaded) return;
+    let alive = true;
+    void resume.load().then(id => {
+      if (!alive) return;
+      setRunId(saving.receipt?.pass.paintRunId ?? id);
+      setResumeLoaded(true); setResumeError(null);
+    }).catch(error => { if (alive) setResumeError(error); });
+    return () => { alive = false; };
+  }, [saving.loaded, saving.receipt?.pass.paintRunId, resumeLoaded, resume, resumeRetry]);
 
   const serverStatus = runQuery.data?.run.status ?? null;
   useEffect(() => {
@@ -144,30 +177,46 @@ export function CommercialPaintingScreen() {
   }, [runId, serverStatus, extract.isPending]);
 
   const runRow = runQuery.data?.run ?? null;
-  useEffect(() => {
-    if (!runRow) return;
-    setJobName(prev => prev || (runRow.job_name ?? ''));
-    setSiteAddress(prev => prev || (runRow.site_address ?? ''));
-  }, [runRow]);
+  const jobName = runId ? runRow?.job_name ?? '' : inputs.value.jobName;
+  const siteAddress = runId ? runRow?.site_address ?? '' : inputs.value.siteAddress;
 
   const uploads = runQuery.data?.uploads ?? [];
   const extraction = runQuery.data?.extraction ?? null;
+  const editSnapshot = runQuery.data?.edit_snapshot ?? null;
+  const observedRevision = editSnapshot && !editSnapshot.released && runQuery.data?.edit_review_state === 'matched' &&
+    paintEditMatchesDisplay(editSnapshot, runRow, extraction) ? editSnapshot.revision : null;
   currentRunIdRef.current = runId;
   currentExtractionIdRef.current = extraction?.id ?? null;
   const corrected = extraction?.corrected_items ?? [];
   const items: TakeoffItem[] = corrected.length > 0 ? corrected : (extraction?.items ?? []);
   const flags = extraction?.sheets_used?.flags ?? [];
-  const bom = extraction?.priced_bom ?? null;
+  // Derive authority during render. Passive cleanup cannot prevent one render
+  // from pairing a remote correction with the previous review's prices/badge.
+  const currentReview = review && pricingVerified && review.revision === observedRevision && review.pass.paintRunId === runId &&
+    review.pass.extractionId === extraction?.id && review.pass.pricingProof === extraction.pricing_review?.pricingProof &&
+    review.pass.pricedAt === extraction.pricing_review?.pricedAt && typeof extraction.priced_at === 'string' &&
+    canonicalPaintTimestamp(extraction.priced_at) === review.pass.pricedAt && review.labour === inputs.value.labour.trim() &&
+    paintInputKey(review.bom) === paintInputKey(extraction.priced_bom) ? review : null;
+  const bom = observedRevision ? currentReview?.bom ?? extraction?.priced_bom ?? null : null;
   const hasPlanSet = uploads.some(u => u.doc_type === 'plan_set');
 
   const uploadBusy =
     pipeline.step === 'signing' || pipeline.step === 'uploading' || pipeline.step === 'completing';
   const extracting = pipeline.step === 'extracting' || serverStatus === 'extracting';
   const docBusy = setDocType.isPending || removeUpload.isPending;
+  const mutationBlocked = !saving.loaded || saving.busy || !!saving.error || !!saving.receipt || !resumeLoaded || !!resumeError || !inputs.stored || switching || runQuery.isError;
+  const contextBusy = uploadBusy || extracting || docBusy || price.isPending;
+  const canEditInputs = inputs.loaded && saving.loaded && !saving.busy && !saving.receipt && resumeLoaded && !contextBusy && !switching;
+  const canRestoreSaveInputs = inputs.loaded && saving.loaded && !!saving.receipt && !saving.receipt.quoteId && !saving.saved &&
+    saving.receipt.pass.paintRunId === runId && resumeLoaded && !resumeError && !saving.busy && !retryPreparing && !contextBusy && !switching;
+  const labourText = inputs.value.labour.trim();
+  const labourRate = labourText === '' ? undefined : Number(labourText);
+  const labourValid = labourText === '' || (/^\d+(\.\d{1,2})?$/.test(labourText) && Number.isFinite(labourRate) && labourRate! > 0 && labourRate! <= 1000);
 
   function resetPricingProof() {
     pricingSequenceRef.current += 1;
     setPricingVerified(false);
+    setReview(null);
     setPricingBlock(null);
   }
 
@@ -175,8 +224,15 @@ export function CommercialPaintingScreen() {
     // Covers persisted-run resume, remote extraction replacement and remount.
     pricingSequenceRef.current += 1;
     setPricingVerified(false);
+    setReview(null);
     setPricingBlock(null);
-  }, [runId, extraction?.id]);
+  }, [runId, extraction?.id, inputs.value.labour, observedRevision]);
+
+  useEffect(() => {
+    if (review && !currentReview) {
+      setPricingVerified(false); setReview(null);
+    }
+  }, [review, currentReview]);
 
   function refreshRun(id: string) {
     void queryClient.invalidateQueries({ queryKey: [...runKey(id)] });
@@ -184,7 +240,8 @@ export function CommercialPaintingScreen() {
   }
 
   async function pickDocs() {
-    if (documentPickerOpenRef.current) return;
+    if (documentPickerOpenRef.current || mutationBlocked || contextBusy) return;
+    const epoch = active.current;
     const remaining = COMMERCIAL_PAINT_DOCUMENT_POLICY.maxFiles - picked.length;
     if (remaining <= 0) {
       setDocumentNote(null);
@@ -199,6 +256,7 @@ export function CommercialPaintingScreen() {
         ...COMMERCIAL_PAINT_DOCUMENT_POLICY,
         maxFiles: remaining,
       });
+      if (epoch !== active.current) return;
       if (result.kind === 'cancelled') return;
       if (result.kind === 'denied' || result.kind === 'failed') {
         setDocumentNote(null);
@@ -227,7 +285,9 @@ export function CommercialPaintingScreen() {
   }
 
   async function uploadAll() {
-    if (picked.length === 0 || uploadBusy) return;
+    if (picked.length === 0 || mutationBlocked || contextBusy || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
     resetPricingProof();
     setNote(null);
     setDocumentNote(null);
@@ -236,43 +296,55 @@ export function CommercialPaintingScreen() {
     let attemptRunId = runId;
     try {
       const signed = await sign.mutateAsync(buildSignBody(picked, { jobName, siteAddress, runId }));
+      if (epoch !== active.current) return;
+      if (runId && signed.paintRunId !== runId) throw new Error('Upload preparation returned a different painting run. Refresh before continuing.');
       attemptRunId = signed.paintRunId;
+      await resume.save(signed.paintRunId);
+      if (epoch !== active.current) return;
       setRunId(signed.paintRunId);
-      void persistRunId(signed.paintRunId);
       dispatch({ type: 'SIGNED', runId: signed.paintRunId });
 
       stage = 'transfer';
       const pairs = zipUploads(picked, signed.uploads);
       for (const pair of pairs) {
         await putSignedFile(pair.target.signedUrl, pair.file);
+        if (epoch !== active.current) return;
         dispatch({ type: 'FILE_PUT_OK' });
       }
 
       stage = 'complete';
-      await complete.mutateAsync(buildCompleteBody(signed.paintRunId, pairs));
+      const completed = await complete.mutateAsync(buildCompleteBody(signed.paintRunId, pairs));
+      if (epoch !== active.current) return;
+      if (completed.paintRunId !== signed.paintRunId) throw new Error('Upload completion returned a different painting run. Refresh before continuing.');
       dispatch({ type: 'COMPLETED' });
       setPicked([]);
       refreshRun(signed.paintRunId);
     } catch (error) {
+      if (epoch !== active.current) return;
       // Files and fields are kept. Retry requests fresh signed targets and
       // restarts the transfer; this pipeline never claims byte-level resume.
       dispatch({ type: 'FAILED' });
       const canReconcile = stage === 'complete' && attemptRunId !== null;
       if (canReconcile && attemptRunId) refreshRun(attemptRunId);
       setNote(uploadFailureNotice(error, 'painting document', { canReconcile }).message);
+    } finally {
+      mutationLock.current = false;
     }
   }
 
   async function runTakeoff() {
-    if (!runId || extracting || extract.isPending) return;
+    if (!runId || mutationBlocked || contextBusy || extract.isPending || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
     resetPricingProof();
     setNote(null);
-    setSavedQuote(null);
     dispatch({ type: 'EXTRACT_START', runId });
     try {
       await extract.mutateAsync({ paintRunId: runId });
+      if (epoch !== active.current) return;
       dispatch({ type: 'EXTRACTED' });
     } catch (error) {
+      if (epoch !== active.current) return;
       // The takeoff may still be running server-side (a dropped connection
       // doesn't stop it) — the run poll decides the real outcome.
       setNote(
@@ -282,13 +354,16 @@ export function CommercialPaintingScreen() {
         ),
       );
     } finally {
-      refreshRun(runId);
+      if (epoch === active.current) refreshRun(runId);
+      mutationLock.current = false;
     }
   }
 
   async function priceTakeoff() {
     const extractionId = extraction?.id;
-    if (!runId || !extractionId || price.isPending) return;
+    if (!runId || !extractionId || !observedRevision || mutationBlocked || contextBusy || !labourValid || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
     setNote(null);
     setPricingBlock(null);
     setPricingVerified(false);
@@ -298,10 +373,14 @@ export function CommercialPaintingScreen() {
       extractionId,
     };
     const verification = await repriceAndProveFreshBom(
-      () => price.mutateAsync({ paintRunId: runId, extractionId }),
+      () => price.mutateAsync({ paintRunId: runId, extractionId, expectedRevision: observedRevision, ...(labourRate === undefined ? {} : { labourRatePerHr: labourRate }) }),
       () => runQuery.refetch(),
       extractionId,
+      labourRate,
+      observedRevision,
     );
+    mutationLock.current = false;
+    if (epoch !== active.current) return;
     void queryClient.invalidateQueries({ queryKey: [...RUNS_KEY] });
     if (
       !isCurrentPaintPricingAttempt(attempt, {
@@ -314,6 +393,11 @@ export function CommercialPaintingScreen() {
     }
 
     if (verification.previewRefreshed) dispatch({ type: 'PRICED' });
+    if (verification.ok) {
+      setReview({ pass: { paintRunId: runId, extractionId, ...verification.review }, revision: observedRevision, bom: verification.bom, labour: labourText, basis: verification.labourBasis.mode });
+      setPricingVerified(true);
+      return;
+    }
     const block = classifyPaintPricingBlock(verification.error);
     setPricingBlock(block);
     if (isPaintPricingProofUnavailable(verification.error)) {
@@ -329,81 +413,91 @@ export function CommercialPaintingScreen() {
   }
 
   async function saveAsQuote() {
-    const extractionId = extraction?.id;
-    if (
-      !runId ||
-      !extractionId ||
-      saveQuote.isPending ||
-      !pricingVerified ||
-      !canSavePaintQuote(bom, pricingBlock)
-    )
-      return;
+    if (!NATIVE_PAINT_SAVE_RELEASE_READY || mutationBlocked || contextBusy || !currentReview || !canSavePaintQuote(bom, pricingBlock)) return;
+    const epoch = active.current;
     setNote(null);
     try {
-      const saved = await saveQuote.mutateAsync({ paintRunId: runId, extractionId });
-      setSavedQuote(saved);
+      await saving.save({ ...currentReview.pass, customerName: inputs.value.customerName, customerPhone: inputs.value.customerPhone });
+      if (epoch !== active.current) return;
       dispatch({ type: 'SAVED' });
-      // A saved run no longer needs auto-resume on next launch.
-      void persistRunId(null);
-      refreshRun(runId);
+      refreshRun(currentReview.pass.paintRunId);
     } catch (error) {
-      setNote(apiErrorMessage(error, 'Saving the quote failed. The pricing is kept — try again.'));
+      if (epoch === active.current) setNote(apiErrorMessage(error, 'The Save outcome is uncertain. Check its status before another calculation.'));
+    }
+  }
+
+  async function retryEarlierSave() {
+    const receipt = saving.receipt;
+    if (!receipt || !canRestoreSaveInputs || !inputs.stored || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
+    setRetryPreparing(true); setNote(null);
+    try {
+      const original = await preparePaintSaveRetryInput(receipt, {
+        customerName: inputs.value.customerName, customerPhone: inputs.value.customerPhone,
+      });
+      if (epoch !== active.current) return;
+      // Explicit continuation of an existing receipt. It never creates a new
+      // pricing pass or bypasses the separate new-Save release gate.
+      await saving.save(original, 'retry');
+      if (epoch !== active.current) return;
+      dispatch({ type: 'SAVED' }); refreshRun(receipt.pass.paintRunId);
+    } catch (error) {
+      if (epoch === active.current) setNote(error instanceof PaintRetryInputError ? error.message :
+        apiErrorMessage(error, 'The earlier Save is still unconfirmed. Check its status before continuing.'));
+    } finally {
+      mutationLock.current = false;
+      if (epoch === active.current) setRetryPreparing(false);
     }
   }
 
   function changeDocType(id: string, docType: PaintDocType) {
-    if (!runId) return;
+    if (!runId || mutationBlocked || contextBusy || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
     resetPricingProof();
     setDocType.mutate(
       { id, doc_type: docType },
       {
         onError: error =>
-          setNote(apiErrorMessage(error, 'Could not update the document type. Try again.')),
-        onSettled: () => refreshRun(runId),
+          epoch === active.current && setNote(apiErrorMessage(error, 'Could not update the document type. Try again.')),
+        onSettled: () => { mutationLock.current = false; if (epoch === active.current) refreshRun(runId); },
       },
     );
   }
 
   function removeDoc(id: string) {
-    if (!runId) return;
+    if (!runId || mutationBlocked || contextBusy || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
     resetPricingProof();
     removeUpload.mutate(
       { id },
       {
         onError: error =>
-          setNote(apiErrorMessage(error, 'Could not remove that document. Try again.')),
-        onSettled: () => refreshRun(runId),
+          epoch === active.current && setNote(apiErrorMessage(error, 'Could not remove that document. Try again.')),
+        onSettled: () => { mutationLock.current = false; if (epoch === active.current) refreshRun(runId); },
       },
     );
   }
 
-  function openRun(id: string) {
-    if (id === runId) return;
+  async function openRun(id: string | null) {
+    if (id === runId || mutationBlocked || contextBusy || mutationLock.current) return;
+    mutationLock.current = true;
+    const epoch = active.current;
+    setSwitching(true);
+    try {
+      await resume.save(id);
+      if (epoch !== active.current) return;
     resetPricingProof();
     dispatch({ type: 'RESET' });
     setRunId(id);
-    void persistRunId(id);
     setPicked([]);
-    setJobName('');
-    setSiteAddress('');
     setNote(null);
-    setSavedQuote(null);
     setPricingBlock(null);
     setPricingVerified(false);
-  }
-
-  function startNewRun() {
-    resetPricingProof();
-    dispatch({ type: 'RESET' });
-    setRunId(null);
-    void persistRunId(null);
-    setPicked([]);
-    setJobName('');
-    setSiteAddress('');
-    setNote(null);
-    setSavedQuote(null);
-    setPricingBlock(null);
-    setPricingVerified(false);
+    } catch (error) { if (epoch === active.current) setNote(apiErrorMessage(error, 'Could not store your run selection. Your current run is kept.')); }
+    finally { mutationLock.current = false; if (epoch === active.current) setSwitching(false); }
   }
 
   const uploadLabel =
@@ -420,6 +514,28 @@ export function CommercialPaintingScreen() {
   return (
     <View style={{ gap: spacing.xl }}>
       {note ? <Notice tone="danger" label="Something needs attention" body={note} /> : null}
+      {!saving.loaded ? <Notice tone="accent" label="Checking earlier quote recovery…" /> : null}
+      {saving.error ? <Notice tone="danger" label="Quote recovery needs attention" body={apiErrorMessage(saving.error)} onRetry={() => void saving.refresh()} /> : null}
+      {resumeError ? <Notice tone="danger" label="Could not restore your run" body="Your saved run selection is kept. Retry before starting another run." onRetry={() => setResumeRetry(n => n + 1)} /> : null}
+      {inputs.error ? <Notice tone="danger" label="Working copy needs attention" body="Your latest details are still on screen. Retry secure storage before leaving or continuing." onRetry={inputs.retry} /> : null}
+      {inputs.loaded && !inputs.stored && !inputs.error ? <Notice tone="accent" label="Storing your working copy…" /> : null}
+      {saving.receipt ? <Card style={{ gap: spacing.md }}>
+        <Notice tone={saving.saved ? 'accent' : 'warn'} label={saving.saved ? 'Quote saved quietly' : 'Check an earlier Save'} body={saving.saved ? 'Your quote is in the owned quote queue. No customer message was sent.' : 'The earlier Save may have completed. Checking reads its status without submitting it again. New calculations stay locked until its outcome is verified.'} />
+        <GhostButton label="Check Save status" loading={saving.busy} disabled={retryPreparing} onPress={() => { if (!mutationLock.current) void saving.refresh(); }} />
+        {!saving.saved && !saving.receipt.quoteId ? <>
+          <Text style={[styles.body, { color: colors.textSec }]}>To retry the earlier Save, restore its original customer details. A local working copy lasts seven days; you can re-enter the details here after it expires. The retry uses the original reviewed pricing and does not send a customer message.</Text>
+          <Field label="Original customer name" value={inputs.value.customerName} maxLength={120} editable={canRestoreSaveInputs}
+            onChangeText={customerName => { if (canRestoreSaveInputs && !mutationLock.current) inputs.update({ customerName }); }} />
+          <Field label="Original customer phone" value={inputs.value.customerPhone} maxLength={40} keyboardType="phone-pad" editable={canRestoreSaveInputs}
+            onChangeText={customerPhone => { if (canRestoreSaveInputs && !mutationLock.current) inputs.update({ customerPhone }); }} />
+          <GhostButton label="Retry earlier Save" loading={saving.busy || retryPreparing} disabled={!canRestoreSaveInputs || !inputs.stored}
+            onPress={() => void retryEarlierSave()} />
+        </> : null}
+        {saving.saved ? <>
+          <GhostButton label="Open saved quote" onPress={() => router.push({ pathname: '/(tabs)/quotes', params: { quoteId: saving.saved!.quoteId } })} />
+          <GhostButton label="Acknowledge saved quote" loading={saving.busy} onPress={() => { void saving.acknowledge(saving.saved!.quoteId).catch(() => {}); }} />
+        </> : null}
+      </Card> : null}
 
       {runQuery.isError && runId ? (
         <Notice
@@ -429,6 +545,9 @@ export function CommercialPaintingScreen() {
           onRetry={() => void runQuery.refetch()}
         />
       ) : null}
+      {runId && runQuery.data && !observedRevision ? <Notice tone="warn" label={editSnapshot?.released ? 'This painting run is released' : 'Refresh the takeoff review'}
+        body={editSnapshot?.released ? 'This released run is immutable. Open its saved quote to review it.' : 'The saved takeoff and its correction version could not be matched. Prices are hidden until a fresh read confirms the exact details shown here.'}
+        onRetry={() => void runQuery.refetch()} /> : null}
 
       {serverStatus === 'failed' && !extracting ? (
         <Notice
@@ -450,8 +569,9 @@ export function CommercialPaintingScreen() {
           measurement takeoff, services layouts, site photos. Each file is auto-classified; correct
           it below if we guessed wrong.
         </Text>
-        <Field label="Job name" value={jobName} onChangeText={setJobName} height={52} />
-        <Field label="Site address" value={siteAddress} onChangeText={setSiteAddress} height={52} />
+        <Field label="Job name" value={jobName} onChangeText={jobName => inputs.update({ jobName })} editable={!runId && canEditInputs} maxLength={200} height={52} />
+        <Field label="Site address" value={siteAddress} onChangeText={siteAddress => inputs.update({ siteAddress })} editable={!runId && canEditInputs} maxLength={300} height={52} />
+        {runId ? <Text style={[styles.hintLine, { color: colors.textDim }]}>Saved job details are read from the server. Use the web editor to change them.</Text> : null}
 
         {picked.map((file, i) => (
           <View key={`${file.uri}-${i}`} style={styles.fileRow}>
@@ -464,7 +584,7 @@ export function CommercialPaintingScreen() {
             <Pressable
               accessibilityRole="button"
               accessibilityLabel={`Remove ${file.name}`}
-              disabled={uploadBusy}
+              disabled={mutationBlocked || contextBusy}
               onPress={() => {
                 setPicked(prev => prev.filter(f => f !== file));
                 setDocumentNote(null);
@@ -479,7 +599,7 @@ export function CommercialPaintingScreen() {
 
         <Pressable
           accessibilityRole="button"
-          disabled={uploadBusy}
+          disabled={mutationBlocked || contextBusy}
           onPress={() => void pickDocs()}
           style={[styles.borderedBtn, { borderColor: colors.ctlLine }, uploadBusy && styles.dimmed]}
         >
@@ -495,7 +615,7 @@ export function CommercialPaintingScreen() {
         ) : null}
 
         {picked.length > 0 ? (
-          <PrimaryCta label={uploadLabel} onPress={() => void uploadAll()} loading={uploadBusy} />
+          <PrimaryCta label={uploadLabel} onPress={() => void uploadAll()} loading={uploadBusy} disabled={mutationBlocked || contextBusy} />
         ) : null}
       </Card>
 
@@ -507,7 +627,7 @@ export function CommercialPaintingScreen() {
             <DocRow
               key={upload.id}
               upload={upload}
-              busy={docBusy || uploadBusy || extracting}
+              busy={mutationBlocked || contextBusy}
               onSetType={docType => changeDocType(upload.id, docType)}
               onRemove={() => removeDoc(upload.id)}
             />
@@ -542,7 +662,7 @@ export function CommercialPaintingScreen() {
             }
             onPress={() => void runTakeoff()}
             loading={extracting || extract.isPending}
-            disabled={!hasPlanSet || uploadBusy}
+            disabled={!hasPlanSet || mutationBlocked || contextBusy}
           />
         </Card>
       ) : null}
@@ -574,11 +694,13 @@ export function CommercialPaintingScreen() {
             Need to edit lines before pricing? Use the takeoff editor on the web — this screen
             prices the takeoff exactly as extracted.
           </Text>
+          <Field label="Labour rate per hour (optional)" value={inputs.value.labour} onChangeText={labour => { resetPricingProof(); inputs.update({ labour }); }} editable={canEditInputs} maxLength={16} height={52} />
+          <Text style={[styles.hintLine, { color: labourValid ? colors.textDim : colors.warningBright }]}>{labourValid ? 'Leave blank to use your current business rate. An override must be between $0.01 and $1,000.' : 'Enter a positive amount up to $1,000 with at most two decimal places.'}</Text>
           <PricingAction
             label={bom ? 'Re-price this takeoff' : 'Price this takeoff'}
             onPress={() => void priceTakeoff()}
             loading={price.isPending}
-            disabled={uploadBusy || extracting}
+            disabled={mutationBlocked || contextBusy || !labourValid || !observedRevision}
           />
         </Card>
       ) : null}
@@ -588,24 +710,22 @@ export function CommercialPaintingScreen() {
         <Card style={{ gap: spacing.md }}>
           <SectionLabel>04 · Priced summary</SectionLabel>
           <PricedSummary bom={bom} />
-          {pipeline.step === 'saved' && savedQuote ? (
-            <Notice
-              tone="accent"
-              label={savedQuote.alreadySaved ? 'Already saved' : 'Quote saved'}
-              body="It's in your quote queue — open the Quotes tab to send it or take a deposit."
-            />
-          ) : (
+          {currentReview ? <Notice tone="accent" label="Exact server pricing reviewed" body={`This review matches the saved takeoff and pricing generation ${currentReview.pass.pricedAt}. Labour uses ${currentReview.basis === 'override' ? 'your explicit override' : 'your business rate'}.`} /> : null}
+          <Field label="Customer name (optional)" value={inputs.value.customerName} onChangeText={customerName => inputs.update({ customerName })} editable={canEditInputs} maxLength={120} height={52} />
+          <Field label="Customer phone (optional)" value={inputs.value.customerPhone} onChangeText={customerPhone => inputs.update({ customerPhone })} editable={canEditInputs} maxLength={30} height={52} />
+          <Text style={[styles.hintLine, { color: colors.textDim }]}>Customer details and labour choices are encrypted working copies on this device for up to seven days.</Text>
             <PaintPricingGate
               bom={bom}
               block={pricingBlock}
-              busy={uploadBusy || extracting || price.isPending || saveQuote.isPending}
-              pricingVerified={pricingVerified}
+              busy={contextBusy || saving.busy}
+              pricingVerified={!!currentReview}
+              releaseReady={NATIVE_PAINT_SAVE_RELEASE_READY}
               onSave={() => void saveAsQuote()}
             />
-          )}
           <Pressable
             accessibilityRole="button"
-            onPress={startNewRun}
+            disabled={mutationBlocked || contextBusy}
+            onPress={() => void openRun(null)}
             style={styles.textBtn}
             hitSlop={8}
           >
@@ -642,7 +762,7 @@ export function CommercialPaintingScreen() {
               key={run.id}
               run={run}
               active={run.id === runId}
-              onPress={() => openRun(run.id)}
+              onPress={() => void openRun(run.id)}
             />
           ))
         )}
@@ -780,12 +900,14 @@ export function PaintPricingGate({
   block,
   busy,
   pricingVerified = false,
+  releaseReady = false,
   onSave,
 }: {
   bom: PricedBom | null;
   block: PaintPricingBlock | null;
   busy: boolean;
   pricingVerified?: boolean;
+  releaseReady?: boolean;
   onSave: () => void;
 }) {
   return (
@@ -812,12 +934,13 @@ export function PaintPricingGate({
           body="A successful re-price and server proof of the exact tenant rates and takeoff revision are required before Save can be enabled."
         />
       ) : null}
+      {!releaseReady ? <Notice tone="warn" label="Mobile Save is awaiting release checks" body="Reviewed pricing is available here. Saving new painting quotes stays unavailable until correction recovery and release acceptance are complete." /> : null}
       {bom ? (
         <PrimaryCta
           label="Save as quote"
           onPress={onSave}
           loading={busy}
-          disabled={busy || !pricingVerified || !canSavePaintQuote(bom, block)}
+          disabled={busy || !releaseReady || !pricingVerified || !canSavePaintQuote(bom, block)}
         />
       ) : null}
     </View>

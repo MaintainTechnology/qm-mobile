@@ -99,8 +99,8 @@ function finiteAmount(value: number | null | undefined): number | null {
 }
 
 /**
- * Build one tagged source before any filtering, counting or sorting. Jobs are additionally guarded
- * by the tenant's active trade list because their endpoint is independent from the tenant payload.
+ * Build one tagged source before filtering. Owned quotes retain inactive-trade and legacy history.
+ * New work is separately capability-gated; jobs retain their active-trade guard pending owned readers.
  */
 export function mergeQueueEntries(
   quotes: readonly QuoteRow[],
@@ -110,11 +110,10 @@ export function mergeQueueEntries(
   const permitted = new Set(
     permittedTrades.map(normalizeQueueTrade).filter((trade): trade is string => trade != null),
   );
-  const permits = (trade: string | null) => permitted.size === 0 || (trade && permitted.has(trade));
+  const permits = (trade: string | null) => trade != null && permitted.has(trade);
 
   const quoteEntries: QueueEntry[] = quotes.flatMap(quote => {
     const trade = normalizeQueueTrade(quote.trade);
-    if (!permits(trade)) return [];
     return [
       {
         kind: 'quote' as const,
@@ -216,7 +215,8 @@ function jobSearchFields(job: TradeJob): unknown[] {
 
 export function entryMatchesSearch(entry: QueueEntry, terms: readonly string[]): boolean {
   if (terms.length === 0) return true;
-  const fields = entry.kind === 'quote' ? quoteSearchFields(entry.quote) : jobSearchFields(entry.job);
+  const fields =
+    entry.kind === 'quote' ? quoteSearchFields(entry.quote) : jobSearchFields(entry.job);
   const haystack = normalizeSearchText(fields.filter(Boolean).join(' '));
   return terms.every(term => haystack.includes(normalizeSearchText(term)));
 }
@@ -243,11 +243,7 @@ function stableKeyTie(a: QueueEntry, b: QueueEntry): number {
 /** Missing timestamps/amounts always sink; deterministic keys eliminate source-order flicker. */
 export function compareQueueEntries(a: QueueEntry, b: QueueEntry, sort: QueueSort): number {
   if (sort === 'newest' || sort === 'oldest') {
-    const primary = comparePresentNumbers(
-      instantMs(a),
-      instantMs(b),
-      sort === 'newest' ? -1 : 1,
-    );
+    const primary = comparePresentNumbers(instantMs(a), instantMs(b), sort === 'newest' ? -1 : 1);
     return primary || stableKeyTie(a, b);
   }
 
@@ -336,7 +332,8 @@ export function queueCalendarDay(instant: string | null, timeZone: string): stri
     month: '2-digit',
     day: '2-digit',
   }).formatToParts(new Date(instant));
-  const part = (type: Intl.DateTimeFormatPartTypes) => parts.find(item => item.type === type)?.value;
+  const part = (type: Intl.DateTimeFormatPartTypes) =>
+    parts.find(item => item.type === type)?.value;
   const year = part('year');
   const month = part('month');
   const day = part('day');
@@ -372,9 +369,14 @@ export function queueBaseMatches(
   );
 }
 
-export function filterAndSortQueue(entries: readonly QueueEntry[], criteria: QueueCriteria): QueueEntry[] {
+export function filterAndSortQueue(
+  entries: readonly QueueEntry[],
+  criteria: QueueCriteria,
+): QueueEntry[] {
   return entries
-    .filter(entry => queueBaseMatches(entry, criteria) && entryMatchesStatus(entry, criteria.status))
+    .filter(
+      entry => queueBaseMatches(entry, criteria) && entryMatchesStatus(entry, criteria.status),
+    )
     .sort((a, b) => compareQueueEntries(a, b, criteria.sort));
 }
 
@@ -396,8 +398,10 @@ export function presentQueueTrades(
   entries: readonly QueueEntry[],
   permittedTrades: readonly string[],
 ): string[] {
-  const present = new Set(entries.map(entry => entry.trade).filter((trade): trade is string => !!trade));
-  return permittedTrades
+  const present = new Set(
+    entries.map(entry => entry.trade).filter((trade): trade is string => !!trade),
+  );
+  return [...permittedTrades, ...present]
     .map(normalizeQueueTrade)
     .filter((trade): trade is string => trade != null && present.has(trade))
     .filter((trade, index, all) => all.indexOf(trade) === index);

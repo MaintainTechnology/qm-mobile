@@ -90,9 +90,14 @@ export function analyticsWindow(weeks: number, now: Date): AnalyticsWindow {
  * parseable from/to and re-clamps weeks. Hand-encoded rather than
  * URLSearchParams because RN's implementation is not WHATWG-complete.
  */
-export function analyticsPath(weeks: number, now: Date): string {
+export function analyticsPath(
+  weeks: number,
+  now: Date,
+  selectedWindow?: AnalyticsWindow | null,
+): string {
   const w = clampWeeks(weeks);
-  const { from, to } = analyticsWindow(w, now);
+  if (selectedWindow === null) return `/api/tenant/analytics?weeks=${w}`;
+  const { from, to } = selectedWindow ?? analyticsWindow(w, now);
   return (
     `/api/tenant/analytics?weeks=${w}` +
     `&from=${encodeURIComponent(from.toISOString())}` +

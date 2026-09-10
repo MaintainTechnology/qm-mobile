@@ -51,6 +51,7 @@ export function WelcomeScreen() {
           label="Help & support"
           onPress={() => router.push('/support' as never)}
         />
+        <GhostButton label="Browse Help & guides" onPress={() => router.push('/sections/help' as never)} />
         <Text style={[styles.reassurance, { color: colors.textDim }]}>
           Your prices. Your approval. Every quote.
         </Text>

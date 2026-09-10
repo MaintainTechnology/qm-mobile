@@ -153,7 +153,29 @@ export const JOB_FIELDS: Record<string, JobFormSpec> = {
   ev_charger: {
     catalogueCategory: 'ev_charger',
     fields: [
-      { code: 'room', label: 'Where is the charger going?', type: 'text' },
+      {
+        code: 'vehicle',
+        label: 'What car is the charger for?',
+        type: 'select',
+        options: ['Tesla', 'BYD', 'another EV', 'not sure'],
+      },
+      {
+        code: 'charger_supply',
+        label: 'Who supplies the charger unit?',
+        type: 'select',
+        options: ['customer already has the charger', 'we supply the charger', 'not sure'],
+      },
+      {
+        code: 'room',
+        label: 'Where is the charger going (garage, carport, external wall)?',
+        type: 'text',
+      },
+      {
+        code: 'switchboard_distance',
+        label: 'Roughly how far is the switchboard from the charger spot?',
+        type: 'select',
+        options: ['under 5 m', '5–10 m', 'over 10 m', 'not sure'],
+      },
       {
         code: 'phase',
         label: 'Single phase or three phase?',
@@ -349,6 +371,27 @@ export const JOB_FIELDS: Record<string, JobFormSpec> = {
   // ── Fallback ────────────────────────────────────────────────────
   other: { fields: GENERIC, usuallyInspection: true },
 };
+
+/** Exact server contract: uncertain/customer-supplied EV units cannot be pinned. */
+export function allowsPinnedCatalogueProduct(
+  jobType: string,
+  answers: Record<string, string>,
+): boolean {
+  return jobType !== 'ev_charger' || answers.charger_supply === 'we supply the charger';
+}
+
+export function productAfterAnswerChange(
+  jobType: string,
+  fieldCode: string,
+  nextValue: string,
+  productId: string,
+): string {
+  return jobType === 'ev_charger' &&
+    fieldCode === 'charger_supply' &&
+    !allowsPinnedCatalogueProduct(jobType, { charger_supply: nextValue })
+    ? ''
+    : productId;
+}
 
 /** Field spec for a job type. Unknown job types fall back to the generic set. */
 export function fieldsForJobType(jobType: string | null | undefined): JobFormSpec {

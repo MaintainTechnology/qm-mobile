@@ -63,6 +63,19 @@ describe('lockReducer', () => {
     expect(state).toEqual({ status: 'unlocked', backgroundedAt: null });
   });
 
+  it('inactive followed by background measures grace from the first departure', () => {
+    expect(
+      run(
+        [
+          { type: 'backgrounded', at: 1_000 },
+          { type: 'backgrounded', at: 30_000 },
+          { type: 'foregrounded', at: 31_001 },
+        ],
+        unlocked,
+      ).status,
+    ).toBe('locked');
+  });
+
   it('a locked app earns no grace window from backgrounding', () => {
     const state = run([
       { type: 'backgrounded', at: 0 },

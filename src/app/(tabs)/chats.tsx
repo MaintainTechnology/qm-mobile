@@ -11,7 +11,7 @@ import { ChatsScreen } from '@/features/chats/ChatsScreen';
  */
 export default function ChatsRoute() {
   const router = useRouter();
-  const params = useLocalSearchParams<{ chatId?: string }>();
+  const params = useLocalSearchParams<{ chatId?: string; filter?: string }>();
   const [selectedId, setSelectedId] = useState<string | null>(params.chatId ?? null);
 
   useEffect(() => {
@@ -23,5 +23,12 @@ export default function ChatsRoute() {
     if (params.chatId) router.setParams({ chatId: undefined });
   }
 
-  return <ChatsScreen selectedId={selectedId} onSelect={setSelectedId} onBack={closeThread} />;
+  return (
+    <ChatsScreen
+      selectedId={selectedId}
+      onSelect={setSelectedId}
+      onBack={closeThread}
+      initialFilter={params.filter}
+    />
+  );
 }

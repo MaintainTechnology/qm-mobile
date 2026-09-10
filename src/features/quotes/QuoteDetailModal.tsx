@@ -4,9 +4,8 @@
  * straight off the wire, and the selected tier's line items (description/quantity/unit price) are
  * rendered verbatim, same field names the web dashboard reads (page.tsx `tierLineItems`, ~line
  * 9029) — no computed per-line total, since that needs the tier's own GST ratio, which is math
- * this app never does. Approve/Send wire to `POST /api/quote/[id]/{approve,send}` with an
- * optimistic status flip (see `./api`) so the action bar reflects the new status immediately
- * rather than waiting on the refetch.
+ * this app never does. Approve/Send wire to `POST /api/quote/[id]/{approve,send}` and refresh the
+ * canonical quote. A successful save or an unknown action result cannot invent a Sent status.
  *
  * One primary action per status (web `confirmSendCta` parity): a held-for-approval quote only
  * ever offers Approve, never a second Send button, since approving IS the send. A tap arms the
@@ -23,6 +22,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   ActivityIndicator,
+  Alert,
   KeyboardAvoidingView,
   Modal,
   Platform,
@@ -49,12 +49,15 @@ import { useApiQuery } from '@/lib/useApi';
 import { useTheme } from '@/lib/useTheme';
 
 import { TRADE_LABELS } from '../trades/hub/sections';
+import { QuoteWorkspace } from './QuoteWorkspace';
+import { quoteActivity } from './quote-activity';
+import { useOwnedQuote } from './owned-quote';
+import { Notice } from '@/features/trades/ui';
 import {
   actionErrorMessage,
-  quoteActionNotice,
+  deliveryReceiptNotice,
   sendQuoteVars,
-  useApproveQuote,
-  useSendQuote,
+  useQuoteDelivery,
   useSetDisplayMode,
   type DisplayMode,
   type SendChannel,
@@ -66,7 +69,10 @@ import {
   formatJobType,
   isResend,
   quoteAge,
-  quoteBadge,
+  quoteBadges,
+  quoteDeliveryChannels,
+  quotePaymentLink,
+  inspectionExplanation,
   type QuoteTone,
 } from './status';
 
@@ -322,19 +328,13 @@ function DetailsBlock({ quote }: { quote: QuoteRow }) {
   );
 }
 
-/** Web Activity timeline, synthesised from status fields exactly as the web does
- *  (page.tsx:9456-9464): drafted → sent → deposit paid / accepted. */
+/** Persisted observations keep delivery and payment states separate. */
 function ActivityBlock({ quote }: { quote: QuoteRow }) {
   const { colors } = useTheme();
-  const drafted = draftedAt(quote.created_at);
-  const status = (quote.status ?? 'draft').toLowerCase();
-  const wasSent = quote.deposit_paid === true || ['sent', 'accepted', 'paid'].includes(status);
-  const events: { label: string; when?: string }[] = [
-    { label: 'Drafted by QuoteMax', when: `${drafted.date} · ${drafted.time}` },
-  ];
-  if (wasSent) events.push({ label: 'Sent to customer' });
-  if (quote.deposit_paid) events.push({ label: 'Deposit paid' });
-  else if (status === 'accepted') events.push({ label: 'Accepted' });
+  const events = quoteActivity(quote).map(event => {
+    const when = event.at ? draftedAt(event.at) : null;
+    return { label: event.label, when: when ? `${when.date} · ${when.time}` : undefined };
+  });
 
   return (
     <View style={styles.section}>
@@ -363,12 +363,11 @@ function ActivityBlock({ quote }: { quote: QuoteRow }) {
  * hide for inspection-routed quotes, exactly as the web hides them; the web's
  * copy-to-clipboard deposit link becomes the native share sheet.
  */
-function LinksBlock({ quote }: { quote: QuoteRow }) {
+function LinksBlock({ quote, onOpenWorkspace }: { quote: QuoteRow; onOpenWorkspace: () => void }) {
   const { colors } = useTheme();
   const token = quote.share_token;
-  const inspection = quote.needs_inspection === true || quote.inspection_required === true;
   if (!token && !quote.measure_href) return null;
-  const depositPath = token ? `/r/${token}/${quote.selected_tier ?? 'better'}` : null;
+  const paymentLink = quotePaymentLink(quote);
   return (
     <View style={styles.section}>
       <Text style={[styles.sectionLabel, { color: colors.textDim }]}>QUICK LINKS</Text>
@@ -377,16 +376,11 @@ function LinksBlock({ quote }: { quote: QuoteRow }) {
         {quote.measure_href ? (
           <LinkOutButton label="Measurement results" path={quote.measure_href} />
         ) : null}
-        {token && !inspection ? (
-          <LinkOutButton label="View PDF · Edit" path={`/dashboard/quote/${token}`} />
-        ) : null}
-        {token && !inspection ? (
-          <LinkOutButton label="Download PDF" path={`/api/q/${token}/pdf`} />
-        ) : null}
-        {depositPath && !inspection ? (
+        <LinkOutButton label="Review, edit and PDF" onPress={onOpenWorkspace} />
+        {paymentLink ? (
           <LinkOutButton
-            label="Share deposit link"
-            onPress={() => void Share.share({ message: apiUrl(depositPath) })}
+            label={paymentLink.label}
+            onPress={() => void Share.share({ message: apiUrl(paymentLink.path) })}
           />
         ) : null}
       </View>
@@ -395,19 +389,31 @@ function LinksBlock({ quote }: { quote: QuoteRow }) {
 }
 
 export function QuoteDetailModal({
-  quote,
+  quote: listedQuote,
   onClose,
 }: {
   quote: QuoteRow | null;
   onClose: () => void;
 }) {
+  const owned = useOwnedQuote(listedQuote?.id ?? '');
+  const quote = useMemo(
+    () =>
+      listedQuote && owned.data?.quote.id === listedQuote.id
+        ? { ...listedQuote, ...owned.data.quote }
+        : listedQuote,
+    [listedQuote, owned.data],
+  );
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
   const reduceMotion = useReducedMotion();
   const scrollRef = useRef<ScrollView>(null);
+  const [workspace, setWorkspace] = useState(false);
   const [deliveryOffset, setDeliveryOffset] = useState(0);
-  const approve = useApproveQuote();
-  const send = useSendQuote();
+  const delivery = useQuoteDelivery(
+    listedQuote && owned.data?.quote.id === listedQuote.id
+      ? { quoteId: listedQuote.id, tenantId: owned.data.quote.tenant_id }
+      : null,
+  );
   /** The primary action needs an explicit second tap to fire (web `confirmSendCta` parity). */
   const [armed, setArmed] = useState(false);
   /** Web SendQuotePanel parity: SMS default; email attaches the PDF server-side. */
@@ -419,14 +425,23 @@ export function QuoteDetailModal({
   // A fresh mutation state per quote — reopening the sheet on a different row must not carry over
   // yesterday's error/success line, an armed confirm, or another customer's typed recipient.
   useEffect(() => {
-    approve.reset();
-    send.reset();
     setArmed(false);
     setChannel('sms');
     setPhone('');
     setEmail('');
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [quote?.id]);
+    setWorkspace(false);
+  }, [quote?.id, delivery.key]);
+  // A reviewed price, recipient or delivery change invalidates the armed tap.
+  useEffect(() => {
+    setArmed(false);
+  }, [
+    owned.data?.customer_release_revision,
+    quote?.customer_phone,
+    owned.data?.quote.customer_email,
+    phone,
+    email,
+    channel,
+  ]);
 
   // Auto-disarm the confirm step — a stray tap minutes later must not fire a stale action.
   useEffect(() => {
@@ -438,14 +453,16 @@ export function QuoteDetailModal({
   const tierLineItems = useMemo(() => (quote ? selectedTierLineItems(quote) : null), [quote]);
 
   if (!quote) return null;
+  if (workspace)
+    return (
+      <QuoteWorkspace quoteId={quote.id} onClose={() => setWorkspace(false)} onDeleted={onClose} />
+    );
 
-  const badge = quoteBadge(quote);
   const toneColor: Record<QuoteTone, string> = {
     ok: colors.successBright,
     warn: colors.warningBright,
     dim: colors.textDim,
   };
-  const tone = toneColor[badge.tone];
   const amount =
     quote.total_inc_gst == null ? null : formatAud(centsFromApiDollars(quote.total_inc_gst));
 
@@ -455,21 +472,28 @@ export function QuoteDetailModal({
     : canSend(quote)
       ? 'send'
       : null;
-  const pending = approve.isPending || send.isPending;
-  const actionNotice = approve.isSuccess
-    ? quoteActionNotice(approve.data, 'approve')
-    : send.isSuccess
-      ? quoteActionNotice(send.data, 'send')
-      : null;
-  const error = approve.error ?? send.error;
+  const pending = delivery.isPending || delivery.isLoading;
+  const receipt = delivery.receipt;
+  const actionNotice = receipt ? deliveryReceiptNotice(receipt) : null;
+  const error = delivery.error;
   // Keep the row unavailable while the mutation refetches the canonical quote. A sent quote stays
   // sendable (resend), so success remains acknowledged until this sheet is reopened; this stops an
   // absent-minded second nudge without inventing a local Sent state.
-  const showActionRow = primaryAction !== null && !pending && actionNotice == null;
+  const showActionRow =
+    primaryAction !== null &&
+    !pending &&
+    actionNotice == null &&
+    error == null &&
+    !owned.isError &&
+    owned.data?.processing.ready === true;
 
   const quoteId = quote.id;
-  const resend = isResend(quote);
+  const resend =
+    isResend(quote) ||
+    !!quote.sent_at ||
+    (typeof quote.customer_released_at === 'string' && !!quote.customer_released_at);
   const onFilePhone = quote.customer_phone?.trim() ? quote.customer_phone.trim() : null;
+  const onFileEmail = owned.data?.quote.customer_email?.trim() || null;
   const deliverySummary =
     channel === 'sms'
       ? onFilePhone || phone.trim()
@@ -477,30 +501,56 @@ export function QuoteDetailModal({
         : 'Add a customer mobile'
       : email.trim()
         ? `Email to ${email.trim()}`
-        : 'Email to address on file';
-  // Web `smsReady` parity: SMS needs a number — on file or typed. Email may go up blank: the
-  // server resolves the on-file address through its contact chain and 400s with its own
-  // plain-language message when there is none.
+        : onFileEmail
+          ? `Email to ${onFileEmail}`
+          : 'Add a customer email';
+  // Every send needs a displayed recipient that the server can compare before
+  // release. Approval uses the saved mobile; Send also supports typed overrides.
   const sendBlocked =
-    primaryAction === 'send' && channel === 'sms' && !onFilePhone && phone.trim().length === 0;
+    (primaryAction === 'approve' && !onFilePhone) || (primaryAction === 'send' &&
+    (!quoteDeliveryChannels(quote).includes(channel) ||
+      (channel === 'sms' && !onFilePhone && phone.trim().length === 0) ||
+      (channel === 'email' && !onFileEmail && email.trim().length === 0)));
 
   function firePrimaryAction() {
-    if (!primaryAction || pending || sendBlocked) return;
+    if (
+      !showActionRow ||
+      !primaryAction ||
+      pending ||
+      sendBlocked ||
+      owned.isError ||
+      !owned.data?.processing.ready ||
+      !owned.data.customer_release_revision
+    )
+      return;
     if (!armed) {
       setArmed(true);
       return;
     }
     setArmed(false);
-    if (primaryAction === 'approve') approve.mutate({ quoteId });
-    else
-      send.mutate(
-        sendQuoteVars(
-          quoteId,
-          channel,
-          channel === 'sms' ? onFilePhone : null,
-          channel === 'sms' ? phone : email,
-        ),
+    const expected_revision = owned.data.customer_release_revision;
+    if (primaryAction === 'approve')
+      void delivery
+        .approve({ expected_revision, reviewedDestination: onFilePhone! })
+        .catch(() => undefined);
+    else {
+      const vars = sendQuoteVars(
+        quoteId,
+        channel,
+        channel === 'sms' ? onFilePhone : onFileEmail,
+        channel === 'sms' ? phone : email,
       );
+      void delivery
+        .send({
+          channel,
+          to: vars.to,
+          expected_revision,
+          resend,
+          reviewedDestination:
+            channel === 'sms' ? onFilePhone || phone.trim() : email.trim() || onFileEmail!,
+        })
+        .catch(() => undefined);
+    }
   }
 
   const actionLabel = armed
@@ -561,9 +611,31 @@ export function QuoteDetailModal({
               {quote.channel ? ` · ${quote.channel === 'voice' ? 'Voice' : 'SMS'}` : ''}
             </Text>
 
-            <View style={[styles.chip, { borderColor: tone, alignSelf: 'flex-start' }]}>
-              <Text style={[styles.chipText, { color: tone }]}>{badge.label.toUpperCase()}</Text>
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}>
+              {quoteBadges(quote).map(item => (
+                <View
+                  key={item.label}
+                  style={[
+                    styles.chip,
+                    { borderColor: toneColor[item.tone], alignSelf: 'flex-start' },
+                  ]}
+                >
+                  <Text style={[styles.chipText, { color: toneColor[item.tone] }]}>
+                    {item.label.toUpperCase()}
+                  </Text>
+                </View>
+              ))}
             </View>
+            {quote.estimate_number ? (
+              <Text selectable style={[styles.sectionBody, { color: colors.textSec }]}>
+                Estimate {quote.estimate_number}
+              </Text>
+            ) : null}
+            {inspectionExplanation(quote) ? (
+              <Text style={[styles.sectionBody, { color: colors.textSec }]}>
+                {inspectionExplanation(quote)}
+              </Text>
+            ) : null}
 
             <View
               style={[
@@ -595,7 +667,7 @@ export function QuoteDetailModal({
                         {item.description}
                       </Text>
                       <Text style={[styles.itemQty, { color: colors.textDim }]}>
-                        {item.quantity ?? 1}
+                        {item.quantity ?? 'Quantity unavailable'}
                         {item.unit_price_ex_gst != null
                           ? ` × ${formatAud(centsFromApiDollars(item.unit_price_ex_gst))}`
                           : ''}
@@ -606,7 +678,7 @@ export function QuoteDetailModal({
                   {tierLineItems.totalIncGstCents != null ? (
                     <View style={[styles.itemsTotalRow, { backgroundColor: colors.ink }]}>
                       <Text style={[styles.itemsTotalLabel, { color: colors.textDim }]}>
-                        TOTAL INC GST
+                        SAVED TOTAL
                       </Text>
                       <Text style={[styles.itemsTotalValue, { color: colors.textPri }]}>
                         {formatAud(tierLineItems.totalIncGstCents)}
@@ -631,9 +703,40 @@ export function QuoteDetailModal({
 
             <DetailsBlock quote={quote} />
 
+            {owned.isError ? (
+              <Notice
+                tone="warn"
+                label="Owner review unavailable"
+                body="Refresh the owner record before approving or sending this quote."
+                onRetry={() => void owned.refetch()}
+              />
+            ) : owned.isPending ? (
+              <ActivityIndicator accessibilityLabel="Loading owner review" />
+            ) : owned.data ? (
+              <View style={styles.section}>
+                <Text style={[styles.sectionLabel, { color: colors.textDim }]}>OWNER REVIEW</Text>
+                {(owned.data.quote.risk_flags ?? []).map((flag, index) => (
+                  <Text
+                    key={`risk-${index}`}
+                    style={[styles.sectionBody, { color: colors.textSec }]}
+                  >
+                    Risk: {flag}
+                  </Text>
+                ))}
+                {(owned.data.quote.assumptions ?? []).map((item, index) => (
+                  <Text
+                    key={`assumption-${index}`}
+                    style={[styles.sectionBody, { color: colors.textSec }]}
+                  >
+                    Assumption: {item}
+                  </Text>
+                ))}
+              </View>
+            ) : null}
+
             <ActivityBlock quote={quote} />
 
-            <LinksBlock quote={quote} />
+            <LinksBlock quote={quote} onOpenWorkspace={() => setWorkspace(true)} />
 
             {quote.messages && quote.messages.length > 0 ? (
               <View style={styles.section}>
@@ -659,13 +762,18 @@ export function QuoteDetailModal({
                       >
                         <Text style={[styles.bubbleBody, { color: colors.textPri }]}>{m.body}</Text>
                         <Text style={[styles.bubbleMeta, { color: colors.textDim }]}>
-                          {inbound ? 'Customer' : 'AI'} · {relativeTime(m.created_at)}
+                          {inbound ? 'Customer' : 'Outbound'} · {relativeTime(m.created_at)}
                         </Text>
                       </View>
                     );
                   })}
                 </View>
               </View>
+            ) : null}
+            {showActionRow && primaryAction === 'approve' && !onFilePhone ? (
+              <Text accessibilityRole="alert" style={[styles.section, { color: colors.warningBright }]}>
+                No customer mobile is on file. Update the customer contact and refresh before approving.
+              </Text>
             ) : null}
             {showActionRow && primaryAction === 'send' ? (
               <View
@@ -689,38 +797,40 @@ export function QuoteDetailModal({
                       { key: 'sms', label: 'Text message' },
                       { key: 'email', label: 'Email' },
                     ] as const
-                  ).map(option => {
-                    const active = channel === option.key;
-                    return (
-                      <Pressable
-                        key={option.key}
-                        accessibilityRole="radio"
-                        accessibilityState={{ checked: active }}
-                        aria-checked={active}
-                        onPress={() => {
-                          setChannel(option.key);
-                          // A confirm armed for one channel must never fire the other.
-                          setArmed(false);
-                        }}
-                        style={[
-                          styles.channelBtn,
-                          {
-                            borderColor: active ? colors.ctlLine : colors.inkLine,
-                            backgroundColor: active ? colors.ink : 'transparent',
-                          },
-                        ]}
-                      >
-                        <Text
+                  )
+                    .filter(option => quoteDeliveryChannels(quote).includes(option.key))
+                    .map(option => {
+                      const active = channel === option.key;
+                      return (
+                        <Pressable
+                          key={option.key}
+                          accessibilityRole="radio"
+                          accessibilityState={{ checked: active }}
+                          aria-checked={active}
+                          onPress={() => {
+                            setChannel(option.key);
+                            // A confirm armed for one channel must never fire the other.
+                            setArmed(false);
+                          }}
                           style={[
-                            styles.channelBtnText,
-                            { color: active ? colors.textPri : colors.textDim },
+                            styles.channelBtn,
+                            {
+                              borderColor: active ? colors.ctlLine : colors.inkLine,
+                              backgroundColor: active ? colors.ink : 'transparent',
+                            },
                           ]}
                         >
-                          {option.label}
-                        </Text>
-                      </Pressable>
-                    );
-                  })}
+                          <Text
+                            style={[
+                              styles.channelBtnText,
+                              { color: active ? colors.textPri : colors.textDim },
+                            ]}
+                          >
+                            {option.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
                 </View>
                 {channel === 'sms' ? (
                   onFilePhone ? (
@@ -799,18 +909,21 @@ export function QuoteDetailModal({
                 >
                   {actionErrorMessage(error)}
                 </Text>
-              ) : actionNotice ? (
+              ) : null}
+              {actionNotice ? (
                 <Text
                   accessibilityLiveRegion="polite"
                   style={[
                     styles.okText,
                     {
                       color:
-                        actionNotice.kind === 'sent' ? colors.successBright : colors.warningBright,
+                        receipt?.state === 'delivered'
+                          ? colors.successBright
+                          : colors.warningBright,
                     },
                   ]}
                 >
-                  {actionNotice.message}
+                  {actionNotice}
                 </Text>
               ) : armed ? (
                 <Text
@@ -825,7 +938,7 @@ export function QuoteDetailModal({
                 <View style={styles.pendingRow}>
                   <ActivityIndicator color={colors.textPri} />
                   <Text style={[styles.pendingLabel, { color: colors.textSec }]}>
-                    {approve.isPending ? 'Approving…' : 'Sending…'}
+                    {delivery.isLoading ? 'Checking delivery…' : 'Confirming delivery request…'}
                   </Text>
                 </View>
               ) : showActionRow ? (
@@ -885,6 +998,50 @@ export function QuoteDetailModal({
                     </Pressable>
                   </View>
                 </>
+              ) : null}
+              {!pending && (receipt || error) ? (
+                <View style={styles.linksWrap}>
+                  <LinkOutButton
+                    label="Refresh delivery status"
+                    onPress={() => void delivery.refresh().catch(() => undefined)}
+                  />
+                  {receipt?.channel === 'sms' && receipt.state === 'failed' ? (
+                    <LinkOutButton
+                      label="Retry original message"
+                      onPress={() =>
+                        Alert.alert(
+                          'Retry original message?',
+                          'This retries the saved message to its original recipient. It does not use any changed delivery fields.',
+                          [
+                            { text: 'Cancel', style: 'cancel' },
+                            {
+                              text: 'Retry message',
+                              onPress: () => void delivery.retry().catch(() => undefined),
+                            },
+                          ],
+                        )
+                      }
+                    />
+                  ) : null}
+                  {receipt &&
+                  ['provider_accepted', 'delivered', 'noop', 'no_commit'].includes(receipt.state) &&
+                  primaryAction ? (
+                    <LinkOutButton
+                      label="Prepare another send"
+                      onPress={() => {
+                        setArmed(false);
+                        void delivery.beginAnother().catch(() => undefined);
+                      }}
+                    />
+                  ) : null}
+                  {receipt?.channel === 'email' &&
+                  ['pending', 'unknown'].includes(receipt.state) ? (
+                    <Text style={[styles.hintText, { color: colors.warningBright }]}>
+                      Email recovery is not yet available. Another send stays blocked until its
+                      outcome can be verified.
+                    </Text>
+                  ) : null}
+                </View>
               ) : null}
             </View>
           )}

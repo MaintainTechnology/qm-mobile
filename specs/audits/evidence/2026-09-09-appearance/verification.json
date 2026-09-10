@@ -1,0 +1,23 @@
+{
+  "result": "pass",
+  "environment": "Installed Chrome, headless; all network requests blocked; fabricated sample data",
+  "styled": {
+    "fontFamily": "Georgia, \"Times New Roman\", serif",
+    "headingBackground": "rgb(37, 99, 235)",
+    "headingColor": "rgb(255, 255, 255)",
+    "bodyWidth": 697.90625,
+    "text": "SE\nSAMPLE ELECTRICAL\nCUSTOMER QUOTE\nQUOTATION\nSample Customer · 9 September 2026\n\nThank you for the opportunity to quote for power points. Your quote is set out below.\n\nYour installation quote\nSCOPE OF WORKS\n\nInstall and test the reviewed fittings. Please keep the work area accessible.\n\nProtect existing finishes.\nTest the completed installation.\nBETTER · RECOMMENDED\n$650.01 No GST\nReviewed installation\nITEM\tQTY\tUNIT (EX GST)\tTOTAL (EX GST)\nSample installation work\t1 job\t$650.01\t$650.01\nPLEASE NOTE\nNo GST is charged on this quote.\nFinal pricing is confirmed on site; variations to the scope above are quoted separately.\nMaterials are supplied to equivalent specification where a named brand is unavailable.\nSAMPLE ELECTRICAL\nSAMPLE ELECTRICAL · NO GST IS CHARGED."
+  },
+  "reset": {
+    "fontFamily": "Manrope, \"Segoe UI\", -apple-system, system-ui, Arial, sans-serif",
+    "headingBackground": "rgba(0, 0, 0, 0)"
+  },
+  "ev": {
+    "fontFamily": "Georgia, \"Times New Roman\", serif",
+    "headingBackground": "rgb(15, 23, 34)",
+    "headingColor": "rgb(255, 255, 255)",
+    "totalLabelColor": "rgb(250, 248, 244)",
+    "text": "SE\nSAMPLE ELECTRICAL\nEST-SAMPLE\nESTIMATE\nPREPARED FOR:\nSample Customer\nTOTAL:\n$650.01\nPROPOSAL DETAILS:\nDate: 9 Sept 2026\nValid Until: 9 Oct 2026\n01\nSCOPE OF WORK\nINCLUSIONS\nSample installation work\n02\nOPTIONAL UPGRADES & RECOMMENDATIONS\nSURGE PROTECTION OPTION\n\nWe highly recommend installing a Surge Protection Device (SPD) to safeguard your new electric vehicle, EV charger, and valuable household electronics against sudden voltage spikes. Power surges can occur from lightning strikes or grid fluctuations and can cause thousands of dollars in damage to sensitive electronics. Pricing depends on there being sufficient physical room in your existing switchboard to fit the device, and is confirmed at your site visit.\n\nSWITCHBOARD CAPACITY NOTE\n\nIf your switchboard does not have a spare circuit position available, additional work is needed to create space or upgrade the board. This is confirmed at your site visit.\n\nPHASE 1 - SWITCHBOARD AND ROUGH-IN\nDESCRIPTION\tQTY\tRATE\tAMOUNT\nSample installation work\t1 JOB\t$650.01\t$650.01\nGROUP TOTAL:\t$650.01\nSubtotal (ex GST):\n$650.01\nTOTAL:\n$650.01\n04\nTERMS & CONDITIONS\nThis is an estimate, not a contract.\nPrices are valid for 30 days from the date of this estimate.\nFinal price may vary based on actual work performed.\nA $99 refundable site visit fee confirms your booking and is credited toward your final quote.\nAll prices are in Australian dollars and are not subject to GST.\nSAMPLE ELECTRICAL\nSAMPLE ELECTRICAL · PRICES ARE NOT SUBJECT TO GST"
+  },
+  "limitation": "Browser renderer and generated sample PDF only; deployed Gotenberg and installed native devices remain unverified."
+}

@@ -1,0 +1,9 @@
+
+ESLint found too many warnings (maximum: 0).
+C:\Users\dalig\Desktop\MaintainTech\MaintainOrg\qm-mobile\src\features\sections\use-business-profile.test.tsx
+  4:72  warning  'C:\Users\dalig\Desktop\MaintainTech\MaintainOrg\qm-mobile\src\features\sections\business-profile-test-fixture.ts' imported multiple times  import/no-duplicates
+  6:30  warning  'C:\Users\dalig\Desktop\MaintainTech\MaintainOrg\qm-mobile\src\features\sections\business-profile-test-fixture.ts' imported multiple times  import/no-duplicates
+
+✖ 2 problems (0 errors, 2 warnings)
+  0 errors and 1 warning potentially fixable with the `--fix` option.
+

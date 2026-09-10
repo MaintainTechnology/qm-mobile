@@ -4,6 +4,7 @@
  */
 import { TENANT_ME_KEY } from '@/lib/tenant';
 import { useApiMutation } from '@/lib/useApi';
+import { ROOFING_SAVED_KEY } from '../tools/tools-api';
 
 import {
   MeasureAllResponseSchema,
@@ -31,6 +32,7 @@ export function useSaveRoof() {
   return useApiMutation<SaveRoofRequest, SaveRoofResponse>(
     '/api/roofing/save',
     SaveRoofResponseSchema,
+    { invalidates: [ROOFING_SAVED_KEY], timeoutMs: 90000 },
   );
 }
 

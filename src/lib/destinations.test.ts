@@ -9,6 +9,8 @@ describe('safeDestination', () => {
     });
     expect(safeDestination('/chats?chatId=chat-9')?.audience).toBe('authenticated');
     expect(safeDestination('/welcome')?.audience).toBe('public');
+    expect(safeDestination('/sections/help')?.audience).toBe('public');
+    expect(safeDestination('/sections/help?document=private')).toBeNull();
     expect(safeDestination('/support')).toEqual({
       audience: 'public',
       href: '/support',

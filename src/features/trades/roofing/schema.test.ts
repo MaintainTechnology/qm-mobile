@@ -282,6 +282,14 @@ describe('roof pricing authority and run fencing', () => {
     ).toBe(false);
   });
 
+  it('retains the same run identity after schema hydration reorders object keys', () => {
+    const overrides = { buildingB: { pitch: 'steep', material: 'metal' }, buildingA: { intent: 'replace' } };
+    const original = { ...request, perBuilding: overrides };
+    const restored = { perBuilding: { buildingA: { intent: 'replace' }, buildingB: { material: 'metal', pitch: 'steep' } }, inputs: request.inputs, address: request.address };
+    expect(roofMeasureFingerprint(restored)).toBe(roofMeasureFingerprint(original));
+    expect(roofMeasureFingerprint({ ...restored, perBuilding: { ...restored.perBuilding, buildingA: { intent: 'repair' } } })).not.toBe(roofMeasureFingerprint(original));
+  });
+
   it('rejects expired, wrong-run, run-switched and unmounted responses', () => {
     expect(roofRunIsFresh('2030-01-01T00:00:00.000Z', Date.parse('2029-01-01'))).toBe(true);
     expect(roofRunIsFresh('2028-01-01T00:00:00.000Z', Date.parse('2029-01-01'))).toBe(false);

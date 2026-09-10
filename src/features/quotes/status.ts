@@ -48,12 +48,43 @@ type QuoteBadge = { label: string; tone: QuoteTone };
  * second line later if a tradie asks for it).
  */
 export function quoteBadge(quote: QuoteRow): QuoteBadge {
+  if (
+    quote.quote_kind === 'balance' &&
+    (quote.deposit_paid || quote.paid_at || status(quote) === 'paid')
+  ) {
+    return { label: 'Paid in full', tone: 'ok' };
+  }
   if (quote.deposit_paid) return { label: 'Deposit paid', tone: 'ok' };
-  if (quote.needs_inspection) return { label: 'Inspection required', tone: 'dim' };
+  if (quote.needs_inspection || quote.inspection_required)
+    return { label: 'Inspection required', tone: 'dim' };
   const s = status(quote);
   if (s === 'accepted') return { label: 'Accepted', tone: 'ok' };
   if (s === 'sent') return { label: 'Sent to customer', tone: 'ok' };
   return { label: 'Awaiting your review', tone: 'warn' };
+}
+
+/** Keep the chain position visible alongside the payment/review status. */
+export function quoteBadges(quote: QuoteRow): QuoteBadge[] {
+  const chain: QuoteBadge[] =
+    quote.quote_kind === 'final'
+      ? [{ label: 'Final quote', tone: 'dim' }]
+      : quote.quote_kind === 'balance'
+        ? [{ label: 'Balance', tone: 'dim' }]
+        : [];
+  return [...chain, quoteBadge(quote)];
+}
+
+export function inspectionExplanation(quote: QuoteRow): string | null {
+  if (quote.inspection_cause === 'grounding_failed') {
+    return 'Pricing could not be verified against your catalogue. Review the missing pricing evidence before releasing this estimate.';
+  }
+  if (quote.inspection_cause === 'site_conditions') {
+    return 'A site inspection is needed to confirm the conditions and scope before a final quote.';
+  }
+  if (quote.inspection_cause === 'model_declared') {
+    return 'The draft flagged details that need inspection and your review before a final quote.';
+  }
+  return null;
 }
 
 /**
@@ -62,7 +93,40 @@ export function quoteBadge(quote: QuoteRow): QuoteBadge {
  * status, so the button is hidden rather than offering a no-op tap.
  */
 export function canApprove(quote: QuoteRow): boolean {
-  return status(quote) === 'awaiting_tradie_approval';
+  return (
+    knownQuoteKind(quote) &&
+    quote.quote_kind !== 'balance' &&
+    !quote.paid_at &&
+    !quote.deposit_paid &&
+    status(quote) === 'awaiting_tradie_approval'
+  );
+}
+
+function knownQuoteKind(quote: QuoteRow): boolean {
+  return quote.quote_kind == null || ['initial', 'final', 'balance'].includes(quote.quote_kind);
+}
+
+/** Final/balance delivery is SMS-only in the current server contract. */
+export function quoteDeliveryChannels(quote: QuoteRow): readonly ('sms' | 'email')[] {
+  if (!knownQuoteKind(quote)) return [];
+  return quote.quote_kind === 'final' || quote.quote_kind === 'balance'
+    ? ['sms']
+    : ['sms', 'email'];
+}
+
+/** Child payment slugs are server-defined; reusing a G/B/B slug would request the wrong action. */
+export function quotePaymentLink(quote: QuoteRow): { path: string; label: string } | null {
+  if (!quote.share_token || !knownQuoteKind(quote) || quote.paid_at || quote.deposit_paid)
+    return null;
+  const token = encodeURIComponent(quote.share_token);
+  if (quote.quote_kind === 'balance')
+    return { path: `/r/${token}/balance`, label: 'Share balance payment link' };
+  if (quote.quote_kind === 'final')
+    return { path: `/r/${token}/deposit`, label: 'Share deposit link' };
+  if (quote.needs_inspection || quote.inspection_required) return null;
+  const tier = quote.selected_tier ?? 'better';
+  if (!['good', 'better', 'best'].includes(tier)) return null;
+  return { path: `/r/${token}/${tier}`, label: 'Share deposit link' };
 }
 
 /**
@@ -73,7 +137,13 @@ export function canApprove(quote: QuoteRow): boolean {
  * status hasn't caught up yet.
  */
 export function canSend(quote: QuoteRow): boolean {
-  if (quote.deposit_paid) return false;
+  if (
+    !knownQuoteKind(quote) ||
+    quote.quote_kind === 'balance' ||
+    quote.deposit_paid ||
+    quote.paid_at
+  )
+    return false;
   const s = status(quote);
   return s !== 'paid' && s !== 'accepted';
 }

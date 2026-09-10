@@ -1,0 +1,9 @@
+PASS src/features/studio/StudioScreen.test.tsx (38.539 s)
+PASS src/features/studio/studio-share.test.ts
+PASS src/features/studio/studio-export-cache.test.ts
+
+Test Suites: 3 passed, 3 total
+Tests:       16 skipped, 5 passed, 21 total
+Snapshots:   0 total
+Time:        49.521 s
+Ran all test suites matching /src\\features\\studio\\StudioScreen.test.tsx|src\\features\\studio\\studio-share.test.ts|src\\features\\studio\\studio-export-cache.test.ts/i with tests matching "same React batch|temporary-file cleanup failure|failed final deletion|without throwIfAborted|revokes every".

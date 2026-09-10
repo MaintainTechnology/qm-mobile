@@ -30,6 +30,7 @@ import {
   type ChatRow,
 } from './chats-api';
 import { chatDisplayName, channelLabel, relativeTime } from './format';
+import { exactChatTimestamp, validChatReply } from './chat-state';
 
 export function ChatThread({
   chat,
@@ -54,7 +55,7 @@ export function ChatThread({
 
   async function handleSend() {
     const body = draft.trim();
-    if (!body || mutation.isPending) return;
+    if (!allowReply || !validChatReply(body) || mutation.isPending) return;
     try {
       await mutation.mutateAsync({ body });
       onDraftChange('');
@@ -134,15 +135,15 @@ export function ChatThread({
                 accessibilityRole="button"
                 accessibilityLabel="Send reply"
                 accessibilityState={{
-                  disabled: !draft.trim() || mutation.isPending,
+                  disabled: !validChatReply(draft) || mutation.isPending,
                   busy: mutation.isPending,
                 }}
                 onPress={handleSend}
-                disabled={!draft.trim() || mutation.isPending}
+                disabled={!validChatReply(draft) || mutation.isPending}
                 style={({ pressed }) => [
                   styles.sendBtn,
                   { backgroundColor: pressed ? colors.accentPress : colors.accent },
-                  (!draft.trim() || mutation.isPending) && styles.disabled,
+                  (!validChatReply(draft) || mutation.isPending) && styles.disabled,
                 ]}
               >
                 {mutation.isPending ? (
@@ -152,6 +153,15 @@ export function ChatThread({
                 )}
               </Pressable>
             </View>
+            <Text
+              accessibilityLiveRegion="polite"
+              style={[
+                type.bodySm,
+                { color: draft.trim().length > 1600 ? colors.warningBright : colors.textDim },
+              ]}
+            >
+              {draft.trim().length} / 1,600 characters
+            </Text>
             {mutation.isError ? (
               <Text
                 accessibilityLiveRegion="polite"
@@ -186,8 +196,8 @@ function MessageBubble({ message }: { message: ChatMessage }) {
       >
         <Text style={[styles.bubbleText, { color: colors.textPri }]}>{message.body}</Text>
         <Text style={[styles.bubbleMeta, { color: colors.textDim }]}>
-          {!inbound ? 'Sent · ' : ''}
-          {relativeTime(message.created_at)}
+          {inbound ? 'Customer · ' : 'Outbound · '}
+          {exactChatTimestamp(message.created_at)}
         </Text>
       </View>
     </View>

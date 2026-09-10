@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<title>Quote — Sample Electrical</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Caterpillar light "warm paper" tokens (app/globals.css light theme) ── */
+  :root{
+    --paper:#FAF8F4; --card:#FFFFFF; --line:#E9E3DC;
+    --accent:#FFC400; --accent-ink:#2B2422;
+    --pri:#241E1B; --sec:#5E544E; --dim:#837870;
+  }
+  *{ box-sizing:border-box; }
+  html,body{ background:var(--paper); }
+  body{
+    margin:0 auto; color:var(--pri);
+    font-family:'Manrope','Segoe UI',-apple-system,system-ui,Arial,sans-serif;
+    font-size:12px; line-height:1.55;
+    /* Pin the layout width to the printable width. Gotenberg renders this
+       document as ONE continuous page, and it derives that page's height by
+       measuring the document at the browser viewport width — so the width
+       must not depend on the viewport, or the tail gets clipped. See the
+       SINGLE-PAGE / WIDTH CONTRACT in lib/pdf/gotenberg.ts. */
+    width:7.27in;
+    /* reserve room for the repeating fixed footer so content never overlaps */
+    padding-bottom:64px;
+  }
+  .mono{ font-family:'JetBrains Mono','Courier New',monospace; }
+
+  /* ── Header (white-label) ── */
+  header{ display:flex; justify-content:space-between; align-items:flex-start; gap:24px; }
+  .brand{ display:flex; align-items:center; gap:12px; }
+  .brand .logo{ max-height:60px; max-width:230px; object-fit:contain; display:block; }
+  .brand .monogram{
+    display:inline-flex; align-items:center; justify-content:center; flex:none;
+    width:46px; height:46px; background:var(--accent); color:var(--accent-ink);
+    font-weight:800; font-size:19px; letter-spacing:-0.02em;
+  }
+  .brand .wordmark{
+    font-weight:800; font-size:26px; line-height:1.05; text-transform:uppercase;
+    letter-spacing:-0.02em; color:var(--pri); max-width:300px;
+  }
+  .head-meta{ text-align:right; }
+  .head-meta .tagline{ font-style:italic; font-weight:700; color:var(--pri); font-size:13px; margin-bottom:4px; }
+  .head-meta .legal{ font-size:11px; color:var(--pri); }
+  .head-meta .contact{ font-size:11px; color:var(--sec); }
+  .rule{ height:3px; margin:12px 0 16px;
+    background:linear-gradient(90deg,var(--accent) 0 96px, var(--line) 96px 100%); }
+
+  /* ── Intro / thank-you ── */
+  .eyebrow{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.18em; text-transform:uppercase; color:var(--dim); }
+  .quote-title{ font-size:22px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.02em; margin:4px 0 2px; }
+  .quote-sub{ color:var(--sec); font-size:11px; }
+  .quote-sub strong{ color:var(--pri); }
+  .intro{ margin:12px 0 4px; color:var(--sec); }
+
+  /* ── Headings & shared body vocabulary ── */
+  h2{ font-size:14px; text-transform:uppercase; letter-spacing:-0.01em; margin:22px 0 8px; }
+  .part{ border:1px solid var(--line); background:var(--card); padding:14px 16px;
+    margin-top:14px; page-break-inside:avoid; }
+  .part-head{ display:flex; align-items:center; gap:12px; }
+  .marker{ font-family:'JetBrains Mono','Courier New',monospace; font-weight:600;
+    font-size:18px; line-height:1; color:var(--accent-ink); background:var(--accent);
+    padding:8px 12px; min-width:40px; text-align:center; }
+  .part-title{ font-size:14px; font-weight:800; text-transform:uppercase;
+    letter-spacing:-0.01em; margin:0; }
+  .part-note-row{ margin:8px 0 0; }
+  .part-note{ color:var(--sec); font-size:11px; }
+  .chip{ font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    font-weight:600; letter-spacing:0.12em; text-transform:uppercase;
+    color:var(--accent-ink); background:var(--accent); padding:1px 6px; vertical-align:middle; }
+  ul.bullets{ margin:8px 0 0; padding-left:18px; }
+  ul.bullets li{ margin-bottom:3px; }
+  ol.prices{ margin:10px 0 0; padding-left:18px; }
+  ol.prices li{ margin-bottom:4px; }
+  .price{ font-weight:800; }
+  .caveat{ color:var(--sec); font-weight:400; }
+
+  /* generic cards/tables used by tier-based trades */
+  .scope{ border-left:3px solid var(--accent); background:#fff; padding:8px 12px; }
+  .statgrid{ display:flex; gap:12px; margin:12px 0 4px; }
+  .stat{ flex:1; border:1px solid var(--line); background:var(--card); padding:10px 12px; }
+  .stat .v{ font-size:19px; font-weight:800; }
+  .stat .v small{ font-size:10px; font-weight:400; color:var(--dim); }
+  .stat .l{ font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    letter-spacing:0.15em; text-transform:uppercase; color:var(--dim); }
+  .stat-selected{ border:2px solid var(--accent); }
+  table{ width:100%; border-collapse:collapse; margin-top:8px; }
+  th{ text-align:left; font-family:'JetBrains Mono','Courier New',monospace; font-size:8.5px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--dim);
+    border-bottom:2px solid var(--pri); padding:5px 6px; }
+  td{ border-bottom:1px solid var(--line); padding:5px 6px; vertical-align:top; }
+  .num{ text-align:right; white-space:nowrap; } th.num{ text-align:right; }
+  .flag{ font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    text-transform:uppercase; color:#B45309; border:1px solid #B45309; padding:1px 6px; }
+  .note{ color:var(--sec); font-size:11px; }
+
+  /* ── Tradie identity block (customer-view section 03 parity) ── */
+  .tradie{ display:flex; align-items:center; gap:14px; border:1px solid var(--line);
+    background:var(--card); padding:12px 14px; margin-top:8px; page-break-inside:avoid; }
+  .tradie-photo{ width:72px; height:72px; flex:none; object-fit:cover;
+    border:1px solid var(--line); background:#fff; }
+  .tradie-name{ font-weight:800; font-size:13px; text-transform:uppercase;
+    letter-spacing:-0.01em; color:var(--pri); }
+  .tradie-copy .note{ margin:4px 0 0; }
+
+  /* ── Figure ── */
+  .figure{ margin:14px 0; page-break-inside:avoid; }
+  .figure img{ width:100%; max-height:420px; object-fit:contain; border:1px solid var(--line); }
+  .figure figcaption{ text-align:center; color:var(--sec); font-style:italic; font-size:11px; margin-top:6px; }
+  /* two-image figure: hero outline tracing + small aerial reference thumbnail */
+  .figure-pair .hero{ width:100%; max-height:420px; object-fit:contain; border:1px solid var(--line); background:#fff; }
+  .figure-pair .thumb{ width:42%; max-width:280px; margin:10px auto 0; }
+  .figure-pair .thumb img{ display:block; width:100%; max-height:170px; object-fit:contain; border:1px solid var(--line); }
+  .figure-pair .thumb figcaption{ text-align:center; color:var(--dim); font-style:italic; font-size:9.5px; margin-top:4px; }
+
+  /* ── Please Note ── */
+  .please{ margin-top:24px; border:1px solid var(--line); background:var(--card); padding:14px 16px; page-break-inside:avoid; }
+  .please h3{ font-family:'JetBrains Mono','Courier New',monospace; font-size:10px;
+    letter-spacing:0.16em; text-transform:uppercase; color:var(--pri); margin:0 0 8px; }
+  .please ul{ margin:0; padding-left:18px; } .please li{ margin-bottom:4px; color:var(--sec); }
+
+  .closing{ margin-top:16px; color:var(--sec); font-size:11px; }
+
+  /* ── Repeating footer (fixed → Chromium prints it on every page) ── */
+  .accentbar{ position:fixed; left:0; right:0; bottom:30px; background:var(--accent);
+    color:var(--accent-ink); text-align:center; padding:6px 10px;
+    font-family:'JetBrains Mono','Courier New',monospace; font-size:9px;
+    letter-spacing:0.14em; text-transform:uppercase; }
+  .footline{ position:fixed; left:0; right:0; bottom:8px; text-align:center;
+    font-family:'JetBrains Mono','Courier New',monospace; font-size:8px;
+    letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); }
+
+  /* Saved quote appearance */
+  body{font-family:Georgia,'Times New Roman',serif;}
+  :root{--accent:#2563EB;--accent-ink:#FFFFFF;}
+  .ev-total-panel .ev-total-panel-label,.ev-grand .ev-grand-label{color:var(--paper);}
+  h2{border:0;background:var(--accent);color:var(--accent-ink);padding:8px 12px;}
+  .ev-body .ev-secthead h2{color:var(--accent-ink);}</style>
+</head>
+<body>
+  <header>
+    <div class="brand"><span class="monogram">SE</span><div class="wordmark">Sample Electrical</div></div>
+    <div class="head-meta"></div>
+  </header>
+  <div class="rule"></div>
+
+  <div class="intro-block">
+    <div class="eyebrow">Customer quote</div>
+    <div class="quote-title">Quotation</div>
+    <div class="quote-sub"><strong>Sample Customer</strong> · 9 September 2026</div>
+    <p class="intro">Thank you for the opportunity to quote for <strong>power points</strong>. Your quote is set out below.</p>
+  </div>
+
+  <h1 class="doc-title">Your installation quote</h1><h2>Scope of works</h2><p><strong>Install and test the reviewed fittings. </strong>Please keep the work area accessible.</p><ul class="bullets"><li>Protect existing finishes.</li><li>Test the completed installation.</li></ul>
+  <section class="part">
+    <div class="tier-head" style="display:flex;justify-content:space-between;align-items:baseline;">
+      <span class="marker" style="padding:4px 10px;font-size:11px;letter-spacing:0.12em;">BETTER · RECOMMENDED</span>
+      <span class="tier-price" style="font-size:20px;font-weight:800;">$650.01 <small style="font-size:10px;font-weight:400;color:var(--dim);">No GST</small></span>
+    </div>
+    <div class="tier-label" style="margin-top:6px;color:var(--sec);font-weight:600;">Reviewed installation</div>
+    <table>
+      <thead><tr><th>Item</th><th class="num">Qty</th><th class="num">Unit (ex GST)</th><th class="num">Total (ex GST)</th></tr></thead>
+      <tbody>
+      <tr>
+        <td>Sample installation work</td>
+        <td class="num">1 job</td>
+        <td class="num">$650.01</td>
+        <td class="num">$650.01</td>
+      </tr></tbody>
+    </table>
+  </section>
+
+  <div class="please">
+    <h3>Please Note</h3>
+    <ul><li>No GST is charged on this quote.</li><li>Final pricing is confirmed on site; variations to the scope above are quoted separately.</li><li>Materials are supplied to equivalent specification where a named brand is unavailable.</li></ul>
+  </div>
+
+  
+
+  <div class="accentbar">Sample Electrical</div>
+  <div class="footline">Sample Electrical · No GST is charged.</div>
+</body>
+</html>

@@ -93,6 +93,13 @@ export const SECTION_GROUPS: SectionGroup[] = [
     label: 'Marketing',
     rows: [
       {
+        id: 'studio',
+        title: 'Brand Studio',
+        blurb: 'Edit five branded slides and export PNG or PDF.',
+        kind: 'screen',
+        target: '/sections/studio',
+      },
+      {
         id: 'invites',
         title: 'Marketing',
         blurb: 'Invite codes and QR codes that bring work in.',

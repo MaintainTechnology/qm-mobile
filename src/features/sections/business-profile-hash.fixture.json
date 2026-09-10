@@ -1,0 +1,15 @@
+{
+  "expectedRevision": "ABCDEF00-1111-4222-8333-444444444444",
+  "patch": {
+    "business_name": "  Café \\ Studio  ",
+    "owner_first_name": "Zoë",
+    "owner_email": "office@example.test",
+    "owner_mobile": "0412345678",
+    "state": "NSW",
+    "abn": "",
+    "sms_estimator_enabled": false,
+    "business_address": " 12 Example St\nUnit 2  "
+  },
+  "canonicalText": "[\"abcdef00-1111-4222-8333-444444444444\",[[\"abn\",\"\"],[\"business_address\",\"12 Example St\\nUnit 2\"],[\"business_name\",\"Café \\\\ Studio\"],[\"owner_email\",\"office@example.test\"],[\"owner_first_name\",\"Zoë\"],[\"owner_mobile\",\"0412345678\"],[\"sms_estimator_enabled\",false],[\"state\",\"NSW\"]]]",
+  "sha256": "029d2f0e72f95f564f10675787e0f3249dc5a948cb363ba551b817a2de7506b1"
+}

@@ -8,23 +8,60 @@
  * `GET /api/tenant/me`'s quotes list once the mutation invalidates it — the one place
  * the pricing book's numbers actually live.
  */
-import { useMemo, useState } from 'react';
+import { useAuth } from '@clerk/expo';
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 
-import { Field, PrimaryCta } from '@/features/auth/ui';
+import { Field, GhostButton, PrimaryCta } from '@/features/auth/ui';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 import { fonts, spacing, type as typeScale } from '@/lib/theme';
 import { useTenantMe } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
 
-import { useJobQuote } from './api';
-import { fieldsForJobType, formatJobType, jobTypesForTrade } from './job-fields';
+import { useJobQuote, useJobQuoteStatus } from './api';
+import {
+  allowsPinnedCatalogueProduct,
+  fieldsForJobType,
+  formatJobType,
+  jobTypesForTrade,
+  productAfterAnswerChange,
+} from './job-fields';
+import {
+  beginAnotherJobDraft,
+  loadDraftAttempt,
+  reconcileJobDraft,
+  runGuardedJobDraft,
+  type DraftAttempt,
+  type DraftScope,
+} from './draft-attempt';
+import { JobAddressField } from './JobAddressField';
+import { JobPhotos } from './JobPhotos';
+import { jobPhotoPayload, type JobPhoto } from './photos';
 import { explainJobQuoteFailure, priceLabel } from './schema';
 import { useCatalogue, type CatalogueRow } from '../catalogue-api';
 import { apiErrorMessage, Card, MultilineField, Notice, PillGroup, SectionLabel } from '../ui';
 
 export function JobQuoteScreen({ trades }: { trades: string[] }) {
+  const { userId } = useAuth();
+  const tenantMe = useTenantMe();
+  const tenantId = tenantMe.data?.tenant.id;
+  if (!userId || !tenantId) return <Notice tone="warn" label="Loading your quoting account…" />;
+  if (!trades.some(trade => trade === 'electrical' || trade === 'plumbing')) {
+    return <Notice tone="warn" label="Job drafting is unavailable for your enabled trades" />;
+  }
+  // Tenant/account changes discard all inputs and ignore the old component's async UI work.
+  return (
+    <JobQuoteForm key={`${userId}:${tenantId}`} trades={trades} scope={{ userId, tenantId }} />
+  );
+}
+
+export function JobQuoteForm({ trades, scope }: { trades: string[]; scope: DraftScope }) {
   const { colors } = useTheme();
+  const router = useRouter();
+  const mounted = useRef(true);
+  const dispatching = useRef(false);
   const hasElectrical = trades.includes('electrical');
   const hasPlumbing = trades.includes('plumbing');
 
@@ -40,30 +77,80 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
   const [customerName, setCustomerName] = useState('');
   const [customerMobile, setCustomerMobile] = useState('');
   const [customerEmail, setCustomerEmail] = useState('');
-  const [productName, setProductName] = useState('');
+  const [productId, setProductId] = useState('');
+  const [photos, setPhotos] = useState<JobPhoto[]>([]);
+  const [attempt, setAttempt] = useState<DraftAttempt | null>(null);
+  const [attemptLoaded, setAttemptLoaded] = useState(false);
+  const [receiptError, setReceiptError] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
+  const { userId, tenantId } = scope;
+  const statusLookup = useJobQuoteStatus();
+  const readStatus = statusLookup.mutateAsync;
+
+  useEffect(() => {
+    mounted.current = true;
+    void loadDraftAttempt({ userId, tenantId })
+      .then(async value => {
+        if (mounted.current) {
+          setAttempt(value);
+          setAttemptLoaded(true);
+        }
+        if (
+          value?.operationId &&
+          value.status !== 'succeeded' &&
+          value.status !== 'failed_no_commit'
+        ) {
+          try {
+            const refreshed = await reconcileJobDraft({ userId, tenantId }, readStatus);
+            if (mounted.current) setAttempt(refreshed);
+          } catch {
+            if (mounted.current)
+              setFormError(
+                'Status is unavailable. Your previous request remains paused. Refresh status when connected.',
+              );
+          }
+        }
+      })
+      .catch(() => {
+        if (mounted.current)
+          setReceiptError(
+            'The previous draft status could not be read. Drafting is paused to avoid creating a duplicate.',
+          );
+      });
+    return () => {
+      mounted.current = false;
+    };
+  }, [userId, tenantId, readStatus]);
 
   const spec = useMemo(() => fieldsForJobType(jobType), [jobType]);
-  const catalogue = useCatalogue(!!spec.catalogueCategory);
+  const productAllowed = allowsPinnedCatalogueProduct(jobType, answers);
+  const catalogue = useCatalogue(productAllowed && !!spec.catalogueCategory);
 
   function pickTrade(next: 'electrical' | 'plumbing') {
     setTrade(next);
     const first = jobTypesForTrade(next)[0] ?? 'other';
     setJobType(first);
     setAnswers({});
-    setProductName('');
+    setProductId('');
+    setPhotos([]);
   }
 
   function pickJobType(next: string) {
     setJobType(next);
     setAnswers({});
-    setProductName('');
+    setProductId('');
+    setPhotos([]);
+  }
+
+  function answer(code: string, value: string) {
+    setAnswers(current => ({ ...current, [code]: value }));
+    setProductId(current => productAfterAnswerChange(jobType, code, value, current));
   }
 
   const products: CatalogueRow[] = useMemo(() => {
-    if (!spec.catalogueCategory) return [];
+    if (!spec.catalogueCategory || !productAllowed) return [];
     return (catalogue.data?.catalogue ?? [])
-      .filter(c => c.category === spec.catalogueCategory && c.active !== false)
+      .filter(c => c.category === spec.catalogueCategory && c.active !== false && c.trade === trade)
       .sort((a, b) => {
         const pa =
           typeof a.unit_price_ex_gst === 'string'
@@ -78,21 +165,25 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           (Number.isFinite(pb) ? (pb as number) : Infinity)
         );
       });
-  }, [catalogue.data, spec.catalogueCategory]);
+  }, [catalogue.data, spec.catalogueCategory, productAllowed, trade]);
 
-  const chosenProduct = products.find(p => p.name === productName) ?? null;
+  const chosenProduct = products.find(p => p.id === productId) ?? null;
 
   const jobQuote = useJobQuote();
   // useJobQuote invalidates TENANT_ME_KEY on success; tenantMe is an active query here so
   // react-query refetches it automatically — no manual refetch effect needed.
   const tenantMe = useTenantMe();
 
-  const pricedQuote = jobQuote.data
-    ? tenantMe.data?.quotes.find(q => q.id === jobQuote.data.quoteId)
+  const completedId =
+    attempt?.status === 'succeeded' || attempt?.status === 'quote_available'
+      ? attempt.quoteId
+      : undefined;
+  const pricedQuote = completedId
+    ? tenantMe.data?.quotes.find(q => q.id === completedId)
     : undefined;
 
-  function onSubmit() {
-    if (jobQuote.isPending) return;
+  async function onSubmit() {
+    if (dispatching.current || !attemptLoaded || receiptError || attempt) return;
     setFormError(null);
     if (!address.trim() || !suburb.trim()) {
       setFormError('Address and suburb are required — the estimator prices by location.');
@@ -107,20 +198,218 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
         return;
       }
     }
+    if (
+      notes.trim().length > 4000 ||
+      customerName.trim().length > 200 ||
+      customerMobile.trim().length > 40 ||
+      customerEmail.trim().length > 200
+    ) {
+      setFormError('Shorten the notes or customer details to fit the supported field limits.');
+      return;
+    }
+    let photoFields: ReturnType<typeof jobPhotoPayload>;
+    try {
+      photoFields = jobPhotoPayload(jobType === 'ev_charger' ? photos : []);
+    } catch (error) {
+      setFormError(error instanceof Error ? error.message : 'Check the job photos.');
+      return;
+    }
+    if (productAllowed && productId && !chosenProduct) {
+      setFormError(
+        'The selected product is no longer available. Choose a current product or let the estimator choose.',
+      );
+      return;
+    }
+    dispatching.current = true;
+    setAttempt({ status: 'pending' });
     jobQuote.reset();
-    jobQuote.mutate({
+    const request = {
       job_type: jobType,
       address: address.trim(),
       suburb: suburb.trim(),
-      answers,
+      answers: { ...answers },
       notes: notes.trim(),
       customer_name: customerName.trim(),
       customer_mobile: customerMobile.trim(),
       customer_email: customerEmail.trim(),
-      ...(productName ? { product_name: productName } : {}),
-      ...(chosenProduct ? { product_id: chosenProduct.id } : {}),
-    });
+      ...(productAllowed && chosenProduct
+        ? { product_name: chosenProduct.name, product_id: chosenProduct.id }
+        : {}),
+      ...photoFields,
+    };
+    try {
+      await runGuardedJobDraft(scope, request, jobQuote.mutateAsync);
+    } catch (error) {
+      if (mounted.current) setFormError(explainJobQuoteFailure(error));
+    } finally {
+      try {
+        const stored = await loadDraftAttempt(scope);
+        if (mounted.current) setAttempt(stored);
+      } catch {
+        if (mounted.current)
+          setReceiptError(
+            'Draft status could not be confirmed. Check Quotes; another request is paused to avoid a duplicate.',
+          );
+      }
+      dispatching.current = false;
+    }
   }
+
+  function reviewDraft() {
+    router.push(
+      completedId
+        ? { pathname: '/(tabs)/quotes', params: { quoteId: completedId } }
+        : '/(tabs)/quotes',
+    );
+  }
+
+  async function refreshDraftStatus() {
+    if (dispatching.current || statusLookup.isPending) return;
+    try {
+      const refreshed = await reconcileJobDraft(scope, readStatus);
+      if (mounted.current) {
+        setAttempt(refreshed);
+        setFormError(null);
+      }
+    } catch {
+      if (mounted.current)
+        setFormError(
+          'Status is unavailable. The request remains paused; refreshing status will not submit it again.',
+        );
+    }
+  }
+
+  function startAnother() {
+    void beginAnotherJobDraft(scope)
+      .then(() => {
+        if (!mounted.current) return;
+        setAnswers({});
+        setAddress('');
+        setSuburb('');
+        setNotes('');
+        setCustomerName('');
+        setCustomerMobile('');
+        setCustomerEmail('');
+        setProductId('');
+        setPhotos([]);
+        setFormError(null);
+        jobQuote.reset();
+        setAttempt(null);
+      })
+      .catch(() => {
+        if (mounted.current)
+          setReceiptError('The previous draft status could not be cleared safely.');
+      });
+  }
+
+  if (!attemptLoaded || receiptError)
+    return (
+      <Notice
+        tone="warn"
+        label="Checking draft status"
+        body={receiptError ?? 'Checking for a previous request before drafting another job.'}
+      />
+    );
+
+  if (attempt)
+    return (
+      <View style={{ gap: spacing.lg }}>
+        {completedId ? (
+          <Card style={{ gap: spacing.md }}>
+            <SectionLabel>
+              {attempt.status === 'succeeded' ? 'Quote drafted' : 'Saved draft available'}
+            </SectionLabel>
+            {attempt.status === 'quote_available' ? (
+              <Notice
+                tone="warn"
+                label="Draft processing is unconfirmed"
+                body="A saved quote is available to review. The full draft process has not been confirmed complete; another request remains paused."
+              />
+            ) : null}
+            {pricedQuote ? (
+              <>
+                {pricedQuote.needs_inspection || pricedQuote.total_inc_gst == null ? (
+                  <Notice
+                    tone="warn"
+                    label="Review required"
+                    body="Check the draft and its inspection requirements before sending."
+                  />
+                ) : null}
+                <Text style={[styles.priceValue, { color: colors.accentText }]}>
+                  {pricedQuote.total_inc_gst == null
+                    ? 'Awaiting a confirmed price'
+                    : formatAud(centsFromApiDollars(pricedQuote.total_inc_gst))}
+                </Text>
+              </>
+            ) : (
+              <Notice
+                tone="accent"
+                label="Loading saved quote details"
+                body="Your draft was created. Refresh the saved details or open it for review."
+                onRetry={() => void tenantMe.refetch()}
+              />
+            )}
+            {attempt.pinRequested && !attempt.pinned ? (
+              <Notice
+                tone="warn"
+                label="Selected product needs review"
+                body="The selected catalogue product was not applied. Check the draft's products and prices."
+              />
+            ) : null}
+            <PrimaryCta label="Review draft" onPress={reviewDraft} />
+            {attempt.status === 'succeeded' ? (
+              <GhostButton
+                label="Start another job"
+                disabled={dispatching.current}
+                onPress={startAnother}
+              />
+            ) : (
+              <GhostButton
+                label={statusLookup.isPending ? 'Checking status…' : 'Refresh draft status'}
+                disabled={statusLookup.isPending}
+                onPress={() => void refreshDraftStatus()}
+              />
+            )}
+          </Card>
+        ) : (
+          <>
+            <Notice
+              tone="warn"
+              label={
+                jobQuote.isPending
+                  ? 'Drafting the quote…'
+                  : attempt.status === 'failed_no_commit'
+                    ? 'Draft was not saved'
+                    : 'Draft status unconfirmed'
+              }
+              body={
+                jobQuote.isPending
+                  ? 'Keep this request open while QuoteMax creates the draft. Nothing is sent to the customer.'
+                  : attempt.status === 'failed_no_commit'
+                    ? 'The server confirmed that this attempt did not create an intake or quote. Start another job to submit a new request.'
+                    : 'This request may have created a job. Drafting is paused until its result can be confirmed. Refresh its status or open Quotes to check your saved work; returning here will not submit it again.'
+              }
+            />
+            {!jobQuote.isPending ? (
+              <GhostButton label="Check Quotes" onPress={reviewDraft} />
+            ) : null}
+            {!jobQuote.isPending && attempt.status === 'failed_no_commit' ? (
+              <GhostButton label="Start another job" onPress={startAnother} />
+            ) : null}
+            {!jobQuote.isPending && attempt.operationId && attempt.status !== 'failed_no_commit' ? (
+              <GhostButton
+                label={statusLookup.isPending ? 'Checking status…' : 'Refresh draft status'}
+                disabled={statusLookup.isPending}
+                onPress={() => void refreshDraftStatus()}
+              />
+            ) : null}
+            {formError && !jobQuote.isPending ? (
+              <Text style={[styles.hint, { color: colors.textSec }]}>{formError}</Text>
+            ) : null}
+          </>
+        )}
+      </View>
+    );
 
   return (
     <View style={{ gap: spacing.xl }}>
@@ -167,7 +456,7 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
               <PillGroup
                 options={(f.options ?? []).map(o => [o, o] as const)}
                 value={answers[f.code] ?? ''}
-                onChange={v => setAnswers(a => ({ ...a, [f.code]: v }))}
+                onChange={v => answer(f.code, v)}
               />
             </View>
           ) : (
@@ -175,18 +464,18 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
               key={f.code}
               label={f.label}
               value={answers[f.code] ?? ''}
-              onChangeText={v => setAnswers(a => ({ ...a, [f.code]: v }))}
+              onChangeText={v => answer(f.code, v)}
               height={52}
               keyboardType={f.type === 'number' ? 'number-pad' : undefined}
             />
           ),
         )}
 
-        {spec.catalogueCategory && catalogue.isPending ? (
+        {productAllowed && spec.catalogueCategory && catalogue.isPending ? (
           <Text style={[styles.hint, { color: colors.textSec }]}>Loading your catalogue…</Text>
         ) : null}
 
-        {spec.catalogueCategory && catalogue.isError ? (
+        {productAllowed && spec.catalogueCategory && catalogue.isError ? (
           <Notice
             tone="danger"
             label="Could not load your catalogue"
@@ -206,21 +495,51 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
                 ...products.map(
                   p =>
                     [
-                      p.name,
+                      p.id,
                       [p.name, priceLabel(p.unit_price_ex_gst)].filter(Boolean).join(' — '),
                     ] as const,
                 ),
               ]}
-              value={productName}
-              onChange={setProductName}
+              value={productId}
+              onChange={setProductId}
             />
+            {chosenProduct ? (
+              <View style={{ gap: spacing.sm, marginTop: spacing.md }}>
+                {chosenProduct.image_path ? (
+                  <Image
+                    source={{ uri: chosenProduct.image_path }}
+                    contentFit="contain"
+                    style={{ height: 180, width: '100%' }}
+                    accessibilityLabel={chosenProduct.name}
+                  />
+                ) : null}
+                <Text style={[styles.hint, { color: colors.textPri }]}>{chosenProduct.name}</Text>
+                <Text style={[styles.hint, { color: colors.textSec }]}>
+                  {[chosenProduct.brand, chosenProduct.range_series].filter(Boolean).join(' · ')}
+                </Text>
+                <Text style={[styles.hint, { color: colors.textSec }]}>
+                  {priceLabel(chosenProduct.unit_price_ex_gst) ?? 'Price unavailable'}
+                  {chosenProduct.unit ? ` per ${chosenProduct.unit}` : ''} · Your catalogue
+                </Text>
+                {chosenProduct.description ? (
+                  <Text style={[styles.hint, { color: colors.textSec }]}>
+                    {chosenProduct.description}
+                  </Text>
+                ) : null}
+              </View>
+            ) : null}
           </View>
+        ) : null}
+        {jobType === 'ev_charger' && !productAllowed ? (
+          <Text style={[styles.hint, { color: colors.textSec }]}>
+            A catalogue charger can be selected only when you supply the charger unit.
+          </Text>
         ) : null}
       </Card>
 
       <Card style={{ gap: spacing.xl }}>
         <SectionLabel>Property details</SectionLabel>
-        <Field label="Address" value={address} onChangeText={setAddress} required height={54} />
+        <JobAddressField value={address} onChange={setAddress} onSuburb={setSuburb} />
         <Field label="Suburb" value={suburb} onChangeText={setSuburb} required height={54} />
         <MultilineField
           label="Anything else about the job"
@@ -229,6 +548,15 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           placeholder="Access, existing wiring, age of the property — anything that changes the price."
         />
       </Card>
+
+      {jobType === 'ev_charger' ? (
+        <JobPhotos
+          key={jobType}
+          photos={photos}
+          setPhotos={setPhotos}
+          disabled={jobQuote.isPending}
+        />
+      ) : null}
 
       <Card style={{ gap: spacing.xl }}>
         <SectionLabel>Customer details · optional</SectionLabel>
@@ -262,8 +590,9 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
 
       <PrimaryCta
         label={jobQuote.isPending ? 'Drafting the quote…' : 'Draft the quote'}
-        onPress={onSubmit}
+        onPress={() => void onSubmit()}
         loading={jobQuote.isPending}
+        disabled={photos.some(photo => photo.status === 'uploading')}
       />
 
       {jobQuote.isError ? (
@@ -271,41 +600,8 @@ export function JobQuoteScreen({ trades }: { trades: string[] }) {
           tone="danger"
           label="Could not draft the quote"
           body={explainJobQuoteFailure(jobQuote.error)}
-          onRetry={onSubmit}
+          onRetry={() => void onSubmit()}
         />
-      ) : null}
-
-      {jobQuote.isSuccess ? (
-        pricedQuote ? (
-          <Card style={{ gap: 10 }}>
-            <SectionLabel>Quote drafted</SectionLabel>
-            {jobQuote.data.needsInspection || pricedQuote.total_inc_gst == null ? (
-              <Notice
-                tone="warn"
-                label="Needs an on-site visit"
-                body="This job routed to the paid site visit rather than an auto-quote — nothing was invented."
-              />
-            ) : null}
-            <Text style={[styles.priceValue, { color: colors.accentText }]}>
-              {pricedQuote.total_inc_gst == null
-                ? '—'
-                : formatAud(centsFromApiDollars(pricedQuote.total_inc_gst))}
-            </Text>
-            <Text style={[styles.priceSub, { color: colors.textDim }]}>
-              {(pricedQuote.selected_tier ?? 'draft').toUpperCase()} TIER
-            </Text>
-            <Text style={[styles.priceSub, { color: colors.textDim }]}>
-              Approve and send it from the Quotes tab.
-            </Text>
-          </Card>
-        ) : (
-          <Notice
-            tone="accent"
-            label={tenantMe.isFetching ? 'Fetching your priced quote…' : 'Quote drafted'}
-            body="It will appear here and in the Quotes tab as soon as it syncs."
-            onRetry={() => void tenantMe.refetch()}
-          />
-        )
       ) : null}
     </View>
   );

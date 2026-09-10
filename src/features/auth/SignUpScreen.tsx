@@ -16,6 +16,7 @@
  *     here mid-session; a tenant already exists → straight to the dashboard.
  */
 import { isClerkAPIResponseError, useAuth, useClerk, useUser } from '@clerk/expo';
+import { ActivationResponseSchema, activatedPhoneReadiness } from './provisioning';
 // Clerk Core 3 promoted the signal-based useSignIn/useSignUp to the default export.
 // Those return { error } from create() and drop setActive/isLoaded entirely, which
 // this multi-step wizard is built on, so it stays on the resource-shaped hooks that
@@ -24,7 +25,7 @@ import { isClerkAPIResponseError, useAuth, useClerk, useUser } from '@clerk/expo
 import { useSignIn, useSignUp } from '@clerk/expo/legacy';
 import { useQueryClient } from '@tanstack/react-query';
 import { useLocalSearchParams, useRouter } from 'expo-router';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
@@ -38,6 +39,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { z } from 'zod';
 
 import { BrandMark } from '@/components/BrandMark';
+import { BusinessAddressField } from '@/features/auth/BusinessAddressField';
 import {
   acquisitionEnvelopeFromParams,
   activationAcquisitionFields,
@@ -122,13 +124,7 @@ const STEPS = [
 const AU_MOBILE = /^(\+?61\s?4\d{2}\s?\d{3}\s?\d{3}|0?4\d{2}\s?\d{3}\s?\d{3})$/;
 const WEBSITE_RE = /^(https?:\/\/)?([\w-]+\.)+[\w-]{2,}(\/\S*)?$/i;
 
-const ActivateResponseSchema = z.looseObject({
-  ok: z.boolean(),
-  tenantId: z.string().optional(),
-  phoneNumber: z.string().nullish(),
-  warning: z.string().nullish(),
-  setupComplete: z.boolean().optional(),
-});
+const ActivateResponseSchema = ActivationResponseSchema;
 
 const ValidateCodeResponseSchema = z.looseObject({
   ok: z.boolean(),
@@ -182,6 +178,16 @@ export function SignUpScreen() {
     getToken: getAuthToken,
     signOut,
   } = useAuth();
+  const activationScope = useMemo(
+    () => ({ active: true, authUserId, authSessionId }),
+    [authUserId, authSessionId],
+  );
+  useEffect(() => {
+    activationScope.active = true;
+    return () => {
+      activationScope.active = false;
+    };
+  }, [activationScope]);
 
   const [resumeEntry, setResumeEntry] = useState(params.resume === '1');
   const [identity, setIdentity] = useState<{ clerkUserId: string; sessionId: string | null }>(
@@ -216,9 +222,7 @@ export function SignUpScreen() {
   const [resendError, setResendError] = useState<string | null>(null);
   const [resendSent, setResendSent] = useState(false);
   const [continuityWarning, setContinuityWarning] = useState<string | null>(null);
-  const [acquisition, setAcquisition] = useState<AcquisitionEnvelope | null>(
-    incomingAcquisition,
-  );
+  const [acquisition, setAcquisition] = useState<AcquisitionEnvelope | null>(incomingAcquisition);
   const acquisitionRef = useRef<AcquisitionEnvelope | null>(incomingAcquisition);
   const acquisitionPersistence = useRef(createAcquisitionPersistence()).current;
 
@@ -230,16 +234,19 @@ export function SignUpScreen() {
   const { user: clerkUser } = useUser();
   const identityBackfilled = useRef(false);
 
-  const commitAcquisition = useCallback((next: AcquisitionEnvelope | null) => {
-    acquisitionRef.current = next;
-    setAcquisition(next);
-    if (!next) return;
-    void acquisitionPersistence.save(next).catch(() => {
-      setContinuityWarning(
-        'We could not save this signup on the device. Keep QuoteMax open until activation finishes.',
-      );
-    });
-  }, [acquisitionPersistence]);
+  const commitAcquisition = useCallback(
+    (next: AcquisitionEnvelope | null) => {
+      acquisitionRef.current = next;
+      setAcquisition(next);
+      if (!next) return;
+      void acquisitionPersistence.save(next).catch(() => {
+        setContinuityWarning(
+          'We could not save this signup on the device. Keep QuoteMax open until activation finishes.',
+        );
+      });
+    },
+    [acquisitionPersistence],
+  );
 
   // Restore only an unbound envelope or one belonging to the live/pending
   // account. Clerk retains its pending sign-up resource across a remount, so
@@ -403,8 +410,7 @@ export function SignUpScreen() {
   const hasPainting = form.trades.includes('painting');
   const hasRoofing = form.trades.includes('roofing');
   const primaryTrade: TradeSlug | undefined = form.trades[0];
-  const verifiedIntent =
-    acquisition?.intent?.status === 'verified' ? acquisition.intent : null;
+  const verifiedIntent = acquisition?.intent?.status === 'verified' ? acquisition.intent : null;
   const lockedSmsInvitation =
     verifiedIntent && acquisition?.invitation?.provenance === 'sms'
       ? acquisition.invitation.code
@@ -494,6 +500,7 @@ export function SignUpScreen() {
         sessions: clerk.client.sessions,
         getActiveToken: getAuthToken,
       });
+      if (!activationScope.active) return;
       if (!token) {
         setSubmitError('Your secure session expired. Sign in again before activating.');
         return;
@@ -506,6 +513,8 @@ export function SignUpScreen() {
         // past the generic 15s default, so match it rather than abort a slow success client-side.
         timeoutMs: 180000,
       });
+      if (!activationScope.active) return;
+      const phoneReadiness = activatedPhoneReadiness(res);
       const current = acquisitionRef.current;
       if (current) {
         const redacted = completeAcquisitionEnvelope(current, {
@@ -514,7 +523,8 @@ export function SignUpScreen() {
         });
         if (redacted) {
           const complete = withAcquisitionProvisioningReceipt(redacted, {
-            setupComplete: res.setupComplete === true,
+            setupComplete: phoneReadiness?.setupComplete === true,
+            phoneReadiness,
             phoneNumber: res.phoneNumber,
             warning: res.warning,
           });
@@ -523,12 +533,14 @@ export function SignUpScreen() {
           try {
             await acquisitionPersistence.save(complete);
           } catch {
+            if (!activationScope.active) return;
             setContinuityWarning(
               'Activation succeeded, but the selected plan could not be saved on this device.',
             );
           }
         }
       }
+      if (!activationScope.active) return;
       router.replace(
         successHref({
           firstName: form.firstName.trim(),
@@ -536,10 +548,11 @@ export function SignUpScreen() {
           warning: res.warning ?? null,
           sessionId,
           clerkUserId,
-          setupComplete: res.setupComplete === true,
+          setupComplete: phoneReadiness?.setupComplete === true,
         }),
       );
     } catch (err) {
+      if (!activationScope.active) return;
       applyActivateFailure(err);
     }
   }
@@ -1041,7 +1054,10 @@ export function SignUpScreen() {
                     <Text style={[styles.verifiedIntentLabel, { color: colors.textDim }]}>
                       INVITATION CODE · FROM TEXT · READ-ONLY
                     </Text>
-                    <Text selectable style={[styles.verifiedIntentPhone, { color: colors.textPri }]}>
+                    <Text
+                      selectable
+                      style={[styles.verifiedIntentPhone, { color: colors.textPri }]}
+                    >
                       {lockedSmsInvitation}
                     </Text>
                     {codeError ? (
@@ -1317,9 +1333,7 @@ export function SignUpScreen() {
                               { backgroundColor: colors.inkCard, borderColor: colors.inkLine },
                             ]}
                           >
-                            <Text
-                              style={[styles.verifiedIntentLabel, { color: colors.textDim }]}
-                            >
+                            <Text style={[styles.verifiedIntentLabel, { color: colors.textDim }]}>
                               MOBILE · VERIFIED VIA SMS
                             </Text>
                             <Text
@@ -1364,13 +1378,14 @@ export function SignUpScreen() {
                           keyboardType="url"
                           error={errors.websiteUrl}
                         />
-                        <Field
-                          label="Business address"
+                        <BusinessAddressField
                           value={form.businessAddress}
-                          onChangeText={v => set('businessAddress', v)}
-                          hint="Optional"
-                          height={54}
-                          autoCapitalize="words"
+                          onChange={v => set('businessAddress', v)}
+                          scopeKey={JSON.stringify([identity.clerkUserId, identity.sessionId])}
+                          getAccessToken={() => identity.sessionId ? activationBearerToken({
+                            sessionId: identity.sessionId, activeSessionId: authSessionId,
+                            sessions: clerk.client.sessions, getActiveToken: getAuthToken,
+                          }) : Promise.resolve(undefined)}
                         />
                         <Field
                           label="ABN"

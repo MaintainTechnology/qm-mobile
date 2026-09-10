@@ -5,7 +5,7 @@
  * feature only owns `src/app/(tabs)/chats.tsx` and this directory, so the thread view (E2) lives
  * here instead of a `chats/[id]` route.
  */
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 import { FlashList } from '@shopify/flash-list';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -13,11 +13,13 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { ListSkeleton, ListState } from '@/components/ListState';
 import { ScreenHeader } from '@/components/ScreenHeader';
 import { GhostButton } from '@/features/auth/ui';
+import { PillOption } from '@/features/trades/ui';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
 import { ChatThread } from './ChatThread';
 import { useChats, type ChatRow } from './chats-api';
+import { isColdChat } from './chat-state';
 import {
   chatDisplayName,
   chatInitial,
@@ -30,10 +32,12 @@ export function ChatsScreen({
   selectedId,
   onSelect,
   onBack,
+  initialFilter,
 }: {
   selectedId: string | null;
   onSelect: (id: string) => void;
   onBack: () => void;
+  initialFilter?: string;
 }) {
   const { colors } = useTheme();
   const insets = useSafeAreaInsets();
@@ -41,9 +45,15 @@ export function ChatsScreen({
   // Drafts keyed by conversation id, held here rather than in ChatThread, so backing out of a
   // thread and returning keeps a half-typed reply.
   const [drafts, setDrafts] = useState<Record<string, string>>({});
+  const [filter, setFilter] = useState<'all' | 'cold'>(initialFilter === 'cold' ? 'cold' : 'all');
+  useEffect(() => {
+    setFilter(initialFilter === 'cold' ? 'cold' : 'all');
+  }, [initialFilter]);
 
   const chats = data?.chats ?? [];
   const selected = selectedId ? (chats.find(c => c.id === selectedId) ?? null) : null;
+  const cold = chats.filter(isColdChat);
+  const shown = filter === 'cold' ? cold : chats;
 
   if (selected) {
     return (
@@ -61,6 +71,27 @@ export function ChatsScreen({
   return (
     <View style={[styles.screen, { backgroundColor: colors.inkDeep, paddingTop: insets.top }]}>
       <ScreenHeader title="Chats" subtitle="Customer texts and calls, in one place." />
+      <View style={{ paddingHorizontal: spacing.xl, gap: spacing.sm, paddingBottom: spacing.sm }}>
+        <View
+          accessibilityRole="radiogroup"
+          accessibilityLabel="Filter conversations"
+          style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.sm }}
+        >
+          <PillOption
+            label={`All (${chats.length})`}
+            selected={filter === 'all'}
+            onPress={() => setFilter('all')}
+          />
+          <PillOption
+            label={`Went cold (${cold.length})`}
+            selected={filter === 'cold'}
+            onPress={() => setFilter('cold')}
+          />
+        </View>
+        <Text style={[type.bodySm, { color: colors.textDim }]}>
+          Counts reflect loaded conversations.
+        </Text>
+      </View>
 
       {isLoading ? (
         <ListSkeleton label="Loading conversations" />
@@ -94,7 +125,7 @@ export function ChatsScreen({
             </View>
           ) : null}
           <FlashList
-            data={chats}
+            data={shown}
             keyExtractor={c => c.id}
             refreshing={isFetching && !isLoading}
             onRefresh={() => void refetch()}
@@ -103,6 +134,12 @@ export function ChatsScreen({
               <View style={{ height: 1, marginLeft: 52, backgroundColor: colors.inkLine }} />
             )}
             renderItem={({ item }) => <ChatListRow chat={item} onPress={() => onSelect(item.id)} />}
+            ListEmptyComponent={
+              <ListState
+                title="No conversations went cold"
+                description="Abandoned customer SMS conversations appear in this view. Active conversations and voice calls stay in All."
+              />
+            }
           />
         </>
       )}
@@ -117,6 +154,11 @@ function ChatListRow({ chat, onPress }: { chat: ChatRow; onPress: () => void }) 
     channelLabel(chat),
     chat.suburb,
     chat.job_type ? chat.job_type.replace(/_/g, ' ') : null,
+    isColdChat(chat) ? 'Went cold' : chat.status?.replace(/_/g, ' '),
+    chat.channel === 'sms' && chat.turn_count != null ? `${chat.turn_count} turns` : null,
+    chat.channel === 'voice' && chat.duration_seconds != null
+      ? `${chat.duration_seconds} seconds`
+      : null,
   ]
     .filter(Boolean)
     .join(' · ');

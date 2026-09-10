@@ -43,6 +43,16 @@
               "scheme": "https",
               "host": "www.quotemax.com.au",
               "pathPrefix": "/app"
+            },
+            {
+              "scheme": "https",
+              "host": "quotemax.com.au",
+              "pathPrefix": "/api/email/unsubscribe/"
+            },
+            {
+              "scheme": "https",
+              "host": "www.quotemax.com.au",
+              "pathPrefix": "/api/email/unsubscribe/"
             }
           ],
           "category": [
@@ -77,6 +87,7 @@
       [
         "expo-image-picker",
         {
+          "microphonePermission": false,
           "cameraPermission": "QuoteMax uses the camera to take site photos to attach to your quotes and videos.",
           "photosPermission": "QuoteMax uses your photo library to attach existing site photos to your quotes and videos."
         }

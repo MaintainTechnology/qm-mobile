@@ -1,20 +1,30 @@
 /**
  * Roof measure (spec web-parity F1) — ported from the web tool at
  * quotemate-automation/app/dashboard/roofing/measure/page.tsx, numbers-and-cards only:
- * no maps, no 3D, no street-view, no address autocomplete (non-goals).
+ * Native address suggestions and per-building scope precede saved owner review.
  *
  * Flow: type an address → POST /api/roofing/measure-all → each returned structure
  * renders as an include/exclude card with its area + priced tiers → the combined
  * total sums the included, quotable structures → Save persists the job,
  * Save as quote promotes it to a shareable customer quote.
  */
-import { useEffect, useRef, useState } from 'react';
-import { Pressable, Share, StyleSheet, Text, View } from 'react-native';
+import { useAuth } from '@clerk/expo';
+import { useRouter } from 'expo-router';
+import { usePreventRemove } from '@react-navigation/native';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useTenantMe, tenantTrades } from '@/lib/tenant';
+import { createRoofInputDraftStore } from './roof-input-draft';
+import { RoofAddressField } from './RoofAddressField';
+import { RoofGeometry } from './RoofGeometry';
+import { useApiQuery } from '@/lib/useApi';
+import { OwnedRoofSchema } from './owned-roof';
+import { clearRoofAttempt, readRoofAttempt, writeRoofAttempt, type RoofAttempt } from './roof-attempt';
+import { Alert, Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { Field, GhostButton, PrimaryCta } from '@/features/auth/ui';
 import { centsFromApiDollars, formatAud } from '@/lib/money';
 
-import { useMeasureRoof, useSaveRoof, useSaveRoofAsQuote } from './api';
+import { useMeasureRoof, useSaveRoof } from './api';
 import {
   AU_STATES,
   ROOF_INTENTS,
@@ -28,7 +38,6 @@ import {
   includedInspectionStructures,
   roofMeasureFingerprint,
   roofRunIsFresh,
-  sameRoofPricingAuthority,
   singleQuotableIncluded,
   structureKey,
   type AuState,
@@ -36,6 +45,7 @@ import {
   type MeasureAllRequest,
   type MeasureAllResponse,
   type RoofStructurePrice,
+  type SaveRoofResponse,
 } from './schema';
 import { apiErrorMessage, Card, Notice, PillGroup, SectionLabel } from '../ui';
 import { fonts, radius, spacing, touch, type as typeScale } from '@/lib/theme';
@@ -45,6 +55,16 @@ const TIER_LABELS = ['Good', 'Better', 'Best'] as const;
 type SuccessfulRoofMeasure = Extract<MeasureAllResponse, { ok: true }>;
 
 export function RoofMeasureScreen() {
+  const { userId } = useAuth();
+  const tenant = useTenantMe();
+  if (tenant.isError && !tenant.data) return <Notice tone="danger" label="Could not load your roofing account" body={apiErrorMessage(tenant.error)} onRetry={() => void tenant.refetch()} />;
+  if (!userId || !tenant.data) return <Notice tone="warn" label="Loading your roofing account…" />;
+  if (!tenantTrades(tenant.data).includes('roofing')) return <Notice tone="warn" label="Roofing is unavailable for this account" />;
+  return <RoofMeasureForm key={`${userId}:${tenant.data.tenant.id}`} scope={{ userId, tenantId: tenant.data.tenant.id }} />;
+}
+
+export function RoofMeasureForm({ scope }: { scope: { userId: string; tenantId: string } }) {
+  const { userId, tenantId } = scope;
   const { colors } = useTheme();
 
   const [address, setAddress] = useState('');
@@ -54,6 +74,21 @@ export function RoofMeasureScreen() {
   const [pitch, setPitch] = useState<string>('standard');
   const [intent, setIntent] = useState<string>('full_reroof');
   const [yearBuilt, setYearBuilt] = useState('');
+  const router = useRouter();
+  const [customerName, setCustomerName] = useState('');
+  const [customerPhone, setCustomerPhone] = useState('');
+  const [perBuilding, setPerBuilding] = useState<NonNullable<MeasureAllRequest['perBuilding']>>({});
+  const store = useMemo(() => createRoofInputDraftStore({ userId, tenantId }), [userId, tenantId]);
+  const [saveAttempt, setSaveAttempt] = useState<RoofAttempt | null>(null);
+  const [saveAttemptLoaded, setSaveAttemptLoaded] = useState(false);
+  const [attemptError, setAttemptError] = useState<string | null>(null);
+  const [savedResult, setSavedResult] = useState<SaveRoofResponse | null>(null);
+  const [savePreparing, setSavePreparing] = useState(false);
+  const saveInFlight = useRef(false);
+  const [draftLoaded, setDraftLoaded] = useState(false);
+  const [draftError, setDraftError] = useState<string | null>(null);
+  const [draftRetry, setDraftRetry] = useState(0);
+  const [storedDraftKey, setStoredDraftKey] = useState<string | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [included, setIncluded] = useState<Record<string, boolean>>({});
   const [accepted, setAccepted] = useState<{
@@ -63,13 +98,71 @@ export function RoofMeasureScreen() {
   const mountedRef = useRef(true);
   const activeRunRef = useRef(0);
   const currentFingerprintRef = useRef('');
+  const draftValue = useMemo(() => ({ address, postcode, state, material, pitch, intent, yearBuilt, customerName, customerPhone, perBuilding, accepted, included }),
+    [address, postcode, state, material, pitch, intent, yearBuilt, customerName, customerPhone, perBuilding, accepted, included]);
+  const draftKey = JSON.stringify(draftValue);
+  const draftUnstored = draftLoaded && storedDraftKey !== draftKey;
+  usePreventRemove(draftUnstored || savePreparing, () => {
+    Alert.alert('Keep this roof open', 'Your latest input has not finished saving securely. Retry working-copy storage before leaving.');
+  });
 
   const measure = useMeasureRoof();
   const saveRoof = useSaveRoof();
-  const saveAsQuote = useSaveRoofAsQuote();
+  const savedLookup = useApiQuery(['roofing','run',userId,tenantId,saveAttempt?.runId],
+    `/api/roofing/measurement/${saveAttempt?.runId ?? 'pending'}?lookup=run`, OwnedRoofSchema,
+    { enabled: saveAttempt?.action === 'save' && !!saveAttempt.runId });
+  useEffect(() => {
+    let current = true;
+    void readRoofAttempt({ userId, tenantId, recordId:'new-roof' }).then(value => {
+      if (current && mountedRef.current) { setSaveAttempt(value); setSaveAttemptLoaded(true); setAttemptError(null); }
+    }).catch(e => { if (current && mountedRef.current) setAttemptError(apiErrorMessage(e)); });
+    return () => { current = false; };
+  }, [userId, tenantId, draftRetry]);
+  useEffect(() => {
+    const saved = savedLookup.data?.measurement;
+    if (!saveAttempt?.runId || !saved || saved.tenant_id !== tenantId || saved.quote?.pricing_run_id !== saveAttempt.runId ||
+      !saved.pricing_authority || saved.pricing_authority.tenant_id !== tenantId || !saved.public_token) return;
+    const recovered: SaveRoofResponse = { ok:true,id:saved.id,measure_token:saved.measure_token,public_token:saved.public_token,pricing_authority:saved.pricing_authority,existing:true };
+    void clearRoofAttempt({ userId, tenantId, recordId:'new-roof' }).then(() => {
+      if (!mountedRef.current) return;
+      setSavedResult(recovered);
+      setSaveAttempt(null);
+    }).catch(e => { if (mountedRef.current) setAttemptError(apiErrorMessage(e)); });
+  }, [savedLookup.data, saveAttempt, userId, tenantId]);
+
+  useEffect(() => {
+    if (draftLoaded) return;
+    let current = true;
+    void store.load().then(saved => {
+      if (!current || !mountedRef.current) return;
+      if (saved) {
+        const d = saved.value; setAddress(d.address); setPostcode(d.postcode); setState(d.state);
+        setMaterial(d.material); setPitch(d.pitch); setIntent(d.intent); setYearBuilt(d.yearBuilt);
+        setCustomerName(d.customerName); setCustomerPhone(d.customerPhone); setPerBuilding(d.perBuilding);
+        if (d.accepted) setAccepted(d.accepted); if (d.included) setIncluded(d.included);
+      }
+      setDraftLoaded(true);
+    }).catch(e => { if (current && mountedRef.current) setDraftError(apiErrorMessage(e)); });
+    return () => { current = false; };
+  }, [store, draftLoaded, draftRetry]);
+  useEffect(() => {
+    if (!draftLoaded) return;
+    let current = true;
+    void store.save(draftValue)
+      .then(() => { if (current && mountedRef.current) { setDraftError(null); setStoredDraftKey(draftKey); } })
+      .catch(e => { if (current && mountedRef.current) setDraftError(apiErrorMessage(e)); });
+    return () => { current = false; };
+  }, [store, draftLoaded, draftValue, draftKey, draftRetry]);
+
+  const lockedInput = !draftLoaded || Boolean(saveAttempt) || savePreparing || saveRoof.isPending;
+  const refetchSavedRun = savedLookup.refetch;
+  useEffect(() => {
+    if (savedResult?.ok && saveAttempt?.runId) void refetchSavedRun();
+  }, [savedResult, saveAttempt?.runId, refetchSavedRun]);
 
   const currentRequest = (): MeasureAllRequest => ({
     address: { address: address.trim(), postcode: postcode.trim(), state },
+    perBuilding,
     inputs: {
       material,
       pitch,
@@ -83,14 +176,14 @@ export function RoofMeasureScreen() {
     roofMeasureFingerprint(accepted.request) === currentFingerprintRef.current;
   const measured: SuccessfulRoofMeasure | null =
     acceptedIsCurrent && accepted?.response.ok === true ? accepted.response : null;
-  const quote: MultiRoofQuote | null = measured?.quote ?? null;
+  const quote: MultiRoofQuote | null = accepted?.response.ok ? accepted.response.quote : null;
   const runFresh = measured ? roofRunIsFresh(measured.run_expires_at) : false;
 
   useEffect(
-    () => () => {
+    () => { mountedRef.current = true; return () => {
       mountedRef.current = false;
       activeRunRef.current += 1;
-    },
+    }; },
     [],
   );
 
@@ -113,15 +206,8 @@ export function RoofMeasureScreen() {
   const singleIncluded = quote ? singleQuotableIncluded(quote, included) : null;
   const totalIncluded = quote ? includedCount(quote, included) : 0;
   const inspectionIncluded = quote ? includedInspectionStructures(quote, included) : [];
-  const canPromote =
-    measured !== null &&
-    runFresh &&
-    totalIncluded > 0 &&
-    inspectionIncluded.length === 0 &&
-    saveRoof.data?.ok === true &&
-    sameRoofPricingAuthority(saveRoof.data.pricing_authority, measured.pricing_authority);
-
   function onMeasure() {
+    if (!draftLoaded || !saveAttemptLoaded || saveAttempt || savePreparing || draftError || measure.isPending || saveRoof.isPending) return;
     const trimmedAddress = address.trim();
     if (trimmedAddress.length < 3) {
       setFormError('Enter the property address.');
@@ -143,7 +229,7 @@ export function RoofMeasureScreen() {
     setFormError(null);
     setAccepted(null);
     saveRoof.reset();
-    saveAsQuote.reset();
+    setSavedResult(null);
     measure.reset();
     measure.mutate(request, {
       onSuccess: response => {
@@ -162,34 +248,33 @@ export function RoofMeasureScreen() {
     });
   }
 
-  function onSave() {
-    if (!quote || !measured || !runFresh) return;
-    saveRoof.mutate({
-      run_token: measured.run_token,
-      address: accepted!.request.address,
-      provider: measured.provider,
-      quote,
-      included_indices: includedIndices1Based(quote, included),
-    });
+  async function onSave() {
+    if (!quote || !measured || !runFresh || !draftLoaded || draftError || attemptError || saveInFlight.current || saveRoof.isPending || !saveAttemptLoaded) return;
+    if (saveAttempt && saveAttempt.runId !== measured.run_id) return;
+    saveInFlight.current = true; setSavePreparing(true);
+    const receipt: RoofAttempt = { version:1, action:'save', revision:measured.pricing_authority.revision, runId:measured.run_id };
+    try {
+      // A retry uses the identical retained verified run, so the server's stable
+      // measurement-token uniqueness reconciles one job even after a lost reply.
+      await store.save({ address, postcode, state, material, pitch, intent, yearBuilt, customerName, customerPhone, perBuilding, accepted, included });
+      if (!mountedRef.current) return;
+      await writeRoofAttempt({ userId,tenantId,recordId:'new-roof' },receipt);
+      if (!mountedRef.current) return;
+      setSaveAttempt(receipt);
+      const result = await saveRoof.mutateAsync({
+        run_token: measured.run_token, address: accepted!.request.address, provider: measured.provider,
+        quote, included_indices: includedIndices1Based(quote,included),
+        customer_name: customerName.trim() || null, customer_phone: customerPhone.trim() || null,
+      });
+      if (!mountedRef.current) return;
+      setSavedResult(result); void savedLookup.refetch();
+    } catch(e) { if (mountedRef.current) setFormError(apiErrorMessage(e)); }
+    finally { saveInFlight.current=false; if (mountedRef.current) setSavePreparing(false); }
   }
 
-  // Promotion sends only the persisted measurement capability plus the pricing
-  // revision. The server reconstructs every selected structure and money field.
-  function onSaveAsQuote() {
-    if (
-      !measured ||
-      !runFresh ||
-      inspectionIncluded.length > 0 ||
-      totalIncluded === 0 ||
-      saveRoof.data?.ok !== true ||
-      !sameRoofPricingAuthority(saveRoof.data.pricing_authority, measured.pricing_authority)
-    ) {
-      return;
-    }
-    saveAsQuote.mutate({
-      measure_token: saveRoof.data.measure_token,
-      expected_pricing_revision: measured.pricing_authority.revision,
-    });
+  // The private editor owns explicit review, durable promotion and reconciliation.
+  function onReviewSaved() {
+    if (savedResult?.ok && !savePreparing && !draftUnstored) router.push({ pathname: '/roofing/[id]', params: { id: savedResult.id } });
   }
 
   return (
@@ -204,13 +289,14 @@ export function RoofMeasureScreen() {
       </View>
       <Card style={{ gap: spacing.xl }}>
         <SectionLabel>Property</SectionLabel>
-        <Field label="Address" value={address} onChangeText={setAddress} required height={54} />
+        <RoofAddressField value={address} onChange={value => { if (lockedInput) return; setAddress(value); setPerBuilding({}); }}
+          onSelect={value => { if (lockedInput) return; setAddress(value.address); if (value.postcode) setPostcode(value.postcode); if (value.state && (AU_STATES as readonly string[]).includes(value.state)) setState(value.state as AuState); setPerBuilding({}); }} />
         <View style={styles.row}>
           <View style={styles.rowField}>
             <Field
               label="Postcode"
               value={postcode}
-              onChangeText={v => setPostcode(v.replace(/[^0-9]/g, '').slice(0, 4))}
+              onChangeText={v => { if (!lockedInput) setPostcode(v.replace(/[^0-9]/g, '').slice(0, 4)); }}
               required
               height={54}
               keyboardType="number-pad"
@@ -220,7 +306,7 @@ export function RoofMeasureScreen() {
             <Field
               label="Year built"
               value={yearBuilt}
-              onChangeText={v => setYearBuilt(v.replace(/[^0-9]/g, '').slice(0, 4))}
+              onChangeText={v => { if (!lockedInput) setYearBuilt(v.replace(/[^0-9]/g, '').slice(0, 4)); }}
               hint="Optional"
               height={54}
               keyboardType="number-pad"
@@ -233,7 +319,7 @@ export function RoofMeasureScreen() {
           <PillGroup
             options={AU_STATES.map(s => [s, s] as const)}
             value={state}
-            onChange={v => setState(v as AuState)}
+            onChange={v => { if (!lockedInput) setState(v as AuState); }}
           />
         </View>
       </Card>
@@ -241,21 +327,35 @@ export function RoofMeasureScreen() {
         <SectionLabel>Roof scope</SectionLabel>
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>DEFAULT ROOF MATERIAL</Text>
-          <PillGroup options={ROOF_MATERIALS} value={material} onChange={setMaterial} />
+          <PillGroup options={ROOF_MATERIALS} value={material} onChange={value => { if (!lockedInput) setMaterial(value); }} />
         </View>
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>ROOF PITCH</Text>
-          <PillGroup options={ROOF_PITCHES} value={pitch} onChange={setPitch} />
+          <PillGroup options={ROOF_PITCHES} value={pitch} onChange={value => { if (!lockedInput) setPitch(value); }} />
         </View>
         <View>
           <Text style={[styles.label, { color: colors.textPri }]}>JOB INTENT</Text>
-          <PillGroup options={ROOF_INTENTS} value={intent} onChange={setIntent} />
+          <PillGroup options={ROOF_INTENTS} value={intent} onChange={value => { if (!lockedInput) setIntent(value); }} />
         </View>
 
         {formError ? <Notice tone="danger" label="Check the form" body={formError} /> : null}
       </Card>
-      <PrimaryCta label="Measure all structures" onPress={onMeasure} loading={measure.isPending} />
+      <Card style={{ gap: spacing.md }}>
+        <SectionLabel>Customer details</SectionLabel>
+        <Field label="Customer name" value={customerName} onChangeText={value => { if (lockedInput) return; saveRoof.reset(); setSavedResult(null); setCustomerName(value.slice(0,160)); }} hint="Optional" />
+        <Field label="Customer phone" value={customerPhone} onChangeText={value => { if (lockedInput) return; saveRoof.reset(); setSavedResult(null); setCustomerPhone(value.slice(0,40)); }} keyboardType="phone-pad" hint="Optional" />
+        <Text style={[styles.structureArea, { color: colors.textSec }]}>Details are saved with the measurement. Entering them does not send a quote.</Text>
+      </Card>
+      {draftError ? <Notice tone="danger" label="Working-copy recovery unavailable" body={draftError} onRetry={() => setDraftRetry(value => value + 1)} /> : null}
+      {attemptError ? <Notice tone="danger" label="Previous Save recovery unavailable" body={attemptError} onRetry={() => setDraftRetry(value => value + 1)} /> : null}
+      {draftLoaded ? <Notice tone="accent" label={draftUnstored ? 'Saving working copy…' : 'Working copy saved on this device'} body="The encrypted working copy is kept for seven days. Keep this screen open if storage reports an error." /> : null}
+      <PrimaryCta label="Measure all structures" onPress={onMeasure} loading={measure.isPending} disabled={!draftLoaded || !saveAttemptLoaded || !!saveAttempt || savePreparing || !!draftError || saveRoof.isPending} />
 
+      {saveAttempt ? <Notice tone="warn" label="Check the previous Save" body="The saved result is being reconciled with this measurement run. Keep this run until the outcome is confirmed; measuring again cannot resolve an earlier Save." onRetry={() => void savedLookup.refetch()} /> : null}
+      {saveAttempt && savedLookup.data?.measurement.tenant_id === tenantId && savedLookup.data.measurement.quote?.pricing_run_id === saveAttempt.runId &&
+        (!savedLookup.data.measurement.pricing_authority || !savedLookup.data.measurement.public_token) ? <Notice tone="warn" label="Saved job found — review is incomplete" body="The private saved job exists, but current pricing or its public review identity is unavailable. The recovery receipt is retained." /> : null}
+      {saveAttempt && savedLookup.data?.measurement.tenant_id === tenantId && savedLookup.data.measurement.quote?.pricing_run_id === saveAttempt.runId ?
+        <GhostButton label="Open recovered private roofing job" onPress={() => router.push({ pathname:'/roofing/[id]', params:{id:savedLookup.data!.measurement.id} })} /> : null}
       {measure.isError ? (
         <Notice
           tone="danger"
@@ -295,15 +395,25 @@ export function RoofMeasureScreen() {
             body={quote.routing.reason}
           />
 
+          <RoofGeometry roof={{ quote, public_token: null, provider: accepted?.response.ok ? accepted.response.provider : null }}
+            selected={includedIndices1Based(quote, included)} onSelect={index => {
+              if (savePreparing || saveAttempt || saveRoof.isPending) return;
+              const structure = quote.structures[index - 1]; if (!structure) return;
+              saveRoof.reset(); setSavedResult(null);
+              setIncluded(previous => ({ ...previous, [structureKey(structure, index - 1)]: previous[structureKey(structure, index - 1)] === false }));
+            }} />
           {quote.structures.map((s, i) => (
             <StructureCard
               key={structureKey(s, i)}
               structure={s}
               index={i}
               included={included[structureKey(s, i)] !== false}
+              overrides={s.buildingId ? perBuilding[s.buildingId] : undefined}
+              onScope={s.buildingId ? change => { if (savePreparing || saveAttempt || saveRoof.isPending) return; saveRoof.reset(); setSavedResult(null); setPerBuilding(previous => ({ ...previous, [s.buildingId!]: { ...previous[s.buildingId!], ...change } })); } : undefined}
               onToggle={() => {
+                if (savePreparing || saveAttempt || saveRoof.isPending) return;
                 saveRoof.reset();
-                saveAsQuote.reset();
+                setSavedResult(null);
                 setIncluded(prev => {
                   const key = structureKey(s, i);
                   return { ...prev, [key]: prev[key] === false };
@@ -357,23 +467,23 @@ export function RoofMeasureScreen() {
             ) : null}
 
             <GhostButton
-              label={saveRoof.isPending ? 'Saving…' : 'Save job'}
+              label={savePreparing || saveRoof.isPending ? 'Saving…' : saveAttempt ? 'Retry the same verified Save' : 'Save job'}
               onPress={onSave}
-              loading={saveRoof.isPending}
-              disabled={!runFresh || totalIncluded === 0 || quote.structures.length === 0}
+              loading={savePreparing || saveRoof.isPending}
+              disabled={!runFresh || !!draftError || !!attemptError || !draftLoaded || totalIncluded === 0 || quote.structures.length === 0}
             />
-            {saveRoof.data?.ok === true ? (
+            {savedResult?.ok === true ? (
               <Notice
                 tone="accent"
                 label="Saved"
-                body={`Job ${saveRoof.data.id.slice(0, 8)} saved.`}
+                body={`Job ${savedResult.id.slice(0, 8)} saved. Open it to review imagery and correct measurements before promotion.`}
               />
             ) : null}
-            {saveRoof.data?.ok === false ? (
+            {savedResult?.ok === false ? (
               <Notice
                 tone="danger"
                 label="Could not save"
-                body={saveRoof.data.detail ?? saveRoof.data.error}
+                body={savedResult.detail ?? savedResult.error}
                 onRetry={onSave}
               />
             ) : null}
@@ -399,37 +509,10 @@ export function RoofMeasureScreen() {
             ) : null}
 
             <PrimaryCta
-              label={saveAsQuote.isPending ? 'Creating quote…' : 'Save as quote'}
-              onPress={onSaveAsQuote}
-              loading={saveAsQuote.isPending}
-              disabled={!canPromote}
+              label="Review saved roof"
+              onPress={onReviewSaved}
+              disabled={savedResult?.ok !== true || savePreparing || draftUnstored}
             />
-            {saveAsQuote.data?.ok === true
-              ? (() => {
-                  const { shareUrl, existing } = saveAsQuote.data;
-                  return (
-                    <>
-                      <Notice
-                        tone="accent"
-                        label={existing ? 'Quote already exists' : 'Quote created'}
-                        body={shareUrl}
-                      />
-                      <GhostButton
-                        label="Share quote link"
-                        onPress={() => void Share.share({ message: shareUrl })}
-                      />
-                    </>
-                  );
-                })()
-              : null}
-            {saveAsQuote.isError ? (
-              <Notice
-                tone="danger"
-                label="Could not create the quote"
-                body={apiErrorMessage(saveAsQuote.error)}
-                onRetry={onSaveAsQuote}
-              />
-            ) : null}
           </Card>
         </>
       ) : null}
@@ -442,11 +525,15 @@ function StructureCard({
   index,
   included,
   onToggle,
+  overrides,
+  onScope,
 }: {
   structure: RoofStructurePrice;
   index: number;
   included: boolean;
   onToggle: () => void;
+  overrides?: Partial<MeasureAllRequest['inputs']>;
+  onScope?: (change: Partial<MeasureAllRequest['inputs']>) => void;
 }) {
   const { colors } = useTheme();
   const inspection = structure.price.routing.decision === 'inspection_required';
@@ -492,6 +579,12 @@ function StructureCard({
         {structure.inputs.material.replace(/_/g, ' ')}
       </Text>
 
+      {onScope ? <View style={{ gap: spacing.md }}>
+        <Text style={[styles.label, { color: colors.textPri }]}>THIS BUILDING’S ROOF SCOPE</Text>
+        <PillGroup options={ROOF_MATERIALS} value={overrides?.material ?? structure.inputs.material} onChange={material => onScope({ material })} />
+        <PillGroup options={ROOF_PITCHES} value={overrides?.pitch ?? structure.inputs.pitch} onChange={pitch => onScope({ pitch })} />
+        <PillGroup options={ROOF_INTENTS} value={overrides?.intent ?? structure.inputs.intent} onChange={intent => onScope({ intent })} />
+      </View> : null}
       {!inspection ? (
         <View style={styles.tierRow}>
           {structure.price.tiers.map((t, i) => (

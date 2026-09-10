@@ -3,21 +3,20 @@
  * "Saved roofing jobs" history (page.tsx:16786-16935). The measure entry point
  * stays the native RoofMeasureScreen; this is just the history table beside
  * it. Totals render exactly as /api/roofing/save GET denormalised them — no
- * client-side arithmetic. Tapping a row opens the job's web page (the rich
- * ?full=1 measurement view, falling back to the measurement-results page).
+ * client-side arithmetic. Tapping a row opens the private native measurement
+ * editor for owned review, corrections and explicit quote promotion.
  */
 import { useState } from 'react';
+import { useRouter } from 'expo-router';
 import { Pressable, StyleSheet, Text, View } from 'react-native';
 
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-import { openWebPath } from '../hub/LinkOut';
 import { apiErrorMessage, Card, Notice, SectionLabel } from '../ui';
 import {
   formatJobDate,
   formatJobPrice,
-  roofJobHref,
   useRoofingSavedJobs,
   type SavedRoofJob,
 } from './tools-api';
@@ -26,10 +25,10 @@ const PAGE = 10;
 
 function JobRow({ job }: { job: SavedRoofJob }) {
   const { colors } = useTheme();
+  const router = useRouter();
   const inspection = job.routing === 'inspection_required';
   // Web parity: a row with no structure count reads as one structure.
   const structures = job.structure_count ?? 1;
-  const href = roofJobHref(job);
   const pillColour = inspection ? colors.warningBright : colors.successBright;
   const price = inspection
     ? 'Inspection'
@@ -48,14 +47,13 @@ function JobRow({ job }: { job: SavedRoofJob }) {
     <Pressable
       accessibilityRole="button"
       accessibilityLabel={job.address ?? 'Saved roofing job'}
-      disabled={href == null}
       onPress={() => {
-        if (href != null) openWebPath(href);
+        router.push({ pathname: '/roofing/[id]', params: { id: job.id } });
       }}
       style={({ pressed }) => [
         styles.row,
         { borderTopColor: colors.inkLine },
-        pressed && href != null && styles.pressed,
+        pressed && styles.pressed,
       ]}
     >
       <View style={styles.rowMain}>
@@ -71,9 +69,7 @@ function JobRow({ job }: { job: SavedRoofJob }) {
           {inspection ? 'INSPECTION' : 'QUOTE'}
         </Text>
         <Text style={[styles.rowPrice, { color: colors.textPri }]}>{price}</Text>
-        {href != null ? (
-          <Text style={[styles.rowChevron, { color: colors.textDim }]}>→</Text>
-        ) : null}
+        <Text style={[styles.rowChevron, { color: colors.textDim }]}>→</Text>
       </View>
     </Pressable>
   );

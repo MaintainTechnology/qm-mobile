@@ -54,6 +54,15 @@ describe('TradeJobsSchema', () => {
 });
 
 describe('mergeQueueEntries', () => {
+  it('preserves owned legacy and inactive-trade quote history while denying unsafely scoped jobs', () => {
+    const entries = mergeQueueEntries(
+      [quote({ id: 'legacy', trade: null }), quote({ id: 'old-trade', trade: 'painting' })],
+      [job()],
+      [],
+    );
+    expect(entries.map(entry => entry.key)).toEqual(['quote:legacy', 'quote:old-trade']);
+    expect(presentQueueTrades(entries, [])).toEqual(['painting']);
+  });
   it('tags both sources before the shared newest sort', () => {
     const entries = merged(
       [quote({ id: 'old-quote', created_at: '2026-08-01T00:00:00.000Z' })],
@@ -152,14 +161,17 @@ describe('status vocabulary and counts', () => {
 
 describe('all-source search', () => {
   it('ANDs normalised terms across job address, headline, trade and status', () => {
-    const [entry] = merged([], [
-      job({
-        trade: 'commercial-painting',
-        address: 'Harbour Offices, Pyrmont',
-        headline: 'Protective coating review',
-        status: 'draft',
-      }),
-    ]);
+    const [entry] = merged(
+      [],
+      [
+        job({
+          trade: 'commercial-painting',
+          address: 'Harbour Offices, Pyrmont',
+          headline: 'Protective coating review',
+          status: 'draft',
+        }),
+      ],
+    );
 
     expect(entryMatchesSearch(entry!, parseQueueSearchTerms('pyrmont commercial review'))).toBe(
       true,
@@ -214,16 +226,12 @@ describe('stable merged sorts', () => {
       [job({ id: 'missing', createdAt: null })],
     );
 
-    expect([...entries].sort((a, b) => compareQueueEntries(a, b, 'newest')).map(e => e.key)).toEqual([
-      'quote:new',
-      'quote:old',
-      'job:roofing:missing',
-    ]);
-    expect([...entries].sort((a, b) => compareQueueEntries(a, b, 'oldest')).map(e => e.key)).toEqual([
-      'quote:old',
-      'quote:new',
-      'job:roofing:missing',
-    ]);
+    expect(
+      [...entries].sort((a, b) => compareQueueEntries(a, b, 'newest')).map(e => e.key),
+    ).toEqual(['quote:new', 'quote:old', 'job:roofing:missing']);
+    expect(
+      [...entries].sort((a, b) => compareQueueEntries(a, b, 'oldest')).map(e => e.key),
+    ).toEqual(['quote:old', 'quote:new', 'job:roofing:missing']);
   });
 
   it('sorts both amount directions while all unpriced jobs and quotes sink stably', () => {

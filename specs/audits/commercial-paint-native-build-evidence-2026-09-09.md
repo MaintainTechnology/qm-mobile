@@ -1,0 +1,45 @@
+# Commercial painting native continuation evidence
+
+Date: 2026-09-09. Bounded implementation of BE04/T09/T10/X03/X04 from `specs/mobile-parity-release-build-spec.md`. This evidence does not close the full commercial-paint workflow or authorize App Store release.
+
+## Implementation coverage
+
+- Pricing requires a successful owned price request followed by an owned read of the exact current extraction. The returned digest, canonical microsecond review timestamp, raw persisted timestamp, server BOM, GST state, adopted-rate presence and labour intent must agree. An explicit override must also match the displayed server labour rate. The screen displays the accepted BOM, never computes customer prices, invalidates review on labour/extraction/source replacement, and ignores late responses.
+- Labour is an explicit optional decimal input; blank means the business rate, partial/zero/invalid text stays visible and cannot be priced. Customer name/phone and new job name/address are separate encrypted working copies. Existing job facts are server-read and read-only here.
+- Run resume uses an encrypted account/tenant pointer with the existing seven-day working-copy retention. It never reads the old unscoped AsyncStorage pointer. Pointer writes complete before changing the visible run, and failures keep the current run. Captured store handles are revoked by account cleanup.
+- Customer drafts use the shared chunked SecureStore adapter, preserving partial edits and previous committed content. Failed reads can retry hydration; failed writes retain the on-screen edit and prevent leaving until the latest copy is stored. Run-specific copies do not overwrite another run.
+- An opaque Save receipt contains only account-scoped reviewed IDs, digest, exact timestamp, input hash and optional verified quote ID. No customer name, phone, share token or expiry is in this receipt. It survives logout and uncertainty. The exact original customer input hash is required for an explicit retry.
+- Initial recovery completes before new mutations or run switching. Remount and “Check Save status” use GET only. Missing/foreign/malformed results retain the receipt. Verified recovery links to the owned quote queue and clears only on explicit acknowledgement of the same quote ID. Neither Save nor recovery sends to the customer.
+- Clerk user/session and tenant scope fence token acquisition, server ownership lookup, request dispatch and late response acceptance. Monotonic epochs cover A→B→A transitions and unmount. Scoped read keys and exact returned run identity protect run queries. The screen serializes mutation starts and prevents new calculations from erasing an unresolved Save.
+- The native new-Save gate remains explicitly closed. Its prerequisites include T08/T09/T10 acceptance; showing an exact reviewed proof is narrower than completing those prerequisites.
+- The latest continuation adds recovery-only customer fields and an explicit **Retry earlier Save** action. A working copy that has expired after seven days can be re-entered. The full original pricing pass and customer-input hash must match; blank versus omitted optional fields are accepted only when that exact variant matches the retained hash. Secure-storage failure keeps the edits visible, blocks retry and protects navigation. New Save remains gated.
+- The latest owned run read pairs `/run/:id` with `/run/:id/corrections`. Only exact run/extraction IDs, job/address and original/corrected arrays may retain an observed revision. Mixed or unavailable snapshots lose their BOM, price timestamp and proof; the screen hides prices and requires refresh. Authentication and ownership failures are not downgraded into a successful preview. Pricing sends the revision already displayed and verifies the same source/revision in its readback.
+- Independent source review identified an intermediate-render race after a remote update: a retained review could display once before passive effects cleared it. The repair stores the reviewed revision and derives `currentReview` synchronously from revision, run/extraction, proof, canonical raw/review timestamp, exact BOM and labour text. Review badge, reviewed amounts and Save eligibility all use that current value. New render-monitor regressions observe the render before passive cleanup for remote correction, pricing and timestamp changes; their execution is pending with the latest suite.
+
+## Validation
+
+Historical focused checkpoint before the latest recovery/revision continuation: `node node_modules/jest/bin/jest.js --ci --runInBand src/features/trades/commercial-painting` — **6 suites, 77 tests passed** (12.833 seconds). This recorded result is not acceptance of the current source.
+
+The suites cover the existing API/state-machine/presentation contract, proof freshness, durable Save receipts, actual hooks with mocked SecureStore/network boundaries, and actual workspace interactions. Adversarial cases include lost POST acknowledgement, GET-only remount, foreign/not-found recovery, initial storage hydration, exact-input retry, A→B→A token completion, late POST after unmount, ownership mismatch, 401 retention, first pre-write 422 rejection, encrypted pointer isolation/revocation, failed draft load/write retry, dirty partial labour, release gate, pending receipt/run switching, run-pointer failure and tenant-read retry.
+
+Historical scoped lint passed for the preceding source. The new expired-copy retry and observed-revision source, workspace/query/receipt/hook tests and source-match tests are awaiting the coordinated native test/lint/type slot. No new result is claimed while that gate is pending.
+
+The parent owns the final canonical whole-mobile TypeScript result. Older intermediate type checks do not certify the latest source.
+
+## Correction contract and native editing boundary
+
+Investigation of the earlier web `app/api/tenant/commercial-painting/run/[id]/route.ts` found that PATCH committed job metadata before validating the correction array, then wrote extraction corrections without an expected baseline or latest-extraction condition, then updated status separately. The isolated migration221 candidate replaces this with owned atomic correction operations and a bounded legacy adapter, hardens rich-run approval against the migration219 pricing source, and updates the current web caller to an observed revision. Its 17 exact files are frozen for guarded local integration; final combined browser, TypeScript and Next gates remain separate evidence. No remote migration was performed.
+
+The paired contract supplies:
+
+1. An owned current-edit snapshot with a canonical revision covering run ID, active extraction ID, job facts and all editable takeoff values. Read this without modifying or adopting anything.
+2. A strictly validated request containing expected revision plus explicit job/correction fields. Validate the whole request before any write; preserve defined blank/zero/false/separate/excluded semantics and reject unsupported values instead of silently dropping rows.
+3. One transaction locking the owned run and active extraction in the same order as pricing/release. It compares expected revision and released status, updates all requested fields together, and invalidates BOM, priced timestamp and pricing proof together. A mismatch returns a structured conflict and does not partially write; a separate owned GET reads the current revision.
+4. A durable operation identity and read-only outcome lookup. Lost responses must reconcile the original operation without silently replacing newer corrections or replaying an unverified mutation.
+5. Actual handler/PGlite and client regressions for competing corrections, metadata plus invalid items, wrong/latest extraction, released authority, interruption, retained conflict copies, explicit Apply versus persistence and corrected readback before pricing. The isolated backend's 80 passing tests and scoped lint are bounded evidence; combined browser/static acceptance remains pending.
+
+Migration219 remains authoritative for price persistence and quiet Save. Migration221 also binds rich-run approval to the actual latest extraction, exact reviewed proof/BOM/timestamp and current consumed source; it strengthens immutable released inputs. Existing same-pass recovery intentionally returns the already committed quote. The native screen consumes only the owned snapshot and observed-revision price contract in this continuation. Native correction POST/editor recovery remains separate work; an unknown correction receipt must never inherit the seven-day working-copy expiry.
+
+## Still outside this acceptance
+
+T08 specialist rate configuration, complete T09 plan/sheet viewer and native correction editor, assistant proposal/Apply flow, repaint/refinement consent and media checks, public/owned quote/PDF parity, real iOS/Android interruption and storage proof, and live backend migration/deployment/readback remain required. No migration, live provider request, customer send or deployment was performed for this slice.

@@ -3,18 +3,21 @@
  */
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import NetInfo, { type NetInfoState } from '@react-native-community/netinfo';
-import { createAsyncStoragePersister } from '@tanstack/query-async-storage-persister';
 import { focusManager, onlineManager, QueryClient } from '@tanstack/react-query';
 import { AppState, Platform } from 'react-native';
 
 import { ApiError, ApiSchemaError } from '@/lib/api';
+import { createScopedQueryStorage } from '@/lib/scoped-query-storage';
 
 /**
  * Cold-start persistence: PersistQueryClientProvider (src/app/_layout.tsx) rehydrates
  * this cache from AsyncStorage, so an offline relaunch on site still shows the last-known
  * quotes instead of an empty app. Its maxAge matches gcTime below.
  */
-export const asyncStoragePersister = createAsyncStoragePersister({ storage: AsyncStorage });
+const scopedQueryStorage = createScopedQueryStorage(AsyncStorage);
+export const createQueryPersister = scopedQueryStorage.createPersister;
+/** Account cleanup revokes all old persisters before deleting their stored cache. */
+export const asyncStoragePersister = { removeClient: scopedQueryStorage.removeClient };
 
 /**
  * A persisted cache is valid only for the Clerk identity that created it.  The

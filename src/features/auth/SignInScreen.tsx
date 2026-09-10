@@ -10,7 +10,6 @@ import { isClerkAPIResponseError, useAuth } from '@clerk/expo';
 // moved to /legacy — see the note in SignUpScreen.
 import { useSignIn } from '@clerk/expo/legacy';
 import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
-import * as WebBrowser from 'expo-web-browser';
 import { useState } from 'react';
 import {
   KeyboardAvoidingView,
@@ -213,8 +212,12 @@ export function SignInScreen() {
 
               <Pressable
                 accessibilityRole="link"
+                accessibilityState={{ disabled: submitting }}
+                disabled={submitting}
                 onPress={() =>
-                  WebBrowser.openBrowserAsync('https://www.quotemax.com.au/forgot-password')
+                  router.push(
+                    `/forgot-password?intent=${encodeURIComponent(String(destinationAfterSignIn()))}` as Href,
+                  )
                 }
                 style={({ pressed }) => [styles.forgotLink, { opacity: pressed ? 0.6 : 1 }]}
               >

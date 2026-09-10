@@ -31,7 +31,12 @@ const isAvailableAsync = jest.mocked(Sharing.isAvailableAsync);
 const shareAsync = jest.mocked(Sharing.shareAsync);
 
 function ok(uri: string) {
-  return { uri, status: 200, headers: { 'content-type': 'application/pdf' }, mimeType: 'application/pdf' };
+  return {
+    uri,
+    status: 200,
+    headers: { 'content-type': 'application/pdf' },
+    mimeType: 'application/pdf',
+  };
 }
 
 const cancelAsync = jest.fn().mockResolvedValue(undefined);
@@ -39,6 +44,7 @@ const downloadAsync = jest.fn();
 
 beforeEach(() => {
   jest.clearAllMocks();
+  cancelAsync.mockReset().mockResolvedValue(undefined);
   isAvailableAsync.mockResolvedValue(true);
   createDownloadResumable.mockReturnValue({ downloadAsync, cancelAsync } as never);
 });
@@ -148,10 +154,13 @@ describe('downloadAndShare', () => {
 
   it('cancels a stalled download at the timeout and removes the partial file', async () => {
     downloadAsync.mockImplementation(
-      () => new Promise((_resolve, reject) => cancelAsync.mockImplementation(() => {
-        reject(new Error('cancelled'));
-        return Promise.resolve();
-      })),
+      () =>
+        new Promise((_resolve, reject) =>
+          cancelAsync.mockImplementation(() => {
+            reject(new Error('cancelled'));
+            return Promise.resolve();
+          }),
+        ),
     );
     await expect(downloadAndShare({ ...args, timeoutMs: 1 })).rejects.toEqual(
       new DownloadCancelledError('timeout'),
@@ -166,6 +175,44 @@ describe('downloadAndShare', () => {
     expect(first).not.toBe(second);
     expect(first.endsWith('.pdf')).toBe(true);
     expect(second.length).toBeLessThanOrEqual(80);
+  });
+
+  it('does not start an already cancelled transfer', async () => {
+    const controller = new AbortController();
+    controller.abort();
+    await expect(downloadAndShare({ ...args, signal: controller.signal })).rejects.toEqual(
+      new DownloadCancelledError('cancelled'),
+    );
+    expect(downloadAsync).not.toHaveBeenCalled();
+  });
+
+  it('bounds a native transfer even when both download and native cancel ignore settlement', async () => {
+    downloadAsync.mockReturnValue(new Promise(() => {}));
+    cancelAsync.mockReturnValue(new Promise(() => {}));
+    await expect(downloadAndShare({ ...args, timeoutMs: 1 })).rejects.toEqual(
+      new DownloadCancelledError('timeout'),
+    );
+    expect(deleteAsync).toHaveBeenCalled();
+    expect(shareAsync).not.toHaveBeenCalled();
+  });
+
+  it('never opens the share sheet after cancellation while destination detection is pending', async () => {
+    downloadAsync.mockResolvedValue(ok('file:///cache/Quote.pdf'));
+    let resolveAvailable: (result: boolean) => void = () => {};
+    isAvailableAsync.mockReturnValue(
+      new Promise(resolve => {
+        resolveAvailable = resolve;
+      }),
+    );
+    const controller = new AbortController();
+    const result = downloadAndShare({ ...args, signal: controller.signal });
+    const rejection = expect(result).rejects.toEqual(new DownloadCancelledError('cancelled'));
+    await Promise.resolve();
+    await Promise.resolve();
+    controller.abort();
+    resolveAvailable(true);
+    await rejection;
+    expect(shareAsync).not.toHaveBeenCalled();
   });
 });
 

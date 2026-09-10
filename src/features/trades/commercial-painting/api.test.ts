@@ -16,11 +16,8 @@ import {
   classifyPaintPricingBlock,
   COMMERCIAL_PAINT_DOCUMENT_POLICY,
   initialPipeline,
-  loadPersistedRunId,
-  persistRunId,
   pipelineReducer,
   putSignedFile,
-  RUN_ID_STORAGE_KEY,
   signedUploadResponseProblem,
   zipUploads,
   type PipelineEvent,
@@ -288,19 +285,6 @@ describe('zipUploads + buildCompleteBody', () => {
     expect(() => zipUploads([pdf('a.pdf'), pdf('b.pdf')], [target('u1', 'a.pdf')])).toThrow(
       /upload slots/,
     );
-  });
-});
-
-describe('run-id persistence', () => {
-  it('round-trips and clears the persisted run id', async () => {
-    await persistRunId('run-42');
-    expect(await loadPersistedRunId()).toBe('run-42');
-    await persistRunId(null);
-    expect(await loadPersistedRunId()).toBeNull();
-  });
-
-  it('uses the agreed storage key', () => {
-    expect(RUN_ID_STORAGE_KEY).toBe('quotemax.cpaint.run-id');
   });
 });
 

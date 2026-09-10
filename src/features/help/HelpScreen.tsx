@@ -1,3 +1,4 @@
+import { useAuth } from '@clerk/expo';
 import { useRouter } from 'expo-router';
 import { useEffect, useRef, useState } from 'react';
 import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
@@ -152,6 +153,7 @@ function DocumentRow({ document }: { document: HelpDocument }) {
 }
 
 export function HelpScreen() {
+  const { isSignedIn } = useAuth();
   const { colors } = useTheme();
   const router = useRouter();
   const [query, setQuery] = useState('');
@@ -160,6 +162,7 @@ export function HelpScreen() {
   return (
     <SectionScreen
       title="Help & guides"
+      fallbackRoute={isSignedIn ? '/menu' : '/welcome'}
       subtitle="Public QuoteMax guides and downloads. Historical documents are labelled and do not override today’s app or server behaviour."
     >
       <View style={styles.searchGroup}>

@@ -1,0 +1,12 @@
+{
+  "status": "failed_typecheck",
+  "skippedStages": [
+    "lint",
+    "full Jest"
+  ],
+  "gate": "check-01",
+  "checked": 391,
+  "drift": [],
+  "completedAt": "2026-09-09T08:04:58.2156672Z",
+  "typeErrors": 6
+}

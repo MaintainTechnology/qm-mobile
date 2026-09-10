@@ -1,0 +1,21 @@
+PASS src/features/studio/StudioScreen.test.tsx (9.799 s)
+PASS src/features/studio/studio-render.test.ts (7.385 s)
+PASS src/features/support/SupportScreen.test.tsx
+PASS src/features/studio/studio-pdf.test.ts (5.207 s)
+PASS src/features/support/contact-receipt.test.ts
+PASS src/lib/account-identity-storage.test.ts
+PASS src/features/support/contact-draft.test.ts
+PASS src/features/studio/studio-contract.test.ts
+PASS src/lib/working-draft-storage.test.ts
+PASS src/features/studio/studio-share.test.ts
+PASS src/lib/use-account-identity-boundary.test.tsx
+PASS src/features/support/contact-contract.test.ts
+PASS src/lib/account-storage.test.ts
+PASS src/features/studio/studio-export-cache.test.ts
+PASS src/lib/account-identity-boundary.test.ts
+
+Test Suites: 15 passed, 15 total
+Tests:       107 passed, 107 total
+Snapshots:   0 total
+Time:        30.408 s, estimated 69 s
+Ran all test suites within paths "src/features/studio/studio-contract.test.ts", "src/features/studio/studio-render.test.ts", "src/features/studio/studio-pdf.test.ts", "src/features/studio/studio-share.test.ts", "src/features/studio/studio-export-cache.test.ts", "src/features/studio/StudioScreen.test.tsx", "src/features/support/contact-contract.test.ts", "src/features/support/contact-draft.test.ts", "src/features/support/contact-receipt.test.ts", "src/features/support/SupportScreen.test.tsx", "src/lib/account-storage.test.ts", "src/lib/account-identity-storage.test.ts", "src/lib/account-identity-boundary.test.ts", "src/lib/use-account-identity-boundary.test.tsx", "src/lib/working-draft-storage.test.ts".

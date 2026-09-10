@@ -1,0 +1,982 @@
+[
+  {
+    "label": "HEAD",
+    "errors": 54,
+    "warnings": 15,
+    "messages": [
+      {
+        "line": 111,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "module",
+        "message": "'ScanLine' is defined but never used."
+      },
+      {
+        "line": 540,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 620,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 629,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 1803,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CommandPalette",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2885,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "OverviewTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2929,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "OverviewTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2963,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "OverviewTab",
+        "message": "'aiTone' is assigned a value but never used."
+      },
+      {
+        "line": 2964,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "OverviewTab",
+        "message": "'aiValue' is assigned a value but never used."
+      },
+      {
+        "line": 3734,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "PipelineStat",
+        "message": "'PipelineStat' is defined but never used."
+      },
+      {
+        "line": 3785,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "RetryProvisionButton",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 3828,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "Kpi",
+        "message": "'Kpi' is defined but never used."
+      },
+      {
+        "line": 3861,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "useCountUp",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 3890,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "KpiTile",
+        "message": "'KpiTile' is defined but never used."
+      },
+      {
+        "line": 3938,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "LatestQuoteRow",
+        "message": "'LatestQuoteRow' is defined but never used."
+      },
+      {
+        "line": 4152,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "BrandImageCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 4274,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "AccountTab",
+        "message": "'onActivateTrade' is defined but never used."
+      },
+      {
+        "line": 4323,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "AccountTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 4893,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "PayoutJobsSection",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 5229,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "LicencesCard",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 5253,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "LicencesCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 5609,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "ActivateTradeCard",
+        "message": "'ActivateTradeCard' is defined but never used."
+      },
+      {
+        "line": 5951,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6000,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+      },
+      {
+        "line": 6000,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+      },
+      {
+        "line": 6049,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6096,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6125,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      },
+      {
+        "line": 6126,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      },
+      {
+        "line": 6148,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6241,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteTierModeCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6300,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteTierModeCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6347,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteDisplayCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6414,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6521,
+        "rule": "react-hooks/refs",
+        "severity": 2,
+        "function": "CalibrationCard",
+        "message": "Error: Cannot access refs during render"
+      },
+      {
+        "line": 6559,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CalibrationCard",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 6848,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "EarlyBirdCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6983,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "PricingBookCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7185,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 7248,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 7249,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7274,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7790,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7980,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "PreferredBrandsCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 8190,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "CustomServiceForm",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 9949,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 9951,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 9993,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 9994,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 9995,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 10002,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 10485,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CoveragePanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 10740,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "BrowseSupplierPanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11281,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "TierLadderPanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11485,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CatalogueTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11516,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CatalogueTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 12700,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "RecipesTab",
+        "message": "React Hook useCallback has a missing dependency: 'tradeFilter'. Either include it or remove the dependency array. If 'setSelectedId' needs the current value of 'tradeFilter', you can also switch to useReducer instead of useState and read 'tradeFilter' in the reducer."
+      },
+      {
+        "line": 12703,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "RecipesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 12709,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "RecipesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 13663,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "EstimatingTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 14251,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "FollowupsTab",
+        "message": "The 'list' logical expression could make the dependencies of useMemo Hook (at line 14255) change on every render. To fix this, wrap the initialization of 'list' in its own useMemo() Hook."
+      },
+      {
+        "line": 14251,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "FollowupsTab",
+        "message": "The 'list' logical expression could make the dependencies of useMemo Hook (at line 14261) change on every render. To fix this, wrap the initialization of 'list' in its own useMemo() Hook."
+      },
+      {
+        "line": 14896,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "FollowupHistory",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 16184,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "Grid",
+        "message": "'Grid' is defined but never used."
+      },
+      {
+        "line": 16196,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "SaveHint",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 16230,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "tabLabel",
+        "message": "'tabLabel' is defined but never used."
+      },
+      {
+        "line": 16293,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "pickTierTotal",
+        "message": "'pickTierTotal' is defined but never used."
+      },
+      {
+        "line": 16407,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "SignageHubTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 17056,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "RoofingHubTab",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      }
+    ]
+  },
+  {
+    "label": "working",
+    "errors": 54,
+    "warnings": 15,
+    "messages": [
+      {
+        "line": 112,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "module",
+        "message": "'ScanLine' is defined but never used."
+      },
+      {
+        "line": 541,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 621,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 630,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "DashboardPage",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 1804,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CommandPalette",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2886,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "OverviewTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2930,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "OverviewTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 2964,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "OverviewTab",
+        "message": "'aiTone' is assigned a value but never used."
+      },
+      {
+        "line": 2965,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "OverviewTab",
+        "message": "'aiValue' is assigned a value but never used."
+      },
+      {
+        "line": 3735,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "PipelineStat",
+        "message": "'PipelineStat' is defined but never used."
+      },
+      {
+        "line": 3786,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "RetryProvisionButton",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 3829,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "Kpi",
+        "message": "'Kpi' is defined but never used."
+      },
+      {
+        "line": 3862,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "useCountUp",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 3891,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "KpiTile",
+        "message": "'KpiTile' is defined but never used."
+      },
+      {
+        "line": 3939,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "LatestQuoteRow",
+        "message": "'LatestQuoteRow' is defined but never used."
+      },
+      {
+        "line": 4153,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "BrandImageCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 4275,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "AccountTab",
+        "message": "'onActivateTrade' is defined but never used."
+      },
+      {
+        "line": 4324,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "AccountTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 4894,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "PayoutJobsSection",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 5230,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "LicencesCard",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 5254,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "LicencesCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 5610,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "ActivateTradeCard",
+        "message": "'ActivateTradeCard' is defined but never used."
+      },
+      {
+        "line": 5952,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6001,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+      },
+      {
+        "line": 6001,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "`\"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`."
+      },
+      {
+        "line": 6050,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "ReviewPolicyCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6097,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6126,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      },
+      {
+        "line": 6127,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      },
+      {
+        "line": 6149,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "Followup2hCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6242,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteTierModeCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6301,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteTierModeCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6348,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteDisplayCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6415,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayCard",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 6522,
+        "rule": "react-hooks/refs",
+        "severity": 2,
+        "function": "CalibrationCard",
+        "message": "Error: Cannot access refs during render"
+      },
+      {
+        "line": 6560,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CalibrationCard",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 6849,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "EarlyBirdCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 6984,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "PricingBookCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7186,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 7249,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 7250,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7275,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7791,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "ServicesTab",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 7981,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "PreferredBrandsCard",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 8191,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "CustomServiceForm",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 9950,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 9952,
+        "rule": "@typescript-eslint/no-explicit-any",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Unexpected any. Specify a different type."
+      },
+      {
+        "line": 9994,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 9995,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 9996,
+        "rule": "react-hooks/static-components",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot create components during render"
+      },
+      {
+        "line": 10003,
+        "rule": "react-hooks/purity",
+        "severity": 2,
+        "function": "QuoteDisplayModeToggle",
+        "message": "Error: Cannot call impure function during render"
+      },
+      {
+        "line": 10486,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CoveragePanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 10741,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "BrowseSupplierPanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11282,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "TierLadderPanel",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11486,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CatalogueTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 11517,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "CatalogueTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 12701,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "RecipesTab",
+        "message": "React Hook useCallback has a missing dependency: 'tradeFilter'. Either include it or remove the dependency array. If 'setSelectedId' needs the current value of 'tradeFilter', you can also switch to useReducer instead of useState and read 'tradeFilter' in the reducer."
+      },
+      {
+        "line": 12704,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "RecipesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 12710,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "RecipesTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 13664,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "EstimatingTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 14238,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "FollowupsTab",
+        "message": "The 'list' logical expression could make the dependencies of useMemo Hook (at line 14242) change on every render. To fix this, wrap the initialization of 'list' in its own useMemo() Hook."
+      },
+      {
+        "line": 14238,
+        "rule": "react-hooks/exhaustive-deps",
+        "severity": 1,
+        "function": "FollowupsTab",
+        "message": "The 'list' logical expression could make the dependencies of useMemo Hook (at line 14248) change on every render. To fix this, wrap the initialization of 'list' in its own useMemo() Hook."
+      },
+      {
+        "line": 14870,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "FollowupHistory",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 16150,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "Grid",
+        "message": "'Grid' is defined but never used."
+      },
+      {
+        "line": 16162,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "SaveHint",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 16196,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "tabLabel",
+        "message": "'tabLabel' is defined but never used."
+      },
+      {
+        "line": 16259,
+        "rule": "@typescript-eslint/no-unused-vars",
+        "severity": 1,
+        "function": "pickTierTotal",
+        "message": "'pickTierTotal' is defined but never used."
+      },
+      {
+        "line": 16373,
+        "rule": "react-hooks/set-state-in-effect",
+        "severity": 2,
+        "function": "SignageHubTab",
+        "message": "Error: Calling setState synchronously within an effect can trigger cascading renders"
+      },
+      {
+        "line": 17022,
+        "rule": "react/no-unescaped-entities",
+        "severity": 2,
+        "function": "RoofingHubTab",
+        "message": "`'` can be escaped with `&apos;`, `&lsquo;`, `&#39;`, `&rsquo;`."
+      }
+    ]
+  }
+]

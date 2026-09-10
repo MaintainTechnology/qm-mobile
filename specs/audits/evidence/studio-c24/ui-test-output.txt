@@ -1,0 +1,15 @@
+PASS src/features/studio/StudioScreen.test.tsx (8.912 s)
+  √ edits only the selected slide and restores the fixed rail selection and copy on reopen (223 ms)
+  √ retains custom copy after failed preview and failed PNG export (533 ms)
+  √ exports only an explicit current PNG or the full ordered carousel PDF (157 ms)
+  √ requires protected Reset confirmation and keeps edits when cancelled (201 ms)
+  √ hides a stale preview and ignores its late result after selecting another slide (851 ms)
+  √ blocks leaving during unsaved storage failures and retries without discarding custom copy (157 ms)
+  √ keeps a failed saved-copy load closed until explicit discard or successful retry (40 ms)
+  √ aborts pending export when the account editor unmounts and never opens a late share sheet (67 ms)
+
+Test Suites: 1 passed, 1 total
+Tests:       8 passed, 8 total
+Snapshots:   0 total
+Time:        9.875 s
+Ran all test suites matching /src\\features\\studio\\StudioScreen.test.tsx/i.

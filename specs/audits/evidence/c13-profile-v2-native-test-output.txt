@@ -1,0 +1,13 @@
+(node:39260) [DEP0040] DeprecationWarning: The `punycode` module is deprecated. Please use a userland alternative instead.
+(Use `node --trace-deprecation ...` to show where the warning was created)
+PASS src/features/sections/business-profile-review.test.tsx
+PASS src/features/sections/use-business-profile.test.tsx
+PASS src/features/sections/BusinessProfileEditor.test.tsx
+PASS src/features/sections/business-profile-write.test.ts
+PASS src/features/sections/business-profile-contract.test.ts
+
+Test Suites: 5 passed, 5 total
+Tests:       45 passed, 45 total
+Snapshots:   0 total
+Time:        12.611 s, estimated 41 s
+Ran all test suites within paths "src/features/sections/business-profile-write.test.ts", "src/features/sections/use-business-profile.test.tsx", "src/features/sections/business-profile-review.test.tsx", "src/features/sections/business-profile-contract.test.ts", "src/features/sections/BusinessProfileEditor.test.tsx".

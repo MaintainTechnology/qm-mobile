@@ -20,34 +20,24 @@ import { useSignUp } from '@clerk/expo/legacy';
 import { useQueryClient } from '@tanstack/react-query';
 import * as Linking from 'expo-linking';
 import { type Href, useLocalSearchParams, useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Pressable, ScrollView, StyleSheet, Text, View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { z } from 'zod';
+import { activationBearerToken } from './activation-session';
+import { usePhoneReadiness } from './use-phone-readiness';
 
 import { BrandMark } from '@/components/BrandMark';
 import {
   acquisitionPostAuthDestination,
   loadAcquisitionEnvelope,
-  saveAcquisitionEnvelope,
   type AcquisitionEnvelope,
-  withAcquisitionProvisioningReceipt,
 } from '@/features/auth/acquisition-envelope';
 import { AUTH_GUTTER, PrimaryCta } from '@/features/auth/ui';
 import { formatAuMobileDisplay } from '@/features/auth/onboard-fields';
 import { ownerTestSmsHref, trustedSuccessState } from '@/features/auth/success-adapter';
-import { apiErrorMessage, apiRequest } from '@/lib/api';
 import { fonts, radius, spacing, touch, type } from '@/lib/theme';
 import { TENANT_ME_KEY } from '@/lib/tenant';
 import { useTheme } from '@/lib/useTheme';
-
-const RetryProvisionResponse = z.looseObject({
-  ok: z.boolean(),
-  phoneNumber: z.string().nullish(),
-  warning: z.string().nullish(),
-  error: z.string().nullish(),
-  setupComplete: z.boolean().optional(),
-});
 
 export function SuccessScreen() {
   const { colors } = useTheme();
@@ -74,31 +64,53 @@ export function SuccessScreen() {
   // `phone`, `warning`, and `ready` are untrusted route hints. A crafted deep
   // link must not manufacture success copy or an SMS CTA; the values below
   // hydrate only from the account-bound response receipt or a fresh retry.
-  const [phoneNumber, setPhoneNumber] = useState<string | null>(null);
-  const [warning, setWarning] = useState<string | null>(null);
-  const [setupComplete, setSetupComplete] = useState(false);
-  const [hasReceipt, setHasReceipt] = useState(false);
+  const [savedReceipt, setHasReceipt] = useState(false);
   const [receiptChecked, setReceiptChecked] = useState(false);
-  const [retrying, setRetrying] = useState(false);
-  const [retryError, setRetryError] = useState<string | null>(null);
   const [smsError, setSmsError] = useState<string | null>(null);
   const [opening, setOpening] = useState(false);
   const [openError, setOpenError] = useState<string | null>(null);
   const pendingSession = pendingSessionId
     ? sessions?.find(session => session.id === pendingSessionId)
     : undefined;
-  const receiptOwnerId =
-    activeUserId ?? pendingSession?.user?.id ?? pendingSession?.publicUserData.userId ?? null;
+  const receiptOwnerId = pendingSessionId
+    ? (pendingSession?.user?.id ?? pendingSession?.publicUserData.userId ?? null)
+    : (activeUserId ?? null);
+  const ownerKey = receiptOwnerId
+    ? `${receiptOwnerId}:${pendingSessionId ?? activeSessionId}`
+    : null;
+  const scope = useMemo(() => ({ active: true, ownerKey }), [ownerKey]);
+  useEffect(() => {
+    scope.active = true;
+    return () => {
+      scope.active = false;
+    };
+  }, [scope]);
+  // A pending owner remains the receipt identity, but an unrelated active
+  // session switch must invalidate already-started reads and OS handoffs.
+  const requestKey = ownerKey ? `${ownerKey}:${activeUserId ?? ''}:${activeSessionId ?? ''}` : null;
+  const requestScope = useMemo(() => ({ active: true, requestKey }), [requestKey]);
+  useEffect(() => {
+    requestScope.active = true;
+    return () => {
+      requestScope.active = false;
+    };
+  }, [requestScope]);
+  const phone = usePhoneReadiness({ ownerKey: requestKey, getToken: tokenForRequest });
+  const hasReceipt = savedReceipt || phone.data !== undefined;
+  const phoneNumber = phone.data?.phoneNumber ?? null;
+  const setupComplete = phone.data?.setupComplete === true;
+  const retrying = phone.busy;
+  const retryError = phone.error;
   const smsHref = ownerTestSmsHref(phoneNumber, setupComplete);
   const lineReady = smsHref !== null;
   const statusWarning =
-    warning ??
+    phone.data?.message ??
     (!receiptChecked
       ? 'Confirming the saved provisioning result for this account…'
       : !hasReceipt
-        ? 'Could not confirm a saved activation result. Retry with your authenticated session.'
+        ? 'Could not confirm a saved activation result. Check status with your authenticated session.'
         : !lineReady
-          ? 'Your dedicated number is still being provisioned. You can open the dashboard and retry here later.'
+          ? 'Your dedicated number is not ready. Check status before starting any further setup.'
           : null);
   const statusLabel = !receiptChecked
     ? 'CHECKING ACCOUNT'
@@ -123,18 +135,15 @@ export function SuccessScreen() {
   useEffect(() => {
     setReceiptChecked(false);
     setHasReceipt(false);
-    setPhoneNumber(null);
-    setWarning(null);
-    setSetupComplete(false);
-    if (!receiptOwnerId) return;
+    if (!receiptOwnerId) {
+      setReceiptChecked(true);
+      return;
+    }
     let cancelled = false;
     void loadAcquisitionEnvelope({ clerkUserId: receiptOwnerId })
       .then(envelope => {
         if (cancelled) return;
         const trusted = trustedSuccessState(envelope);
-        setPhoneNumber(trusted.phoneNumber);
-        setWarning(trusted.warning);
-        setSetupComplete(trusted.setupComplete);
         setHasReceipt(trusted.hasReceipt);
       })
       .catch(() => {
@@ -151,63 +160,16 @@ export function SuccessScreen() {
   /** A token for the pending (not-yet-active) session, or the live one if this screen was
    *  reached already signed in (the A2 resume-entry path, whose session is active throughout). */
   async function tokenForRequest(): Promise<string | undefined> {
-    if (activeSessionId) return (await getToken()) ?? undefined;
-    const session = pendingSessionId ? sessions?.find(s => s.id === pendingSessionId) : undefined;
-    return session ? ((await session.getToken()) ?? undefined) : undefined;
+    return activationBearerToken({
+      sessionId: pendingSessionId,
+      activeSessionId,
+      sessions: sessions ?? [],
+      getActiveToken: getToken,
+    });
   }
 
   async function retry() {
-    if (retrying) return;
-    setRetrying(true);
-    setRetryError(null);
-    try {
-      const token = await tokenForRequest();
-      if (!token) {
-        setRetryError('Not signed in on this screen anymore. Open the dashboard below instead.');
-        return;
-      }
-      const res = await apiRequest('/api/onboard/retry-provision', RetryProvisionResponse, {
-        method: 'POST',
-        token,
-        // Provisions a phone number — same budget as the activation call itself.
-        timeoutMs: 120000,
-      });
-      const nextPhoneNumber = res.phoneNumber ?? null;
-      const nextSetupComplete = res.setupComplete === true;
-      setSetupComplete(nextSetupComplete);
-      setPhoneNumber(nextPhoneNumber);
-      setHasReceipt(true);
-      setReceiptChecked(true);
-      if (ownerTestSmsHref(nextPhoneNumber, nextSetupComplete)) {
-        setWarning(null);
-      } else {
-        setWarning(res.warning ?? res.error ?? 'Still not ready — try again shortly.');
-      }
-      if (receiptOwnerId) {
-        try {
-          const current = await loadAcquisitionEnvelope({ clerkUserId: receiptOwnerId });
-          if (current) {
-            await saveAcquisitionEnvelope(
-              withAcquisitionProvisioningReceipt(current, {
-                setupComplete: nextSetupComplete,
-                phoneNumber: nextPhoneNumber,
-                warning: res.warning ?? res.error,
-              }),
-            );
-          }
-        } catch {
-          setRetryError(
-            'The latest result is available now but could not be saved for the next app restart.',
-          );
-        }
-      }
-    } catch (err) {
-      setRetryError(
-        apiErrorMessage(err, 'Could not reach QuoteMax. Check your signal and try again.'),
-      );
-    } finally {
-      setRetrying(false);
-    }
+    await phone.refresh();
   }
 
   async function openOwnerTestSms() {
@@ -218,12 +180,15 @@ export function SuccessScreen() {
     }
     try {
       if (!(await Linking.canOpenURL(smsHref))) {
+        if (!requestScope.active) return;
         setSmsError('No SMS app is available on this device.');
         return;
       }
+      if (!requestScope.active) return;
       await Linking.openURL(smsHref);
     } catch {
-      setSmsError('Could not open your SMS app. Try again from this device.');
+      if (requestScope.active)
+        setSmsError('Could not open your SMS app. Try again from this device.');
     }
   }
 
@@ -236,8 +201,9 @@ export function SuccessScreen() {
       const pendingSession = pendingSessionId
         ? sessions?.find(session => session.id === pendingSessionId)
         : undefined;
-      const destinationOwnerId =
-        activeUserId ?? pendingSession?.user?.id ?? pendingSession?.publicUserData.userId ?? null;
+      const destinationOwnerId = receiptOwnerId;
+      if (!destinationOwnerId || (pendingSessionId && !pendingSession))
+        throw new Error('Session unavailable');
       let acquisition: AcquisitionEnvelope | null = null;
       if (destinationOwnerId) {
         try {
@@ -247,19 +213,23 @@ export function SuccessScreen() {
           // activated account from reaching the dashboard.
         }
       }
+      if (!scope.active || !requestScope.active) return;
       const destination = acquisitionPostAuthDestination(acquisition) as Href;
-      if (!activeSessionId && pendingSessionId && isLoaded && setActive) {
+      if (pendingSessionId && activeSessionId !== pendingSessionId) {
+        if (!isLoaded || !setActive) throw new Error('Session unavailable');
         await setActive({ session: pendingSessionId });
       }
+      if (!scope.active) return;
       // The (tabs) guard's own useTenantMe() query may still be caching activation's own
       // pre-activate 404 from earlier in this session — clear it so the dashboard fetches fresh
       // rather than reading "no tenant" and bouncing straight back into the wizard.
       queryClient.removeQueries({ queryKey: TENANT_ME_KEY });
       router.replace(destination);
     } catch {
-      setOpenError("Couldn't open the dashboard — check your signal and tap again.");
+      if (scope.active)
+        setOpenError("Couldn't open the dashboard — check your signal and tap again.");
     } finally {
-      setOpening(false);
+      if (scope.active) setOpening(false);
     }
   }
 
@@ -305,7 +275,9 @@ export function SuccessScreen() {
               {smsHref ? (
                 <Pressable
                   accessibilityRole="link"
-                  onPress={openOwnerTestSms}
+                  onPress={() => {
+                    void openOwnerTestSms();
+                  }}
                   hitSlop={8}
                   style={({ pressed }) => [styles.smsLinkRow, { opacity: pressed ? 0.6 : 1 }]}
                 >
@@ -342,7 +314,7 @@ export function SuccessScreen() {
             {receiptChecked ? (
               <Pressable
                 accessibilityRole="button"
-                accessibilityLabel="Retry provisioning"
+                accessibilityLabel="Check phone setup"
                 accessibilityState={{ disabled: retrying, busy: retrying }}
                 onPress={retry}
                 disabled={retrying}
@@ -356,10 +328,19 @@ export function SuccessScreen() {
                 ]}
               >
                 <Text style={[styles.retryLabel, { color: colors.textPri }]}>
-                  {retrying ? 'RETRYING…' : 'RETRY PROVISIONING'}
+                  {retrying ? 'CHECKING…' : 'CHECK PHONE SETUP'}
                 </Text>
               </Pressable>
             ) : null}
+            {phone.data?.retryable && (
+              <PrimaryCta
+                label="Start phone setup"
+                disabled={retrying}
+                onPress={() => {
+                  void phone.start();
+                }}
+              />
+            )}
             {retryError ? (
               <Text style={[styles.retryError, { color: colors.dangerBright }]}>{retryError}</Text>
             ) : null}

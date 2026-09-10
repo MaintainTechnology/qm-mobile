@@ -1,0 +1,12 @@
+PASS src/features/studio/StudioScreen.test.tsx (17.754 s)
+PASS src/features/studio/studio-render.test.ts (13.121 s)
+PASS src/features/studio/studio-pdf.test.ts
+PASS src/features/studio/studio-contract.test.ts
+PASS src/features/studio/studio-share.test.ts
+PASS src/features/studio/studio-export-cache.test.ts
+
+Test Suites: 6 passed, 6 total
+Tests:       35 passed, 35 total
+Snapshots:   0 total
+Time:        37.413 s
+Ran all test suites matching /src\\features\\studio/i.

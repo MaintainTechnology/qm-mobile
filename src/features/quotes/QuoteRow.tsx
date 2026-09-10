@@ -10,24 +10,23 @@ import type { QuoteRow as QuoteRowData } from '@/lib/tenant';
 import { fonts, radius, spacing, touch } from '@/lib/theme';
 import { useTheme } from '@/lib/useTheme';
 
-import { customerLabel, formatJobType, quoteAge, quoteBadge, type QuoteTone } from './status';
+import { customerLabel, formatJobType, quoteAge, quoteBadges, type QuoteTone } from './status';
 
 export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () => void }) {
   const { colors } = useTheme();
-  const badge = quoteBadge(quote);
+  const badges = quoteBadges(quote);
   const toneColor: Record<QuoteTone, string> = {
     ok: colors.successBright,
     warn: colors.warningBright,
     dim: colors.textDim,
   };
-  const tone = toneColor[badge.tone];
   const amount =
     quote.total_inc_gst == null ? null : formatAud(centsFromApiDollars(quote.total_inc_gst));
 
   return (
     <Pressable
       accessibilityRole="button"
-      accessibilityLabel={`${customerLabel(quote)}, ${badge.label}${amount ? `, ${amount}` : ''}`}
+      accessibilityLabel={`${customerLabel(quote)}, ${badges.map(badge => badge.label).join(', ')}${amount ? `, ${amount}` : ''}`}
       accessibilityHint="Opens the quote for review"
       onPress={onPress}
       style={({ pressed }) => [
@@ -58,8 +57,12 @@ export function QuoteRow({ quote, onPress }: { quote: QuoteRowData; onPress: () 
         {quote.suburb ? ` · ${quote.suburb}` : ''}
       </Text>
       <View style={styles.bottomRow}>
-        <View style={[styles.chip, { borderColor: tone }]}>
-          <Text style={[styles.chipText, { color: tone }]}>{badge.label}</Text>
+        <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: spacing.xs }}>
+          {badges.map(badge => (
+            <View key={badge.label} style={[styles.chip, { borderColor: toneColor[badge.tone] }]}>
+              <Text style={[styles.chipText, { color: toneColor[badge.tone] }]}>{badge.label}</Text>
+            </View>
+          ))}
         </View>
         <Text style={[styles.meta, { color: colors.textDim }]}>
           {quote.channel ? `${quote.channel === 'voice' ? 'Voice' : 'SMS'} · ` : ''}

@@ -71,11 +71,12 @@ describe('quote action outcomes', () => {
     });
   });
 
-  it('claims delivery only when the server explicitly returns status sent', () => {
-    expect(quoteActionNotice({ ok: true, status: 'sent' }, 'approve')).toEqual({
-      kind: 'sent',
-      message: 'Approved and sent.',
+  it('distinguishes provider acceptance from delivery and a bare sent status', () => {
+    expect(quoteActionNotice({ ok: true, status: 'sent', accepted: true }, 'approve')).toEqual({
+      kind: 'provider_accepted',
+      message: 'Approved. The provider accepted the message; customer delivery is not yet confirmed.',
     });
+    expect(quoteActionNotice({ ok: true, status: 'sent' }, 'approve').kind).toBe('reconciled');
     expect(quoteActionNotice({ ok: true }, 'send')).toEqual({
       kind: 'reconciled',
       message:

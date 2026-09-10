@@ -27,7 +27,10 @@ export function trustedSuccessState(
     hasReceipt: receipt !== undefined,
     phoneNumber: receipt?.phoneNumber ?? null,
     warning: receipt?.warning ?? null,
-    setupComplete: receipt?.setupComplete === true,
+    // A legacy setupComplete flag alone did not distinguish stubs/routing.
+    setupComplete:
+      receipt?.phoneReadiness?.setupComplete === true &&
+      receipt.phoneNumber === receipt.phoneReadiness.phoneNumber,
   };
 }
 
@@ -37,7 +40,8 @@ export function trustedDedicatedNumber(
 ): string | null {
   if (!setupComplete || !phoneNumber) return null;
   const compact = phoneNumber.replace(/\s+/g, '');
-  return /^\+614\d{8}$/.test(compact) ? compact : null;
+  // The provider also provisions SMS-capable Australian local numbers.
+  return /^\+[1-9]\d{7,14}$/.test(compact) ? compact : null;
 }
 
 export function ownerTestSmsHref(

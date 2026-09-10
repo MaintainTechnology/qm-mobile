@@ -1,0 +1,44 @@
+// Real server renderer and real native PDF composer. Only owner auth is mocked;
+// no HTTP/provider/live tenant access. This is local output proof, not device QA.
+import { PNG } from 'C:/Users/dalig/Downloads/QuoteMate/quoteMate/quotemate-automation/node_modules/pngjs/lib/png.js';
+import { writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
+import { DEFAULT_CAROUSEL } from '../../../../src/features/studio/studio-presets.ts';
+import { createStudioPdf } from '../../../../src/features/studio/studio-pdf.ts';
+import { studioRenderBody } from '../../../../src/features/studio/studio-contract.ts';
+vi.mock('@/lib/marketing/auth', () => ({ tenantFromBearer: async () => ({ id: 'isolated-fixture-owner' }) }));
+import { POST } from '@/app/api/studio/render/route';
+
+it('exports the five actual offline slide renders through the native PDF composer', async () => {
+  const output = 'C:/Users/dalig/Desktop/MaintainTech/MaintainOrg/qm-mobile/specs/audits/evidence/studio-c24/';
+  const nativeFetch = globalThis.fetch;
+  const network = vi.fn();
+  vi.stubGlobal('fetch', (input, init) => {
+    const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
+    if (url.startsWith('data:application/octet-stream;base64,')) return nativeFetch(input, init);
+    network(url); return Promise.reject(new Error('Network disabled in Studio fixture'));
+  });
+  const pages = [];
+  try {
+    const pdf = await createStudioPdf(DEFAULT_CAROUSEL, async (slide, index) => {
+      const response = await POST(new Request('https://app.invalid/api/studio/render', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: studioRenderBody(slide),
+      }));
+      expect(response.status).toBe(200);
+      const bytes = new Uint8Array(await response.arrayBuffer());
+      const png = PNG.sync.read(Buffer.from(bytes));
+      expect([png.width, png.height]).toEqual([1080, 1350]);
+      const file = `slide-${index + 1}-${slide.kind}.png`;
+      writeFileSync(output + file, bytes);
+      pages.push({ index: index + 1, kind: slide.kind, file, width: png.width, height: png.height,
+        photo: slide.photo?.src ?? null, sha256: createHash('sha256').update(bytes).digest('hex') });
+      return bytes;
+    });
+    expect(network).not.toHaveBeenCalled();
+    writeFileSync(output + 'quotemax-carousel.pdf', pdf);
+    writeFileSync(output + 'render-evidence.json', JSON.stringify({ networkCalls: network.mock.calls.length,
+      ownerAuth: 'isolated fixture', renderer: 'actual Next ImageResponse plus bundled fonts and approved gallery',
+      composer: 'actual mobile createStudioPdf with pdf-lib 1.17.1', deviceProof: false,
+      pages, pdfBytes: pdf.length, pdfSha256: createHash('sha256').update(pdf).digest('hex') }, null, 2));
+  } finally { vi.unstubAllGlobals(); }
+});
